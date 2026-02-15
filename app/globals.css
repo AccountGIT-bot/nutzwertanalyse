@@ -24,9 +24,9 @@
 
 /* BUSINESS */
 [data-theme="business"] {
-  --accent: 245 158 11;
-  --accent-2: 168 85 247;
-  --glow: 217 70 239;
+  --accent: 245 158 11;      /* Gold dominant */
+  --accent-2: 168 85 247;    /* Violett sekundär */
+  --glow: 245 158 11;        /* Glow bleibt Gold */
 }
 
 body {
@@ -40,4 +40,27 @@ body {
     radial-gradient(900px 500px at 20% 10%, rgb(var(--glow) / 0.12), transparent 60%),
     radial-gradient(700px 500px at 80% 30%, rgb(var(--accent-2) / 0.10), transparent 60%),
     linear-gradient(180deg, rgb(var(--bg-1)), rgb(var(--bg-2)));
+}
+.themed-bg {
+  position: relative;
+  overflow-x: hidden;
+}
+
+.themed-bg::before {
+  content: "";
+  position: fixed;
+  inset: -40px;
+  pointer-events: none;
+  background:
+    radial-gradient(900px 500px at 20% 10%, rgb(var(--glow) / 0.14), transparent 60%),
+    radial-gradient(700px 500px at 80% 30%, rgb(var(--accent-2) / 0.12), transparent 60%);
+  filter: blur(0px);
+  animation: floatGlow 10s ease-in-out infinite;
+  opacity: 0.9;
+}
+
+@keyframes floatGlow {
+  0%   { transform: translate3d(0, 0, 0) scale(1); }
+  50%  { transform: translate3d(10px, -12px, 0) scale(1.02); }
+  100% { transform: translate3d(0, 0, 0) scale(1); }
 }
