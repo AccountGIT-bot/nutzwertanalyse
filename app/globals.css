@@ -1,10 +1,13 @@
 @import "tailwindcss";
 
+/* Default (falls noch kein Theme gesetzt ist) */
 :root {
   --accent: 37 99 235;
   --accent-2: 59 130 246;
+
   --bg-1: 2 6 23;
   --bg-2: 15 23 42;
+
   --glow: 56 189 248;
 }
 
@@ -13,6 +16,9 @@
   --accent: 37 99 235;
   --accent-2: 59 130 246;
   --glow: 56 189 248;
+
+  --bg-1: 2 6 23;
+  --bg-2: 15 23 42;
 }
 
 /* ADVANCED */
@@ -20,13 +26,20 @@
   --accent: 16 185 129;
   --accent-2: 45 212 191;
   --glow: 34 211 238;
+
+  --bg-1: 2 6 23;
+  --bg-2: 12 24 30;
 }
 
-/* BUSINESS */
+/* BUSINESS (Gold dominiert, Violett nur als Akzent) */
 [data-theme="business"] {
-  --accent: 245 158 11;      /* Gold dominant */
-  --accent-2: 168 85 247;    /* Violett sekundär */
-  --glow: 245 158 11;        /* Glow bleibt Gold */
+  --accent: 245 158 11;   /* Gold */
+  --accent-2: 168 85 247; /* Violett */
+  --glow: 251 191 36;     /* warmes Gold-Glow */
+
+  /* leicht wärmerer Unterton, aber sehr subtil */
+  --bg-1: 7 6 18;
+  --bg-2: 14 14 28;
 }
 
 body {
@@ -34,33 +47,58 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
+/* ===== Global Themed Background ===== */
 .themed-bg {
   min-height: 100vh;
-  background:
-    radial-gradient(900px 500px at 20% 10%, rgb(var(--glow) / 0.12), transparent 60%),
-    radial-gradient(700px 500px at 80% 30%, rgb(var(--accent-2) / 0.10), transparent 60%),
-    linear-gradient(180deg, rgb(var(--bg-1)), rgb(var(--bg-2)));
-}
-.themed-bg {
   position: relative;
   overflow-x: hidden;
+
+  background:
+    linear-gradient(180deg, rgb(var(--bg-1)), rgb(var(--bg-2)));
 }
 
+/* Glow-Layer */
 .themed-bg::before {
   content: "";
   position: fixed;
-  inset: -40px;
+  inset: 0;
   pointer-events: none;
+  z-index: -1;
+
   background:
-    radial-gradient(900px 500px at 20% 10%, rgb(var(--glow) / 0.14), transparent 60%),
-    radial-gradient(700px 500px at 80% 30%, rgb(var(--accent-2) / 0.12), transparent 60%);
-  filter: blur(0px);
-  animation: floatGlow 10s ease-in-out infinite;
-  opacity: 0.9;
+    radial-gradient(900px 520px at 18% 12%, rgb(var(--glow) / 0.14), transparent 60%),
+    radial-gradient(760px 520px at 82% 28%, rgb(var(--accent-2) / 0.10), transparent 60%),
+    radial-gradient(620px 420px at 55% 90%, rgb(var(--accent) / 0.08), transparent 60%);
+  filter: saturate(1.05);
 }
 
-@keyframes floatGlow {
-  0%   { transform: translate3d(0, 0, 0) scale(1); }
-  50%  { transform: translate3d(10px, -12px, 0) scale(1.02); }
-  100% { transform: translate3d(0, 0, 0) scale(1); }
+/* Motion-Layer (sehr subtil) */
+.themed-bg::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: -1;
+
+  background:
+    radial-gradient(800px 420px at 30% 20%, rgb(var(--accent) / 0.10), transparent 60%),
+    radial-gradient(740px 420px at 70% 55%, rgb(var(--accent-2) / 0.08), transparent 60%);
+  opacity: 0.9;
+
+  transform: translate3d(0, 0, 0);
+  animation: bg-drift 14s ease-in-out infinite;
+}
+
+/* leichte Bewegung im Gradient */
+@keyframes bg-drift {
+  0%   { transform: translate3d(0px, 0px, 0) scale(1); }
+  50%  { transform: translate3d(16px, -10px, 0) scale(1.02); }
+  100% { transform: translate3d(0px, 0px, 0) scale(1); }
+}
+
+/* Motion respektieren */
+@media (prefers-reduced-motion: reduce) {
+  .themed-bg::after {
+    animation: none;
+  }
 }

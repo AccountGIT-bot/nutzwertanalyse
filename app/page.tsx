@@ -104,7 +104,12 @@ export default function Home() {
               onClick={() => choose(m.id)}
               onMouseEnter={() => preview(m.id)}
               onMouseLeave={restore}
-              className="group relative overflow-hidden rounded-2xl border border-white/10 bg-white/5 p-8 text-left transition duration-300 hover:bg-white/10"
+              className={[
+                "group relative overflow-hidden rounded-2xl border border-white/10 bg-white/5 p-8 text-left",
+                "transition duration-300 ease-out",
+                "hover:bg-white/10 hover:-translate-y-1 hover:shadow-2xl hover:shadow-black/30",
+                "active:translate-y-0",
+              ].join(" ")}
             >
               {/* Card-Glow (pro Karte, unabhängig vom globalen Theme) */}
               <div
@@ -138,7 +143,7 @@ export default function Home() {
 
                 <div className="mt-10">
                   <div
-                    className="inline-flex items-center gap-2 rounded-full px-5 py-2 text-sm font-medium transition"
+                    className="inline-flex items-center gap-2 rounded-full px-5 py-2 text-sm font-medium transition group-hover:scale-[1.02]"
                     style={{
                       background: `rgb(${m.accent} / 0.15)`,
                       color: `rgb(${m.accent})`,
@@ -170,11 +175,12 @@ export default function Home() {
         })}
       </div>
 
-      {/* Next steps (charmant, kurz, ohne Technik) */}
+      {/* Next steps (charmant, kurz) */}
       <div className="mt-12 text-center">
         <div className="mx-auto inline-flex flex-wrap justify-center gap-x-6 gap-y-2 rounded-full border border-white/10 bg-white/5 px-5 py-3 text-xs text-white/65">
           <span>
-            Als nächstes: <span className="text-white/80">subtilerer BUSINESS-Background</span>
+            Als nächstes:{" "}
+            <span className="text-white/80">subtilerer BUSINESS-Background</span>
           </span>
           <span className="hidden sm:inline text-white/20">•</span>
           <span>
