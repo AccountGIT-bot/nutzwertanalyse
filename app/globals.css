@@ -8,22 +8,22 @@
   --glow: 56 189 248;
 }
 
-/* Basic */
+/* BASIC */
 [data-theme="basic"] {
   --accent: 37 99 235;
   --accent-2: 59 130 246;
   --glow: 56 189 248;
 }
 
-/* Pro */
-[data-theme="pro"] {
+/* ADVANCED */
+[data-theme="advanced"] {
   --accent: 16 185 129;
   --accent-2: 45 212 191;
   --glow: 34 211 238;
 }
 
-/* Premium */
-[data-theme="premium"] {
+/* BUSINESS */
+[data-theme="business"] {
   --accent: 245 158 11;
   --accent-2: 168 85 247;
   --glow: 217 70 239;
