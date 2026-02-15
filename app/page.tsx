@@ -91,14 +91,6 @@ export default function Home() {
           KI-Unterstützung, Visualisierung und Reportumfang unterscheiden sich.
           Damit funktioniert es als B2C-Tool, B2B-Standard und Beratungsbasis.
         </p>
-
-        <div className="mt-8 mx-auto inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-xs text-white/70">
-          <span
-            className="h-2 w-2 rounded-full"
-            style={{ background: `rgb(var(--accent))` }}
-          />
-          Eine Methode – drei Tiefen
-        </div>
       </div>
 
       {/* Cards */}
@@ -114,7 +106,7 @@ export default function Home() {
               onMouseLeave={restore}
               className="group relative overflow-hidden rounded-2xl border border-white/10 bg-white/5 p-8 text-left transition duration-300 hover:bg-white/10"
             >
-              {/* Subtiler Card-Glow (nur optisch, nicht Theme-abhängig) */}
+              {/* Card-Glow (pro Karte, unabhängig vom globalen Theme) */}
               <div
                 className="absolute inset-0 opacity-0 transition duration-300 group-hover:opacity-100"
                 style={{
@@ -176,6 +168,23 @@ export default function Home() {
             </button>
           );
         })}
+      </div>
+
+      {/* Next steps (charmant, kurz, ohne Technik) */}
+      <div className="mt-12 text-center">
+        <div className="mx-auto inline-flex flex-wrap justify-center gap-x-6 gap-y-2 rounded-full border border-white/10 bg-white/5 px-5 py-3 text-xs text-white/65">
+          <span>
+            Als nächstes: <span className="text-white/80">subtilerer BUSINESS-Background</span>
+          </span>
+          <span className="hidden sm:inline text-white/20">•</span>
+          <span>
+            <span className="text-white/80">leichte Bewegung</span> im Gradient
+          </span>
+          <span className="hidden sm:inline text-white/20">•</span>
+          <span>
+            <span className="text-white/80">Micro-Animationen</span> bei Karten
+          </span>
+        </div>
       </div>
     </main>
   );
