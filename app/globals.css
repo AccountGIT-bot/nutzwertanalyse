@@ -142,3 +142,76 @@ body {
   border-color: #00736a;
   box-shadow: 0 0 0 4px rgba(0,115,106,0.15);
 }
+
+/* ------------------------------
+   Landing (Route "/") – Light UI
+   Accent: #00736a
+-------------------------------- */
+
+:root {
+  --landing-accent: 0 115 106; /* #00736a */
+}
+
+.landing-bg {
+  min-height: 100vh;
+  background: radial-gradient(900px 600px at 30% 20%, rgba(0,115,106,0.22), transparent 55%),
+              linear-gradient(180deg, #fbfbfb, #eef1f1);
+}
+
+.landing-hex {
+  position: relative;
+  overflow: hidden;
+}
+
+.landing-hex::after {
+  content: "";
+  position: absolute;
+  inset: -10%;
+  background-image:
+    linear-gradient(rgba(0,0,0,0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,0,0,0.06) 1px, transparent 1px);
+  background-size: 64px 64px;
+  opacity: 0.10;
+  transform: skewX(-8deg);
+  pointer-events: none;
+}
+
+.landing-pill {
+  background: rgba(255,255,255,0.65);
+  border: 1px solid rgba(0,0,0,0.12);
+  border-radius: 999px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.12);
+  backdrop-filter: blur(10px);
+}
+
+.landing-input {
+  background: transparent;
+  outline: none;
+  color: rgba(0,0,0,0.75);
+}
+
+.landing-input::placeholder {
+  color: rgba(0,115,106,0.75);
+  letter-spacing: 0.08em;
+}
+
+.landing-start {
+  background: #00736a;
+  color: white;
+  border-radius: 999px;
+}
+
+.landing-btn {
+  background: rgba(255,255,255,0.70);
+  border: 1px solid rgba(0,0,0,0.10);
+  border-radius: 999px;
+  box-shadow: 0 12px 30px rgba(0,0,0,0.10);
+}
+
+.landing-login-card {
+  background: rgba(255,255,255,0.55);
+  border: 1px solid rgba(0,0,0,0.10);
+  border-radius: 20px;
+  box-shadow: 0 24px 80px rgba(0,0,0,0.18);
+  backdrop-filter: blur(12px);
+}

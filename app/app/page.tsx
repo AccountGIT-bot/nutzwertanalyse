@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
 type Theme = "basic" | "advanced" | "business";
+type PackageLevel = "basic" | "advanced" | "business";
 
 const MODELS = [
   {
@@ -53,12 +54,20 @@ const MODELS = [
   },
 ];
 
-export default function Home() {
+function getSavedTheme(): Theme {
+  try {
+    return (localStorage.getItem("nwa_theme") as Theme | null) ?? "basic";
+  } catch {
+    return "basic";
+  }
+}
+
+export default function PackageSelect() {
+  const router = useRouter();
   const [selected, setSelected] = useState<Theme>("basic");
-  const router = useRouter(); // ✅ 2.2
 
   useEffect(() => {
-    const saved = (localStorage.getItem("nwa_theme") as Theme | null) ?? "basic";
+    const saved = getSavedTheme();
     setSelected(saved);
     document.documentElement.dataset.theme = saved;
   }, []);
@@ -68,42 +77,36 @@ export default function Home() {
   }
 
   function restore() {
-    const saved = (localStorage.getItem("nwa_theme") as Theme | null) ?? "basic";
-    document.documentElement.dataset.theme = saved;
+    document.documentElement.dataset.theme = getSavedTheme();
   }
 
   function choose(theme: Theme) {
-    // ✅ 2.3: Theme & packageLevel trennen, Navigation via Router
-    setSelected(theme);
+    const packageLevel: PackageLevel = theme;
 
-    // Visuell
+    setSelected(theme);
     localStorage.setItem("nwa_theme", theme);
+    localStorage.setItem("nwa_packageLevel", packageLevel);
     document.documentElement.dataset.theme = theme;
 
-    // Methodisch (für MVP gleich wie Theme, aber eigener Key)
-    localStorage.setItem("nwa_packageLevel", theme);
-
-    router.push("/new"); // ✅ kein Full Reload
+    router.push("/new");
   }
 
   return (
-    <main className="mx-auto max-w-6xl px-6 py-16 text-white">
-      {/* Header */}
-      <div className="mb-14 text-center">
-        <h1 className="text-5xl font-semibold tracking-tight">
+    <main className="mx-auto max-w-6xl px-5 sm:px-6 py-12 sm:py-16 text-white">
+      <div className="mb-10 sm:mb-14 text-center">
+        <h1 className="text-4xl sm:text-5xl font-semibold tracking-tight">
           Nutzwertanalyse
           <span style={{ color: `rgb(var(--accent))` }}>.</span>
         </h1>
 
-        <p className="mt-6 max-w-3xl mx-auto text-white/70 text-lg leading-relaxed">
+        <p className="mt-5 sm:mt-6 max-w-3xl mx-auto text-white/70 text-base sm:text-lg leading-relaxed">
           Skalierbares Modell: Der Ablauf bleibt immer gleich – nur Tiefe,
           KI-Unterstützung, Visualisierung und Reportumfang unterscheiden sich.
           Damit funktioniert es als B2C-Tool, B2B-Standard und Beratungsbasis.
         </p>
       </div>
 
-      {/* Cards */}
-      <div className="grid gap-8 md:grid-cols-3">
+      <div className="grid gap-6 sm:gap-8 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
         {MODELS.map((m) => {
           const active = selected === m.id;
 
@@ -113,14 +116,18 @@ export default function Home() {
               onClick={() => choose(m.id)}
               onMouseEnter={() => preview(m.id)}
               onMouseLeave={restore}
+              onFocus={() => preview(m.id)}
+              onBlur={restore}
+              onTouchStart={() => preview(m.id)}
               className={[
-                "group relative overflow-hidden rounded-2xl border border-white/10 bg-white/5 p-8 text-left",
+                "group relative overflow-hidden rounded-2xl border border-white/10 bg-white/5",
+                "p-7 sm:p-8 text-left",
                 "transition duration-300 ease-out",
                 "hover:bg-white/10 hover:-translate-y-1 hover:shadow-2xl hover:shadow-black/30",
                 "active:translate-y-0",
+                "focus:outline-none focus-visible:ring-2 focus-visible:ring-white/20",
               ].join(" ")}
             >
-              {/* Card-Glow (pro Karte, unabhängig vom globalen Theme) */}
               <div
                 className="absolute inset-0 opacity-0 transition duration-300 group-hover:opacity-100"
                 style={{
@@ -150,9 +157,9 @@ export default function Home() {
                   ))}
                 </ul>
 
-                <div className="mt-10">
+                <div className="mt-9 sm:mt-10">
                   <div
-                    className="inline-flex items-center gap-2 rounded-full px-5 py-2 text-sm font-medium transition group-hover:scale-[1.02]"
+                    className="inline-flex w-full sm:w-auto justify-center sm:justify-start items-center gap-2 rounded-full px-5 py-2 text-sm font-medium transition group-hover:scale-[1.02]"
                     style={{
                       background: `rgb(${m.accent} / 0.15)`,
                       color: `rgb(${m.accent})`,
@@ -170,36 +177,15 @@ export default function Home() {
                 </div>
               </div>
 
-              {/* Active Ring */}
               {active && (
                 <div
                   className="absolute inset-0 rounded-2xl pointer-events-none"
-                  style={{
-                    boxShadow: `0 0 0 2px rgb(${m.accent} / 0.45)`,
-                  }}
+                  style={{ boxShadow: `0 0 0 2px rgb(${m.accent} / 0.45)` }}
                 />
               )}
             </button>
           );
         })}
-      </div>
-
-      {/* Next steps (charmant, kurz) */}
-      <div className="mt-12 text-center">
-        <div className="mx-auto inline-flex flex-wrap justify-center gap-x-6 gap-y-2 rounded-full border border-white/10 bg-white/5 px-5 py-3 text-xs text-white/65">
-          <span>
-            Als nächstes:{" "}
-            <span className="text-white/80">subtilerer BUSINESS-Background</span>
-          </span>
-          <span className="hidden sm:inline text-white/20">•</span>
-          <span>
-            <span className="text-white/80">leichte Bewegung</span> im Gradient
-          </span>
-          <span className="hidden sm:inline text-white/20">•</span>
-          <span>
-            <span className="text-white/80">Micro-Animationen</span> bei Karten
-          </span>
-        </div>
       </div>
     </main>
   );
