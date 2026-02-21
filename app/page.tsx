@@ -9,6 +9,7 @@ export default function LandingWithIntro() {
   const router = useRouter();
   const [phase, setPhase] = useState<Phase>("intro");
   const [text, setText] = useState("");
+  const [showPw, setShowPw] = useState(false);
 
   const canStart = useMemo(() => text.trim().length > 0, [text]);
 
@@ -41,7 +42,9 @@ export default function LandingWithIntro() {
         <div
           className={[
             "text-center transition-all duration-700 ease-out",
-            phase === "intro" ? "translate-y-0 scale-100" : "-translate-y-3 scale-[0.98]",
+            phase === "intro"
+              ? "translate-y-0 scale-100"
+              : "-translate-y-3 scale-[0.98]",
           ].join(" ")}
         >
           <div
@@ -67,7 +70,9 @@ export default function LandingWithIntro() {
         {/* Headline */}
         <div className="text-center">
           <h1 className="text-5xl md:text-6xl font-semibold tracking-tight">
-            <span style={{ color: "rgb(var(--landing-accent))" }}>Nutzwertanalyse</span>
+            <span style={{ color: "rgb(var(--landing-accent))" }}>
+              Nutzwertanalyse
+            </span>
             <span style={{ color: "rgb(var(--landing-accent))" }}>.</span>
           </h1>
         </div>
@@ -84,7 +89,11 @@ export default function LandingWithIntro() {
               }}
               aria-hidden="true"
             >
-              <span style={{ color: "rgb(var(--landing-accent))", fontSize: 18 }}>⌁</span>
+              <span
+                style={{ color: "rgb(var(--landing-accent))", fontSize: 18 }}
+              >
+                ⌁
+              </span>
             </div>
 
             <input
@@ -109,47 +118,68 @@ export default function LandingWithIntro() {
           </div>
         </div>
 
-        {/* Lower area: Social + Login card (optisch, später funktional) */}
-        <div className="mt-12 md:mt-16 grid gap-8 md:grid-cols-2 items-end">
-          {/* Social buttons */}
-          <div className="flex flex-col gap-3 md:max-w-sm">
-            <button className="landing-btn px-4 py-3 text-sm font-medium flex items-center justify-center gap-3 transition hover:brightness-[1.02]">
-              <span className="text-lg" aria-hidden="true">G</span>
-              <span>Log in with Google</span>
-            </button>
+        {/* Lower area: Social + Login card (ein Block, zentriert, gleiche Höhe) */}
+        <div className="mt-12 md:mt-16 flex justify-center">
+          <div className="grid w-full max-w-4xl gap-6 md:grid-cols-2 items-stretch">
+            {/* Social buttons */}
+            <div className="flex flex-col justify-center gap-3">
+              <button className="landing-btn w-full">
+                <span className="text-lg" aria-hidden="true">G</span>
+                <span className="text-sm text-black/70">Log in with Google</span>
+              </button>
 
-            <button className="landing-btn px-4 py-3 text-sm font-medium flex items-center justify-center gap-3 transition hover:brightness-[1.02]">
-              <span className="text-lg" aria-hidden="true">f</span>
-              <span>Log in with Facebook</span>
-            </button>
+              <button className="landing-btn w-full">
+                <span className="text-lg" aria-hidden="true">f</span>
+                <span className="text-sm text-black/70">Log in with Facebook</span>
+              </button>
 
-            <button className="landing-btn px-4 py-3 text-sm font-medium flex items-center justify-center gap-3 transition hover:brightness-[1.02]">
-              <span className="text-lg" aria-hidden="true"></span>
-              <span>Log in with Apple</span>
-            </button>
-          </div>
+              <button className="landing-btn w-full">
+                <span className="text-lg" aria-hidden="true"></span>
+                <span className="text-sm text-black/70">Log in with Apple</span>
+              </button>
+            </div>
 
-          {/* Login card */}
-          <div className="md:flex md:justify-end">
-            <div className="landing-login-card w-full md:w-[320px] p-5">
-              <div className="text-center font-semibold text-black/70">Login</div>
+            {/* Login card */}
+            <div className="landing-login-card p-6 flex flex-col justify-center">
+              <div className="text-center text-sm font-semibold text-black/70">
+                Login
+              </div>
 
               <div className="mt-4 space-y-3">
-                <div className="rounded-xl bg-white/60 border border-black/10 px-3 py-2">
-                  <div className="text-[11px] text-black/45">Username</div>
-                  <input className="w-full bg-transparent outline-none text-sm" />
-                </div>
+                <input
+                  className="landing-field w-full"
+                  placeholder="Username"
+                  autoComplete="username"
+                />
 
-                <div className="rounded-xl bg-white/60 border border-black/10 px-3 py-2">
-                  <div className="text-[11px] text-black/45">Password</div>
-                  <input className="w-full bg-transparent outline-none text-sm" type="password" />
+                <div className="relative">
+                  <input
+                    className="landing-field w-full pr-12"
+                    placeholder="Password"
+                    type={showPw ? "text" : "password"}
+                    autoComplete="current-password"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPw((v) => !v)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-black/50 hover:text-black/70"
+                    aria-label={showPw ? "Passwort verbergen" : "Passwort anzeigen"}
+                    title={showPw ? "Passwort verbergen" : "Passwort anzeigen"}
+                  >
+                    {showPw ? "🙈" : "👁️"}
+                  </button>
                 </div>
 
                 <button
-                  className="w-full rounded-full py-2.5 text-sm font-semibold text-white transition"
-                  style={{ background: "rgba(0,0,0,0.55)" }}
+                  className="landing-btn w-full"
+                  style={{
+                    background: "rgba(0,115,106,0.12)",
+                    borderColor: "rgba(0,115,106,0.25)",
+                  }}
                 >
-                  Login
+                  <span className="text-sm" style={{ color: "#00736a" }}>
+                    Login
+                  </span>
                 </button>
 
                 <div className="text-center text-[11px] text-black/45">
