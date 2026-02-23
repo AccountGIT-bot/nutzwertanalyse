@@ -18,7 +18,7 @@ const PRESETS: Array<{
   id: PresetId;
   label: string;
   hint: string;
-  image: string; // path in /public
+  image: string;
 }> = [
   {
     id: "supplier",
@@ -67,7 +67,7 @@ export default function LandingWithIntro() {
   const canStart = useMemo(() => text.trim().length > 0, [text]);
 
   useEffect(() => {
-    const t = setTimeout(() => setPhase("landing"), 2600);
+    const t = setTimeout(() => setPhase("landing"), 3000);
     return () => clearTimeout(t);
   }, []);
 
@@ -92,29 +92,22 @@ export default function LandingWithIntro() {
     goToApp({ draft, preset: p });
   }
 
-  const placeholderText = "WELCHE ENTSCHEIDUNG STEHT HEUTE AN...?";
+  const placeholderText = "WELCHE ENTSCHEIDUNG SOLL HEUTE STRUKTURIERT WERDEN?";
 
   return (
     <main className="relative min-h-screen text-slate-900 overflow-hidden">
       {/* Premium Background */}
       <div className="absolute inset-0 -z-10">
-        {/* Base */}
         <div className="absolute inset-0 bg-gradient-to-b from-[#fbfbfb] via-[#f3f6f6] to-[#eef2f2]" />
-
-        {/* Soft spotlights */}
         <div
           className="absolute inset-0"
           style={{
             background:
-              "radial-gradient(900px 650px at 18% 18%, rgba(0,0,0,0.05), transparent 62%), radial-gradient(850px 600px at 85% 40%, rgba(0,0,0,0.035), transparent 62%), radial-gradient(900px 700px at 50% 110%, rgba(0,0,0,0.06), transparent 70%)",
+              "radial-gradient(900px 650px at 18% 18%, rgba(0,0,0,0.05), transparent 62%), radial-gradient(850px 600px at 85% 40%, rgba(0,0,0,0.035), transparent 62%), radial-gradient(900px 700px at 50% 115%, rgba(0,0,0,0.07), transparent 72%)",
           }}
         />
-
-        {/* Subtle grain + sheen */}
         <div className="absolute inset-0 landing-grain opacity-[0.20]" />
         <div className="absolute inset-0 landing-sheen2 opacity-[0.65]" />
-
-        {/* “Premium” vignette */}
         <div className="absolute inset-0 bg-[radial-gradient(1200px_700px_at_50%_30%,transparent_55%,rgba(0,0,0,0.10)_100%)]" />
       </div>
 
@@ -138,221 +131,293 @@ export default function LandingWithIntro() {
             Nutzwertanalyse<span className="opacity-70">.</span>
           </div>
           <div className="mt-4 text-sm text-black/45">
-            Entscheidungen strukturiert treffen
+            Entscheidungen nachvollziehbar begründen
           </div>
         </div>
       </div>
 
-      {/* LANDING CONTENT */}
-      <div
-        className={[
-          "mx-auto max-w-6xl px-5 sm:px-6",
-          "py-10 sm:py-14 md:py-16",
-          "transition-all duration-700 ease-out",
-          phase === "landing"
-            ? "opacity-100 translate-y-0"
-            : "opacity-0 translate-y-2",
-        ].join(" ")}
-      >
-        {/* Header (oben links) */}
-        <div className="flex items-start justify-between gap-6">
-          <div className="max-w-xl">
-            <div className="inline-flex items-center gap-3">
-              <h1 className="text-4xl sm:text-5xl font-semibold tracking-tight text-slate-900">
-                Nutzwertanalyse<span className="opacity-70">.</span>
-              </h1>
-
-              {/* tiny premium divider */}
-              <div className="hidden sm:block h-[28px] w-px bg-black/10" />
-              <div className="hidden sm:block text-xs tracking-[0.28em] uppercase text-black/40">
-                Decision Studio
+      {/* PAGE LAYOUT: Header / Content / Footer */}
+      <div className="relative min-h-screen flex flex-col">
+        {/* Header */}
+        <header className="h-[64px] sm:h-[72px] shrink-0">
+          <div className="mx-auto max-w-6xl px-5 sm:px-6 h-full flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="h-10 w-10 rounded-2xl bg-black/5 border border-black/10 grid place-items-center">
+                <span className="text-black/70 text-lg">⌁</span>
+              </div>
+              <div className="leading-tight">
+                <div className="text-sm sm:text-base font-semibold tracking-tight text-slate-900">
+                  Nutzwertanalyse
+                  <span className="opacity-60">.tool</span>
+                </div>
+                <div className="text-[11px] sm:text-xs text-black/45">
+                  Decision documentation • Governance-ready
+                </div>
               </div>
             </div>
 
-            <p className="mt-3 text-sm sm:text-base text-black/50 leading-relaxed">
-              Starte direkt mit deiner Entscheidung oder wähle eine Vorlage.
-              <span className="text-black/40">
-                {" "}
-                Speichern/Export/Account erst später.
-              </span>
-            </p>
+            <nav className="hidden md:flex items-center gap-6 text-sm text-black/55">
+              <a className="hover:text-black/80 transition" href="#ethik">
+                Ethik
+              </a>
+              <a className="hover:text-black/80 transition" href="#vision">
+                Vision
+              </a>
+              <a className="hover:text-black/80 transition" href="#leitfaden">
+                Leitfaden
+              </a>
+              <a className="hover:text-black/80 transition" href="#privacy">
+                Datenschutz
+              </a>
+            </nav>
+
+            <button
+              className="rounded-full px-4 py-2 text-sm font-semibold border border-black/10 bg-white/65 backdrop-blur-md text-black/55 cursor-not-allowed"
+              title="Login folgt später"
+              aria-disabled="true"
+            >
+              Login (später)
+            </button>
           </div>
 
-          {/* optional empty right space for future (login etc.) */}
-          <div className="hidden md:block" />
-        </div>
+          {/* subtle divider */}
+          <div className="h-px bg-black/10" />
+        </header>
 
-        {/* Search + Start */}
-        <div className="mt-8 sm:mt-10 md:mt-12">
-          <div className="w-full max-w-4xl">
-            <div className="relative rounded-[999px] bg-white/72 border border-black/10 shadow-[0_30px_80px_rgba(0,0,0,0.10)] backdrop-blur-md px-3 sm:px-4 py-3 sm:py-4">
-              <div className="flex items-center gap-3 sm:gap-4">
-                {/* icon bubble (neutral, no color) */}
-                <div
-                  className="h-12 w-12 sm:h-14 sm:w-14 shrink-0 rounded-full flex items-center justify-center"
-                  style={{
-                    background: "rgba(0,0,0,0.04)",
-                    border: "1px solid rgba(0,0,0,0.10)",
-                  }}
-                  aria-hidden="true"
-                >
-                  <span className="text-black/60" style={{ fontSize: 18 }}>
-                    ⌁
-                  </span>
-                </div>
+        {/* Content: must fit without scrolling */}
+        <section className="flex-1 min-h-0">
+          <div className="mx-auto max-w-6xl px-5 sm:px-6 h-full flex flex-col">
+            {/* Top copy (compact) */}
+            <div className="pt-5 sm:pt-6">
+              <div className="max-w-3xl">
+                <h1 className="text-3xl sm:text-4xl font-semibold tracking-tight text-slate-900">
+                  Entscheidungen dokumentieren.{" "}
+                  <span className="opacity-70">Nachvollziehbar & auditfähig.</span>
+                </h1>
 
-                {/* input with placeholder overlay */}
-                <div className="relative w-full">
-                  <input
-                    value={text}
-                    onChange={(e) => setText(e.target.value)}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter") startFromInput();
-                    }}
-                    onFocus={() => setIsFocused(true)}
-                    onBlur={() => setIsFocused(false)}
-                    className={[
-                      "w-full bg-transparent outline-none font-medium tracking-wide",
-                      "text-sm sm:text-base",
-                      "placeholder:text-transparent",
-                      "pr-2",
-                    ].join(" ")}
-                    placeholder={placeholderText}
-                    aria-label="Welche Entscheidung steht heute an?"
-                  />
-
-                  {/* Desktop placeholder */}
-                  {!text && !isFocused && (
-                    <div className="pointer-events-none absolute inset-y-0 left-0 hidden sm:flex items-center">
-                      <span className="text-black/55 text-sm sm:text-base font-semibold tracking-[0.18em] uppercase">
-                        {placeholderText}
-                      </span>
-                    </div>
-                  )}
-
-                  {/* Mobile placeholder marquee */}
-                  {!text && !isFocused && (
-                    <div className="pointer-events-none absolute inset-y-0 left-0 flex sm:hidden items-center w-full overflow-hidden">
-                      <div className="w-full landing-marquee-mask">
-                        <div className="landing-marquee text-black/55 text-sm font-semibold tracking-[0.18em] uppercase whitespace-nowrap">
-                          {placeholderText}&nbsp;&nbsp;&nbsp;•&nbsp;&nbsp;&nbsp;
-                          {placeholderText}
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                </div>
-
-                <button
-                  onClick={startFromInput}
-                  disabled={!canStart}
-                  className={[
-                    "shrink-0 rounded-full px-6 sm:px-9 py-3 sm:py-3.5",
-                    "text-sm sm:text-base font-semibold",
-                    "transition-all duration-200",
-                    "shadow-[0_18px_40px_rgba(0,0,0,0.10)]",
-                    "active:scale-[0.99]",
-                    canStart
-                      ? "hover:brightness-[1.04]"
-                      : "opacity-65 cursor-not-allowed",
-                  ].join(" ")}
-                  style={{
-                    background: "#0b0f14",
-                    color: "white",
-                  }}
-                  aria-label="Start"
-                  title="Start"
-                >
-                  START
-                </button>
+                <p className="mt-2 text-sm sm:text-base text-black/55 leading-relaxed">
+                  Starte ohne Login: Formuliere deine Entscheidung oder nutze eine Vorlage.
+                  Das Tool führt dich strukturiert durch Kriterien, Gewichtung und Bewertung –
+                  mit sauberer Dokumentation für Team, Management und Compliance.
+                </p>
               </div>
             </div>
 
-            <div className="mt-3 text-xs sm:text-sm text-black/45">
-              Ohne Login starten – Login wird erst fürs Speichern/Export relevant.
-            </div>
-          </div>
-        </div>
-
-        {/* 6 Presets */}
-        <div className="mt-8 sm:mt-10">
-          <div className="w-full max-w-5xl">
-            <div className="grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2 md:grid-cols-3">
-              {PRESETS.map((p) => (
-                <button
-                  key={p.id}
-                  onClick={() => startFromPreset(p.id)}
-                  className={[
-                    "group relative overflow-hidden rounded-3xl text-left",
-                    "border border-black/10",
-                    "shadow-[0_18px_55px_rgba(0,0,0,0.12)]",
-                    "transition duration-300 ease-out",
-                    "hover:-translate-y-1 hover:shadow-[0_25px_70px_rgba(0,0,0,0.16)]",
-                    "active:translate-y-0",
-                    "h-[190px] sm:h-[235px] lg:h-[275px]",
-                    "focus:outline-none focus-visible:ring-2 focus-visible:ring-black/20",
-                  ].join(" ")}
-                >
-                  {/* Background image */}
-                  <div className="absolute inset-0">
-                    <Image
-                      src={p.image}
-                      alt=""
-                      fill
-                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                      // ✅ “breiter / mehr rechts sehen”: right-centered + slight zoom
-                      className="object-cover object-[72%_50%] scale-[1.08] transition-transform duration-500 ease-out group-hover:scale-[1.12]"
-                      priority={p.id === "supplier"}
-                    />
-
-                    {/* readability layers */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/72 via-black/18 to-black/0" />
-                    <div className="absolute inset-0 bg-[radial-gradient(900px_280px_at_20%_100%,rgba(0,0,0,0.35),transparent_65%)]" />
-
-                    {/* premium glass sheen on hover */}
-                    <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition duration-300 landing-card-sheen" />
-                  </div>
-
-                  {/* Label oben links (statt unten) */}
-                  <div className="relative z-10 p-4 sm:p-5">
+            {/* Search (compact) */}
+            <div className="mt-4 sm:mt-5">
+              <div className="w-full max-w-4xl">
+                <div className="relative rounded-[999px] bg-white/72 border border-black/10 shadow-[0_24px_70px_rgba(0,0,0,0.10)] backdrop-blur-md px-3 sm:px-4 py-3">
+                  <div className="flex items-center gap-3 sm:gap-4">
                     <div
-                      className="inline-flex flex-col gap-1 rounded-2xl px-4 py-3 backdrop-blur-md"
+                      className="h-11 w-11 sm:h-12 sm:w-12 shrink-0 rounded-full flex items-center justify-center"
                       style={{
-                        background: "rgba(0,0,0,0.38)",
-                        border: "1px solid rgba(255,255,255,0.16)",
+                        background: "rgba(0,0,0,0.04)",
+                        border: "1px solid rgba(0,0,0,0.10)",
                       }}
-                    >
-                      <div className="text-base font-semibold text-white leading-tight">
-                        {p.label}
-                      </div>
-                      <div className="text-xs text-white/80">{p.hint}</div>
-                    </div>
-                  </div>
-
-                  {/* Click affordance (subtle) */}
-                  <div className="absolute bottom-4 right-4 z-10">
-                    <div
-                      className={[
-                        "h-10 w-10 rounded-full grid place-items-center",
-                        "backdrop-blur-md border border-white/15",
-                        "bg-black/25",
-                        "opacity-0 group-hover:opacity-100 transition duration-300",
-                      ].join(" ")}
                       aria-hidden="true"
                     >
-                      <span className="text-white/85 text-lg">→</span>
+                      <span className="text-black/60" style={{ fontSize: 18 }}>
+                        ⌁
+                      </span>
                     </div>
+
+                    <div className="relative w-full">
+                      <input
+                        value={text}
+                        onChange={(e) => setText(e.target.value)}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter") startFromInput();
+                        }}
+                        onFocus={() => setIsFocused(true)}
+                        onBlur={() => setIsFocused(false)}
+                        className={[
+                          "w-full bg-transparent outline-none font-medium tracking-wide",
+                          "text-sm sm:text-base",
+                          "placeholder:text-transparent",
+                          "pr-2",
+                        ].join(" ")}
+                        placeholder={placeholderText}
+                        aria-label="Entscheidung eingeben"
+                      />
+
+                      {!text && !isFocused && (
+                        <div className="pointer-events-none absolute inset-y-0 left-0 hidden sm:flex items-center">
+                          <span className="text-black/55 text-sm sm:text-base font-semibold tracking-[0.14em] uppercase">
+                            {placeholderText}
+                          </span>
+                        </div>
+                      )}
+
+                      {!text && !isFocused && (
+                        <div className="pointer-events-none absolute inset-y-0 left-0 flex sm:hidden items-center w-full overflow-hidden">
+                          <div className="w-full landing-marquee-mask">
+                            <div className="landing-marquee text-black/55 text-sm font-semibold tracking-[0.14em] uppercase whitespace-nowrap">
+                              {placeholderText}&nbsp;&nbsp;&nbsp;•&nbsp;&nbsp;&nbsp;
+                              {placeholderText}
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+
+                    <button
+                      onClick={startFromInput}
+                      disabled={!canStart}
+                      className={[
+                        "shrink-0 rounded-full px-6 sm:px-8 py-2.5",
+                        "text-sm sm:text-base font-semibold",
+                        "transition-all duration-200",
+                        "shadow-[0_16px_34px_rgba(0,0,0,0.10)]",
+                        "active:scale-[0.99]",
+                        canStart
+                          ? "hover:brightness-[1.04]"
+                          : "opacity-65 cursor-not-allowed",
+                      ].join(" ")}
+                      style={{
+                        background: "#0b0f14",
+                        color: "white",
+                      }}
+                      aria-label="Start"
+                      title="Start"
+                    >
+                      Start
+                    </button>
                   </div>
-                </button>
-              ))}
+                </div>
+
+                <div className="mt-2 text-xs sm:text-sm text-black/45">
+                  Ohne Login starten – Account erst für Speichern/Export.
+                </div>
+              </div>
             </div>
 
-            <div className="mt-6 text-center text-xs text-black/35">
-              Login wird erst relevant, wenn du speichern / exportieren / Abo
-              nutzen willst.
+            {/* Presets grid (no-scroll sizing) */}
+            <div className="mt-4 sm:mt-5 flex-1 min-h-0">
+              <div className="h-full">
+                <div className="grid gap-3 sm:gap-4 grid-cols-2 md:grid-cols-3">
+                  {PRESETS.map((p) => (
+                    <button
+                      key={p.id}
+                      onClick={() => startFromPreset(p.id)}
+                      className={[
+                        "group relative overflow-hidden rounded-3xl text-left",
+                        "border border-black/10",
+                        "shadow-[0_16px_42px_rgba(0,0,0,0.12)]",
+                        "transition duration-300 ease-out",
+                        "hover:-translate-y-0.5 hover:shadow-[0_22px_55px_rgba(0,0,0,0.16)]",
+                        "active:translate-y-0",
+                        "focus:outline-none focus-visible:ring-2 focus-visible:ring-black/20",
+                        // ✅ height clamps to avoid scrolling
+                        "h-[clamp(120px,18vh,170px)]",
+                      ].join(" ")}
+                    >
+                      <div className="absolute inset-0">
+                        <Image
+                          src={p.image}
+                          alt=""
+                          fill
+                          sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 33vw"
+                          className="object-cover object-[74%_50%] scale-[1.10] transition-transform duration-500 ease-out group-hover:scale-[1.14]"
+                          priority={p.id === "supplier"}
+                        />
+
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/72 via-black/18 to-black/0" />
+                        <div className="absolute inset-0 bg-[radial-gradient(900px_280px_at_20%_100%,rgba(0,0,0,0.35),transparent_65%)]" />
+                        <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition duration-300 landing-card-sheen" />
+                      </div>
+
+                      {/* Label top-left */}
+                      <div className="relative z-10 p-3 sm:p-4">
+                        <div
+                          className="inline-flex flex-col gap-1 rounded-2xl px-3.5 py-2.5 backdrop-blur-md"
+                          style={{
+                            background: "rgba(0,0,0,0.38)",
+                            border: "1px solid rgba(255,255,255,0.16)",
+                          }}
+                        >
+                          <div className="text-sm sm:text-base font-semibold text-white leading-tight">
+                            {p.label}
+                          </div>
+                          <div className="text-[11px] sm:text-xs text-white/80">
+                            {p.hint}
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* subtle arrow affordance */}
+                      <div className="absolute bottom-3 right-3 z-10">
+                        <div
+                          className={[
+                            "h-9 w-9 rounded-full grid place-items-center",
+                            "backdrop-blur-md border border-white/15",
+                            "bg-black/25",
+                            "opacity-0 group-hover:opacity-100 transition duration-300",
+                          ].join(" ")}
+                          aria-hidden="true"
+                        >
+                          <span className="text-white/85 text-lg">→</span>
+                        </div>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+
+                {/* mini “enterprise note” (very small) */}
+                <div className="mt-2 text-[11px] text-black/40 hidden sm:block">
+                  Methodik: Nutzwertanalyse • Optional: AHP/Sensitivität • Dokumentation für Governance/DSG
+                </div>
+              </div>
             </div>
           </div>
-        </div>
+        </section>
+
+        {/* Footer */}
+        <footer className="shrink-0">
+          <div className="h-px bg-black/10" />
+          <div className="mx-auto max-w-6xl px-5 sm:px-6 py-3 sm:py-4">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-[11px] sm:text-xs text-black/55">
+              <div id="vision">
+                <div className="font-semibold text-black/70">Vision</div>
+                <div className="mt-1">
+                  Transparente Entscheidungen – verständlich, vergleichbar, auditfähig.
+                </div>
+              </div>
+
+              <div id="ethik">
+                <div className="font-semibold text-black/70">Ethik</div>
+                <div className="mt-1">
+                  Fairness, Nachvollziehbarkeit, keine Manipulation – klare Kriterien statt Bauchgefühl.
+                </div>
+              </div>
+
+              <div id="leitfaden">
+                <div className="font-semibold text-black/70">Unternehmensleitfaden</div>
+                <div className="mt-1">
+                  Vorgehen, Rollen, Governance-Checks & Dokumentationsstandard.
+                </div>
+              </div>
+
+              <div id="privacy">
+                <div className="font-semibold text-black/70">Recht & Datenschutz</div>
+                <div className="mt-1 flex flex-wrap gap-x-3 gap-y-1">
+                  <span className="underline underline-offset-2 decoration-black/20">
+                    Datenschutz (DSG)
+                  </span>
+                  <span className="underline underline-offset-2 decoration-black/20">
+                    AGB
+                  </span>
+                  <span className="underline underline-offset-2 decoration-black/20">
+                    Impressum
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-2 text-[10px] sm:text-[11px] text-black/35">
+              © {new Date().getFullYear()} Nutzwertanalyse.tool • Draft-first • Login erst bei Export/Account-Funktionen
+            </div>
+          </div>
+        </footer>
       </div>
 
       {/* Global CSS (landing only) */}
@@ -380,13 +445,11 @@ export default function LandingWithIntro() {
           }
         }
 
-        /* subtle film grain */
         .landing-grain {
           background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)' opacity='.28'/%3E%3C/svg%3E");
           mix-blend-mode: soft-light;
         }
 
-        /* premium sheen for preset cards */
         .landing-card-sheen {
           background: linear-gradient(
             120deg,
