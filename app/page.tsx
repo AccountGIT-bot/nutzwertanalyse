@@ -64,11 +64,33 @@ export default function LandingWithIntro() {
   const [text, setText] = useState("");
   const [isFocused, setIsFocused] = useState(false);
 
+  // Fog / appear
+  const [pageReady, setPageReady] = useState(false);
+
+  // Header reacts to scroll (professional feel)
+  const [scrolled, setScrolled] = useState(false);
+
   const canStart = useMemo(() => text.trim().length > 0, [text]);
 
   useEffect(() => {
+    // intro to landing
     const t = setTimeout(() => setPhase("landing"), 3000);
     return () => clearTimeout(t);
+  }, []);
+
+  useEffect(() => {
+    // slight fog on first paint; text fades in cleanly
+    const r = requestAnimationFrame(() => setPageReady(true));
+    return () => cancelAnimationFrame(r);
+  }, []);
+
+  useEffect(() => {
+    function onScroll() {
+      setScrolled(window.scrollY > 8);
+    }
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
   function goToApp(payload: { draft: string; preset?: PresetId }) {
@@ -95,7 +117,7 @@ export default function LandingWithIntro() {
   const placeholderText = "WELCHE ENTSCHEIDUNG SOLL HEUTE STRUKTURIERT WERDEN?";
 
   return (
-    <main className="relative min-h-screen text-slate-900 overflow-hidden">
+    <main className="relative min-h-[100svh] text-slate-900 overflow-x-hidden">
       {/* Premium Background */}
       <div className="absolute inset-0 -z-10">
         <div className="absolute inset-0 bg-gradient-to-b from-[#fbfbfb] via-[#f3f6f6] to-[#eef2f2]" />
@@ -106,12 +128,12 @@ export default function LandingWithIntro() {
               "radial-gradient(900px 650px at 18% 18%, rgba(0,0,0,0.05), transparent 62%), radial-gradient(850px 600px at 85% 40%, rgba(0,0,0,0.035), transparent 62%), radial-gradient(900px 700px at 50% 115%, rgba(0,0,0,0.07), transparent 72%)",
           }}
         />
-        <div className="absolute inset-0 landing-grain opacity-[0.20]" />
-        <div className="absolute inset-0 landing-sheen2 opacity-[0.65]" />
+        <div className="absolute inset-0 landing-grain opacity-[0.18]" />
+        <div className="absolute inset-0 landing-sheen2 opacity-[0.60]" />
         <div className="absolute inset-0 bg-[radial-gradient(1200px_700px_at_50%_30%,transparent_55%,rgba(0,0,0,0.10)_100%)]" />
       </div>
 
-      {/* INTRO OVERLAY */}
+      {/* Intro overlay */}
       <div
         className={[
           "fixed inset-0 z-50 grid place-items-center",
@@ -136,77 +158,122 @@ export default function LandingWithIntro() {
         </div>
       </div>
 
-      {/* PAGE LAYOUT: Header / Content / Footer */}
-      <div className="relative min-h-screen flex flex-col">
+      {/* Appear fog overlay (after intro it looks crisp) */}
+      <div
+        className={[
+          "fixed inset-0 z-40 pointer-events-none",
+          "transition-opacity duration-700 ease-out",
+          pageReady ? "opacity-0" : "opacity-100",
+        ].join(" ")}
+        style={{
+          backdropFilter: "blur(10px)",
+          background: "rgba(255,255,255,0.22)",
+        }}
+      />
+
+      {/* Layout */}
+      <div className="relative min-h-[100svh] flex flex-col">
         {/* Header */}
-        <header className="h-[64px] sm:h-[72px] shrink-0">
-          <div className="mx-auto max-w-6xl px-5 sm:px-6 h-full flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="h-10 w-10 rounded-2xl bg-black/5 border border-black/10 grid place-items-center">
-                <span className="text-black/70 text-lg">⌁</span>
-              </div>
-              <div className="leading-tight">
-                <div className="text-sm sm:text-base font-semibold tracking-tight text-slate-900">
-                  Nutzwertanalyse
-                  <span className="opacity-60">.tool</span>
+        <header className="sticky top-0 z-30">
+          <div
+            className={[
+              "transition-all duration-300",
+              scrolled
+                ? "bg-white/70 backdrop-blur-xl shadow-[0_12px_30px_rgba(0,0,0,0.08)]"
+                : "bg-white/0",
+            ].join(" ")}
+          >
+            <div className="mx-auto max-w-6xl px-5 sm:px-6 h-[68px] sm:h-[76px] flex items-center justify-between">
+              <button
+                onClick={() => router.push("/")}
+                className="flex items-center gap-3 text-left"
+                aria-label="Zur Startseite"
+                title="Startseite"
+              >
+                <div className="h-10 w-10 rounded-2xl bg-black/5 border border-black/10 grid place-items-center">
+                  <span className="text-black/70 text-lg">⌁</span>
                 </div>
-                <div className="text-[11px] sm:text-xs text-black/45">
-                  Decision documentation • Governance-ready
+                <div className="leading-tight">
+                  <div className="text-sm sm:text-base font-semibold tracking-tight text-slate-900">
+                    Nutzwertanalyse<span className="opacity-60">.tool</span>
+                  </div>
+                  <div className="text-[11px] sm:text-xs text-black/45">
+                    Decision documentation • Governance-ready
+                  </div>
                 </div>
+              </button>
+
+              <nav className="hidden lg:flex items-center gap-6 text-sm text-black/55">
+                <a className="hover:text-black/80 transition" href="#principles">
+                  Prinzipien
+                </a>
+                <a className="hover:text-black/80 transition" href="#framework">
+                  Framework
+                </a>
+                <a className="hover:text-black/80 transition" href="#privacy">
+                  Datenschutz
+                </a>
+              </nav>
+
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => router.push("/login")}
+                  className={[
+                    "rounded-full px-4 py-2 text-sm font-semibold",
+                    "border border-black/10",
+                    "bg-white/70 backdrop-blur-md",
+                    "hover:bg-white/85 transition",
+                  ].join(" ")}
+                >
+                  Login
+                </button>
               </div>
             </div>
 
-            <nav className="hidden md:flex items-center gap-6 text-sm text-black/55">
-              <a className="hover:text-black/80 transition" href="#ethik">
-                Ethik
-              </a>
-              <a className="hover:text-black/80 transition" href="#vision">
-                Vision
-              </a>
-              <a className="hover:text-black/80 transition" href="#leitfaden">
-                Leitfaden
-              </a>
-              <a className="hover:text-black/80 transition" href="#privacy">
-                Datenschutz
-              </a>
-            </nav>
-
-            <button
-              className="rounded-full px-4 py-2 text-sm font-semibold border border-black/10 bg-white/65 backdrop-blur-md text-black/55 cursor-not-allowed"
-              title="Login folgt später"
-              aria-disabled="true"
-            >
-              Login (später)
-            </button>
+            <div className="h-px bg-black/10" />
           </div>
-
-          {/* subtle divider */}
-          <div className="h-px bg-black/10" />
         </header>
 
-        {/* Content: must fit without scrolling */}
+        {/* Content */}
         <section className="flex-1 min-h-0">
           <div className="mx-auto max-w-6xl px-5 sm:px-6 h-full flex flex-col">
-            {/* Top copy (compact) */}
-            <div className="pt-5 sm:pt-6">
+            {/* Copy area – more airy, not cramped */}
+            <div
+              className={[
+                "pt-5 sm:pt-7",
+                "transition-all duration-700 ease-out",
+                pageReady ? "opacity-100 translate-y-0" : "opacity-0 translate-y-2",
+              ].join(" ")}
+            >
               <div className="max-w-3xl">
-                <h1 className="text-3xl sm:text-4xl font-semibold tracking-tight text-slate-900">
+                <div className="text-[11px] sm:text-xs tracking-[0.28em] uppercase text-black/45">
+                  Nutzwertanalyse • Dokumentation • Vergleichbarkeit
+                </div>
+
+                <h1 className="mt-2 text-3xl sm:text-4xl font-semibold tracking-tight text-slate-900">
                   Entscheidungen dokumentieren.{" "}
-                  <span className="opacity-70">Nachvollziehbar & auditfähig.</span>
+                  <span className="opacity-70">Sauber begründet.</span>
                 </h1>
 
-                <p className="mt-2 text-sm sm:text-base text-black/55 leading-relaxed">
-                  Starte ohne Login: Formuliere deine Entscheidung oder nutze eine Vorlage.
-                  Das Tool führt dich strukturiert durch Kriterien, Gewichtung und Bewertung –
-                  mit sauberer Dokumentation für Team, Management und Compliance.
+                <p className="mt-3 text-sm sm:text-base text-black/55 leading-relaxed">
+                  Starte mit einer Entscheidung oder einer Vorlage. Du erhältst einen
+                  strukturierten Bewertungsprozess (Kriterien, Gewichtung, Bewertung)
+                  und eine nachvollziehbare Dokumentation – für Team, Management und
+                  Compliance.
                 </p>
               </div>
             </div>
 
-            {/* Search (compact) */}
-            <div className="mt-4 sm:mt-5">
+            {/* Search – slightly bigger, but spacing smarter */}
+            <div
+              className={[
+                "mt-5 sm:mt-6",
+                "transition-all duration-700 ease-out delay-75",
+                pageReady ? "opacity-100 translate-y-0" : "opacity-0 translate-y-2",
+              ].join(" ")}
+            >
               <div className="w-full max-w-4xl">
-                <div className="relative rounded-[999px] bg-white/72 border border-black/10 shadow-[0_24px_70px_rgba(0,0,0,0.10)] backdrop-blur-md px-3 sm:px-4 py-3">
+                <div className="relative rounded-[999px] bg-white/74 border border-black/10 shadow-[0_26px_72px_rgba(0,0,0,0.10)] backdrop-blur-md px-3 sm:px-4 py-3">
                   <div className="flex items-center gap-3 sm:gap-4">
                     <div
                       className="h-11 w-11 sm:h-12 sm:w-12 shrink-0 rounded-full flex items-center justify-center"
@@ -242,7 +309,7 @@ export default function LandingWithIntro() {
 
                       {!text && !isFocused && (
                         <div className="pointer-events-none absolute inset-y-0 left-0 hidden sm:flex items-center">
-                          <span className="text-black/55 text-sm sm:text-base font-semibold tracking-[0.14em] uppercase">
+                          <span className="text-black/55 text-sm sm:text-base font-semibold tracking-[0.12em] uppercase">
                             {placeholderText}
                           </span>
                         </div>
@@ -251,7 +318,7 @@ export default function LandingWithIntro() {
                       {!text && !isFocused && (
                         <div className="pointer-events-none absolute inset-y-0 left-0 flex sm:hidden items-center w-full overflow-hidden">
                           <div className="w-full landing-marquee-mask">
-                            <div className="landing-marquee text-black/55 text-sm font-semibold tracking-[0.14em] uppercase whitespace-nowrap">
+                            <div className="landing-marquee text-black/55 text-sm font-semibold tracking-[0.12em] uppercase whitespace-nowrap">
                               {placeholderText}&nbsp;&nbsp;&nbsp;•&nbsp;&nbsp;&nbsp;
                               {placeholderText}
                             </div>
@@ -273,10 +340,7 @@ export default function LandingWithIntro() {
                           ? "hover:brightness-[1.04]"
                           : "opacity-65 cursor-not-allowed",
                       ].join(" ")}
-                      style={{
-                        background: "#0b0f14",
-                        color: "white",
-                      }}
+                      style={{ background: "#0b0f14", color: "white" }}
                       aria-label="Start"
                       title="Start"
                     >
@@ -291,9 +355,15 @@ export default function LandingWithIntro() {
               </div>
             </div>
 
-            {/* Presets grid (no-scroll sizing) */}
-            <div className="mt-4 sm:mt-5 flex-1 min-h-0">
-              <div className="h-full">
+            {/* Presets – we give them breathing room but keep fold-fit */}
+            <div
+              className={[
+                "mt-5 sm:mt-6 flex-1 min-h-0",
+                "transition-all duration-700 ease-out delay-100",
+                pageReady ? "opacity-100 translate-y-0" : "opacity-0 translate-y-2",
+              ].join(" ")}
+            >
+              <div className="h-full flex flex-col">
                 <div className="grid gap-3 sm:gap-4 grid-cols-2 md:grid-cols-3">
                   {PRESETS.map((p) => (
                     <button
@@ -307,8 +377,8 @@ export default function LandingWithIntro() {
                         "hover:-translate-y-0.5 hover:shadow-[0_22px_55px_rgba(0,0,0,0.16)]",
                         "active:translate-y-0",
                         "focus:outline-none focus-visible:ring-2 focus-visible:ring-black/20",
-                        // ✅ height clamps to avoid scrolling
-                        "h-[clamp(120px,18vh,170px)]",
+                        // ✅ more elegant sizing; slightly taller than before but still fold-safe
+                        "h-[clamp(132px,18.5vh,182px)]",
                       ].join(" ")}
                     >
                       <div className="absolute inset-0">
@@ -321,18 +391,18 @@ export default function LandingWithIntro() {
                           priority={p.id === "supplier"}
                         />
 
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/72 via-black/18 to-black/0" />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/72 via-black/16 to-black/0" />
                         <div className="absolute inset-0 bg-[radial-gradient(900px_280px_at_20%_100%,rgba(0,0,0,0.35),transparent_65%)]" />
                         <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition duration-300 landing-card-sheen" />
                       </div>
 
-                      {/* Label top-left */}
+                      {/* label: a bit more premium (less blocky) */}
                       <div className="relative z-10 p-3 sm:p-4">
                         <div
                           className="inline-flex flex-col gap-1 rounded-2xl px-3.5 py-2.5 backdrop-blur-md"
                           style={{
-                            background: "rgba(0,0,0,0.38)",
-                            border: "1px solid rgba(255,255,255,0.16)",
+                            background: "rgba(0,0,0,0.34)",
+                            border: "1px solid rgba(255,255,255,0.14)",
                           }}
                         >
                           <div className="text-sm sm:text-base font-semibold text-white leading-tight">
@@ -344,13 +414,12 @@ export default function LandingWithIntro() {
                         </div>
                       </div>
 
-                      {/* subtle arrow affordance */}
                       <div className="absolute bottom-3 right-3 z-10">
                         <div
                           className={[
                             "h-9 w-9 rounded-full grid place-items-center",
                             "backdrop-blur-md border border-white/15",
-                            "bg-black/25",
+                            "bg-black/22",
                             "opacity-0 group-hover:opacity-100 transition duration-300",
                           ].join(" ")}
                           aria-hidden="true"
@@ -362,65 +431,65 @@ export default function LandingWithIntro() {
                   ))}
                 </div>
 
-                {/* mini “enterprise note” (very small) */}
-                <div className="mt-2 text-[11px] text-black/40 hidden sm:block">
-                  Methodik: Nutzwertanalyse • Optional: AHP/Sensitivität • Dokumentation für Governance/DSG
+                {/* Principles / Framework mini rows (professional, but tiny) */}
+                <div className="mt-3 hidden sm:grid grid-cols-3 gap-3 text-[11px] text-black/45">
+                  <div
+                    id="principles"
+                    className="rounded-2xl border border-black/10 bg-white/55 backdrop-blur-md px-4 py-3"
+                  >
+                    <div className="font-semibold text-black/70">Prinzipien</div>
+                    <div className="mt-1">
+                      Transparenz, Fairness, Nachvollziehbarkeit – klare Kriterien statt Bauchgefühl.
+                    </div>
+                  </div>
+
+                  <div
+                    id="framework"
+                    className="rounded-2xl border border-black/10 bg-white/55 backdrop-blur-md px-4 py-3"
+                  >
+                    <div className="font-semibold text-black/70">Framework</div>
+                    <div className="mt-1">
+                      Kriterien • Gewichtung • Bewertung • Sensitivität – dokumentiert & vergleichbar.
+                    </div>
+                  </div>
+
+                  <div
+                    id="privacy"
+                    className="rounded-2xl border border-black/10 bg-white/55 backdrop-blur-md px-4 py-3"
+                  >
+                    <div className="font-semibold text-black/70">Datenschutz</div>
+                    <div className="mt-1">
+                      DSG-fokussiert: Datenminimierung, Zweckbindung, klare Export-/Speicherlogik.
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-        </section>
 
-        {/* Footer */}
-        <footer className="shrink-0">
-          <div className="h-px bg-black/10" />
-          <div className="mx-auto max-w-6xl px-5 sm:px-6 py-3 sm:py-4">
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-[11px] sm:text-xs text-black/55">
-              <div id="vision">
-                <div className="font-semibold text-black/70">Vision</div>
-                <div className="mt-1">
-                  Transparente Entscheidungen – verständlich, vergleichbar, auditfähig.
+            {/* Footer — not cramped, but compact */}
+            <footer className="mt-4 pb-4 sm:pb-5">
+              <div className="h-px bg-black/10" />
+              <div className="pt-3 text-[10px] sm:text-[11px] text-black/40 flex flex-col sm:flex-row gap-2 sm:items-center sm:justify-between">
+                <div>
+                  © {new Date().getFullYear()} Nutzwertanalyse.tool • Draft-first • Login erst bei Export/Account-Funktionen
                 </div>
-              </div>
-
-              <div id="ethik">
-                <div className="font-semibold text-black/70">Ethik</div>
-                <div className="mt-1">
-                  Fairness, Nachvollziehbarkeit, keine Manipulation – klare Kriterien statt Bauchgefühl.
-                </div>
-              </div>
-
-              <div id="leitfaden">
-                <div className="font-semibold text-black/70">Unternehmensleitfaden</div>
-                <div className="mt-1">
-                  Vorgehen, Rollen, Governance-Checks & Dokumentationsstandard.
-                </div>
-              </div>
-
-              <div id="privacy">
-                <div className="font-semibold text-black/70">Recht & Datenschutz</div>
-                <div className="mt-1 flex flex-wrap gap-x-3 gap-y-1">
+                <div className="flex flex-wrap gap-x-3 gap-y-1">
                   <span className="underline underline-offset-2 decoration-black/20">
-                    Datenschutz (DSG)
+                    Impressum
                   </span>
                   <span className="underline underline-offset-2 decoration-black/20">
                     AGB
                   </span>
                   <span className="underline underline-offset-2 decoration-black/20">
-                    Impressum
+                    Datenschutz
                   </span>
                 </div>
               </div>
-            </div>
-
-            <div className="mt-2 text-[10px] sm:text-[11px] text-black/35">
-              © {new Date().getFullYear()} Nutzwertanalyse.tool • Draft-first • Login erst bei Export/Account-Funktionen
-            </div>
+            </footer>
           </div>
-        </footer>
+        </section>
       </div>
 
-      {/* Global CSS (landing only) */}
       <style jsx global>{`
         .landing-sheen2 {
           background: radial-gradient(
