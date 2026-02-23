@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 
@@ -64,25 +64,48 @@ export default function LandingWithIntro() {
   const [text, setText] = useState("");
   const [isFocused, setIsFocused] = useState(false);
 
-  // Fog / appear
-  const [pageReady, setPageReady] = useState(false);
+  // Startseiten-Fog: soll lange genug bleiben, damit man Intro lesen kann
+  const [fogVisible, setFogVisible] = useState(true);
+  const [fogSoftHide, setFogSoftHide] = useState(false);
+  const fogTimer = useRef<number | null>(null);
 
   // Header reacts to scroll (professional feel)
   const [scrolled, setScrolled] = useState(false);
 
   const canStart = useMemo(() => text.trim().length > 0, [text]);
+  const placeholderText = "WELCHE ENTSCHEIDUNG SOLL HEUTE STRUKTURIERT WERDEN?";
 
   useEffect(() => {
-    // intro to landing
-    const t = setTimeout(() => setPhase("landing"), 3000);
-    return () => clearTimeout(t);
+    // Intro: 3 Sekunden sichtbar
+    const t = window.setTimeout(() => setPhase("landing"), 3000);
+    return () => window.clearTimeout(t);
   }, []);
 
   useEffect(() => {
-    // slight fog on first paint; text fades in cleanly
-    const r = requestAnimationFrame(() => setPageReady(true));
-    return () => cancelAnimationFrame(r);
-  }, []);
+    // Fog-Handling NUR auf Startseite:
+    // - Fog bleibt während Intro vollständig aktiv
+    // - Danach noch kurz "soft" stehen lassen und erst dann ausblenden
+    if (fogTimer.current) window.clearTimeout(fogTimer.current);
+
+    if (phase === "intro") {
+      setFogVisible(true);
+      setFogSoftHide(false);
+      return;
+    }
+
+    // landing: fog bleibt noch etwas, dann fade-out
+    setFogVisible(true);
+    setFogSoftHide(false);
+    fogTimer.current = window.setTimeout(() => {
+      setFogSoftHide(true); // startet fade-out
+      // nach fade-out ganz aus
+      window.setTimeout(() => setFogVisible(false), 650);
+    }, 550);
+
+    return () => {
+      if (fogTimer.current) window.clearTimeout(fogTimer.current);
+    };
+  }, [phase]);
 
   useEffect(() => {
     function onScroll() {
@@ -114,8 +137,6 @@ export default function LandingWithIntro() {
     goToApp({ draft, preset: p });
   }
 
-  const placeholderText = "WELCHE ENTSCHEIDUNG SOLL HEUTE STRUKTURIERT WERDEN?";
-
   return (
     <main className="relative min-h-[100svh] text-slate-900 overflow-x-hidden">
       {/* Premium Background */}
@@ -133,7 +154,22 @@ export default function LandingWithIntro() {
         <div className="absolute inset-0 bg-[radial-gradient(1200px_700px_at_50%_30%,transparent_55%,rgba(0,0,0,0.10)_100%)]" />
       </div>
 
-      {/* Intro overlay */}
+      {/* Fog Overlay (nur Startseite, länger) */}
+      {fogVisible && (
+        <div
+          className={[
+            "fixed inset-0 z-40 pointer-events-none",
+            "transition-opacity duration-700 ease-out",
+            fogSoftHide ? "opacity-0" : "opacity-100",
+          ].join(" ")}
+          style={{
+            backdropFilter: "blur(12px)",
+            background: "rgba(255,255,255,0.28)",
+          }}
+        />
+      )}
+
+      {/* INTRO OVERLAY */}
       <div
         className={[
           "fixed inset-0 z-50 grid place-items-center",
@@ -158,20 +194,6 @@ export default function LandingWithIntro() {
         </div>
       </div>
 
-      {/* Appear fog overlay (after intro it looks crisp) */}
-      <div
-        className={[
-          "fixed inset-0 z-40 pointer-events-none",
-          "transition-opacity duration-700 ease-out",
-          pageReady ? "opacity-0" : "opacity-100",
-        ].join(" ")}
-        style={{
-          backdropFilter: "blur(10px)",
-          background: "rgba(255,255,255,0.22)",
-        }}
-      />
-
-      {/* Layout */}
       <div className="relative min-h-[100svh] flex flex-col">
         {/* Header */}
         <header className="sticky top-0 z-30">
@@ -210,26 +232,23 @@ export default function LandingWithIntro() {
                 <a className="hover:text-black/80 transition" href="#framework">
                   Framework
                 </a>
-                <a className="hover:text-black/80 transition" href="#privacy">
+                <a className="hover:text-black/80 transition" href="/datenschutz">
                   Datenschutz
                 </a>
               </nav>
 
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={() => router.push("/login")}
-                  className={[
-                    "rounded-full px-4 py-2 text-sm font-semibold",
-                    "border border-black/10",
-                    "bg-white/70 backdrop-blur-md",
-                    "hover:bg-white/85 transition",
-                  ].join(" ")}
-                >
-                  Login
-                </button>
-              </div>
+              <button
+                onClick={() => router.push("/login")}
+                className={[
+                  "rounded-full px-4 py-2 text-sm font-semibold",
+                  "border border-black/10",
+                  "bg-white/70 backdrop-blur-md",
+                  "hover:bg-white/85 transition",
+                ].join(" ")}
+              >
+                Login
+              </button>
             </div>
-
             <div className="h-px bg-black/10" />
           </div>
         </header>
@@ -237,14 +256,7 @@ export default function LandingWithIntro() {
         {/* Content */}
         <section className="flex-1 min-h-0">
           <div className="mx-auto max-w-6xl px-5 sm:px-6 h-full flex flex-col">
-            {/* Copy area – more airy, not cramped */}
-            <div
-              className={[
-                "pt-5 sm:pt-7",
-                "transition-all duration-700 ease-out",
-                pageReady ? "opacity-100 translate-y-0" : "opacity-0 translate-y-2",
-              ].join(" ")}
-            >
+            <div className="pt-5 sm:pt-7">
               <div className="max-w-3xl">
                 <div className="text-[11px] sm:text-xs tracking-[0.28em] uppercase text-black/45">
                   Nutzwertanalyse • Dokumentation • Vergleichbarkeit
@@ -256,22 +268,16 @@ export default function LandingWithIntro() {
                 </h1>
 
                 <p className="mt-3 text-sm sm:text-base text-black/55 leading-relaxed">
-                  Starte mit einer Entscheidung oder einer Vorlage. Du erhältst einen
-                  strukturierten Bewertungsprozess (Kriterien, Gewichtung, Bewertung)
-                  und eine nachvollziehbare Dokumentation – für Team, Management und
-                  Compliance.
+                  Starte mit einer Entscheidung oder einer Vorlage. Du erhältst
+                  einen strukturierten Bewertungsprozess (Kriterien, Gewichtung,
+                  Bewertung) und eine nachvollziehbare Dokumentation – für Team,
+                  Management und Compliance.
                 </p>
               </div>
             </div>
 
-            {/* Search – slightly bigger, but spacing smarter */}
-            <div
-              className={[
-                "mt-5 sm:mt-6",
-                "transition-all duration-700 ease-out delay-75",
-                pageReady ? "opacity-100 translate-y-0" : "opacity-0 translate-y-2",
-              ].join(" ")}
-            >
+            {/* Search */}
+            <div className="mt-5 sm:mt-6">
               <div className="w-full max-w-4xl">
                 <div className="relative rounded-[999px] bg-white/74 border border-black/10 shadow-[0_26px_72px_rgba(0,0,0,0.10)] backdrop-blur-md px-3 sm:px-4 py-3">
                   <div className="flex items-center gap-3 sm:gap-4">
@@ -355,14 +361,8 @@ export default function LandingWithIntro() {
               </div>
             </div>
 
-            {/* Presets – we give them breathing room but keep fold-fit */}
-            <div
-              className={[
-                "mt-5 sm:mt-6 flex-1 min-h-0",
-                "transition-all duration-700 ease-out delay-100",
-                pageReady ? "opacity-100 translate-y-0" : "opacity-0 translate-y-2",
-              ].join(" ")}
-            >
+            {/* Presets */}
+            <div className="mt-5 sm:mt-6 flex-1 min-h-0">
               <div className="h-full flex flex-col">
                 <div className="grid gap-3 sm:gap-4 grid-cols-2 md:grid-cols-3">
                   {PRESETS.map((p) => (
@@ -377,7 +377,6 @@ export default function LandingWithIntro() {
                         "hover:-translate-y-0.5 hover:shadow-[0_22px_55px_rgba(0,0,0,0.16)]",
                         "active:translate-y-0",
                         "focus:outline-none focus-visible:ring-2 focus-visible:ring-black/20",
-                        // ✅ more elegant sizing; slightly taller than before but still fold-safe
                         "h-[clamp(132px,18.5vh,182px)]",
                       ].join(" ")}
                     >
@@ -390,13 +389,11 @@ export default function LandingWithIntro() {
                           className="object-cover object-[74%_50%] scale-[1.10] transition-transform duration-500 ease-out group-hover:scale-[1.14]"
                           priority={p.id === "supplier"}
                         />
-
                         <div className="absolute inset-0 bg-gradient-to-t from-black/72 via-black/16 to-black/0" />
                         <div className="absolute inset-0 bg-[radial-gradient(900px_280px_at_20%_100%,rgba(0,0,0,0.35),transparent_65%)]" />
                         <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition duration-300 landing-card-sheen" />
                       </div>
 
-                      {/* label: a bit more premium (less blocky) */}
                       <div className="relative z-10 p-3 sm:p-4">
                         <div
                           className="inline-flex flex-col gap-1 rounded-2xl px-3.5 py-2.5 backdrop-blur-md"
@@ -431,7 +428,6 @@ export default function LandingWithIntro() {
                   ))}
                 </div>
 
-                {/* Principles / Framework mini rows (professional, but tiny) */}
                 <div className="mt-3 hidden sm:grid grid-cols-3 gap-3 text-[11px] text-black/45">
                   <div
                     id="principles"
@@ -453,36 +449,52 @@ export default function LandingWithIntro() {
                     </div>
                   </div>
 
-                  <div
-                    id="privacy"
-                    className="rounded-2xl border border-black/10 bg-white/55 backdrop-blur-md px-4 py-3"
-                  >
-                    <div className="font-semibold text-black/70">Datenschutz</div>
+                  <div className="rounded-2xl border border-black/10 bg-white/55 backdrop-blur-md px-4 py-3">
+                    <div className="font-semibold text-black/70">Recht</div>
                     <div className="mt-1">
-                      DSG-fokussiert: Datenminimierung, Zweckbindung, klare Export-/Speicherlogik.
+                      <a className="underline underline-offset-2 decoration-black/20" href="/datenschutz">
+                        Datenschutz (DSG)
+                      </a>{" "}
+                      •{" "}
+                      <a className="underline underline-offset-2 decoration-black/20" href="/agb">
+                        AGB
+                      </a>{" "}
+                      •{" "}
+                      <a className="underline underline-offset-2 decoration-black/20" href="/impressum">
+                        Impressum
+                      </a>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
 
-            {/* Footer — not cramped, but compact */}
+            {/* Footer */}
             <footer className="mt-4 pb-4 sm:pb-5">
               <div className="h-px bg-black/10" />
               <div className="pt-3 text-[10px] sm:text-[11px] text-black/40 flex flex-col sm:flex-row gap-2 sm:items-center sm:justify-between">
                 <div>
-                  © {new Date().getFullYear()} Nutzwertanalyse.tool • Draft-first • Login erst bei Export/Account-Funktionen
+                  © {new Date().getFullYear()} Nutzwertanalyse.tool • Draft-first
                 </div>
                 <div className="flex flex-wrap gap-x-3 gap-y-1">
-                  <span className="underline underline-offset-2 decoration-black/20">
+                  <a
+                    href="/impressum"
+                    className="underline underline-offset-2 decoration-black/20"
+                  >
                     Impressum
-                  </span>
-                  <span className="underline underline-offset-2 decoration-black/20">
+                  </a>
+                  <a
+                    href="/agb"
+                    className="underline underline-offset-2 decoration-black/20"
+                  >
                     AGB
-                  </span>
-                  <span className="underline underline-offset-2 decoration-black/20">
+                  </a>
+                  <a
+                    href="/datenschutz"
+                    className="underline underline-offset-2 decoration-black/20"
+                  >
                     Datenschutz
-                  </span>
+                  </a>
                 </div>
               </div>
             </footer>
@@ -513,12 +525,10 @@ export default function LandingWithIntro() {
             opacity: 0.55;
           }
         }
-
         .landing-grain {
           background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)' opacity='.28'/%3E%3C/svg%3E");
           mix-blend-mode: soft-light;
         }
-
         .landing-card-sheen {
           background: linear-gradient(
             120deg,
@@ -528,7 +538,6 @@ export default function LandingWithIntro() {
           );
           mix-blend-mode: overlay;
         }
-
         .landing-marquee-mask {
           mask-image: linear-gradient(
             to right,
