@@ -1,16 +1,18 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 
 type Slot = { r: number; c: number };
 
-type RotatingItem = {
+type FloatingQuote = {
   id: string;
   text: string;
   slot: Slot;
-  rotate: string;
-  opacity: number;
+  rotate: number;
+  phase: "in" | "out"; // for fade in/out
+  bornAt: number;
+  lifeMs: number;
 };
 
 function shuffle<T>(arr: T[]) {
@@ -28,7 +30,6 @@ export default function LoginPage() {
 
   const MICRO_TEXTS = useMemo(
     () => [
-      // existing-ish + improved mix
       "Nutzwert = Summe gewichteter Kriterien",
       "Transparenz statt Bauchgefühl",
       "Vergleichbarkeit über Alternativen",
@@ -42,7 +43,7 @@ export default function LoginPage() {
       "Risiken sichtbar machen",
       "Entscheidungen auditfähig machen",
 
-      // ✅ 10 neue, abwechslungsreiche
+      // 10 zusätzliche, abwechslungsreiche
       "Entscheidungslogik: konsistent & prüfbar",
       "Prioritäten sichtbar – Konflikte reduzieren",
       "Kriterienkataloge: wiederverwendbar",
@@ -57,48 +58,130 @@ export default function LoginPage() {
     []
   );
 
-  // 5x4 grid => 20 slots, guaranteed no overlap
-  const GRID = { rows: 4, cols: 5 };
+  // Grid slots => verhindert Overlap
+  const GRID = { rows: 4, cols: 5 }; // 20 Slots
 
-  const [items, setItems] = useState<RotatingItem[]>([]);
-
-  useEffect(() => {
-    // Build all slots
+  const allSlots = useMemo(() => {
     const slots: Slot[] = [];
     for (let r = 0; r < GRID.rows; r++) {
       for (let c = 0; c < GRID.cols; c++) slots.push({ r, c });
     }
+    return slots;
+  }, [GRID.rows, GRID.cols]);
 
-    // pick 5 unique slots per render cycle
-    const pickCount = 5;
+  const [quotes, setQuotes] = useState<FloatingQuote[]>([]);
 
-    function buildSet(): RotatingItem[] {
-      const texts = shuffle(MICRO_TEXTS).slice(0, pickCount);
-      const chosenSlots = shuffle(slots).slice(0, pickCount);
+  const timersRef = useRef<number[]>([]);
+  const usedRecentlyRef = useRef<string[]>([]);
 
-      return texts.map((text, i) => ({
-        id: `it-${Date.now()}-${i}`,
+  function clearAllTimers() {
+    timersRef.current.forEach((t) => window.clearTimeout(t));
+    timersRef.current = [];
+  }
+
+  function rand(min: number, max: number) {
+    return Math.random() * (max - min) + min;
+  }
+
+  function pickText(exclude: string[]) {
+    // avoid recently used to keep it feeling “fresh”
+    const recent = new Set(usedRecentlyRef.current);
+    const candidates = MICRO_TEXTS.filter((t) => !recent.has(t) && !exclude.includes(t));
+    const pool = candidates.length ? candidates : MICRO_TEXTS.filter((t) => !exclude.includes(t));
+    const text = pool[Math.floor(Math.random() * pool.length)] ?? MICRO_TEXTS[0];
+
+    usedRecentlyRef.current = [text, ...usedRecentlyRef.current].slice(0, 10);
+    return text;
+  }
+
+  function pickFreeSlot(current: FloatingQuote[]) {
+    const used = new Set(current.map((q) => `${q.slot.r}-${q.slot.c}`));
+    const free = allSlots.filter((s) => !used.has(`${s.r}-${s.c}`));
+    if (!free.length) return null;
+    return free[Math.floor(Math.random() * free.length)];
+  }
+
+  function spawnOne() {
+    setQuotes((prev) => {
+      // limit how many are concurrently visible (premium, nicht “zu voll”)
+      const maxVisible = 6;
+      if (prev.filter((p) => p.phase === "in").length >= maxVisible) return prev;
+
+      const slot = pickFreeSlot(prev);
+      if (!slot) return prev;
+
+      const text = pickText(prev.map((p) => p.text));
+      const q: FloatingQuote = {
+        id: `q-${Date.now()}-${Math.random().toString(16).slice(2)}`,
         text,
-        slot: chosenSlots[i],
-        rotate: `${(Math.random() * 14 - 7).toFixed(1)}deg`,
-        opacity: 0.22 + Math.random() * 0.12, // 0.22–0.34 (satter)
-      }));
-    }
+        slot,
+        rotate: rand(-8, 8),
+        phase: "in",
+        bornAt: Date.now(),
+        lifeMs: Math.floor(rand(5200, 9800)), // stays visible for a random time
+      };
+      return [...prev, q];
+    });
+  }
 
-    // initial
-    setItems(buildSet());
+  function scheduleLoop() {
+    // Spawn intervals: each quote has its own random timing -> organic
+    const nextInMs = Math.floor(rand(900, 2300));
+    const t = window.setTimeout(() => {
+      spawnOne();
+      scheduleLoop();
+    }, nextInMs);
+    timersRef.current.push(t);
+  }
 
-    // rotate every 6.5s
-    const t = window.setInterval(() => {
-      setItems(buildSet());
-    }, 6500);
+  useEffect(() => {
+    // initial: start with 3 quotes so it feels alive, then random spawns
+    const initial = window.setTimeout(() => {
+      spawnOne();
+      window.setTimeout(spawnOne, 450);
+      window.setTimeout(spawnOne, 900);
+      scheduleLoop();
+    }, 250);
+    timersRef.current.push(initial);
 
-    return () => window.clearInterval(t);
-  }, [MICRO_TEXTS]);
+    return () => clearAllTimers();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    // per quote lifetime -> fade out -> remove (soft)
+    // we do it by scheduling timeouts when quotes change
+    // keep it simple: schedule for each "in" quote if not already scheduled via bornAt
+    quotes.forEach((q) => {
+      if (q.phase !== "in") return;
+
+      const age = Date.now() - q.bornAt;
+      const remaining = Math.max(0, q.lifeMs - age);
+
+      // after remaining: mark as out (fade)
+      const t1 = window.setTimeout(() => {
+        setQuotes((prev) =>
+          prev.map((x) => (x.id === q.id ? { ...x, phase: "out" } : x))
+        );
+      }, remaining);
+
+      // after remaining + fadeDuration: remove
+      const fadeMs = 900;
+      const t2 = window.setTimeout(() => {
+        setQuotes((prev) => prev.filter((x) => x.id !== q.id));
+      }, remaining + fadeMs);
+
+      timersRef.current.push(t1, t2);
+    });
+
+    // don’t return cleanup here, global cleanup is enough;
+    // otherwise we'd remove timers too aggressively.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [quotes.length]);
 
   return (
     <main className="relative min-h-[100svh] text-slate-900 overflow-hidden">
-      {/* Background */}
+      {/* Background matches landing */}
       <div className="absolute inset-0 -z-10">
         <div className="absolute inset-0 bg-gradient-to-b from-[#fbfbfb] via-[#f3f6f6] to-[#eef2f2]" />
         <div
@@ -113,7 +196,7 @@ export default function LoginPage() {
         <div className="absolute inset-0 bg-[radial-gradient(1200px_700px_at_50%_30%,transparent_55%,rgba(0,0,0,0.10)_100%)]" />
       </div>
 
-      {/* Rotating micro-text layer (no overlap via grid slots) */}
+      {/* Organic rotating quotes (no overlap by slot-grid) */}
       <div className="absolute inset-0 -z-10 pointer-events-none select-none">
         <div
           className="absolute inset-0"
@@ -125,27 +208,27 @@ export default function LoginPage() {
             gap: "2.5%",
           }}
         >
-          {items.map((it) => (
+          {quotes.map((q) => (
             <div
-              key={it.id}
-              className="login-quote"
+              key={q.id}
               style={{
-                gridColumn: it.slot.c + 1,
-                gridRow: it.slot.r + 1,
+                gridColumn: q.slot.c + 1,
+                gridRow: q.slot.r + 1,
                 alignSelf: "center",
                 justifySelf: "center",
-                transform: `rotate(${it.rotate})`,
-                color: "rgba(0,115,106,0.98)",
-                opacity: it.opacity,
-                fontSize: "clamp(12px, 1.25vw, 16px)", // bigger
+                transform: `rotate(${q.rotate}deg)`,
+                color: "rgba(0,115,106,0.98)", // slightly more saturated
+                fontSize: "clamp(13px, 1.35vw, 17px)",
                 letterSpacing: "0.16em",
                 textTransform: "uppercase",
-                filter: "blur(0.15px)",
-                textShadow: "0 1px 0 rgba(255,255,255,0.25)",
                 whiteSpace: "nowrap",
+                opacity: q.phase === "in" ? 0.34 : 0,
+                transition: "opacity 900ms ease, transform 1400ms ease",
+                filter: "blur(0.15px)",
+                textShadow: "0 1px 0 rgba(255,255,255,0.22)",
               }}
             >
-              {it.text}
+              {q.text}
             </div>
           ))}
         </div>
@@ -219,10 +302,7 @@ export default function LoginPage() {
           <div className="space-y-3">
             <div className="rounded-2xl bg-white/70 border border-black/10 px-3 py-2 focus-within:ring-2 focus-within:ring-[#00736a]/15">
               <div className="text-[11px] text-black/45">Username</div>
-              <input
-                className="w-full bg-transparent outline-none text-sm"
-                autoComplete="username"
-              />
+              <input className="w-full bg-transparent outline-none text-sm" autoComplete="username" />
             </div>
 
             <div className="rounded-2xl bg-white/70 border border-black/10 px-3 py-2 focus-within:ring-2 focus-within:ring-[#00736a]/15">
@@ -273,19 +353,13 @@ export default function LoginPage() {
           <div className="pt-3 text-[10px] sm:text-[11px] text-black/40 flex flex-col sm:flex-row gap-2 sm:items-center sm:justify-between">
             <div>© {new Date().getFullYear()} Nutzwertanalyse.tool</div>
             <div className="flex flex-wrap gap-x-3 gap-y-1">
-              <a
-                href="/impressum"
-                className="underline underline-offset-2 decoration-black/20"
-              >
+              <a href="/impressum" className="underline underline-offset-2 decoration-black/20">
                 Impressum
               </a>
               <a href="/agb" className="underline underline-offset-2 decoration-black/20">
                 AGB
               </a>
-              <a
-                href="/datenschutz"
-                className="underline underline-offset-2 decoration-black/20"
-              >
+              <a href="/datenschutz" className="underline underline-offset-2 decoration-black/20">
                 Datenschutz
               </a>
             </div>
@@ -320,24 +394,9 @@ export default function LoginPage() {
           background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)' opacity='.28'/%3E%3C/svg%3E");
           mix-blend-mode: soft-light;
         }
-        .login-quote {
-          animation: quoteFloat 8s ease-in-out infinite;
-          will-change: transform, opacity;
-        }
-        @keyframes quoteFloat {
-          0% {
-            transform: translateY(0px) rotate(var(--r, 0deg));
-          }
-          50% {
-            transform: translateY(-10px) rotate(var(--r, 0deg));
-          }
-          100% {
-            transform: translateY(0px) rotate(var(--r, 0deg));
-          }
-        }
         @media (prefers-reduced-motion: reduce) {
-          .login-quote {
-            animation: none !important;
+          * {
+            scroll-behavior: auto !important;
           }
         }
       `}</style>

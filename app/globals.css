@@ -245,3 +245,36 @@ body {
   border-color: rgba(0,115,106,0.55);
   box-shadow: 0 0 0 4px rgba(0,115,106,0.12);
 }
+
+/* ===== App ( /app ) Premium Light Background ===== */
+.app-premium-bg {
+  min-height: 100vh;
+  position: relative;
+  overflow-x: hidden;
+  background: linear-gradient(180deg, #fbfbfb, #eef2f2);
+}
+
+.app-premium-bg::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: -1;
+
+  background:
+    radial-gradient(900px 650px at 18% 18%, rgba(0,0,0,0.05), transparent 62%),
+    radial-gradient(850px 600px at 85% 40%, rgba(0,0,0,0.035), transparent 62%),
+    radial-gradient(900px 700px at 50% 115%, rgba(0,0,0,0.07), transparent 72%);
+}
+
+.app-premium-bg::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: -1;
+
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)' opacity='.22'/%3E%3C/svg%3E");
+  mix-blend-mode: soft-light;
+  opacity: 0.22;
+}
