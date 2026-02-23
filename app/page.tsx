@@ -58,33 +58,73 @@ const PRESETS: Array<{
   },
 ];
 
+const INTRO_COOLDOWN_MS = 3 * 60 * 1000; // 3 Minuten
+const INTRO_KEY = "nwa_intro_lastShownAt";
+
+function shouldShowIntroNow() {
+  try {
+    const last = Number(localStorage.getItem(INTRO_KEY) || "0");
+    return !last || Date.now() - last > INTRO_COOLDOWN_MS;
+  } catch {
+    return true;
+  }
+}
+
+function markIntroShownNow() {
+  try {
+    localStorage.setItem(INTRO_KEY, String(Date.now()));
+  } catch {}
+}
+
 export default function LandingWithIntro() {
   const router = useRouter();
-  const [phase, setPhase] = useState<Phase>("intro");
+
+  // Determine intro on client to avoid SSR mismatch
+  const [phase, setPhase] = useState<Phase>("landing");
+  const [shouldIntro, setShouldIntro] = useState(false);
+
   const [text, setText] = useState("");
   const [isFocused, setIsFocused] = useState(false);
 
-  // Startseiten-Fog: soll lange genug bleiben, damit man Intro lesen kann
-  const [fogVisible, setFogVisible] = useState(true);
+  // Fog on startseite only, tied to intro
+  const [fogVisible, setFogVisible] = useState(false);
   const [fogSoftHide, setFogSoftHide] = useState(false);
   const fogTimer = useRef<number | null>(null);
 
-  // Header reacts to scroll (professional feel)
   const [scrolled, setScrolled] = useState(false);
 
   const canStart = useMemo(() => text.trim().length > 0, [text]);
   const placeholderText = "WELCHE ENTSCHEIDUNG SOLL HEUTE STRUKTURIERT WERDEN?";
 
   useEffect(() => {
-    // Intro: 3 Sekunden sichtbar
-    const t = window.setTimeout(() => setPhase("landing"), 3000);
-    return () => window.clearTimeout(t);
+    // Decide intro only once on mount
+    const show = shouldShowIntroNow();
+    setShouldIntro(show);
+
+    if (show) {
+      setPhase("intro");
+      setFogVisible(true);
+      setFogSoftHide(false);
+
+      // after 3s -> landing
+      const t = window.setTimeout(() => {
+        setPhase("landing");
+        markIntroShownNow();
+      }, 3000);
+
+      return () => window.clearTimeout(t);
+    } else {
+      // no intro, no fog
+      setPhase("landing");
+      setFogVisible(false);
+      setFogSoftHide(false);
+    }
   }, []);
 
   useEffect(() => {
-    // Fog-Handling NUR auf Startseite:
-    // - Fog bleibt während Intro vollständig aktiv
-    // - Danach noch kurz "soft" stehen lassen und erst dann ausblenden
+    // Fog fade-out only if intro was shown
+    if (!shouldIntro) return;
+
     if (fogTimer.current) window.clearTimeout(fogTimer.current);
 
     if (phase === "intro") {
@@ -93,19 +133,18 @@ export default function LandingWithIntro() {
       return;
     }
 
-    // landing: fog bleibt noch etwas, dann fade-out
+    // landing: keep fog slightly, then fade
     setFogVisible(true);
     setFogSoftHide(false);
     fogTimer.current = window.setTimeout(() => {
-      setFogSoftHide(true); // startet fade-out
-      // nach fade-out ganz aus
+      setFogSoftHide(true);
       window.setTimeout(() => setFogVisible(false), 650);
     }, 550);
 
     return () => {
       if (fogTimer.current) window.clearTimeout(fogTimer.current);
     };
-  }, [phase]);
+  }, [phase, shouldIntro]);
 
   useEffect(() => {
     function onScroll() {
@@ -154,8 +193,8 @@ export default function LandingWithIntro() {
         <div className="absolute inset-0 bg-[radial-gradient(1200px_700px_at_50%_30%,transparent_55%,rgba(0,0,0,0.10)_100%)]" />
       </div>
 
-      {/* Fog Overlay (nur Startseite, länger) */}
-      {fogVisible && (
+      {/* Fog Overlay only when intro is active/just ended */}
+      {shouldIntro && fogVisible && (
         <div
           className={[
             "fixed inset-0 z-40 pointer-events-none",
@@ -170,29 +209,31 @@ export default function LandingWithIntro() {
       )}
 
       {/* INTRO OVERLAY */}
-      <div
-        className={[
-          "fixed inset-0 z-50 grid place-items-center",
-          "transition-all duration-700 ease-out",
-          phase === "intro" ? "opacity-100" : "opacity-0 pointer-events-none",
-        ].join(" ")}
-      >
+      {shouldIntro && (
         <div
           className={[
-            "text-center transition-all duration-700 ease-out",
-            phase === "intro"
-              ? "translate-y-0 scale-100 opacity-100"
-              : "-translate-y-3 scale-[0.98] opacity-0",
+            "fixed inset-0 z-50 grid place-items-center",
+            "transition-all duration-700 ease-out",
+            phase === "intro" ? "opacity-100" : "opacity-0 pointer-events-none",
           ].join(" ")}
         >
-          <div className="text-5xl md:text-6xl font-semibold tracking-tight text-slate-900">
-            Nutzwertanalyse<span className="opacity-70">.</span>
-          </div>
-          <div className="mt-4 text-sm text-black/45">
-            Entscheidungen nachvollziehbar begründen
+          <div
+            className={[
+              "text-center transition-all duration-700 ease-out",
+              phase === "intro"
+                ? "translate-y-0 scale-100 opacity-100"
+                : "-translate-y-3 scale-[0.98] opacity-0",
+            ].join(" ")}
+          >
+            <div className="text-5xl md:text-6xl font-semibold tracking-tight text-slate-900">
+              Nutzwertanalyse<span className="opacity-70">.</span>
+            </div>
+            <div className="mt-4 text-sm text-black/45">
+              Entscheidungen nachvollziehbar begründen
+            </div>
           </div>
         </div>
-      </div>
+      )}
 
       <div className="relative min-h-[100svh] flex flex-col">
         {/* Header */}
@@ -410,20 +451,6 @@ export default function LandingWithIntro() {
                           </div>
                         </div>
                       </div>
-
-                      <div className="absolute bottom-3 right-3 z-10">
-                        <div
-                          className={[
-                            "h-9 w-9 rounded-full grid place-items-center",
-                            "backdrop-blur-md border border-white/15",
-                            "bg-black/22",
-                            "opacity-0 group-hover:opacity-100 transition duration-300",
-                          ].join(" ")}
-                          aria-hidden="true"
-                        >
-                          <span className="text-white/85 text-lg">→</span>
-                        </div>
-                      </div>
                     </button>
                   ))}
                 </div>
@@ -473,26 +500,15 @@ export default function LandingWithIntro() {
             <footer className="mt-4 pb-4 sm:pb-5">
               <div className="h-px bg-black/10" />
               <div className="pt-3 text-[10px] sm:text-[11px] text-black/40 flex flex-col sm:flex-row gap-2 sm:items-center sm:justify-between">
-                <div>
-                  © {new Date().getFullYear()} Nutzwertanalyse.tool • Draft-first
-                </div>
+                <div>© {new Date().getFullYear()} Nutzwertanalyse.tool • Draft-first</div>
                 <div className="flex flex-wrap gap-x-3 gap-y-1">
-                  <a
-                    href="/impressum"
-                    className="underline underline-offset-2 decoration-black/20"
-                  >
+                  <a href="/impressum" className="underline underline-offset-2 decoration-black/20">
                     Impressum
                   </a>
-                  <a
-                    href="/agb"
-                    className="underline underline-offset-2 decoration-black/20"
-                  >
+                  <a href="/agb" className="underline underline-offset-2 decoration-black/20">
                     AGB
                   </a>
-                  <a
-                    href="/datenschutz"
-                    className="underline underline-offset-2 decoration-black/20"
-                  >
+                  <a href="/datenschutz" className="underline underline-offset-2 decoration-black/20">
                     Datenschutz
                   </a>
                 </div>

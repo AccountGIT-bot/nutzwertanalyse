@@ -3,32 +3,37 @@
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 
-type FloatItem = {
+type Slot = { r: number; c: number };
+
+type RotatingItem = {
   id: string;
   text: string;
-  top: string;
-  left: string;
+  slot: Slot;
   rotate: string;
-  delay: string;
-  duration: string;
-  opacity: string;
-  size: string;
+  opacity: number;
 };
+
+function shuffle<T>(arr: T[]) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
 
 export default function LoginPage() {
   const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
 
-  // Generate floating micro text AFTER mount (avoid hydration issues)
-  const [floats, setFloats] = useState<FloatItem[]>([]);
-
   const MICRO_TEXTS = useMemo(
     () => [
+      // existing-ish + improved mix
       "Nutzwert = Summe gewichteter Kriterien",
       "Transparenz statt Bauchgefühl",
       "Vergleichbarkeit über Alternativen",
       "Gewichtung: 100%-Methode",
-      "AHP: Konsistenz & Struktur",
+      "AHP: Struktur & Konsistenz",
       "Sensitivität: Was ändert das Ergebnis?",
       "Dokumentation = Entscheidungsqualität",
       "Kriterien sauber definieren",
@@ -36,36 +41,64 @@ export default function LoginPage() {
       "DSG: Datenminimierung & Zweckbindung",
       "Risiken sichtbar machen",
       "Entscheidungen auditfähig machen",
+
+      // ✅ 10 neue, abwechslungsreiche
+      "Entscheidungslogik: konsistent & prüfbar",
+      "Prioritäten sichtbar – Konflikte reduzieren",
+      "Kriterienkataloge: wiederverwendbar",
+      "Stakeholder-Input strukturiert erfassen",
+      "Trade-offs klar kommunizieren",
+      "Qualität: Methode vor Meinung",
+      "Bewertungsskala: einheitlich & verständlich",
+      "Entscheidungsreport: kompakt & sauber",
+      "Versionierung: Änderungen nachvollziehbar",
+      "Szenarien: Varianten transparent vergleichen",
     ],
     []
   );
 
+  // 5x4 grid => 20 slots, guaranteed no overlap
+  const GRID = { rows: 4, cols: 5 };
+
+  const [items, setItems] = useState<RotatingItem[]>([]);
+
   useEffect(() => {
-    function rnd(min: number, max: number) {
-      return Math.random() * (max - min) + min;
+    // Build all slots
+    const slots: Slot[] = [];
+    for (let r = 0; r < GRID.rows; r++) {
+      for (let c = 0; c < GRID.cols; c++) slots.push({ r, c });
     }
 
-    const items: FloatItem[] = Array.from({ length: 14 }).map((_, i) => {
-      const text = MICRO_TEXTS[i % MICRO_TEXTS.length];
-      return {
-        id: `f-${i}`,
-        text,
-        top: `${rnd(6, 92).toFixed(2)}%`,
-        left: `${rnd(4, 94).toFixed(2)}%`,
-        rotate: `${rnd(-10, 10).toFixed(1)}deg`,
-        delay: `${rnd(0, 4).toFixed(2)}s`,
-        duration: `${rnd(10, 18).toFixed(2)}s`,
-        opacity: `${rnd(0.10, 0.18).toFixed(2)}`,
-        size: `${rnd(10, 12.5).toFixed(1)}px`,
-      };
-    });
+    // pick 5 unique slots per render cycle
+    const pickCount = 5;
 
-    setFloats(items);
+    function buildSet(): RotatingItem[] {
+      const texts = shuffle(MICRO_TEXTS).slice(0, pickCount);
+      const chosenSlots = shuffle(slots).slice(0, pickCount);
+
+      return texts.map((text, i) => ({
+        id: `it-${Date.now()}-${i}`,
+        text,
+        slot: chosenSlots[i],
+        rotate: `${(Math.random() * 14 - 7).toFixed(1)}deg`,
+        opacity: 0.22 + Math.random() * 0.12, // 0.22–0.34 (satter)
+      }));
+    }
+
+    // initial
+    setItems(buildSet());
+
+    // rotate every 6.5s
+    const t = window.setInterval(() => {
+      setItems(buildSet());
+    }, 6500);
+
+    return () => window.clearInterval(t);
   }, [MICRO_TEXTS]);
 
   return (
     <main className="relative min-h-[100svh] text-slate-900 overflow-hidden">
-      {/* Background matches landing */}
+      {/* Background */}
       <div className="absolute inset-0 -z-10">
         <div className="absolute inset-0 bg-gradient-to-b from-[#fbfbfb] via-[#f3f6f6] to-[#eef2f2]" />
         <div
@@ -80,29 +113,42 @@ export default function LoginPage() {
         <div className="absolute inset-0 bg-[radial-gradient(1200px_700px_at_50%_30%,transparent_55%,rgba(0,0,0,0.10)_100%)]" />
       </div>
 
-      {/* Floating micro texts (green, subtle) */}
+      {/* Rotating micro-text layer (no overlap via grid slots) */}
       <div className="absolute inset-0 -z-10 pointer-events-none select-none">
-        {floats.map((f) => (
-          <div
-            key={f.id}
-            className="absolute whitespace-nowrap login-float"
-            style={{
-              top: f.top,
-              left: f.left,
-              transform: `translate(-50%, -50%) rotate(${f.rotate})`,
-              color: "rgba(0,115,106,0.95)",
-              opacity: f.opacity as any,
-              fontSize: f.size,
-              letterSpacing: "0.12em",
-              textTransform: "uppercase",
-              filter: "blur(0.2px)",
-              animationDelay: f.delay,
-              animationDuration: f.duration,
-            }}
-          >
-            {f.text}
-          </div>
-        ))}
+        <div
+          className="absolute inset-0"
+          style={{
+            display: "grid",
+            gridTemplateColumns: `repeat(${GRID.cols}, 1fr)`,
+            gridTemplateRows: `repeat(${GRID.rows}, 1fr)`,
+            padding: "6%",
+            gap: "2.5%",
+          }}
+        >
+          {items.map((it) => (
+            <div
+              key={it.id}
+              className="login-quote"
+              style={{
+                gridColumn: it.slot.c + 1,
+                gridRow: it.slot.r + 1,
+                alignSelf: "center",
+                justifySelf: "center",
+                transform: `rotate(${it.rotate})`,
+                color: "rgba(0,115,106,0.98)",
+                opacity: it.opacity,
+                fontSize: "clamp(12px, 1.25vw, 16px)", // bigger
+                letterSpacing: "0.16em",
+                textTransform: "uppercase",
+                filter: "blur(0.15px)",
+                textShadow: "0 1px 0 rgba(255,255,255,0.25)",
+                whiteSpace: "nowrap",
+              }}
+            >
+              {it.text}
+            </div>
+          ))}
+        </div>
       </div>
 
       {/* Header */}
@@ -227,13 +273,19 @@ export default function LoginPage() {
           <div className="pt-3 text-[10px] sm:text-[11px] text-black/40 flex flex-col sm:flex-row gap-2 sm:items-center sm:justify-between">
             <div>© {new Date().getFullYear()} Nutzwertanalyse.tool</div>
             <div className="flex flex-wrap gap-x-3 gap-y-1">
-              <a href="/impressum" className="underline underline-offset-2 decoration-black/20">
+              <a
+                href="/impressum"
+                className="underline underline-offset-2 decoration-black/20"
+              >
                 Impressum
               </a>
               <a href="/agb" className="underline underline-offset-2 decoration-black/20">
                 AGB
               </a>
-              <a href="/datenschutz" className="underline underline-offset-2 decoration-black/20">
+              <a
+                href="/datenschutz"
+                className="underline underline-offset-2 decoration-black/20"
+              >
                 Datenschutz
               </a>
             </div>
@@ -268,25 +320,23 @@ export default function LoginPage() {
           background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)' opacity='.28'/%3E%3C/svg%3E");
           mix-blend-mode: soft-light;
         }
-        .login-float {
-          animation-name: floaty;
-          animation-timing-function: ease-in-out;
-          animation-iteration-count: infinite;
-          will-change: transform;
+        .login-quote {
+          animation: quoteFloat 8s ease-in-out infinite;
+          will-change: transform, opacity;
         }
-        @keyframes floaty {
+        @keyframes quoteFloat {
           0% {
-            transform: translate(-50%, -50%) translateY(0px);
+            transform: translateY(0px) rotate(var(--r, 0deg));
           }
           50% {
-            transform: translate(-50%, -50%) translateY(-10px);
+            transform: translateY(-10px) rotate(var(--r, 0deg));
           }
           100% {
-            transform: translate(-50%, -50%) translateY(0px);
+            transform: translateY(0px) rotate(var(--r, 0deg));
           }
         }
         @media (prefers-reduced-motion: reduce) {
-          .login-float {
+          .login-quote {
             animation: none !important;
           }
         }
