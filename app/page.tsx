@@ -17,57 +17,43 @@ type PresetId =
 const PRESETS: Array<{
   id: PresetId;
   label: string;
-  emoji: string;
   hint: string;
-  accent: string; // rgb string like "0 115 106"
   image: string; // path in /public
 }> = [
   {
     id: "supplier",
-    label: "Lieferant",
-    emoji: "🤝",
+    label: "Lieferantenauswahl",
     hint: "Partner objektiv vergleichen",
-    accent: "37 99 235", // Blau
     image: "/presets/Startseite_Lieferantenauswahl_komprimiert.jpg",
   },
   {
     id: "software",
-    label: "Software",
-    emoji: "💻",
+    label: "Softwarevergleich",
     hint: "Tools effizient bewerten",
-    accent: "45 212 191", // Türkis
     image: "/presets/Startseite_Softwarevergleich_komprimiert.jpg",
   },
   {
     id: "investment",
-    label: "Investition",
-    emoji: "📈",
+    label: "Investitionsentscheid",
     hint: "Chancen & Risiken abwägen",
-    accent: "16 185 129", // Grün
     image: "/presets/Startseite_Investitionsentscheid_komprimiert.jpg",
   },
   {
     id: "machines",
-    label: "Maschinen",
-    emoji: "⚙",
+    label: "Maschinenkauf",
     hint: "Leistung & Wirtschaftlichkeit",
-    accent: "148 163 184", // Metall / Grau
     image: "/presets/Startseite_Maschinenkauf_komprimiert.jpg",
   },
   {
     id: "vehicle",
-    label: "Fahrzeug",
-    emoji: "🚗",
+    label: "Fahrzeuganschaffung",
     hint: "Anschaffung & Nutzen",
-    accent: "217 119 6", // warm neutral (amber)
     image: "/presets/Startseite_Fahrzeugauswahl_komprimiert.jpg",
   },
   {
     id: "employee",
-    label: "Mitarbeiter",
-    emoji: "👤✔",
+    label: "Mitarbeiterwahl",
     hint: "Bewerber fair vergleichen",
-    accent: "15 23 42", // Navy
     image: "/presets/Startseite_Mitarbeiterwahl_komprimiert.jpg",
   },
 ];
@@ -81,7 +67,7 @@ export default function LandingWithIntro() {
   const canStart = useMemo(() => text.trim().length > 0, [text]);
 
   useEffect(() => {
-    const t = setTimeout(() => setPhase("landing"), 3000);
+    const t = setTimeout(() => setPhase("landing"), 2600);
     return () => clearTimeout(t);
   }, []);
 
@@ -90,7 +76,7 @@ export default function LandingWithIntro() {
       localStorage.setItem("nwa_decisionDraft", payload.draft);
       if (payload.preset) localStorage.setItem("nwa_preset", payload.preset);
     } catch {}
-    router.push("/app"); // ✅ führt zu app/app/page.tsx
+    router.push("/app");
   }
 
   function startFromInput() {
@@ -110,19 +96,26 @@ export default function LandingWithIntro() {
 
   return (
     <main className="relative min-h-screen text-slate-900 overflow-hidden">
-      {/* Background */}
+      {/* Premium Background */}
       <div className="absolute inset-0 -z-10">
-        <div className="absolute inset-0 bg-gradient-to-b from-[#fbfbfb] to-[#eef1f1]" />
+        {/* Base */}
+        <div className="absolute inset-0 bg-gradient-to-b from-[#fbfbfb] via-[#f3f6f6] to-[#eef2f2]" />
+
+        {/* Soft spotlights */}
         <div
           className="absolute inset-0"
           style={{
             background:
-              "radial-gradient(900px 650px at 20% 15%, rgba(0,115,106,0.26), transparent 58%), radial-gradient(700px 520px at 85% 45%, rgba(0,115,106,0.12), transparent 62%)",
+              "radial-gradient(900px 650px at 18% 18%, rgba(0,0,0,0.05), transparent 62%), radial-gradient(850px 600px at 85% 40%, rgba(0,0,0,0.035), transparent 62%), radial-gradient(900px 700px at 50% 110%, rgba(0,0,0,0.06), transparent 70%)",
           }}
         />
-        <div className="absolute inset-0 landing-sheen" />
-        <div className="absolute inset-0 landing-hex opacity-[0.12]" />
-        <div className="absolute inset-0 bg-[radial-gradient(1200px_700px_at_50%_35%,transparent_55%,rgba(0,0,0,0.06)_100%)]" />
+
+        {/* Subtle grain + sheen */}
+        <div className="absolute inset-0 landing-grain opacity-[0.20]" />
+        <div className="absolute inset-0 landing-sheen2 opacity-[0.65]" />
+
+        {/* “Premium” vignette */}
+        <div className="absolute inset-0 bg-[radial-gradient(1200px_700px_at_50%_30%,transparent_55%,rgba(0,0,0,0.10)_100%)]" />
       </div>
 
       {/* INTRO OVERLAY */}
@@ -141,11 +134,8 @@ export default function LandingWithIntro() {
               : "-translate-y-3 scale-[0.98] opacity-0",
           ].join(" ")}
         >
-          <div
-            className="text-5xl md:text-6xl font-semibold tracking-tight"
-            style={{ color: "#00736a" }}
-          >
-            Nutzwertanalyse<span className="opacity-90">.</span>
+          <div className="text-5xl md:text-6xl font-semibold tracking-tight text-slate-900">
+            Nutzwertanalyse<span className="opacity-70">.</span>
           </div>
           <div className="mt-4 text-sm text-black/45">
             Entscheidungen strukturiert treffen
@@ -164,36 +154,54 @@ export default function LandingWithIntro() {
             : "opacity-0 translate-y-2",
         ].join(" ")}
       >
-        {/* Headline */}
-        <div className="text-center">
-          <h1 className="text-5xl sm:text-6xl font-semibold tracking-tight">
-            <span style={{ color: "#00736a" }}>Nutzwertanalyse</span>
-            <span style={{ color: "#00736a" }}>.</span>
-          </h1>
-          <p className="mt-4 text-sm sm:text-base text-black/45">
-            Starte mit einer Entscheidung oder wähle eine Vorlage – Login kommt
-            später.
-          </p>
+        {/* Header (oben links) */}
+        <div className="flex items-start justify-between gap-6">
+          <div className="max-w-xl">
+            <div className="inline-flex items-center gap-3">
+              <h1 className="text-4xl sm:text-5xl font-semibold tracking-tight text-slate-900">
+                Nutzwertanalyse<span className="opacity-70">.</span>
+              </h1>
+
+              {/* tiny premium divider */}
+              <div className="hidden sm:block h-[28px] w-px bg-black/10" />
+              <div className="hidden sm:block text-xs tracking-[0.28em] uppercase text-black/40">
+                Decision Studio
+              </div>
+            </div>
+
+            <p className="mt-3 text-sm sm:text-base text-black/50 leading-relaxed">
+              Starte direkt mit deiner Entscheidung oder wähle eine Vorlage.
+              <span className="text-black/40">
+                {" "}
+                Speichern/Export/Account erst später.
+              </span>
+            </p>
+          </div>
+
+          {/* optional empty right space for future (login etc.) */}
+          <div className="hidden md:block" />
         </div>
 
         {/* Search + Start */}
-        <div className="mt-8 sm:mt-10 md:mt-12 flex justify-center">
+        <div className="mt-8 sm:mt-10 md:mt-12">
           <div className="w-full max-w-4xl">
-            <div className="relative rounded-[999px] bg-white/70 border border-black/10 shadow-[0_30px_80px_rgba(0,0,0,0.10)] backdrop-blur-md px-3 sm:px-4 py-3 sm:py-4">
+            <div className="relative rounded-[999px] bg-white/72 border border-black/10 shadow-[0_30px_80px_rgba(0,0,0,0.10)] backdrop-blur-md px-3 sm:px-4 py-3 sm:py-4">
               <div className="flex items-center gap-3 sm:gap-4">
-                {/* icon bubble */}
+                {/* icon bubble (neutral, no color) */}
                 <div
                   className="h-12 w-12 sm:h-14 sm:w-14 shrink-0 rounded-full flex items-center justify-center"
                   style={{
-                    background: "rgba(0,115,106,0.12)",
-                    border: "1px solid rgba(0,115,106,0.20)",
+                    background: "rgba(0,0,0,0.04)",
+                    border: "1px solid rgba(0,0,0,0.10)",
                   }}
                   aria-hidden="true"
                 >
-                  <span style={{ color: "#00736a", fontSize: 18 }}>⌁</span>
+                  <span className="text-black/60" style={{ fontSize: 18 }}>
+                    ⌁
+                  </span>
                 </div>
 
-                {/* input with animated placeholder overlay */}
+                {/* input with placeholder overlay */}
                 <div className="relative w-full">
                   <input
                     value={text}
@@ -213,20 +221,20 @@ export default function LandingWithIntro() {
                     aria-label="Welche Entscheidung steht heute an?"
                   />
 
-                  {/* Desktop placeholder (static) */}
+                  {/* Desktop placeholder */}
                   {!text && !isFocused && (
                     <div className="pointer-events-none absolute inset-y-0 left-0 hidden sm:flex items-center">
-                      <span className="text-[#00736a]/75 text-sm sm:text-base font-semibold tracking-[0.18em] uppercase">
+                      <span className="text-black/55 text-sm sm:text-base font-semibold tracking-[0.18em] uppercase">
                         {placeholderText}
                       </span>
                     </div>
                   )}
 
-                  {/* Mobile placeholder (marquee) */}
+                  {/* Mobile placeholder marquee */}
                   {!text && !isFocused && (
                     <div className="pointer-events-none absolute inset-y-0 left-0 flex sm:hidden items-center w-full overflow-hidden">
                       <div className="w-full landing-marquee-mask">
-                        <div className="landing-marquee text-[#00736a]/75 text-sm font-semibold tracking-[0.18em] uppercase whitespace-nowrap">
+                        <div className="landing-marquee text-black/55 text-sm font-semibold tracking-[0.18em] uppercase whitespace-nowrap">
                           {placeholderText}&nbsp;&nbsp;&nbsp;•&nbsp;&nbsp;&nbsp;
                           {placeholderText}
                         </div>
@@ -246,10 +254,10 @@ export default function LandingWithIntro() {
                     "active:scale-[0.99]",
                     canStart
                       ? "hover:brightness-[1.04]"
-                      : "opacity-70 cursor-not-allowed",
+                      : "opacity-65 cursor-not-allowed",
                   ].join(" ")}
                   style={{
-                    background: "#00736a",
+                    background: "#0b0f14",
                     color: "white",
                   }}
                   aria-label="Start"
@@ -260,15 +268,14 @@ export default function LandingWithIntro() {
               </div>
             </div>
 
-            <div className="mt-4 text-center text-xs sm:text-sm text-black/45">
-              Tipp: Du kannst ohne Login starten – Login kommt erst später, wenn
-              du wirklich weitermachst.
+            <div className="mt-3 text-xs sm:text-sm text-black/45">
+              Ohne Login starten – Login wird erst fürs Speichern/Export relevant.
             </div>
           </div>
         </div>
 
         {/* 6 Presets */}
-        <div className="mt-8 sm:mt-10 flex justify-center">
+        <div className="mt-8 sm:mt-10">
           <div className="w-full max-w-5xl">
             <div className="grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2 md:grid-cols-3">
               {PRESETS.map((p) => (
@@ -282,62 +289,58 @@ export default function LandingWithIntro() {
                     "transition duration-300 ease-out",
                     "hover:-translate-y-1 hover:shadow-[0_25px_70px_rgba(0,0,0,0.16)]",
                     "active:translate-y-0",
-                    // Grössere Kacheln:
-                    "h-[180px] sm:h-[220px] lg:h-[260px]",
+                    "h-[190px] sm:h-[235px] lg:h-[275px]",
                     "focus:outline-none focus-visible:ring-2 focus-visible:ring-black/20",
                   ].join(" ")}
                 >
-                  {/* Background image + readability gradient */}
+                  {/* Background image */}
                   <div className="absolute inset-0">
                     <Image
                       src={p.image}
                       alt=""
                       fill
                       sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                      className="object-cover opacity-100"
+                      // ✅ “breiter / mehr rechts sehen”: right-centered + slight zoom
+                      className="object-cover object-[72%_50%] scale-[1.08] transition-transform duration-500 ease-out group-hover:scale-[1.12]"
                       priority={p.id === "supplier"}
                     />
 
-                    {/* Verlauf für Lesbarkeit (unten) */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/15 to-black/0" />
+                    {/* readability layers */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/72 via-black/18 to-black/0" />
+                    <div className="absolute inset-0 bg-[radial-gradient(900px_280px_at_20%_100%,rgba(0,0,0,0.35),transparent_65%)]" />
 
-                    {/* Accent Glow nur beim Hover (einmal, nicht doppelt) */}
-                    <div
-                      className="absolute inset-0 opacity-0 group-hover:opacity-100 transition duration-300"
-                      style={{
-                        background: `radial-gradient(800px 320px at 15% 0%, rgb(${p.accent} / 0.22), transparent 62%)`,
-                      }}
-                    />
+                    {/* premium glass sheen on hover */}
+                    <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition duration-300 landing-card-sheen" />
                   </div>
 
-                  {/* Glass Label unten links */}
-                  <div className="relative z-10 flex h-full items-end p-4 sm:p-5">
+                  {/* Label oben links (statt unten) */}
+                  <div className="relative z-10 p-4 sm:p-5">
                     <div
-                      className="rounded-2xl px-4 py-3 backdrop-blur-md"
+                      className="inline-flex flex-col gap-1 rounded-2xl px-4 py-3 backdrop-blur-md"
                       style={{
-                        background: "rgba(0,0,0,0.40)",
-                        border: "1px solid rgba(255,255,255,0.18)",
+                        background: "rgba(0,0,0,0.38)",
+                        border: "1px solid rgba(255,255,255,0.16)",
                       }}
                     >
-                      <div className="flex items-center gap-2">
-                        <span className="text-lg" aria-hidden="true">
-                          {p.emoji}
-                        </span>
-
-                        <div className="text-base font-semibold text-white leading-tight">
-                          {p.label}
-                        </div>
-
-                        <span
-                          className="ml-1 h-2.5 w-2.5 rounded-full"
-                          style={{ background: `rgb(${p.accent})` }}
-                          aria-hidden="true"
-                        />
+                      <div className="text-base font-semibold text-white leading-tight">
+                        {p.label}
                       </div>
+                      <div className="text-xs text-white/80">{p.hint}</div>
+                    </div>
+                  </div>
 
-                      <div className="mt-1 text-xs text-white/80">
-                        {p.hint}
-                      </div>
+                  {/* Click affordance (subtle) */}
+                  <div className="absolute bottom-4 right-4 z-10">
+                    <div
+                      className={[
+                        "h-10 w-10 rounded-full grid place-items-center",
+                        "backdrop-blur-md border border-white/15",
+                        "bg-black/25",
+                        "opacity-0 group-hover:opacity-100 transition duration-300",
+                      ].join(" ")}
+                      aria-hidden="true"
+                    >
+                      <span className="text-white/85 text-lg">→</span>
                     </div>
                   </div>
                 </button>
@@ -345,8 +348,8 @@ export default function LandingWithIntro() {
             </div>
 
             <div className="mt-6 text-center text-xs text-black/35">
-              Login wird erst relevant, wenn du wirklich speichern / exportieren
-              / Abo nutzen willst.
+              Login wird erst relevant, wenn du speichern / exportieren / Abo
+              nutzen willst.
             </div>
           </div>
         </div>
@@ -354,66 +357,46 @@ export default function LandingWithIntro() {
 
       {/* Global CSS (landing only) */}
       <style jsx global>{`
-        .landing-sheen {
-          opacity: 0.55;
+        .landing-sheen2 {
           background: radial-gradient(
-            900px 500px at 10% 30%,
-            rgba(0, 115, 106, 0.14),
-            transparent 60%
+            800px 420px at 22% 18%,
+            rgba(255, 255, 255, 0.55),
+            transparent 62%
           );
-          animation: sheenMove 10s ease-in-out infinite;
+          animation: sheenMove2 12s ease-in-out infinite;
         }
-        @keyframes sheenMove {
+        @keyframes sheenMove2 {
           0% {
             transform: translate3d(-2%, 0, 0);
-            opacity: 0.45;
+            opacity: 0.55;
           }
           50% {
             transform: translate3d(2%, -1%, 0);
-            opacity: 0.65;
+            opacity: 0.75;
           }
           100% {
             transform: translate3d(-2%, 0, 0);
-            opacity: 0.45;
+            opacity: 0.55;
           }
         }
-        .landing-hex {
-          background-image: linear-gradient(
-              30deg,
-              rgba(0, 0, 0, 0.08) 12%,
-              transparent 12.5%,
-              transparent 87%,
-              rgba(0, 0, 0, 0.08) 87.5%,
-              rgba(0, 0, 0, 0.08)
-            ),
-            linear-gradient(
-              150deg,
-              rgba(0, 0, 0, 0.08) 12%,
-              transparent 12.5%,
-              transparent 87%,
-              rgba(0, 0, 0, 0.08) 87.5%,
-              rgba(0, 0, 0, 0.08)
-            ),
-            linear-gradient(
-              90deg,
-              rgba(0, 0, 0, 0.06) 2%,
-              transparent 2.5%,
-              transparent 97%,
-              rgba(0, 0, 0, 0.06) 97.5%,
-              rgba(0, 0, 0, 0.06)
-            );
-          background-size: 120px 208px;
-          mask-image: radial-gradient(
-            900px 600px at 78% 35%,
-            black 55%,
-            transparent 78%
-          );
-          -webkit-mask-image: radial-gradient(
-            900px 600px at 78% 35%,
-            black 55%,
-            transparent 78%
-          );
+
+        /* subtle film grain */
+        .landing-grain {
+          background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)' opacity='.28'/%3E%3C/svg%3E");
+          mix-blend-mode: soft-light;
         }
+
+        /* premium sheen for preset cards */
+        .landing-card-sheen {
+          background: linear-gradient(
+            120deg,
+            rgba(255, 255, 255, 0.04),
+            rgba(255, 255, 255, 0.14),
+            rgba(255, 255, 255, 0.04)
+          );
+          mix-blend-mode: overlay;
+        }
+
         .landing-marquee-mask {
           mask-image: linear-gradient(
             to right,
