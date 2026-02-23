@@ -20,7 +20,7 @@ const PRESETS: Array<{
   emoji: string;
   hint: string;
   accent: string; // rgb string like "0 115 106"
-  image: string;  // path in /public
+  image: string; // path in /public
 }> = [
   {
     id: "supplier",
@@ -100,7 +100,6 @@ export default function LandingWithIntro() {
   }
 
   function startFromPreset(p: PresetId) {
-    // Wenn Nutzer nichts schreibt, setzen wir einen sinnvollen Draft
     const draft =
       text.trim() ||
       `Vorlage: ${PRESETS.find((x) => x.id === p)?.label ?? "Auswahl"}`;
@@ -271,73 +270,73 @@ export default function LandingWithIntro() {
         {/* 6 Presets */}
         <div className="mt-8 sm:mt-10 flex justify-center">
           <div className="w-full max-w-5xl">
-            <div className="grid gap-4 sm:gap-5 grid-cols-2 md:grid-cols-3">
+            <div className="grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2 md:grid-cols-3">
               {PRESETS.map((p) => (
                 <button
                   key={p.id}
                   onClick={() => startFromPreset(p.id)}
                   className={[
-                    "group relative overflow-hidden rounded-2xl",
-                    "border border-black/10 bg-white/55 backdrop-blur-md",
-                    "shadow-[0_18px_55px_rgba(0,0,0,0.10)]",
-                    "p-4 sm:p-5 text-left",
+                    "group relative overflow-hidden rounded-3xl text-left",
+                    "border border-black/10",
+                    "shadow-[0_18px_55px_rgba(0,0,0,0.12)]",
                     "transition duration-300 ease-out",
-                    "hover:-translate-y-1 hover:shadow-[0_25px_70px_rgba(0,0,0,0.12)]",
+                    "hover:-translate-y-1 hover:shadow-[0_25px_70px_rgba(0,0,0,0.16)]",
                     "active:translate-y-0",
+                    // Grössere Kacheln:
+                    "h-[180px] sm:h-[220px] lg:h-[260px]",
+                    "focus:outline-none focus-visible:ring-2 focus-visible:ring-black/20",
                   ].join(" ")}
                 >
-                  {/* Accent glow */}
-                  <div
-                    className="absolute inset-0 opacity-0 group-hover:opacity-100 transition duration-300"
-                    style={{
-                      background: `radial-gradient(700px 260px at 15% 0%, rgb(${p.accent} / 0.22), transparent 62%)`,
-                    }}
-                  />
+                  {/* Background image + readability gradient */}
+                  <div className="absolute inset-0">
+                    <Image
+                      src={p.image}
+                      alt=""
+                      fill
+                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                      className="object-cover opacity-100"
+                      priority={p.id === "supplier"}
+                    />
 
-                  {/* Background image */}
-<div className="absolute inset-0">
-  <Image
-    src={p.image}
-    alt=""
-    fill
-    sizes="(max-width: 768px) 50vw, 33vw"
-    className="object-cover"
-    priority={p.id === "supplier"} // nur 1 preset priorisieren
-  />
-  {/* dunkle/helle Lesbarkeits-Layer */}
-  <div className="absolute inset-0 bg-white/55" />
-  <div
-    className="absolute inset-0 opacity-0 group-hover:opacity-100 transition duration-300"
-    style={{
-      background: `radial-gradient(700px 260px at 15% 0%, rgb(${p.accent} / 0.22), transparent 62%)`,
-    }}
-  />
-</div>
+                    {/* Verlauf für Lesbarkeit (unten) */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/15 to-black/0" />
 
-                  <div className="relative flex items-start gap-3">
+                    {/* Accent Glow nur beim Hover (einmal, nicht doppelt) */}
                     <div
-                      className="h-11 w-11 rounded-xl flex items-center justify-center shrink-0"
+                      className="absolute inset-0 opacity-0 group-hover:opacity-100 transition duration-300"
                       style={{
-                        background: `rgb(${p.accent} / 0.10)`,
-                        border: `1px solid rgb(${p.accent} / 0.18)`,
+                        background: `radial-gradient(800px 320px at 15% 0%, rgb(${p.accent} / 0.22), transparent 62%)`,
                       }}
-                      aria-hidden="true"
-                    >
-                      <span className="text-xl">{p.emoji}</span>
-                    </div>
+                    />
+                  </div>
 
-                    <div className="min-w-0">
-                      <div
-                        className="font-semibold tracking-tight"
-                        style={{ color: `rgb(${p.accent})` }}
-                      >
-                        {p.label}
+                  {/* Glass Label unten links */}
+                  <div className="relative z-10 flex h-full items-end p-4 sm:p-5">
+                    <div
+                      className="rounded-2xl px-4 py-3 backdrop-blur-md"
+                      style={{
+                        background: "rgba(0,0,0,0.40)",
+                        border: "1px solid rgba(255,255,255,0.18)",
+                      }}
+                    >
+                      <div className="flex items-center gap-2">
+                        <span className="text-lg" aria-hidden="true">
+                          {p.emoji}
+                        </span>
+
+                        <div className="text-base font-semibold text-white leading-tight">
+                          {p.label}
+                        </div>
+
+                        <span
+                          className="ml-1 h-2.5 w-2.5 rounded-full"
+                          style={{ background: `rgb(${p.accent})` }}
+                          aria-hidden="true"
+                        />
                       </div>
-                      <div className="mt-1 text-xs sm:text-sm text-black/55">
+
+                      <div className="mt-1 text-xs text-white/80">
                         {p.hint}
-                      </div>
-                      <div className="mt-3 text-[11px] text-black/40">
-                        Klick → Vorlage starten
                       </div>
                     </div>
                   </div>
