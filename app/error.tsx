@@ -13,6 +13,7 @@ export default function GlobalError({
   const router = useRouter();
 
   useEffect(() => {
+    // Optional: später an Monitoring/Logging anschliessen
     // console.error(error);
   }, [error]);
 
@@ -32,7 +33,7 @@ export default function GlobalError({
         <div className="absolute inset-0 bg-[radial-gradient(1200px_700px_at_50%_30%,transparent_55%,rgba(0,0,0,0.10)_100%)]" />
       </div>
 
-      {/* Header */}
+      {/* Header-like bar */}
       <header className="sticky top-0 z-30">
         <div className="bg-white/70 backdrop-blur-xl shadow-[0_12px_30px_rgba(0,0,0,0.08)]">
           <div className="mx-auto max-w-6xl px-5 sm:px-6 h-[68px] sm:h-[76px] flex items-center justify-between">
@@ -55,12 +56,14 @@ export default function GlobalError({
               </div>
             </button>
 
-            <button
-              onClick={() => router.refresh()}
-              className="rounded-full px-4 py-2 text-sm font-semibold border border-black/10 bg-white/70 hover:bg-white/85 transition"
-            >
-              Seite neu laden
-            </button>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => router.refresh()}
+                className="rounded-full px-4 py-2 text-sm font-semibold border border-black/10 bg-white/70 hover:bg-white/85 transition"
+              >
+                Seite neu laden
+              </button>
+            </div>
           </div>
           <div className="h-px bg-black/10" />
         </div>
@@ -78,8 +81,9 @@ export default function GlobalError({
           </h1>
 
           <p className="mt-3 text-sm sm:text-base text-black/55 leading-relaxed">
-            Du kannst es erneut versuchen oder zur Startseite zurück. Falls es
-            wiederholt passiert, notiere dir den Fehlercode unten.
+            Das ist ein unerwarteter Fehler. Du kannst die Seite neu laden oder
+            zurück zur Startseite gehen. Falls es wiederholt passiert, notiere
+            dir den Fehlercode unten.
           </p>
 
           <div className="mt-6 grid gap-3 sm:grid-cols-2">
@@ -107,22 +111,13 @@ export default function GlobalError({
           </div>
 
           <div className="mt-8 flex flex-wrap gap-x-4 gap-y-2 text-[11px] text-black/45">
-            <a
-              href="/impressum"
-              className="underline underline-offset-2 decoration-black/20"
-            >
+            <a href="/impressum" className="underline underline-offset-2 decoration-black/20">
               Impressum
             </a>
-            <a
-              href="/agb"
-              className="underline underline-offset-2 decoration-black/20"
-            >
+            <a href="/agb" className="underline underline-offset-2 decoration-black/20">
               AGB
             </a>
-            <a
-              href="/datenschutz"
-              className="underline underline-offset-2 decoration-black/20"
-            >
+            <a href="/datenschutz" className="underline underline-offset-2 decoration-black/20">
               Datenschutz
             </a>
           </div>
@@ -134,9 +129,7 @@ export default function GlobalError({
           <div className="h-px bg-black/10" />
           <div className="pt-3 text-[10px] sm:text-[11px] text-black/40 flex flex-col sm:flex-row gap-2 sm:items-center sm:justify-between">
             <div>© {new Date().getFullYear()} Nutzwertanalyse.tool</div>
-            <div className="text-black/35">
-              Stabilität • Transparenz • Governance
-            </div>
+            <div className="text-black/35">Stabilität • Transparenz • Governance</div>
           </div>
         </div>
       </footer>
