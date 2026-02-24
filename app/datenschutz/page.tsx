@@ -6,12 +6,7 @@ export default function DatenschutzPage() {
   const router = useRouter();
 
   return (
-    <main className="relative min-h-[100svh] text-slate-900 overflow-hidden">
-      <div className="absolute inset-0 -z-10">
-        <div className="absolute inset-0 bg-gradient-to-b from-[#fbfbfb] via-[#f3f6f6] to-[#eef2f2]" />
-        <div className="absolute inset-0 bg-[radial-gradient(1200px_700px_at_50%_30%,transparent_55%,rgba(0,0,0,0.10)_100%)]" />
-      </div>
-
+    <main className="premium-light-bg relative min-h-[100svh] text-slate-900 overflow-hidden">
       <header className="sticky top-0 z-30">
         <div className="bg-white/70 backdrop-blur-xl shadow-[0_12px_30px_rgba(0,0,0,0.08)]">
           <div className="mx-auto max-w-4xl px-5 sm:px-6 h-[68px] sm:h-[76px] flex items-center justify-between">
@@ -19,6 +14,7 @@ export default function DatenschutzPage() {
               onClick={() => router.push("/")}
               className="flex items-center gap-3 text-left"
               aria-label="Zur Startseite"
+              title="Startseite"
             >
               <div className="h-10 w-10 rounded-2xl bg-black/5 border border-black/10 grid place-items-center">
                 <span className="text-black/70 text-lg">⌁</span>
@@ -44,14 +40,14 @@ export default function DatenschutzPage() {
         </div>
       </header>
 
-      <section className="mx-auto max-w-4xl px-5 sm:px-6 py-10 sm:py-12">
+      <section className="relative z-10 mx-auto max-w-4xl px-5 sm:px-6 py-10 sm:py-12">
         <div className="rounded-3xl bg-white/72 border border-black/10 shadow-[0_30px_80px_rgba(0,0,0,0.10)] backdrop-blur-md p-6 sm:p-8">
           <h1 className="text-3xl sm:text-4xl font-semibold tracking-tight">
             Datenschutzerklärung
           </h1>
           <p className="mt-3 text-sm sm:text-base text-black/55">
-            Diese Vorlage orientiert sich am Schweizer Datenschutzgesetz (DSG).
-            Bitte ergänze Anbieterangaben und prüfe die Texte mit deinem Setup (Hosting, Analytics, Payment).
+            Diese Vorlage orientiert sich am Schweizer Datenschutzgesetz (DSG). Bitte ergänze
+            Anbieterangaben und prüfe die Texte mit deinem Setup (Hosting, Analytics, Payment).
           </p>
 
           <div className="mt-8 space-y-7 text-sm text-black/65 leading-relaxed">
@@ -60,8 +56,8 @@ export default function DatenschutzPage() {
               <div className="mt-2">
                 Verantwortlich für die Datenbearbeitung ist:
                 <br />
-                <span className="font-medium">[Dein Firmenname / Betreiber]</span>,
-                <span className="font-medium"> [Adresse, Schweiz]</span>
+                <span className="font-medium">[Dein Firmenname / Betreiber]</span>,{" "}
+                <span className="font-medium">[Adresse, Schweiz]</span>
                 <br />
                 Kontakt: <span className="font-medium">[E-Mail]</span>
               </div>
@@ -70,9 +66,9 @@ export default function DatenschutzPage() {
             <div>
               <div className="font-semibold text-black/80">2. Grundsätze</div>
               <div className="mt-2">
-                Wir bearbeiten Personendaten nach den Grundsätzen von Zweckbindung, Verhältnismässigkeit
-                (Datenminimierung), Transparenz und Sicherheit. Wir treffen angemessene technische und
-                organisatorische Massnahmen (TOM), um Daten zu schützen.
+                Wir bearbeiten Personendaten nach den Grundsätzen von Zweckbindung,
+                Verhältnismässigkeit (Datenminimierung), Transparenz und Sicherheit. Wir treffen
+                angemessene technische und organisatorische Massnahmen (TOM), um Daten zu schützen.
               </div>
             </div>
 
@@ -111,12 +107,14 @@ export default function DatenschutzPage() {
             </div>
 
             <div>
-              <div className="font-semibold text-black/80">6. Auftragsbearbeiter & Drittanbieter</div>
+              <div className="font-semibold text-black/80">
+                6. Auftragsbearbeiter & Drittanbieter
+              </div>
               <div className="mt-2">
-                Wir können Dienstleister einsetzen (z. B. Hosting, E-Mail, Monitoring, Payment).
-                Diese bearbeiten Daten als Auftragsbearbeiter gemäss DSG und nur nach unseren Weisungen.
-                Falls Daten in Länder ausserhalb der Schweiz/des EWR übertragen werden, stellen wir
-                ein angemessenes Datenschutzniveau sicher (z. B. Standardvertragsklauseln, wo nötig).
+                Wir können Dienstleister einsetzen (z. B. Hosting, E-Mail, Monitoring, Payment). Diese
+                bearbeiten Daten als Auftragsbearbeiter gemäss DSG und nur nach unseren Weisungen.
+                Falls Daten in Länder ausserhalb der Schweiz/des EWR übertragen werden, stellen wir ein
+                angemessenes Datenschutzniveau sicher (z. B. Standardvertragsklauseln, wo nötig).
               </div>
             </div>
 
@@ -142,8 +140,9 @@ export default function DatenschutzPage() {
             <div>
               <div className="font-semibold text-black/80">9. Rechte der betroffenen Personen</div>
               <div className="mt-2">
-                Betroffene Personen können nach DSG Auskunft, Berichtigung, Löschung sowie weitere Rechte
-                geltend machen, soweit anwendbar. Anfragen bitte an <span className="font-medium">[Kontakt-E-Mail]</span>.
+                Betroffene Personen können nach DSG Auskunft, Berichtigung, Löschung sowie weitere
+                Rechte geltend machen, soweit anwendbar. Anfragen bitte an{" "}
+                <span className="font-medium">[Kontakt-E-Mail]</span>.
               </div>
             </div>
 
@@ -178,19 +177,24 @@ export default function DatenschutzPage() {
             >
               Impressum
             </a>
-            <button
-              onClick={() => router.push("/")}
-              className="rounded-full px-4 py-2 border border-black/10 bg-white/70 hover:bg-white/85 transition"
-            >
-              Startseite
-            </button>
           </div>
         </div>
       </section>
 
-      <footer className="pb-6">
-        <div className="mx-auto max-w-4xl px-5 sm:px-6 text-[11px] text-black/40">
-          © {new Date().getFullYear()} Nutzwertanalyse.tool
+      <footer className="relative z-10 pb-6">
+        <div className="mx-auto max-w-4xl px-5 sm:px-6">
+          <div className="h-px bg-black/10" />
+          <div className="pt-3 text-[10px] sm:text-[11px] text-black/40 flex flex-col sm:flex-row gap-2 sm:items-center sm:justify-between">
+            <div>© {new Date().getFullYear()} Nutzwertanalyse.tool</div>
+            <div className="flex flex-wrap gap-x-3 gap-y-1">
+              <a href="/impressum" className="underline underline-offset-2 decoration-black/20">
+                Impressum
+              </a>
+              <a href="/agb" className="underline underline-offset-2 decoration-black/20">
+                AGB
+              </a>
+            </div>
+          </div>
         </div>
       </footer>
     </main>

@@ -180,24 +180,10 @@ export default function LoginPage() {
   }, [quotes.length]);
 
   return (
-    <main className="relative min-h-[100svh] text-slate-900 overflow-hidden">
-      {/* Background matches landing */}
-      <div className="absolute inset-0 -z-10">
-        <div className="absolute inset-0 bg-gradient-to-b from-[#fbfbfb] via-[#f3f6f6] to-[#eef2f2]" />
-        <div
-          className="absolute inset-0"
-          style={{
-            background:
-              "radial-gradient(900px 650px at 18% 18%, rgba(0,0,0,0.05), transparent 62%), radial-gradient(850px 600px at 85% 40%, rgba(0,0,0,0.035), transparent 62%), radial-gradient(900px 700px at 50% 115%, rgba(0,0,0,0.07), transparent 72%)",
-          }}
-        />
-        <div className="absolute inset-0 login-grain opacity-[0.18]" />
-        <div className="absolute inset-0 login-sheen opacity-[0.60]" />
-        <div className="absolute inset-0 bg-[radial-gradient(1200px_700px_at_50%_30%,transparent_55%,rgba(0,0,0,0.10)_100%)]" />
-      </div>
+    <main className="premium-light-bg relative min-h-[100svh] text-slate-900 overflow-hidden">
 
       {/* Organic rotating quotes (no overlap by slot-grid) */}
-      <div className="absolute inset-0 -z-10 pointer-events-none select-none">
+      <div className="absolute inset-0 z-0 pointer-events-none select-none">
         <div
           className="absolute inset-0"
           style={{
@@ -269,7 +255,7 @@ export default function LoginPage() {
       </header>
 
       {/* Content */}
-      <div className="min-h-[calc(100svh-76px)] flex items-center justify-center px-6 py-10">
+      <div className="relative z-10 min-h-[calc(100svh-76px)] flex items-center justify-center px-6 py-10">
         <div className="w-full max-w-md rounded-3xl bg-white/72 border border-black/10 shadow-[0_30px_80px_rgba(0,0,0,0.10)] backdrop-blur-md p-6 sm:p-7">
           <div className="text-center">
             <div className="text-3xl font-semibold tracking-tight text-slate-900">
@@ -347,7 +333,7 @@ export default function LoginPage() {
       </div>
 
       {/* Footer */}
-      <footer className="pb-4">
+      <footer className="relative z-10 pb-4">
         <div className="mx-auto max-w-6xl px-5 sm:px-6">
           <div className="h-px bg-black/10" />
           <div className="pt-3 text-[10px] sm:text-[11px] text-black/40 flex flex-col sm:flex-row gap-2 sm:items-center sm:justify-between">
@@ -368,38 +354,12 @@ export default function LoginPage() {
       </footer>
 
       <style jsx global>{`
-        .login-sheen {
-          background: radial-gradient(
-            800px 420px at 22% 18%,
-            rgba(255, 255, 255, 0.55),
-            transparent 62%
-          );
-          animation: sheenMove2 12s ease-in-out infinite;
-        }
-        @keyframes sheenMove2 {
-          0% {
-            transform: translate3d(-2%, 0, 0);
-            opacity: 0.55;
-          }
-          50% {
-            transform: translate3d(2%, -1%, 0);
-            opacity: 0.75;
-          }
-          100% {
-            transform: translate3d(-2%, 0, 0);
-            opacity: 0.55;
-          }
-        }
-        .login-grain {
-          background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)' opacity='.28'/%3E%3C/svg%3E");
-          mix-blend-mode: soft-light;
-        }
-        @media (prefers-reduced-motion: reduce) {
-          * {
-            scroll-behavior: auto !important;
-          }
-        }
-      `}</style>
+  @media (prefers-reduced-motion: reduce) {
+    * {
+      scroll-behavior: auto !important;
+    }
+  }
+`}</style>
     </main>
   );
 }
