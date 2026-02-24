@@ -34,35 +34,35 @@ async function fetchWithTimeout(url: string, timeoutMs: number) {
   }
 }
 
-function StatusIcon({ status }: { status: StepStatus }) {
+function StatusPill({ status }: { status: StepStatus }) {
   if (status === "running") {
     return (
-      <span className="inline-flex h-6 w-6 items-center justify-center">
-        <span className="h-4 w-4 rounded-full border border-black/25 border-t-black/65 animate-spin" />
+      <span className="inline-flex items-center gap-2 rounded-full px-2.5 py-1 text-[11px] border border-black/10 bg-white/70 text-black/55">
+        <span className="h-3 w-3 rounded-full border border-black/25 border-t-black/65 animate-spin" />
+        läuft
       </span>
     );
   }
   if (status === "ok") {
     return (
-      <span className="inline-flex h-6 w-6 items-center justify-center">
-        <span className="h-5 w-5 rounded-full bg-emerald-500/15 border border-emerald-500/35 grid place-items-center">
-          <span className="text-emerald-700 text-sm font-bold">✓</span>
-        </span>
+      <span className="inline-flex items-center gap-2 rounded-full px-2.5 py-1 text-[11px] border border-emerald-500/20 bg-emerald-500/10 text-emerald-800">
+        <span className="h-2 w-2 rounded-full bg-emerald-600/70" />
+        OK
       </span>
     );
   }
   if (status === "fail") {
     return (
-      <span className="inline-flex h-6 w-6 items-center justify-center">
-        <span className="h-5 w-5 rounded-full bg-rose-500/12 border border-rose-500/30 grid place-items-center">
-          <span className="text-rose-700 text-sm font-bold">×</span>
-        </span>
+      <span className="inline-flex items-center gap-2 rounded-full px-2.5 py-1 text-[11px] border border-rose-500/20 bg-rose-500/10 text-rose-800">
+        <span className="h-2 w-2 rounded-full bg-rose-600/70" />
+        Fehler
       </span>
     );
   }
   return (
-    <span className="inline-flex h-6 w-6 items-center justify-center">
-      <span className="h-2 w-2 rounded-full bg-black/15" />
+    <span className="inline-flex items-center gap-2 rounded-full px-2.5 py-1 text-[11px] border border-black/10 bg-white/60 text-black/45">
+      <span className="h-2 w-2 rounded-full bg-black/25" />
+      bereit
     </span>
   );
 }
@@ -72,19 +72,19 @@ function Diagnostics({ variant }: { variant: "404" | "error" }) {
     {
       key: "internet",
       title: "Verbindung",
-      subtitle: "Internetstatus & Netzwerkverfügbarkeit",
+      subtitle: "Internetstatus & Netzwerk",
       status: "idle",
     },
     {
       key: "app",
       title: "Erreichbarkeit",
-      subtitle: "Antwort der Anwendung (Startseite)",
+      subtitle: "Antwort der Startseite",
       status: "idle",
     },
     {
       key: "health",
       title: "Systemstatus",
-      subtitle: "Service-Check via /api/health",
+      subtitle: "/api/health",
       status: "idle",
     },
   ]);
@@ -105,7 +105,7 @@ function Diagnostics({ variant }: { variant: "404" | "error" }) {
     runningRef.current = true;
 
     try {
-      // 1) Verbindung
+      // 1) Internet
       setSteps((prev) =>
         prev.map((s) =>
           s.key === "internet"
@@ -116,8 +116,7 @@ function Diagnostics({ variant }: { variant: "404" | "error" }) {
 
       const internetStart = msNow();
       const online = typeof navigator !== "undefined" ? navigator.onLine : true;
-
-      await new Promise((r) => window.setTimeout(r, 350));
+      await new Promise((r) => window.setTimeout(r, 280));
       if (unmountedRef.current) return;
 
       setSteps((prev) =>
@@ -127,15 +126,13 @@ function Diagnostics({ variant }: { variant: "404" | "error" }) {
                 ...s,
                 status: online ? "ok" : "fail",
                 ms: Math.round(msNow() - internetStart),
-                detail: online
-                  ? "Online – Verbindung erkannt."
-                  : "Offline – WLAN/Mobilfunk oder VPN prüfen.",
+                detail: online ? "Online" : "Offline (WLAN/Mobilfunk/VPN prüfen)",
               }
             : s
         )
       );
 
-      // 2) App-Erreichbarkeit
+      // 2) App
       setSteps((prev) =>
         prev.map((s) =>
           s.key === "app"
@@ -146,7 +143,7 @@ function Diagnostics({ variant }: { variant: "404" | "error" }) {
 
       const appStart = msNow();
       try {
-        const res = await fetchWithTimeout("/", 4000);
+        const res = await fetchWithTimeout("/", 3500);
         const ms = Math.round(msNow() - appStart);
         if (unmountedRef.current) return;
 
@@ -157,9 +154,7 @@ function Diagnostics({ variant }: { variant: "404" | "error" }) {
                   ...s,
                   status: res.ok ? "ok" : "fail",
                   ms,
-                  detail: res.ok
-                    ? `Antwort erhalten (HTTP ${res.status}).`
-                    : `Antwort erhalten, aber nicht OK (HTTP ${res.status}).`,
+                  detail: `HTTP ${res.status}`,
                 }
               : s
           )
@@ -176,9 +171,7 @@ function Diagnostics({ variant }: { variant: "404" | "error" }) {
                   status: "fail",
                   ms,
                   detail:
-                    e?.name === "AbortError"
-                      ? "Zeitüberschreitung – die App reagiert nicht."
-                      : "Fehler beim Laden – Netzwerk/Firewall/Adblock prüfen.",
+                    e?.name === "AbortError" ? "Timeout" : "Netz/Firewall/Adblock",
                 }
               : s
           )
@@ -196,7 +189,7 @@ function Diagnostics({ variant }: { variant: "404" | "error" }) {
 
       const healthStart = msNow();
       try {
-        const res = await fetchWithTimeout("/api/health", 4000);
+        const res = await fetchWithTimeout("/api/health", 3500);
         const ms = Math.round(msNow() - healthStart);
         if (unmountedRef.current) return;
 
@@ -207,17 +200,15 @@ function Diagnostics({ variant }: { variant: "404" | "error" }) {
                   ...s,
                   status: res.ok ? "ok" : "fail",
                   ms,
-                  detail: res.ok
-                    ? "System OK – Services antworten."
-                    : `Service antwortet, aber nicht OK (HTTP ${res.status}).`,
+                  detail: res.ok ? "OK" : `HTTP ${res.status}`,
                 }
               : s
           )
         );
       } catch {
-        // Fallback
+        // Fallback: favicon
         try {
-          const res2 = await fetchWithTimeout("/favicon.ico", 3500);
+          const res2 = await fetchWithTimeout("/favicon.ico", 2500);
           const ms = Math.round(msNow() - healthStart);
           if (unmountedRef.current) return;
 
@@ -228,9 +219,7 @@ function Diagnostics({ variant }: { variant: "404" | "error" }) {
                     ...s,
                     status: res2.ok ? "ok" : "fail",
                     ms,
-                    detail: res2.ok
-                      ? "System erreichbar (Fallback-Check)."
-                      : "System nicht erreichbar – bitte später erneut versuchen.",
+                    detail: res2.ok ? "Fallback OK" : "Keine Antwort",
                   }
                 : s
             )
@@ -242,12 +231,7 @@ function Diagnostics({ variant }: { variant: "404" | "error" }) {
           setSteps((prev) =>
             prev.map((s) =>
               s.key === "health"
-                ? {
-                    ...s,
-                    status: "fail",
-                    ms,
-                    detail: "Keine Antwort – Netzwerk oder Serverstatus prüfen.",
-                  }
+                ? { ...s, status: "fail", ms, detail: "Keine Antwort" }
                 : s
             )
           );
@@ -261,7 +245,6 @@ function Diagnostics({ variant }: { variant: "404" | "error" }) {
   useEffect(() => {
     unmountedRef.current = false;
     runOnce();
-
     loopRef.current = window.setInterval(() => runOnce(), 22000);
 
     return () => {
@@ -278,8 +261,8 @@ function Diagnostics({ variant }: { variant: "404" | "error" }) {
           <div className="text-sm font-semibold text-black/75">Live-Systemcheck</div>
           <div className="mt-1 text-[11px] text-black/50">
             {variant === "404"
-              ? "Zur Einordnung: falscher Link vs. Verbindungs-/Systemthema."
-              : "Zur Einordnung: Netzwerk, Erreichbarkeit und Systemstatus."}
+              ? "Hilft zu unterscheiden: falscher Link vs. Verbindungs-/Systemproblem."
+              : "Netzwerk, Erreichbarkeit und Systemstatus."}
           </div>
         </div>
 
@@ -299,30 +282,25 @@ function Diagnostics({ variant }: { variant: "404" | "error" }) {
         </div>
       </div>
 
-      <div className="mt-4 space-y-3">
-        {steps.map((s, idx) => (
-          <div
-            key={s.key}
-            className="flex items-start gap-3 rounded-xl border border-black/10 bg-white/70 px-3 py-2"
-          >
-            <StatusIcon status={s.status} />
+      {/* kompakt als Liste */}
+      <div className="mt-4 divide-y divide-black/10 rounded-xl border border-black/10 bg-white/70 overflow-hidden">
+        {steps.map((s) => (
+          <div key={s.key} className="px-3 py-2 flex items-center gap-3">
+            <div className="min-w-[120px] text-sm font-semibold text-black/70">
+              {s.title}
+            </div>
 
-            <div className="min-w-0 flex-1">
-              <div className="flex items-center justify-between gap-3">
-                <div className="text-sm font-semibold text-black/70">
-                  {idx + 1}. {s.title}
-                </div>
-                <div className="text-[11px] text-black/45">
-                  {typeof s.ms === "number" ? `${s.ms} ms` : ""}
-                </div>
-              </div>
-
-              <div className="text-[11px] text-black/50">{s.subtitle}</div>
-
+            <div className="flex-1 min-w-0">
+              <div className="text-[11px] text-black/55">{s.subtitle}</div>
               {s.detail && (
-                <div className="mt-1 text-[11px] text-black/55">{s.detail}</div>
+                <div className="text-[11px] text-black/60">
+                  {s.detail}
+                  {typeof s.ms === "number" ? ` • ${s.ms} ms` : ""}
+                </div>
               )}
             </div>
+
+            <StatusPill status={s.status} />
           </div>
         ))}
       </div>
@@ -340,48 +318,48 @@ function Diagnostics({ variant }: { variant: "404" | "error" }) {
 }
 
 function ErrorImageTop() {
-  // ✅ oben zentral, responsive, subtil animiert
+  const [imgOk, setImgOk] = useState(true);
+
   return (
     <div className="w-full flex justify-center">
       <div className="relative">
+        {/* Grössenlogik: gross sichtbar, aber nie aus dem Screen */}
         <img
-          src="/404_Error_Image.png"
+          src="/404_Error_Image.jpg"
           alt="404"
-          className="block w-[min(520px,85vw)] h-auto drop-shadow-[0_18px_50px_rgba(0,0,0,0.12)]"
+          onError={() => setImgOk(false)}
+          className="block w-[min(920px,94vw)] sm:w-[min(980px,90vw)] h-auto"
+          style={{
+            filter: "drop-shadow(0 22px 60px rgba(0,0,0,0.14))",
+          }}
         />
-        <div className="absolute inset-0 pointer-events-none rounded-2xl opacity-70 animate-softGlow" />
+
+        {/* subtile grüne aura */}
+        <div className="absolute inset-0 pointer-events-none rounded-2xl opacity-80 animate-softGlow" />
+
+        {!imgOk && (
+          <div className="mt-3 text-center text-[12px] text-black/55">
+            Bild nicht gefunden. Lege es in <span className="font-mono">/public/404_Error_Image.jpg</span>
+          </div>
+        )}
       </div>
 
       <style jsx global>{`
         @keyframes softGlow {
-          0% {
-            filter: blur(0px);
-            transform: translateY(0px);
-            opacity: 0.40;
-          }
-          50% {
-            filter: blur(0.3px);
-            transform: translateY(-6px);
-            opacity: 0.70;
-          }
-          100% {
-            filter: blur(0px);
-            transform: translateY(0px);
-            opacity: 0.40;
-          }
+          0% { transform: translateY(0px); opacity: 0.35; }
+          50% { transform: translateY(-6px); opacity: 0.70; }
+          100% { transform: translateY(0px); opacity: 0.35; }
         }
         .animate-softGlow {
           animation: softGlow 10.5s ease-in-out infinite;
           background: radial-gradient(
-            420px 240px at 50% 65%,
-            rgba(0, 115, 106, 0.14),
+            520px 280px at 50% 60%,
+            rgba(0, 115, 106, 0.18),
             transparent 62%
           );
         }
         @media (prefers-reduced-motion: reduce) {
-          .animate-softGlow {
-            animation: none;
-          }
+          .animate-softGlow { animation: none; }
         }
       `}</style>
     </div>
@@ -438,7 +416,7 @@ export default function NotFoundPage() {
         {/* 1) Bild */}
         <ErrorImageTop />
 
-        {/* 2) Text/CTA frei (ohne zusätzliche Box/Border) */}
+        {/* 2) Text/CTA frei */}
         <div className="mt-7">
           <div className="inline-flex items-center gap-2 rounded-full px-3 py-1 text-[11px] font-semibold border border-black/10 bg-white/70 text-black/70">
             🟢 GLOBAL • Seite nicht gefunden
@@ -464,25 +442,19 @@ export default function NotFoundPage() {
           </div>
 
           <div className="mt-7 flex flex-wrap gap-x-4 gap-y-2 text-[11px] text-black/45">
-            <a
-              href="/impressum"
-              className="underline underline-offset-2 decoration-black/20"
-            >
+            <a href="/impressum" className="underline underline-offset-2 decoration-black/20">
               Impressum
             </a>
             <a href="/agb" className="underline underline-offset-2 decoration-black/20">
               AGB
             </a>
-            <a
-              href="/datenschutz"
-              className="underline underline-offset-2 decoration-black/20"
-            >
+            <a href="/datenschutz" className="underline underline-offset-2 decoration-black/20">
               Datenschutz
             </a>
           </div>
         </div>
 
-        {/* 3) Diagnose unten */}
+        {/* 3) Diagnose unten kompakt */}
         <Diagnostics variant="404" />
       </section>
 
