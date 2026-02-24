@@ -21,7 +21,6 @@ function msNow() {
 async function fetchWithTimeout(url: string, timeoutMs: number) {
   const controller = new AbortController();
   const t = window.setTimeout(() => controller.abort(), timeoutMs);
-
   try {
     const res = await fetch(url, {
       method: "GET",
@@ -37,32 +36,32 @@ async function fetchWithTimeout(url: string, timeoutMs: number) {
 function StatusPill({ status }: { status: StepStatus }) {
   if (status === "running") {
     return (
-      <span className="inline-flex items-center gap-2 rounded-full px-2.5 py-1 text-[11px] border border-black/10 bg-white/70 text-black/55">
+      <span className="inline-flex items-center gap-2 rounded-full px-3 py-1 text-[11px] font-semibold border border-black/10 bg-white/70 text-black/55">
         <span className="h-3 w-3 rounded-full border border-black/25 border-t-black/65 animate-spin" />
-        läuft
+        Prüfe…
       </span>
     );
   }
   if (status === "ok") {
     return (
-      <span className="inline-flex items-center gap-2 rounded-full px-2.5 py-1 text-[11px] border border-emerald-500/20 bg-emerald-500/10 text-emerald-800">
-        <span className="h-2 w-2 rounded-full bg-emerald-600/70" />
+      <span className="inline-flex items-center gap-2 rounded-full px-3 py-1 text-[11px] font-semibold border border-emerald-500/25 bg-emerald-500/10 text-emerald-800">
+        <span className="h-2 w-2 rounded-full bg-emerald-500" />
         OK
       </span>
     );
   }
   if (status === "fail") {
     return (
-      <span className="inline-flex items-center gap-2 rounded-full px-2.5 py-1 text-[11px] border border-rose-500/20 bg-rose-500/10 text-rose-800">
-        <span className="h-2 w-2 rounded-full bg-rose-600/70" />
-        Fehler
+      <span className="inline-flex items-center gap-2 rounded-full px-3 py-1 text-[11px] font-semibold border border-rose-500/25 bg-rose-500/10 text-rose-800">
+        <span className="h-2 w-2 rounded-full bg-rose-500" />
+        Problem
       </span>
     );
   }
   return (
-    <span className="inline-flex items-center gap-2 rounded-full px-2.5 py-1 text-[11px] border border-black/10 bg-white/60 text-black/45">
-      <span className="h-2 w-2 rounded-full bg-black/25" />
-      bereit
+    <span className="inline-flex items-center gap-2 rounded-full px-3 py-1 text-[11px] font-semibold border border-black/10 bg-white/65 text-black/45">
+      <span className="h-2 w-2 rounded-full bg-black/20" />
+      Bereit
     </span>
   );
 }
@@ -84,14 +83,12 @@ function Diagnostics({ variant }: { variant: "404" | "error" }) {
     {
       key: "health",
       title: "Systemstatus",
-      subtitle: "/api/health",
+      subtitle: "Service-Check via /api/health",
       status: "idle",
     },
   ]);
 
   const loopRef = useRef<number | null>(null);
-  const runningRef = useRef(false);
-  const unmountedRef = useRef(false);
 
   const summary = useMemo(() => {
     const ok = steps.filter((s) => s.status === "ok").length;
@@ -101,168 +98,174 @@ function Diagnostics({ variant }: { variant: "404" | "error" }) {
   }, [steps]);
 
   async function runOnce() {
-    if (runningRef.current || unmountedRef.current) return;
-    runningRef.current = true;
+    // 1) Internet
+    setSteps((prev) =>
+      prev.map((s) =>
+        s.key === "internet" ? { ...s, status: "running", detail: undefined } : s
+      )
+    );
 
+    const internetStart = msNow();
+    const online = typeof navigator !== "undefined" ? navigator.onLine : true;
+
+    await new Promise((r) => window.setTimeout(r, 260));
+
+    setSteps((prev) =>
+      prev.map((s) =>
+        s.key === "internet"
+          ? {
+              ...s,
+              status: online ? "ok" : "fail",
+              ms: Math.round(msNow() - internetStart),
+              detail: online
+                ? "Online – Verbindung erkannt."
+                : "Offline – WLAN/Mobilfunk oder VPN prüfen.",
+            }
+          : s
+      )
+    );
+
+    // 2) App
+    setSteps((prev) =>
+      prev.map((s) =>
+        s.key === "app" ? { ...s, status: "running", detail: undefined } : s
+      )
+    );
+
+    const appStart = msNow();
     try {
-      // 1) Internet
-      setSteps((prev) =>
-        prev.map((s) =>
-          s.key === "internet"
-            ? { ...s, status: "running", detail: undefined, ms: undefined }
-            : s
-        )
-      );
-
-      const internetStart = msNow();
-      const online = typeof navigator !== "undefined" ? navigator.onLine : true;
-      await new Promise((r) => window.setTimeout(r, 280));
-      if (unmountedRef.current) return;
+      const res = await fetchWithTimeout("/", 4000);
+      const ms = Math.round(msNow() - appStart);
 
       setSteps((prev) =>
         prev.map((s) =>
-          s.key === "internet"
+          s.key === "app"
             ? {
                 ...s,
-                status: online ? "ok" : "fail",
-                ms: Math.round(msNow() - internetStart),
-                detail: online ? "Online" : "Offline (WLAN/Mobilfunk/VPN prüfen)",
+                status: res.ok ? "ok" : "fail",
+                ms,
+                detail: res.ok
+                  ? `Antwort erhalten (HTTP ${res.status}).`
+                  : `Antwort erhalten, aber nicht OK (HTTP ${res.status}).`,
               }
             : s
         )
       );
-
-      // 2) App
+    } catch (e: any) {
+      const ms = Math.round(msNow() - appStart);
       setSteps((prev) =>
         prev.map((s) =>
           s.key === "app"
-            ? { ...s, status: "running", detail: undefined, ms: undefined }
+            ? {
+                ...s,
+                status: "fail",
+                ms,
+                detail:
+                  e?.name === "AbortError"
+                    ? "Zeitüberschreitung – App reagiert nicht."
+                    : "Fehler beim Laden – Netzwerk/Firewall/Adblock prüfen.",
+              }
             : s
         )
       );
+    }
 
-      const appStart = msNow();
-      try {
-        const res = await fetchWithTimeout("/", 3500);
-        const ms = Math.round(msNow() - appStart);
-        if (unmountedRef.current) return;
+    // 3) Health
+    setSteps((prev) =>
+      prev.map((s) =>
+        s.key === "health" ? { ...s, status: "running", detail: undefined } : s
+      )
+    );
 
+    const healthStart = msNow();
+    const healthUrl = "/api/health";
+
+    try {
+      const res = await fetchWithTimeout(healthUrl, 4000);
+      const ms = Math.round(msNow() - healthStart);
+
+      if (res.ok) {
         setSteps((prev) =>
           prev.map((s) =>
-            s.key === "app"
-              ? {
-                  ...s,
-                  status: res.ok ? "ok" : "fail",
-                  ms,
-                  detail: `HTTP ${res.status}`,
-                }
+            s.key === "health"
+              ? { ...s, status: "ok", ms, detail: "System OK – Service antwortet." }
               : s
           )
         );
-      } catch (e: any) {
-        const ms = Math.round(msNow() - appStart);
-        if (unmountedRef.current) return;
-
+      } else {
         setSteps((prev) =>
           prev.map((s) =>
-            s.key === "app"
+            s.key === "health"
               ? {
                   ...s,
                   status: "fail",
                   ms,
-                  detail:
-                    e?.name === "AbortError" ? "Timeout" : "Netz/Firewall/Adblock",
+                  detail: `Service antwortet, aber nicht OK (HTTP ${res.status}).`,
                 }
               : s
           )
         );
       }
-
-      // 3) Health
-      setSteps((prev) =>
-        prev.map((s) =>
-          s.key === "health"
-            ? { ...s, status: "running", detail: undefined, ms: undefined }
-            : s
-        )
-      );
-
-      const healthStart = msNow();
+    } catch {
+      // Fallback: favicon
       try {
-        const res = await fetchWithTimeout("/api/health", 3500);
+        const res2 = await fetchWithTimeout("/favicon.ico", 3500);
         const ms = Math.round(msNow() - healthStart);
-        if (unmountedRef.current) return;
 
         setSteps((prev) =>
           prev.map((s) =>
             s.key === "health"
               ? {
                   ...s,
-                  status: res.ok ? "ok" : "fail",
+                  status: res2.ok ? "ok" : "fail",
                   ms,
-                  detail: res.ok ? "OK" : `HTTP ${res.status}`,
+                  detail: res2.ok
+                    ? "System erreichbar (Fallback-Check)."
+                    : "System nicht erreichbar – bitte später erneut versuchen.",
                 }
               : s
           )
         );
       } catch {
-        // Fallback: favicon
-        try {
-          const res2 = await fetchWithTimeout("/favicon.ico", 2500);
-          const ms = Math.round(msNow() - healthStart);
-          if (unmountedRef.current) return;
-
-          setSteps((prev) =>
-            prev.map((s) =>
-              s.key === "health"
-                ? {
-                    ...s,
-                    status: res2.ok ? "ok" : "fail",
-                    ms,
-                    detail: res2.ok ? "Fallback OK" : "Keine Antwort",
-                  }
-                : s
-            )
-          );
-        } catch {
-          const ms = Math.round(msNow() - healthStart);
-          if (unmountedRef.current) return;
-
-          setSteps((prev) =>
-            prev.map((s) =>
-              s.key === "health"
-                ? { ...s, status: "fail", ms, detail: "Keine Antwort" }
-                : s
-            )
-          );
-        }
+        const ms = Math.round(msNow() - healthStart);
+        setSteps((prev) =>
+          prev.map((s) =>
+            s.key === "health"
+              ? {
+                  ...s,
+                  status: "fail",
+                  ms,
+                  detail: "Keine Antwort – Netzwerk oder Serverstatus prüfen.",
+                }
+              : s
+          )
+        );
       }
-    } finally {
-      runningRef.current = false;
     }
   }
 
   useEffect(() => {
-    unmountedRef.current = false;
     runOnce();
-    loopRef.current = window.setInterval(() => runOnce(), 22000);
+
+    loopRef.current = window.setInterval(() => {
+      runOnce();
+    }, 22000);
 
     return () => {
-      unmountedRef.current = true;
       if (loopRef.current) window.clearInterval(loopRef.current);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
-    <div className="mt-8 rounded-2xl border border-black/10 bg-white/60 p-4">
+    <div className="mt-6 rounded-2xl border border-black/10 bg-white/60 p-4">
       <div className="flex items-start justify-between gap-4">
         <div>
           <div className="text-sm font-semibold text-black/75">Live-Systemcheck</div>
           <div className="mt-1 text-[11px] text-black/50">
             {variant === "404"
-              ? "Hilft zu unterscheiden: falscher Link vs. Verbindungs-/Systemproblem."
-              : "Netzwerk, Erreichbarkeit und Systemstatus."}
+              ? "Zur Einordnung: falscher Link vs. Verbindungs-/Systemthema."
+              : "Zur Einordnung: Netzwerk, Erreichbarkeit und Systemstatus."}
           </div>
         </div>
 
@@ -282,22 +285,23 @@ function Diagnostics({ variant }: { variant: "404" | "error" }) {
         </div>
       </div>
 
-      {/* kompakt als Liste */}
-      <div className="mt-4 divide-y divide-black/10 rounded-xl border border-black/10 bg-white/70 overflow-hidden">
-        {steps.map((s) => (
-          <div key={s.key} className="px-3 py-2 flex items-center gap-3">
-            <div className="min-w-[120px] text-sm font-semibold text-black/70">
-              {s.title}
-            </div>
-
-            <div className="flex-1 min-w-0">
-              <div className="text-[11px] text-black/55">{s.subtitle}</div>
-              {s.detail && (
-                <div className="text-[11px] text-black/60">
-                  {s.detail}
-                  {typeof s.ms === "number" ? ` • ${s.ms} ms` : ""}
+      <div className="mt-4 space-y-2">
+        {steps.map((s, idx) => (
+          <div
+            key={s.key}
+            className="flex items-center justify-between gap-4 rounded-xl border border-black/10 bg-white/70 px-3 py-2"
+          >
+            <div className="min-w-0">
+              <div className="flex items-center gap-2">
+                <div className="text-sm font-semibold text-black/70">
+                  {idx + 1}. {s.title}
                 </div>
-              )}
+                <div className="text-[11px] text-black/40">
+                  {typeof s.ms === "number" ? `${s.ms} ms` : ""}
+                </div>
+              </div>
+              <div className="text-[11px] text-black/50">{s.subtitle}</div>
+              {s.detail && <div className="text-[11px] text-black/55">{s.detail}</div>}
             </div>
 
             <StatusPill status={s.status} />
@@ -313,55 +317,6 @@ function Diagnostics({ variant }: { variant: "404" | "error" }) {
           Systemcheck erneut ausführen
         </button>
       </div>
-    </div>
-  );
-}
-
-function ErrorImageTop() {
-  const [imgOk, setImgOk] = useState(true);
-
-  return (
-    <div className="w-full flex justify-center">
-      <div className="relative">
-        {/* Grössenlogik: gross sichtbar, aber nie aus dem Screen */}
-        <img
-          src="/404_Error_Image.jpg"
-          alt="404"
-          onError={() => setImgOk(false)}
-          className="block w-[min(920px,94vw)] sm:w-[min(980px,90vw)] h-auto"
-          style={{
-            filter: "drop-shadow(0 22px 60px rgba(0,0,0,0.14))",
-          }}
-        />
-
-        {/* subtile grüne aura */}
-        <div className="absolute inset-0 pointer-events-none rounded-2xl opacity-80 animate-softGlow" />
-
-        {!imgOk && (
-          <div className="mt-3 text-center text-[12px] text-black/55">
-            Bild nicht gefunden. Lege es in <span className="font-mono">/public/404_Error_Image.jpg</span>
-          </div>
-        )}
-      </div>
-
-      <style jsx global>{`
-        @keyframes softGlow {
-          0% { transform: translateY(0px); opacity: 0.35; }
-          50% { transform: translateY(-6px); opacity: 0.70; }
-          100% { transform: translateY(0px); opacity: 0.35; }
-        }
-        .animate-softGlow {
-          animation: softGlow 10.5s ease-in-out infinite;
-          background: radial-gradient(
-            520px 280px at 50% 60%,
-            rgba(0, 115, 106, 0.18),
-            transparent 62%
-          );
-        }
-        @media (prefers-reduced-motion: reduce) {
-          .animate-softGlow { animation: none; }
-        }
-      `}</style>
     </div>
   );
 }
@@ -411,13 +366,22 @@ export default function NotFoundPage() {
         </div>
       </header>
 
-      {/* Content */}
-      <section className="mx-auto max-w-3xl px-5 sm:px-6 py-10 sm:py-14">
-        {/* 1) Bild */}
-        <ErrorImageTop />
+      {/* Image on top */}
+      <div className="mx-auto max-w-5xl px-5 sm:px-6 pt-7 sm:pt-9">
+        <img
+          src="/presets/404_Error_Image.png"
+          alt="404"
+          className="mx-auto w-full max-w-[900px] xl:max-w-[1000px] h-auto select-none pointer-events-none"
+          style={{
+            opacity: 0.98,
+            filter: "contrast(1.02) saturate(1.05)",
+          }}
+        />
+      </div>
 
-        {/* 2) Text/CTA frei */}
-        <div className="mt-7">
+      {/* Main card (no extra frame above image, image “blends”) */}
+      <section className="mx-auto max-w-3xl px-5 sm:px-6 py-7 sm:py-10">
+        <div className="rounded-3xl bg-white/72 border border-black/10 shadow-[0_30px_80px_rgba(0,0,0,0.10)] backdrop-blur-md p-6 sm:p-8">
           <div className="inline-flex items-center gap-2 rounded-full px-3 py-1 text-[11px] font-semibold border border-black/10 bg-white/70 text-black/70">
             🟢 GLOBAL • Seite nicht gefunden
           </div>
@@ -441,7 +405,7 @@ export default function NotFoundPage() {
             </button>
           </div>
 
-          <div className="mt-7 flex flex-wrap gap-x-4 gap-y-2 text-[11px] text-black/45">
+          <div className="mt-4 flex flex-wrap gap-x-4 gap-y-2 text-[11px] text-black/45">
             <a href="/impressum" className="underline underline-offset-2 decoration-black/20">
               Impressum
             </a>
@@ -452,10 +416,10 @@ export default function NotFoundPage() {
               Datenschutz
             </a>
           </div>
-        </div>
 
-        {/* 3) Diagnose unten kompakt */}
-        <Diagnostics variant="404" />
+          {/* Compact diagnostics below */}
+          <Diagnostics variant="404" />
+        </div>
       </section>
 
       {/* Footer */}
