@@ -1,14 +1,20 @@
 @import "tailwindcss";
 
+/* =========================================================
+   Base Theme Tokens (App Themes)
+   ========================================================= */
+
 /* Default (falls noch kein Theme gesetzt ist) */
 :root {
   --accent: 37 99 235;
   --accent-2: 59 130 246;
+  --glow: 56 189 248;
 
   --bg-1: 2 6 23;
   --bg-2: 15 23 42;
 
-  --glow: 56 189 248;
+  /* Landing Accent */
+  --landing-accent: 0 115 106; /* #00736a */
 }
 
 /* BASIC */
@@ -16,7 +22,6 @@
   --accent: 37 99 235;
   --accent-2: 59 130 246;
   --glow: 56 189 248;
-
   --bg-1: 2 6 23;
   --bg-2: 15 23 42;
 }
@@ -26,7 +31,6 @@
   --accent: 16 185 129;
   --accent-2: 45 212 191;
   --glow: 34 211 238;
-
   --bg-1: 2 6 23;
   --bg-2: 12 24 30;
 }
@@ -36,8 +40,6 @@
   --accent: 245 158 11;   /* Gold */
   --accent-2: 168 85 247; /* Violett */
   --glow: 251 191 36;     /* warmes Gold-Glow */
-
-  /* leicht wärmerer Unterton, aber sehr subtil */
   --bg-1: 7 6 18;
   --bg-2: 14 14 28;
 }
@@ -47,17 +49,18 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
-/* ===== Global Themed Background ===== */
+/* =========================================================
+   App Themed Background ( /app Layout )
+   ========================================================= */
+
 .themed-bg {
   min-height: 100vh;
   position: relative;
   overflow-x: hidden;
-
-  background:
-    linear-gradient(180deg, rgb(var(--bg-1)), rgb(var(--bg-2)));
+  background: linear-gradient(180deg, rgb(var(--bg-1)), rgb(var(--bg-2)));
 }
 
-/* Glow-Layer */
+/* Glow Layer */
 .themed-bg::before {
   content: "";
   position: fixed;
@@ -72,7 +75,7 @@ body {
   filter: saturate(1.05);
 }
 
-/* Motion-Layer (sehr subtil) */
+/* Motion Layer (subtil) */
 .themed-bg::after {
   content: "";
   position: fixed;
@@ -84,72 +87,29 @@ body {
     radial-gradient(800px 420px at 30% 20%, rgb(var(--accent) / 0.10), transparent 60%),
     radial-gradient(740px 420px at 70% 55%, rgb(var(--accent-2) / 0.08), transparent 60%);
   opacity: 0.9;
-
   transform: translate3d(0, 0, 0);
   animation: bg-drift 14s ease-in-out infinite;
 }
 
-/* leichte Bewegung im Gradient */
 @keyframes bg-drift {
   0%   { transform: translate3d(0px, 0px, 0) scale(1); }
   50%  { transform: translate3d(16px, -10px, 0) scale(1.02); }
   100% { transform: translate3d(0px, 0px, 0) scale(1); }
 }
 
-/* Motion respektieren */
 @media (prefers-reduced-motion: reduce) {
-  .themed-bg::after {
-    animation: none;
-  }
+  .themed-bg::after { animation: none; }
 }
 
-/* ===== Landing Background ===== */
+/* =========================================================
+   Landing Background ( / )
+   ========================================================= */
 
 .landing-bg {
   min-height: 100vh;
-  background:
-    radial-gradient(900px 500px at 10% 0%, rgba(0,115,106,0.15), transparent 60%),
-    linear-gradient(180deg, #ffffff, #f8f9f9);
   position: relative;
   overflow: hidden;
-}
 
-/* Subtiles Hexagon Overlay */
-.landing-bg::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background-image: url("/hexagon-pattern.svg");
-  background-repeat: no-repeat;
-  background-position: right center;
-  background-size: 45%;
-  opacity: 0.08;
-  pointer-events: none;
-}
-
-/* Animation */
-@keyframes smoothFade {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-.fade-in {
-  animation: smoothFade 0.8s ease forwards;
-}
-
-/* Input Glow */
-.input-glow:focus {
-  border-color: #00736a;
-  box-shadow: 0 0 0 4px rgba(0,115,106,0.15);
-}
-
-:root {
-  --landing-accent: 0 115 106; /* #00736a */
-}
-
-/* ===== Landing (/) ===== */
-.landing-bg {
-  min-height: 100vh;
   background:
     radial-gradient(900px 600px at 18% 18%, rgba(0,115,106,0.26), transparent 58%),
     radial-gradient(700px 480px at 78% 30%, rgba(0,0,0,0.08), transparent 62%),
@@ -157,12 +117,12 @@ body {
     linear-gradient(180deg, #fbfbfb, #eef2f2);
 }
 
+/* Hex / Grid Feeling (subtil) */
 .landing-hex {
   position: relative;
   overflow: hidden;
 }
 
-/* Hex / Grid Feeling (subtil) */
 .landing-hex::after {
   content: "";
   position: absolute;
@@ -176,7 +136,6 @@ body {
   pointer-events: none;
 }
 
-/* leichtes “Glow band” links wie in deinem Mock */
 .landing-hex::before {
   content: "";
   position: absolute;
@@ -185,6 +144,21 @@ body {
   pointer-events: none;
 }
 
+/* Entry fade */
+@keyframes smoothFade {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.fade-in { animation: smoothFade 0.8s ease forwards; }
+
+/* Input focus glow */
+.input-glow:focus {
+  border-color: #00736a;
+  box-shadow: 0 0 0 4px rgba(0,115,106,0.15);
+}
+
+/* Landing UI helpers */
 .landing-pill {
   background: rgba(255,255,255,0.72);
   border: 1px solid rgba(0,0,0,0.12);
@@ -211,7 +185,7 @@ body {
 }
 
 .landing-btn {
-  height: 44px;            /* <-- wichtig: gleiche Höhe wie Inputs */
+  height: 44px;
   display: inline-flex;
   align-items: center;
   gap: 10px;
@@ -232,7 +206,7 @@ body {
 }
 
 .landing-field {
-  height: 44px;            /* <-- Inputs gleiche Höhe */
+  height: 44px;
   padding: 0 12px;
   border-radius: 12px;
   border: 1px solid rgba(0,0,0,0.12);
@@ -246,15 +220,18 @@ body {
   box-shadow: 0 0 0 4px rgba(0,115,106,0.12);
 }
 
-/* ===== App ( /app ) Premium Light Background ===== */
-.app-premium-bg {
+/* =========================================================
+   Premium Light Background (Global pages: login/404/error/legal)
+   ========================================================= */
+
+.premium-light-bg {
   min-height: 100vh;
   position: relative;
   overflow-x: hidden;
   background: linear-gradient(180deg, #fbfbfb, #eef2f2);
 }
 
-.app-premium-bg::before {
+.premium-light-bg::before {
   content: "";
   position: fixed;
   inset: 0;
@@ -267,7 +244,7 @@ body {
     radial-gradient(900px 700px at 50% 115%, rgba(0,0,0,0.07), transparent 72%);
 }
 
-.app-premium-bg::after {
+.premium-light-bg::after {
   content: "";
   position: fixed;
   inset: 0;

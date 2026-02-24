@@ -34,7 +34,6 @@ async function fetchWithTimeout(url: string, timeoutMs: number) {
 }
 
 function StatusIcon({ status }: { status: StepStatus }) {
-  // Subtle, premium "living" animation: spinner while running, check on ok, x on fail
   if (status === "running") {
     return (
       <span className="inline-flex h-6 w-6 items-center justify-center">
@@ -71,20 +70,20 @@ function Diagnostics({ variant }: { variant: "404" | "error" }) {
   const [steps, setSteps] = useState<Step[]>([
     {
       key: "internet",
-      title: "Netzwerk",
-      subtitle: "Internetverbindung prüfen",
+      title: "Verbindung",
+      subtitle: "Internetstatus und Netzwerkverfügbarkeit",
       status: "idle",
     },
     {
       key: "app",
-      title: "App",
-      subtitle: "Erreichbarkeit der Seite prüfen",
+      title: "Erreichbarkeit",
+      subtitle: "Antwort der Anwendung (Startseite)",
       status: "idle",
     },
     {
       key: "health",
-      title: "System",
-      subtitle: "Status /api/health prüfen",
+      title: "Systemstatus",
+      subtitle: "Service-Check via /api/health",
       status: "idle",
     },
   ]);
@@ -99,7 +98,7 @@ function Diagnostics({ variant }: { variant: "404" | "error" }) {
   }, [steps]);
 
   async function runOnce() {
-    // Step 1: internet
+    // 1) Verbindung
     setSteps((prev) =>
       prev.map((s) =>
         s.key === "internet" ? { ...s, status: "running", detail: undefined } : s
@@ -109,7 +108,7 @@ function Diagnostics({ variant }: { variant: "404" | "error" }) {
     const internetStart = msNow();
     const online = typeof navigator !== "undefined" ? navigator.onLine : true;
 
-    // quick wait to make it feel "alive" even if instant
+    // kurze Verzögerung für eine ruhige, “wertige” Sequenz
     await new Promise((r) => window.setTimeout(r, 350));
 
     setSteps((prev) =>
@@ -120,14 +119,14 @@ function Diagnostics({ variant }: { variant: "404" | "error" }) {
               status: online ? "ok" : "fail",
               ms: Math.round(msNow() - internetStart),
               detail: online
-                ? "Online erkannt"
-                : "Offline erkannt (WLAN/Mobilfunk prüfen)",
+                ? "Online – Verbindung erkannt."
+                : "Offline – WLAN/Mobilfunk oder VPN prüfen.",
             }
           : s
       )
     );
 
-    // Step 2: app reachability
+    // 2) Erreichbarkeit der App
     setSteps((prev) =>
       prev.map((s) =>
         s.key === "app" ? { ...s, status: "running", detail: undefined } : s
@@ -138,6 +137,7 @@ function Diagnostics({ variant }: { variant: "404" | "error" }) {
     try {
       const res = await fetchWithTimeout("/", 4000);
       const ms = Math.round(msNow() - appStart);
+
       setSteps((prev) =>
         prev.map((s) =>
           s.key === "app"
@@ -146,8 +146,8 @@ function Diagnostics({ variant }: { variant: "404" | "error" }) {
                 status: res.ok ? "ok" : "fail",
                 ms,
                 detail: res.ok
-                  ? `Antwort erhalten (${res.status})`
-                  : `Antwort erhalten (${res.status})`,
+                  ? `Antwort erhalten (HTTP ${res.status}).`
+                  : `Antwort erhalten, aber nicht OK (HTTP ${res.status}).`,
               }
             : s
         )
@@ -163,15 +163,15 @@ function Diagnostics({ variant }: { variant: "404" | "error" }) {
                 ms,
                 detail:
                   e?.name === "AbortError"
-                    ? "Timeout – App reagiert nicht"
-                    : "Fehler beim Laden der App",
+                    ? "Zeitüberschreitung – die App reagiert nicht."
+                    : "Fehler beim Laden – Netzwerk/Firewall/Adblock prüfen.",
               }
             : s
         )
       );
     }
 
-    // Step 3: health check (prefer /api/health, fallback to favicon)
+    // 3) Systemstatus /api/health (Fallback: favicon)
     setSteps((prev) =>
       prev.map((s) =>
         s.key === "health" ? { ...s, status: "running", detail: undefined } : s
@@ -180,6 +180,7 @@ function Diagnostics({ variant }: { variant: "404" | "error" }) {
 
     const healthStart = msNow();
     const healthUrl = "/api/health";
+
     try {
       const res = await fetchWithTimeout(healthUrl, 4000);
       const ms = Math.round(msNow() - healthStart);
@@ -188,7 +189,7 @@ function Diagnostics({ variant }: { variant: "404" | "error" }) {
         setSteps((prev) =>
           prev.map((s) =>
             s.key === "health"
-              ? { ...s, status: "ok", ms, detail: "System OK" }
+              ? { ...s, status: "ok", ms, detail: "System OK – Services antworten." }
               : s
           )
         );
@@ -200,17 +201,18 @@ function Diagnostics({ variant }: { variant: "404" | "error" }) {
                   ...s,
                   status: "fail",
                   ms,
-                  detail: `Health nicht OK (${res.status})`,
+                  detail: `Service antwortet, aber nicht OK (HTTP ${res.status}).`,
                 }
               : s
           )
         );
       }
     } catch (e: any) {
-      // fallback
+      // Fallback
       try {
         const res2 = await fetchWithTimeout("/favicon.ico", 3500);
         const ms = Math.round(msNow() - healthStart);
+
         setSteps((prev) =>
           prev.map((s) =>
             s.key === "health"
@@ -219,8 +221,8 @@ function Diagnostics({ variant }: { variant: "404" | "error" }) {
                   status: res2.ok ? "ok" : "fail",
                   ms,
                   detail: res2.ok
-                    ? "System erreichbar (Fallback)"
-                    : "System nicht erreichbar",
+                    ? "System erreichbar (Fallback-Check)."
+                    : "System nicht erreichbar – bitte später erneut versuchen.",
                 }
               : s
           )
@@ -230,7 +232,12 @@ function Diagnostics({ variant }: { variant: "404" | "error" }) {
         setSteps((prev) =>
           prev.map((s) =>
             s.key === "health"
-              ? { ...s, status: "fail", ms, detail: "Keine Antwort erhalten" }
+              ? {
+                  ...s,
+                  status: "fail",
+                  ms,
+                  detail: "Keine Antwort – Netzwerk oder Serverstatus prüfen.",
+                }
               : s
           )
         );
@@ -239,12 +246,9 @@ function Diagnostics({ variant }: { variant: "404" | "error" }) {
   }
 
   useEffect(() => {
-    // Run immediately, then keep a soft “hourglass feeling” by re-running periodically
     runOnce();
 
-    // Subtle periodic re-check (not too aggressive)
     loopRef.current = window.setInterval(() => {
-      // Don’t spam if user is offline and it keeps failing: still re-check but slower feel
       runOnce();
     }, 22000);
 
@@ -259,12 +263,12 @@ function Diagnostics({ variant }: { variant: "404" | "error" }) {
       <div className="flex items-start justify-between gap-4">
         <div>
           <div className="text-sm font-semibold text-black/75">
-            Live-Diagnose
+            Live-Systemcheck
           </div>
           <div className="mt-1 text-[11px] text-black/50">
             {variant === "404"
-              ? "Hilft dir zu erkennen, ob es wirklich nur ein Link-Problem ist."
-              : "Hilft dir zu erkennen, ob es ein Netzwerk- oder Systemproblem ist."}
+              ? "Zur Einordnung: Ist es nur ein falscher Link oder liegt ein Verbindungs-/Systemthema vor?"
+              : "Zur Einordnung: Netzwerk, Erreichbarkeit und Systemstatus werden geprüft."}
           </div>
         </div>
 
@@ -291,6 +295,7 @@ function Diagnostics({ variant }: { variant: "404" | "error" }) {
             className="flex items-start gap-3 rounded-xl border border-black/10 bg-white/70 px-3 py-2"
           >
             <StatusIcon status={s.status} />
+
             <div className="min-w-0 flex-1">
               <div className="flex items-center justify-between gap-3">
                 <div className="text-sm font-semibold text-black/70">
@@ -300,11 +305,11 @@ function Diagnostics({ variant }: { variant: "404" | "error" }) {
                   {typeof s.ms === "number" ? `${s.ms} ms` : ""}
                 </div>
               </div>
+
               <div className="text-[11px] text-black/50">{s.subtitle}</div>
+
               {s.detail && (
-                <div className="mt-1 text-[11px] text-black/55">
-                  {s.detail}
-                </div>
+                <div className="mt-1 text-[11px] text-black/55">{s.detail}</div>
               )}
             </div>
           </div>
@@ -316,15 +321,8 @@ function Diagnostics({ variant }: { variant: "404" | "error" }) {
           onClick={() => runOnce()}
           className="rounded-full px-4 py-2 text-xs font-semibold border border-black/10 bg-white/70 hover:bg-white/85 transition"
         >
-          Diagnose erneut ausführen
+          Systemcheck erneut ausführen
         </button>
-
-        <a
-          href="/"
-          className="rounded-full px-4 py-2 text-xs font-semibold border border-black/10 bg-white/70 hover:bg-white/85 transition"
-        >
-          Startseite
-        </a>
       </div>
     </div>
   );
@@ -386,12 +384,12 @@ export default function NotFoundPage() {
           </div>
 
           <h1 className="mt-4 text-3xl sm:text-4xl font-semibold tracking-tight">
-            Diese Seite existiert nicht.
+            Diese Seite ist nicht verfügbar.
           </h1>
 
           <p className="mt-3 text-sm sm:text-base text-black/55 leading-relaxed">
-            Der Link ist ungültig oder die Seite wurde verschoben. Du kannst zur
-            Startseite zurückgehen.
+            Die URL ist ungültig oder die Seite wurde verschoben. Du kannst zur
+            Startseite zurückkehren oder mit dem Zurück-Button fortfahren.
           </p>
 
           <div className="mt-6">
@@ -404,17 +402,25 @@ export default function NotFoundPage() {
             </button>
           </div>
 
-          {/* ✅ Animated, real diagnostics */}
           <Diagnostics variant="404" />
 
           <div className="mt-8 flex flex-wrap gap-x-4 gap-y-2 text-[11px] text-black/45">
-            <a href="/impressum" className="underline underline-offset-2 decoration-black/20">
+            <a
+              href="/impressum"
+              className="underline underline-offset-2 decoration-black/20"
+            >
               Impressum
             </a>
-            <a href="/agb" className="underline underline-offset-2 decoration-black/20">
+            <a
+              href="/agb"
+              className="underline underline-offset-2 decoration-black/20"
+            >
               AGB
             </a>
-            <a href="/datenschutz" className="underline underline-offset-2 decoration-black/20">
+            <a
+              href="/datenschutz"
+              className="underline underline-offset-2 decoration-black/20"
+            >
               Datenschutz
             </a>
           </div>
@@ -426,7 +432,9 @@ export default function NotFoundPage() {
           <div className="h-px bg-black/10" />
           <div className="pt-3 text-[10px] sm:text-[11px] text-black/40 flex flex-col sm:flex-row gap-2 sm:items-center sm:justify-between">
             <div>© {new Date().getFullYear()} Nutzwertanalyse.tool</div>
-            <div className="text-black/35">Stabilität • Transparenz • Governance</div>
+            <div className="text-black/35">
+              Stabilität • Transparenz • Governance
+            </div>
           </div>
         </div>
       </footer>
