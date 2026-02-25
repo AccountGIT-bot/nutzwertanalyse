@@ -5,6 +5,8 @@ import { useRouter } from "next/navigation";
 
 type Errors = Partial<Record<"email" | "password", string>>;
 
+const BRAND_GREEN = "0 115 106"; // #00736a
+
 function isEmail(v: string) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.trim());
 }
@@ -22,7 +24,7 @@ export default function LoginPage() {
 
   const [submitAttempted, setSubmitAttempted] = useState(false);
 
-  // Invite panel appears after 3s
+  // Right invite appears after 3s
   const [showInvite, setShowInvite] = useState(false);
 
   useEffect(() => {
@@ -49,18 +51,16 @@ export default function LoginPage() {
       "border bg-white/70 backdrop-blur-md",
       hasError
         ? "border-red-500/60 ring-4 ring-red-500/10"
-        : "border-black/10 focus:border-emerald-500/50 focus:ring-4 focus:ring-emerald-500/10",
+        : "border-black/10 focus:ring-4",
     ].join(" ");
   }
 
   function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     setSubmitAttempted(true);
-
     if (!canSubmit) return;
 
     // TODO: echtes Login (API/Auth)
-    // aktuell: nur Demo-Navigation
     router.push("/app");
   }
 
@@ -69,7 +69,7 @@ export default function LoginPage() {
 
   return (
     <main className="premium-light-bg relative min-h-[100svh] text-slate-900 overflow-x-hidden">
-      {/* Top subtle brand header */}
+      {/* Header */}
       <header className="sticky top-0 z-20">
         <div className="bg-white/0">
           <div className="mx-auto max-w-6xl px-5 sm:px-6 h-[68px] sm:h-[76px] flex items-center justify-between">
@@ -105,185 +105,233 @@ export default function LoginPage() {
       </header>
 
       <section className="mx-auto max-w-6xl px-5 sm:px-6 py-10 sm:py-14">
-        <div className="grid gap-6 lg:gap-8 lg:grid-cols-[1.05fr_0.95fr] items-stretch">
-          {/* Login card */}
-          <div className="relative overflow-hidden rounded-3xl border border-black/10 bg-white/70 backdrop-blur-md shadow-[0_22px_80px_rgba(0,0,0,0.12)]">
-            {/* Subtle inner highlight */}
-            <div
-              className="pointer-events-none absolute inset-0 opacity-80"
-              style={{
-                background:
-                  "radial-gradient(800px 320px at 16% 0%, rgba(16,185,129,0.12), transparent 60%), radial-gradient(900px 420px at 90% 40%, rgba(0,0,0,0.045), transparent 62%)",
-              }}
-            />
+        {/* Stage */}
+        <div className="relative">
+          {/* Right panel slides in from behind after 3s (LG+) */}
+          <div
+            className={[
+              "hidden lg:block",
+              "absolute top-0 right-0 w-[420px] xl:w-[460px]",
+              "transition-all duration-700 ease-out",
+              showInvite ? "opacity-100 translate-x-0" : "opacity-0 translate-x-10",
+            ].join(" ")}
+            style={{ zIndex: 0 }}
+          >
+            <div className="relative overflow-hidden rounded-3xl border border-black/10 bg-white/55 backdrop-blur-md shadow-[0_22px_80px_rgba(0,0,0,0.10)] min-h-[320px]">
+              {/* Brand green bar */}
+              <div
+                className={[
+                  "absolute top-0 bottom-0 right-0 w-[10px]",
+                  "transition-all duration-700 ease-out",
+                ].join(" ")}
+                style={{
+                  background: `linear-gradient(180deg, rgb(${BRAND_GREEN} / 0.95), rgb(${BRAND_GREEN} / 0.70))`,
+                  boxShadow: `0 0 0 1px rgb(${BRAND_GREEN} / 0.22), 0 18px 60px rgb(${BRAND_GREEN} / 0.18)`,
+                }}
+              />
 
-            <div className="relative p-6 sm:p-8">
-              <div className="text-[11px] sm:text-xs tracking-[0.28em] uppercase text-black/45">
-                Account • Login
+              <div className="relative p-6 sm:p-8 h-full flex flex-col justify-center">
+                <div className="text-[11px] sm:text-xs tracking-[0.28em] uppercase text-black/45">
+                  Neu hier?
+                </div>
+
+                <div className="mt-2 text-2xl sm:text-3xl font-semibold tracking-tight">
+                  Sind Sie neu<span className="opacity-60">?</span>
+                </div>
+
+                <p className="mt-2 text-sm text-black/55 leading-relaxed">
+                  Registrieren Sie sich jetzt und speichern Sie Analysen, erstellen Reports (PDF)
+                  und dokumentieren Entscheide nachvollziehbar.
+                </p>
+
+                <div className="mt-5 flex items-center gap-3">
+                  <button
+                    onClick={() => router.push("/login/register")}
+                    className="rounded-full px-6 py-2.5 text-sm font-semibold transition active:scale-[0.99]"
+                    style={{
+                      background: `rgb(${BRAND_GREEN} / 0.12)`,
+                      border: `1px solid rgb(${BRAND_GREEN} / 0.28)`,
+                      color: `rgb(${BRAND_GREEN})`,
+                      boxShadow: `0 16px 34px rgb(${BRAND_GREEN} / 0.12)`,
+                    }}
+                  >
+                    Registrieren
+                  </button>
+
+                  <button
+                    onClick={() => router.push("/")}
+                    className="rounded-full px-5 py-2.5 text-sm font-semibold border border-black/10 bg-white/70 hover:bg-white/85 transition"
+                  >
+                    Zurück zur Startseite
+                  </button>
+                </div>
+
+                <div className="mt-4 text-xs text-black/45">
+                  DSG-konform • Pflichtfelder • klare Validierung
+                </div>
               </div>
-
-              <h1 className="mt-2 text-2xl sm:text-3xl font-semibold tracking-tight">
-                Willkommen zurück<span className="opacity-60">.</span>
-              </h1>
-
-              <p className="mt-2 text-sm text-black/55 leading-relaxed max-w-xl">
-                Melde dich an, um Analysen zu speichern, Exporte zu erstellen und deine Dokumentation
-                auditfähig zu verwalten.
-              </p>
-
-              <form onSubmit={onSubmit} className="mt-6 space-y-4">
-                <div>
-                  <label className="block text-xs font-semibold text-black/60 mb-1.5">
-                    E-Mail
-                  </label>
-                  <input
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    onBlur={() => setTouched((t) => ({ ...t, email: true }))}
-                    className={fieldClass(showEmailError)}
-                    placeholder="name@firma.ch"
-                    autoComplete="email"
-                    inputMode="email"
-                  />
-                  {showEmailError && (
-                    <div className="mt-1.5 text-xs text-red-600/90">{errors.email}</div>
-                  )}
-                </div>
-
-                <div>
-                  <label className="block text-xs font-semibold text-black/60 mb-1.5">
-                    Passwort
-                  </label>
-                  <input
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    onBlur={() => setTouched((t) => ({ ...t, password: true }))}
-                    className={fieldClass(showPwError)}
-                    placeholder="••••••••"
-                    type="password"
-                    autoComplete="current-password"
-                  />
-                  {showPwError && (
-                    <div className="mt-1.5 text-xs text-red-600/90">{errors.password}</div>
-                  )}
-                </div>
-
-                <div className="flex items-center justify-between gap-3 pt-1">
-                  <button
-                    type="button"
-                    onClick={() => alert("TODO: Passwort-Reset")}
-                    className="text-sm text-black/55 hover:text-black/80 underline underline-offset-4 decoration-black/20"
-                  >
-                    Passwort vergessen?
-                  </button>
-
-                  <button
-                    type="submit"
-                    className={[
-                      "rounded-full px-6 py-2.5 text-sm font-semibold transition",
-                      "shadow-[0_16px_34px_rgba(0,0,0,0.10)] active:scale-[0.99]",
-                      canSubmit
-                        ? "bg-[#0b0f14] text-white hover:brightness-[1.05]"
-                        : "bg-black/60 text-white/90 opacity-70 cursor-not-allowed",
-                    ].join(" ")}
-                    disabled={!canSubmit}
-                  >
-                    Login
-                  </button>
-                </div>
-
-                <div className="pt-2 text-xs text-black/45">
-                  Hinweis: Ohne Account kannst du trotzdem starten – Registrierung ist für Speichern/Export.
-                </div>
-              </form>
             </div>
           </div>
 
-          {/* Right panel: animated invite after 3s */}
-          <div className="relative">
-            <div
-              className={[
-                "relative overflow-hidden rounded-3xl border border-black/10",
-                "bg-white/55 backdrop-blur-md shadow-[0_22px_80px_rgba(0,0,0,0.10)]",
-                "h-full min-h-[260px]",
-              ].join(" ")}
-            >
-              {/* Green bar animation */}
-              <div className="absolute inset-0">
+          {/* Login card (center for first 3s, then slides left to make room) */}
+          <div
+            className={[
+              "relative",
+              "transition-transform duration-700 ease-out",
+              showInvite ? "lg:translate-x-[-240px]" : "lg:translate-x-0",
+            ].join(" ")}
+            style={{ zIndex: 10 }}
+          >
+            <div className="mx-auto lg:mx-0 max-w-xl">
+              <div className="relative overflow-hidden rounded-3xl border border-black/10 bg-white/70 backdrop-blur-md shadow-[0_22px_80px_rgba(0,0,0,0.12)]">
+                {/* Brand green bar also on login card */}
                 <div
-                  className={[
-                    "absolute top-0 bottom-0 right-0",
-                    "transition-all duration-700 ease-out",
-                    showInvite ? "w-[10px] opacity-100" : "w-0 opacity-0",
-                  ].join(" ")}
+                  className="absolute top-0 bottom-0 right-0 w-[10px]"
                   style={{
-                    background:
-                      "linear-gradient(180deg, rgba(16,185,129,0.95), rgba(45,212,191,0.75))",
-                    boxShadow: "0 0 0 1px rgba(16,185,129,0.25), 0 18px 60px rgba(16,185,129,0.20)",
+                    background: `linear-gradient(180deg, rgb(${BRAND_GREEN} / 0.95), rgb(${BRAND_GREEN} / 0.70))`,
+                    boxShadow: `0 0 0 1px rgb(${BRAND_GREEN} / 0.22), 0 18px 60px rgb(${BRAND_GREEN} / 0.18)`,
                   }}
                 />
-              </div>
 
-              <div className="relative p-6 sm:p-8 h-full flex flex-col justify-center">
                 <div
-                  className={[
-                    "transition-all duration-700 ease-out",
-                    showInvite ? "translate-x-0 opacity-100" : "translate-x-3 opacity-0",
-                  ].join(" ")}
-                >
+                  className="pointer-events-none absolute inset-0 opacity-80"
+                  style={{
+                    background: `radial-gradient(800px 320px at 16% 0%, rgb(${BRAND_GREEN} / 0.12), transparent 60%), radial-gradient(900px 420px at 90% 40%, rgba(0,0,0,0.045), transparent 62%)`,
+                  }}
+                />
+
+                <div className="relative p-6 sm:p-8">
                   <div className="text-[11px] sm:text-xs tracking-[0.28em] uppercase text-black/45">
-                    Neu hier?
+                    Account • Login
                   </div>
 
-                  <div className="mt-2 text-2xl sm:text-3xl font-semibold tracking-tight">
-                    Sind Sie neu<span className="opacity-60">?</span>
-                  </div>
+                  <h1 className="mt-2 text-2xl sm:text-3xl font-semibold tracking-tight">
+                    Willkommen zurück<span className="opacity-60">.</span>
+                  </h1>
 
-                  <p className="mt-2 text-sm text-black/55 leading-relaxed max-w-md">
-                    Registrieren Sie sich jetzt und speichern Sie Analysen, erstellen Reports (PDF)
-                    und dokumentieren Entscheide nachvollziehbar.
+                  <p className="mt-2 text-sm text-black/55 leading-relaxed max-w-xl">
+                    Melde dich an, um Analysen zu speichern, Exporte zu erstellen und deine Dokumentation
+                    auditfähig zu verwalten.
                   </p>
 
-                  <div className="mt-5 flex items-center gap-3">
-                    <button
-                      onClick={() => router.push("/login/register")}
-                      className="rounded-full px-6 py-2.5 text-sm font-semibold transition active:scale-[0.99]"
-                      style={{
-                        background: "rgba(16,185,129,0.12)",
-                        border: "1px solid rgba(16,185,129,0.28)",
-                        color: "rgb(16 185 129)",
-                        boxShadow: "0 16px 34px rgba(16,185,129,0.12)",
-                      }}
-                    >
-                      Registrieren
-                    </button>
+                  <form onSubmit={onSubmit} className="mt-6 space-y-4">
+                    <div>
+                      <label className="block text-xs font-semibold text-black/60 mb-1.5">
+                        E-Mail
+                      </label>
+                      <input
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        onBlur={() => setTouched((t) => ({ ...t, email: true }))}
+                        className={fieldClass(showEmailError)}
+                        placeholder="hans.mustermann@muster.ch"
+                        autoComplete="email"
+                        inputMode="email"
+                        style={
+                          showEmailError
+                            ? undefined
+                            : {
+                                borderColor: "rgba(0,0,0,0.10)",
+                                boxShadow: undefined,
+                              }
+                        }
+                      />
+                      {showEmailError && (
+                        <div className="mt-1.5 text-xs text-red-600/90">{errors.email}</div>
+                      )}
+                    </div>
 
-                    <button
-                      onClick={() => router.push("/")}
-                      className="rounded-full px-5 py-2.5 text-sm font-semibold border border-black/10 bg-white/70 hover:bg-white/85 transition"
-                    >
-                      Zurück zur Startseite
-                    </button>
-                  </div>
+                    <div>
+                      <label className="block text-xs font-semibold text-black/60 mb-1.5">
+                        Passwort
+                      </label>
+                      <input
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        onBlur={() => setTouched((t) => ({ ...t, password: true }))}
+                        className={fieldClass(showPwError)}
+                        placeholder="••••••••"
+                        type="password"
+                        autoComplete="current-password"
+                      />
+                      {showPwError && (
+                        <div className="mt-1.5 text-xs text-red-600/90">{errors.password}</div>
+                      )}
+                    </div>
 
-                  <div className="mt-4 text-xs text-black/45">
-                    DSG-konform • Pflichtfelder • klare Validierung
-                  </div>
+                    <div className="flex items-center justify-between gap-3 pt-1">
+                      <button
+                        type="button"
+                        onClick={() => alert("TODO: Passwort-Reset")}
+                        className="text-sm text-black/55 hover:text-black/80 underline underline-offset-4 decoration-black/20"
+                      >
+                        Passwort vergessen?
+                      </button>
+
+                      <button
+                        type="submit"
+                        className={[
+                          "rounded-full px-6 py-2.5 text-sm font-semibold transition",
+                          "shadow-[0_16px_34px_rgba(0,0,0,0.10)] active:scale-[0.99]",
+                          canSubmit
+                            ? "text-white hover:brightness-[1.05]"
+                            : "bg-black/60 text-white/90 opacity-70 cursor-not-allowed",
+                        ].join(" ")}
+                        style={
+                          canSubmit
+                            ? { background: `rgb(${BRAND_GREEN})` }
+                            : undefined
+                        }
+                        disabled={!canSubmit}
+                      >
+                        Login
+                      </button>
+                    </div>
+
+                    <div className="pt-2 text-xs text-black/45">
+                      Hinweis: Ohne Account kannst du trotzdem starten – Registrierung ist für Speichern/Export.
+                    </div>
+                  </form>
+
+                  {/* Mobile: show invite AFTER 3s as a block below */}
+                  {showInvite && (
+                    <div className="lg:hidden mt-6 overflow-hidden rounded-2xl border border-black/10 bg-white/55 backdrop-blur-md">
+                      <div
+                        className="h-[6px]"
+                        style={{
+                          background: `linear-gradient(90deg, rgb(${BRAND_GREEN}), rgb(${BRAND_GREEN} / 0.70))`,
+                        }}
+                      />
+                      <div className="p-4">
+                        <div className="text-xs tracking-[0.28em] uppercase text-black/45">
+                          Neu hier?
+                        </div>
+                        <div className="mt-1 text-lg font-semibold">Sind Sie neu?</div>
+                        <p className="mt-1.5 text-sm text-black/55">
+                          Registrieren Sie sich jetzt – Speichern, Export, Dokumentation.
+                        </p>
+                        <button
+                          onClick={() => router.push("/login/register")}
+                          className="mt-3 rounded-full px-5 py-2.5 text-sm font-semibold"
+                          style={{
+                            background: `rgb(${BRAND_GREEN} / 0.12)`,
+                            border: `1px solid rgb(${BRAND_GREEN} / 0.28)`,
+                            color: `rgb(${BRAND_GREEN})`,
+                          }}
+                        >
+                          Registrieren
+                        </button>
+                      </div>
+                    </div>
+                  )}
                 </div>
-
-                {!showInvite && (
-                  <div className="text-sm text-black/35">
-                    {/* tiny placeholder so it doesn’t feel empty while waiting */}
-                    Laden…
-                  </div>
-                )}
               </div>
             </div>
           </div>
         </div>
 
         <div className="mt-8 text-[11px] text-black/40">
-          © {new Date().getFullYear()} Nutzwertanalyse.tool • Login/Registrierung (MVP UI)
+          © {new Date().getFullYear()} Nutzwertanalyse.tool
         </div>
       </section>
     </main>

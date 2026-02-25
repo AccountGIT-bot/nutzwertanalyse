@@ -1,7 +1,9 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
+
+const BRAND_GREEN = "0 115 106"; // #00736a
 
 type Form = {
   firstName: string;
@@ -9,6 +11,7 @@ type Form = {
   email: string;
   password: string;
   confirmPassword: string;
+  address: string; // optional (Musterstrasse Wunsch)
   company: string;
   acceptTerms: boolean;
 };
@@ -28,7 +31,6 @@ function isEmail(v: string) {
 }
 
 function strongEnough(pw: string) {
-  // Minimal: 8 Zeichen + 1 Zahl (kannst du später härter machen)
   return pw.length >= 8 && /\d/.test(pw);
 }
 
@@ -41,6 +43,7 @@ export default function RegisterPage() {
     email: "",
     password: "",
     confirmPassword: "",
+    address: "",
     company: "",
     acceptTerms: false,
   });
@@ -56,6 +59,13 @@ export default function RegisterPage() {
 
   const [submitAttempted, setSubmitAttempted] = useState(false);
   const [serverMsg, setServerMsg] = useState<string | null>(null);
+
+  // Trial note after 15s
+  const [showTrial, setShowTrial] = useState(false);
+  useEffect(() => {
+    const t = window.setTimeout(() => setShowTrial(true), 15000);
+    return () => window.clearTimeout(t);
+  }, []);
 
   const errors: Errors = useMemo(() => {
     const e: Errors = {};
@@ -96,7 +106,7 @@ export default function RegisterPage() {
       "border bg-white/70 backdrop-blur-md",
       hasError
         ? "border-red-500/60 ring-4 ring-red-500/10"
-        : "border-black/10 focus:border-emerald-500/50 focus:ring-4 focus:ring-emerald-500/10",
+        : "border-black/10 focus:ring-4",
     ].join(" ");
   }
 
@@ -108,7 +118,6 @@ export default function RegisterPage() {
     if (!canSubmit) return;
 
     // TODO: echtes Register (API/Auth)
-    // aktuell: Demo-Erfolg
     setServerMsg("Account erstellt (Demo). Du kannst dich jetzt einloggen.");
     window.setTimeout(() => router.push("/login"), 900);
   }
@@ -160,11 +169,19 @@ export default function RegisterPage() {
         <div className="grid gap-6 lg:gap-8 lg:grid-cols-[1.1fr_0.9fr] items-start">
           {/* Form card */}
           <div className="relative overflow-hidden rounded-3xl border border-black/10 bg-white/70 backdrop-blur-md shadow-[0_22px_80px_rgba(0,0,0,0.12)]">
+            {/* Right brand bar */}
+            <div
+              className="absolute top-0 bottom-0 right-0 w-[10px]"
+              style={{
+                background: `linear-gradient(180deg, rgb(${BRAND_GREEN} / 0.95), rgb(${BRAND_GREEN} / 0.70))`,
+                boxShadow: `0 0 0 1px rgb(${BRAND_GREEN} / 0.22), 0 18px 60px rgb(${BRAND_GREEN} / 0.18)`,
+              }}
+            />
+
             <div
               className="pointer-events-none absolute inset-0 opacity-80"
               style={{
-                background:
-                  "radial-gradient(900px 360px at 18% 0%, rgba(16,185,129,0.14), transparent 60%), radial-gradient(900px 420px at 90% 50%, rgba(0,0,0,0.045), transparent 62%)",
+                background: `radial-gradient(900px 360px at 18% 0%, rgb(${BRAND_GREEN} / 0.14), transparent 60%), radial-gradient(900px 420px at 90% 50%, rgba(0,0,0,0.045), transparent 62%)`,
               }}
             />
 
@@ -186,14 +203,14 @@ export default function RegisterPage() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
                     <label className="block text-xs font-semibold text-black/60 mb-1.5">
-                      Vorname <span className="text-emerald-600">*</span>
+                      Vorname <span style={{ color: `rgb(${BRAND_GREEN})` }}>*</span>
                     </label>
                     <input
                       value={form.firstName}
                       onChange={(e) => set("firstName", e.target.value)}
                       onBlur={() => setTouched((t) => ({ ...t, firstName: true }))}
                       className={inputClass(showError("firstName"))}
-                      placeholder="Liam"
+                      placeholder="Hans"
                       autoComplete="given-name"
                     />
                     {showError("firstName") && (
@@ -203,14 +220,14 @@ export default function RegisterPage() {
 
                   <div>
                     <label className="block text-xs font-semibold text-black/60 mb-1.5">
-                      Nachname <span className="text-emerald-600">*</span>
+                      Nachname <span style={{ color: `rgb(${BRAND_GREEN})` }}>*</span>
                     </label>
                     <input
                       value={form.lastName}
                       onChange={(e) => set("lastName", e.target.value)}
                       onBlur={() => setTouched((t) => ({ ...t, lastName: true }))}
                       className={inputClass(showError("lastName"))}
-                      placeholder="…"
+                      placeholder="Mustermann"
                       autoComplete="family-name"
                     />
                     {showError("lastName") && (
@@ -221,27 +238,40 @@ export default function RegisterPage() {
 
                 <div>
                   <label className="block text-xs font-semibold text-black/60 mb-1.5">
+                    Adresse (optional)
+                  </label>
+                  <input
+                    value={form.address}
+                    onChange={(e) => set("address", e.target.value)}
+                    className={inputClass(false)}
+                    placeholder="Musterstrasse 1, 5000 Aarau"
+                    autoComplete="street-address"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-black/60 mb-1.5">
                     Firma (optional)
                   </label>
                   <input
                     value={form.company}
                     onChange={(e) => set("company", e.target.value)}
                     className={inputClass(false)}
-                    placeholder="z.B. Decision Studios GmbH"
+                    placeholder="Musterfirma AG"
                     autoComplete="organization"
                   />
                 </div>
 
                 <div>
                   <label className="block text-xs font-semibold text-black/60 mb-1.5">
-                    E-Mail <span className="text-emerald-600">*</span>
+                    E-Mail <span style={{ color: `rgb(${BRAND_GREEN})` }}>*</span>
                   </label>
                   <input
                     value={form.email}
                     onChange={(e) => set("email", e.target.value)}
                     onBlur={() => setTouched((t) => ({ ...t, email: true }))}
                     className={inputClass(showError("email"))}
-                    placeholder="name@firma.ch"
+                    placeholder="hans.mustermann@muster.ch"
                     autoComplete="email"
                     inputMode="email"
                   />
@@ -253,7 +283,7 @@ export default function RegisterPage() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
                     <label className="block text-xs font-semibold text-black/60 mb-1.5">
-                      Passwort <span className="text-emerald-600">*</span>
+                      Passwort <span style={{ color: `rgb(${BRAND_GREEN})` }}>*</span>
                     </label>
                     <input
                       value={form.password}
@@ -267,7 +297,10 @@ export default function RegisterPage() {
                     <div className="mt-1.5 flex items-center justify-between text-xs">
                       <span className="text-black/45">
                         Stärke:{" "}
-                        <span className={pwStrength.ok ? "text-emerald-700 font-semibold" : "text-black/55"}>
+                        <span
+                          className={pwStrength.ok ? "font-semibold" : "text-black/55"}
+                          style={pwStrength.ok ? { color: `rgb(${BRAND_GREEN})` } : undefined}
+                        >
                           {pwStrength.label}
                         </span>
                       </span>
@@ -280,7 +313,7 @@ export default function RegisterPage() {
 
                   <div>
                     <label className="block text-xs font-semibold text-black/60 mb-1.5">
-                      Passwort bestätigen <span className="text-emerald-600">*</span>
+                      Passwort bestätigen <span style={{ color: `rgb(${BRAND_GREEN})` }}>*</span>
                     </label>
                     <input
                       value={form.confirmPassword}
@@ -317,20 +350,14 @@ export default function RegisterPage() {
                     />
                     <div className="text-sm text-black/60 leading-relaxed">
                       Ich akzeptiere{" "}
-                      <a
-                        className="underline underline-offset-4 decoration-black/20 hover:text-black/80"
-                        href="/agb"
-                      >
+                      <a className="underline underline-offset-4 decoration-black/20 hover:text-black/80" href="/agb">
                         AGB
                       </a>{" "}
                       und{" "}
-                      <a
-                        className="underline underline-offset-4 decoration-black/20 hover:text-black/80"
-                        href="/datenschutz"
-                      >
+                      <a className="underline underline-offset-4 decoration-black/20 hover:text-black/80" href="/datenschutz">
                         Datenschutz (DSG)
                       </a>
-                      . <span className="text-emerald-700 font-semibold">*</span>
+                      . <span style={{ color: `rgb(${BRAND_GREEN})` }} className="font-semibold">*</span>
                       {showError("acceptTerms") && (
                         <div className="mt-1.5 text-xs text-red-600/90">{errors.acceptTerms}</div>
                       )}
@@ -338,8 +365,39 @@ export default function RegisterPage() {
                   </label>
                 </div>
 
+                {/* Trial note after 15s */}
+                <div
+                  className={[
+                    "transition-all duration-700 ease-out",
+                    showTrial ? "opacity-100 translate-y-0" : "opacity-0 translate-y-2 pointer-events-none h-0 overflow-hidden",
+                  ].join(" ")}
+                >
+                  <div
+                    className="mt-2 rounded-2xl border px-4 py-3 text-sm"
+                    style={{
+                      borderColor: `rgb(${BRAND_GREEN} / 0.22)`,
+                      background: `rgb(${BRAND_GREEN} / 0.08)`,
+                      color: "rgba(0,0,0,0.72)",
+                    }}
+                  >
+                    <div className="font-semibold" style={{ color: `rgb(${BRAND_GREEN})` }}>
+                      14 Tage kostenlos testen
+                    </div>
+                    <div className="mt-1 text-black/60">
+                      Unsere Software können Sie 14 Tage kostenlos testen – ohne Risiko.
+                    </div>
+                  </div>
+                </div>
+
                 {serverMsg && (
-                  <div className="rounded-2xl border border-emerald-500/20 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-900">
+                  <div
+                    className="rounded-2xl border px-4 py-3 text-sm"
+                    style={{
+                      borderColor: `rgb(${BRAND_GREEN} / 0.22)`,
+                      background: `rgb(${BRAND_GREEN} / 0.10)`,
+                      color: "rgba(0,0,0,0.78)",
+                    }}
+                  >
                     {serverMsg}
                   </div>
                 )}
@@ -359,10 +417,9 @@ export default function RegisterPage() {
                     className={[
                       "rounded-full px-6 py-2.5 text-sm font-semibold transition",
                       "shadow-[0_16px_34px_rgba(0,0,0,0.10)] active:scale-[0.99]",
-                      canSubmit
-                        ? "bg-[#0b0f14] text-white hover:brightness-[1.05]"
-                        : "bg-black/60 text-white/90 opacity-70 cursor-not-allowed",
+                      canSubmit ? "text-white hover:brightness-[1.05]" : "bg-black/60 text-white/90 opacity-70 cursor-not-allowed",
                     ].join(" ")}
+                    style={canSubmit ? { background: `rgb(${BRAND_GREEN})` } : undefined}
                   >
                     Account erstellen
                   </button>
@@ -374,10 +431,16 @@ export default function RegisterPage() {
           {/* Side info card */}
           <div className="relative overflow-hidden rounded-3xl border border-black/10 bg-white/55 backdrop-blur-md shadow-[0_22px_80px_rgba(0,0,0,0.10)]">
             <div
+              className="absolute top-0 bottom-0 right-0 w-[10px]"
+              style={{
+                background: `linear-gradient(180deg, rgb(${BRAND_GREEN} / 0.95), rgb(${BRAND_GREEN} / 0.70))`,
+                boxShadow: `0 0 0 1px rgb(${BRAND_GREEN} / 0.18)`,
+              }}
+            />
+            <div
               className="absolute inset-0 pointer-events-none"
               style={{
-                background:
-                  "radial-gradient(700px 260px at 20% 0%, rgba(16,185,129,0.12), transparent 60%)",
+                background: `radial-gradient(700px 260px at 20% 0%, rgb(${BRAND_GREEN} / 0.12), transparent 60%)`,
               }}
             />
             <div className="relative p-6 sm:p-8">
@@ -391,22 +454,22 @@ export default function RegisterPage() {
 
               <ul className="mt-4 space-y-2.5 text-sm text-black/65">
                 <li className="flex gap-3">
-                  <span className="mt-2 h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                  <span className="mt-2 h-1.5 w-1.5 rounded-full" style={{ background: `rgb(${BRAND_GREEN})` }} />
                   Analysen & Versionen speichern
                 </li>
                 <li className="flex gap-3">
-                  <span className="mt-2 h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                  <span className="mt-2 h-1.5 w-1.5 rounded-full" style={{ background: `rgb(${BRAND_GREEN})` }} />
                   PDF Report / Entscheidungsdokumentation
                 </li>
                 <li className="flex gap-3">
-                  <span className="mt-2 h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                  <span className="mt-2 h-1.5 w-1.5 rounded-full" style={{ background: `rgb(${BRAND_GREEN})` }} />
                   DSG & Governance-Ready Struktur
                 </li>
               </ul>
 
               <div className="mt-6 text-xs text-black/45 leading-relaxed">
                 Hinweis: Das ist aktuell UI/Validierung (MVP). Im nächsten Schritt hängen wir die echte
-                Auth (z.B. NextAuth / Clerk / Supabase Auth) dran.
+                Auth dran.
               </div>
             </div>
           </div>
