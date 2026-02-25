@@ -105,28 +105,40 @@ export default function LoginPage() {
       </header>
 
       <section className="mx-auto max-w-6xl px-5 sm:px-6 py-10 sm:py-14">
-        {/* Stage */}
-        <div className="relative">
-          {/* Right panel slides in from behind after 3s (LG+) */}
+        {/* Stage: after 3s, we add right padding on lg to make room for the invite panel */}
+        <div
+          className={[
+            "relative",
+            "transition-[padding] duration-700 ease-out",
+            showInvite ? "lg:pr-[460px]" : "lg:pr-0",
+          ].join(" ")}
+        >
+          {/* Right panel (slides in after 3s) */}
           <div
             className={[
               "hidden lg:block",
               "absolute top-0 right-0 w-[420px] xl:w-[460px]",
               "transition-all duration-700 ease-out",
-              showInvite ? "opacity-100 translate-x-0" : "opacity-0 translate-x-10",
+              showInvite
+                ? "opacity-100 translate-x-0 pointer-events-auto"
+                : "opacity-0 translate-x-8 pointer-events-none",
             ].join(" ")}
-            style={{ zIndex: 0 }}
+            style={{ zIndex: 20 }}
           >
             <div className="relative overflow-hidden rounded-3xl border border-black/10 bg-white/55 backdrop-blur-md shadow-[0_22px_80px_rgba(0,0,0,0.10)] min-h-[320px]">
               {/* Brand green bar */}
               <div
-                className={[
-                  "absolute top-0 bottom-0 right-0 w-[10px]",
-                  "transition-all duration-700 ease-out",
-                ].join(" ")}
+                className="absolute top-0 bottom-0 right-0 w-[10px]"
                 style={{
                   background: `linear-gradient(180deg, rgb(${BRAND_GREEN} / 0.95), rgb(${BRAND_GREEN} / 0.70))`,
                   boxShadow: `0 0 0 1px rgb(${BRAND_GREEN} / 0.22), 0 18px 60px rgb(${BRAND_GREEN} / 0.18)`,
+                }}
+              />
+
+              <div
+                className="pointer-events-none absolute inset-0 opacity-80"
+                style={{
+                  background: `radial-gradient(900px 360px at 18% 0%, rgb(${BRAND_GREEN} / 0.12), transparent 60%), radial-gradient(900px 420px at 90% 55%, rgba(0,0,0,0.045), transparent 62%)`,
                 }}
               />
 
@@ -154,6 +166,12 @@ export default function LoginPage() {
                       color: `rgb(${BRAND_GREEN})`,
                       boxShadow: `0 16px 34px rgb(${BRAND_GREEN} / 0.12)`,
                     }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.boxShadow = `0 18px 46px rgb(${BRAND_GREEN} / 0.20)`;
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.boxShadow = `0 16px 34px rgb(${BRAND_GREEN} / 0.12)`;
+                    }}
                   >
                     Registrieren
                   </button>
@@ -166,6 +184,14 @@ export default function LoginPage() {
                   </button>
                 </div>
 
+                <button
+                  type="button"
+                  onClick={() => router.push("/login")}
+                  className="mt-4 text-sm text-black/55 hover:text-black/80 underline underline-offset-4 decoration-black/20 transition"
+                >
+                  Bereits registriert? Zum Login
+                </button>
+
                 <div className="mt-4 text-xs text-black/45">
                   DSG-konform • Pflichtfelder • klare Validierung
                 </div>
@@ -173,158 +199,147 @@ export default function LoginPage() {
             </div>
           </div>
 
-          {/* Login card (center for first 3s, then slides left to make room) */}
-          <div
-            className={[
-              "relative",
-              "transition-transform duration-700 ease-out",
-              showInvite ? "lg:translate-x-[-240px]" : "lg:translate-x-0",
-            ].join(" ")}
-            style={{ zIndex: 10 }}
-          >
-            <div className="mx-auto lg:mx-0 max-w-xl">
-              <div className="relative overflow-hidden rounded-3xl border border-black/10 bg-white/70 backdrop-blur-md shadow-[0_22px_80px_rgba(0,0,0,0.12)]">
-                {/* Brand green bar also on login card */}
-                <div
-                  className="absolute top-0 bottom-0 right-0 w-[10px]"
-                  style={{
-                    background: `linear-gradient(180deg, rgb(${BRAND_GREEN} / 0.95), rgb(${BRAND_GREEN} / 0.70))`,
-                    boxShadow: `0 0 0 1px rgb(${BRAND_GREEN} / 0.22), 0 18px 60px rgb(${BRAND_GREEN} / 0.18)`,
-                  }}
-                />
+          {/* Login card (stays centered; padding makes room later) */}
+          <div className="mx-auto lg:mx-0 max-w-xl relative" style={{ zIndex: 30 }}>
+            <div className="relative overflow-hidden rounded-3xl border border-black/10 bg-white/70 backdrop-blur-md shadow-[0_22px_80px_rgba(0,0,0,0.12)]">
+              {/* Brand green bar on login card */}
+              <div
+                className="absolute top-0 bottom-0 right-0 w-[10px]"
+                style={{
+                  background: `linear-gradient(180deg, rgb(${BRAND_GREEN} / 0.95), rgb(${BRAND_GREEN} / 0.70))`,
+                  boxShadow: `0 0 0 1px rgb(${BRAND_GREEN} / 0.22), 0 18px 60px rgb(${BRAND_GREEN} / 0.18)`,
+                }}
+              />
 
-                <div
-                  className="pointer-events-none absolute inset-0 opacity-80"
-                  style={{
-                    background: `radial-gradient(800px 320px at 16% 0%, rgb(${BRAND_GREEN} / 0.12), transparent 60%), radial-gradient(900px 420px at 90% 40%, rgba(0,0,0,0.045), transparent 62%)`,
-                  }}
-                />
+              <div
+                className="pointer-events-none absolute inset-0 opacity-80"
+                style={{
+                  background: `radial-gradient(800px 320px at 16% 0%, rgb(${BRAND_GREEN} / 0.12), transparent 60%), radial-gradient(900px 420px at 90% 40%, rgba(0,0,0,0.045), transparent 62%)`,
+                }}
+              />
 
-                <div className="relative p-6 sm:p-8">
-                  <div className="text-[11px] sm:text-xs tracking-[0.28em] uppercase text-black/45">
-                    Account • Login
+              <div className="relative p-6 sm:p-8">
+                <div className="text-[11px] sm:text-xs tracking-[0.28em] uppercase text-black/45">
+                  Account • Login
+                </div>
+
+                <h1
+                  className="mt-2 text-3xl sm:text-4xl font-extrabold tracking-tight"
+                  style={{ color: `rgb(${BRAND_GREEN})` }}
+                >
+                  Willkommen zurück<span className="opacity-60">.</span>
+                </h1>
+
+                <p className="mt-2 text-sm text-black/55 leading-relaxed max-w-xl">
+                  Melde dich an, um Analysen zu speichern, Exporte zu erstellen und deine Dokumentation
+                  auditfähig zu verwalten.
+                </p>
+
+                <form onSubmit={onSubmit} className="mt-6 space-y-4">
+                  <div>
+                    <label className="block text-xs font-semibold text-black/60 mb-1.5">
+                      E-Mail
+                    </label>
+                    <input
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      onBlur={() => setTouched((t) => ({ ...t, email: true }))}
+                      className={fieldClass(showEmailError)}
+                      placeholder="hans.mustermann@muster.ch"
+                      autoComplete="email"
+                      inputMode="email"
+                      style={
+                        showEmailError
+                          ? undefined
+                          : {
+                              borderColor: "rgba(0,0,0,0.10)",
+                            }
+                      }
+                    />
+                    {showEmailError && (
+                      <div className="mt-1.5 text-xs text-red-600/90">{errors.email}</div>
+                    )}
                   </div>
 
-                  <h1 className="mt-2 text-2xl sm:text-3xl font-semibold tracking-tight">
-                    Willkommen zurück<span className="opacity-60">.</span>
-                  </h1>
+                  <div>
+                    <label className="block text-xs font-semibold text-black/60 mb-1.5">
+                      Passwort
+                    </label>
+                    <input
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      onBlur={() => setTouched((t) => ({ ...t, password: true }))}
+                      className={fieldClass(showPwError)}
+                      placeholder="••••••••"
+                      type="password"
+                      autoComplete="current-password"
+                    />
+                    {showPwError && (
+                      <div className="mt-1.5 text-xs text-red-600/90">{errors.password}</div>
+                    )}
+                  </div>
 
-                  <p className="mt-2 text-sm text-black/55 leading-relaxed max-w-xl">
-                    Melde dich an, um Analysen zu speichern, Exporte zu erstellen und deine Dokumentation
-                    auditfähig zu verwalten.
-                  </p>
+                  <div className="flex items-center justify-between gap-3 pt-1">
+                    <button
+                      type="button"
+                      onClick={() => alert("TODO: Passwort-Reset")}
+                      className="text-sm text-black/55 hover:text-black/80 underline underline-offset-4 decoration-black/20"
+                    >
+                      Passwort vergessen?
+                    </button>
 
-                  <form onSubmit={onSubmit} className="mt-6 space-y-4">
-                    <div>
-                      <label className="block text-xs font-semibold text-black/60 mb-1.5">
-                        E-Mail
-                      </label>
-                      <input
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        onBlur={() => setTouched((t) => ({ ...t, email: true }))}
-                        className={fieldClass(showEmailError)}
-                        placeholder="hans.mustermann@muster.ch"
-                        autoComplete="email"
-                        inputMode="email"
-                        style={
-                          showEmailError
-                            ? undefined
-                            : {
-                                borderColor: "rgba(0,0,0,0.10)",
-                                boxShadow: undefined,
-                              }
-                        }
-                      />
-                      {showEmailError && (
-                        <div className="mt-1.5 text-xs text-red-600/90">{errors.email}</div>
-                      )}
-                    </div>
+                    <button
+                      type="submit"
+                      className={[
+                        "rounded-full px-6 py-2.5 text-sm font-semibold transition",
+                        "shadow-[0_16px_34px_rgba(0,0,0,0.10)] active:scale-[0.99]",
+                        canSubmit
+                          ? "text-white hover:brightness-[1.05]"
+                          : "bg-black/60 text-white/90 opacity-70 cursor-not-allowed",
+                      ].join(" ")}
+                      style={canSubmit ? { background: `rgb(${BRAND_GREEN})` } : undefined}
+                      disabled={!canSubmit}
+                    >
+                      Login
+                    </button>
+                  </div>
 
-                    <div>
-                      <label className="block text-xs font-semibold text-black/60 mb-1.5">
-                        Passwort
-                      </label>
-                      <input
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        onBlur={() => setTouched((t) => ({ ...t, password: true }))}
-                        className={fieldClass(showPwError)}
-                        placeholder="••••••••"
-                        type="password"
-                        autoComplete="current-password"
-                      />
-                      {showPwError && (
-                        <div className="mt-1.5 text-xs text-red-600/90">{errors.password}</div>
-                      )}
-                    </div>
+                  <div className="pt-2 text-xs text-black/45">
+                    Hinweis: Ohne Account kannst du trotzdem starten – Registrierung ist für Speichern/Export.
+                  </div>
+                </form>
 
-                    <div className="flex items-center justify-between gap-3 pt-1">
-                      <button
-                        type="button"
-                        onClick={() => alert("TODO: Passwort-Reset")}
-                        className="text-sm text-black/55 hover:text-black/80 underline underline-offset-4 decoration-black/20"
-                      >
-                        Passwort vergessen?
-                      </button>
-
-                      <button
-                        type="submit"
-                        className={[
-                          "rounded-full px-6 py-2.5 text-sm font-semibold transition",
-                          "shadow-[0_16px_34px_rgba(0,0,0,0.10)] active:scale-[0.99]",
-                          canSubmit
-                            ? "text-white hover:brightness-[1.05]"
-                            : "bg-black/60 text-white/90 opacity-70 cursor-not-allowed",
-                        ].join(" ")}
-                        style={
-                          canSubmit
-                            ? { background: `rgb(${BRAND_GREEN})` }
-                            : undefined
-                        }
-                        disabled={!canSubmit}
-                      >
-                        Login
-                      </button>
-                    </div>
-
-                    <div className="pt-2 text-xs text-black/45">
-                      Hinweis: Ohne Account kannst du trotzdem starten – Registrierung ist für Speichern/Export.
-                    </div>
-                  </form>
-
-                  {/* Mobile: show invite AFTER 3s as a block below */}
-                  {showInvite && (
-                    <div className="lg:hidden mt-6 overflow-hidden rounded-2xl border border-black/10 bg-white/55 backdrop-blur-md">
-                      <div
-                        className="h-[6px]"
-                        style={{
-                          background: `linear-gradient(90deg, rgb(${BRAND_GREEN}), rgb(${BRAND_GREEN} / 0.70))`,
-                        }}
-                      />
-                      <div className="p-4">
-                        <div className="text-xs tracking-[0.28em] uppercase text-black/45">
-                          Neu hier?
-                        </div>
-                        <div className="mt-1 text-lg font-semibold">Sind Sie neu?</div>
-                        <p className="mt-1.5 text-sm text-black/55">
-                          Registrieren Sie sich jetzt – Speichern, Export, Dokumentation.
-                        </p>
-                        <button
-                          onClick={() => router.push("/login/register")}
-                          className="mt-3 rounded-full px-5 py-2.5 text-sm font-semibold"
-                          style={{
-                            background: `rgb(${BRAND_GREEN} / 0.12)`,
-                            border: `1px solid rgb(${BRAND_GREEN} / 0.28)`,
-                            color: `rgb(${BRAND_GREEN})`,
-                          }}
-                        >
-                          Registrieren
-                        </button>
+                {/* Mobile: invite appears after 3s as a block below */}
+                {showInvite && (
+                  <div className="lg:hidden mt-6 overflow-hidden rounded-2xl border border-black/10 bg-white/55 backdrop-blur-md">
+                    <div
+                      className="h-[6px]"
+                      style={{
+                        background: `linear-gradient(90deg, rgb(${BRAND_GREEN}), rgb(${BRAND_GREEN} / 0.70))`,
+                      }}
+                    />
+                    <div className="p-4">
+                      <div className="text-xs tracking-[0.28em] uppercase text-black/45">
+                        Neu hier?
                       </div>
+                      <div className="mt-1 text-lg font-semibold">Sind Sie neu?</div>
+                      <p className="mt-1.5 text-sm text-black/55">
+                        Registrieren Sie sich jetzt – Speichern, Export, Dokumentation.
+                      </p>
+                      <button
+                        onClick={() => router.push("/login/register")}
+                        className="mt-3 rounded-full px-5 py-2.5 text-sm font-semibold transition active:scale-[0.99]"
+                        style={{
+                          background: `rgb(${BRAND_GREEN} / 0.12)`,
+                          border: `1px solid rgb(${BRAND_GREEN} / 0.28)`,
+                          color: `rgb(${BRAND_GREEN})`,
+                        }}
+                      >
+                        Registrieren
+                      </button>
                     </div>
-                  )}
-                </div>
+                  </div>
+                )}
               </div>
             </div>
           </div>
