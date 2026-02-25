@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 
 const BRAND_GREEN = "0 115 106"; // #00736a
 
@@ -11,7 +12,7 @@ type Form = {
   email: string;
   password: string;
   confirmPassword: string;
-  address: string; // optional (Musterstrasse Wunsch)
+  address: string;
   company: string;
   acceptTerms: boolean;
 };
@@ -59,6 +60,7 @@ export default function RegisterPage() {
 
   const [submitAttempted, setSubmitAttempted] = useState(false);
   const [serverMsg, setServerMsg] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Trial note after 15s
   const [showTrial, setShowTrial] = useState(false);
@@ -77,8 +79,7 @@ export default function RegisterPage() {
     else if (!isEmail(form.email)) e.email = "Bitte eine gültige E-Mail eingeben.";
 
     if (!form.password) e.password = "Passwort ist erforderlich.";
-    else if (!strongEnough(form.password))
-      e.password = "Min. 8 Zeichen und mindestens 1 Zahl.";
+    else if (!strongEnough(form.password)) e.password = "Min. 8 Zeichen und mindestens 1 Zahl.";
 
     if (!form.confirmPassword) e.confirmPassword = "Bitte Passwort bestätigen.";
     else if (form.confirmPassword !== form.password)
@@ -90,7 +91,7 @@ export default function RegisterPage() {
     return e;
   }, [form]);
 
-  const canSubmit = Object.keys(errors).length === 0;
+  const canSubmit = Object.keys(errors).length === 0 && !isSubmitting;
 
   function set<K extends keyof Form>(key: K, value: Form[K]) {
     setForm((p) => ({ ...p, [key]: value }));
@@ -110,16 +111,25 @@ export default function RegisterPage() {
     ].join(" ");
   }
 
+  function startOAuth(provider: "apple" | "google") {
+    console.warn(`[auth] OAuth not configured yet: ${provider}`);
+  }
+
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     setSubmitAttempted(true);
     setServerMsg(null);
 
-    if (!canSubmit) return;
+    if (Object.keys(errors).length) return;
 
-    // TODO: echtes Register (API/Auth)
-    setServerMsg("Account erstellt (Demo). Du kannst dich jetzt einloggen.");
-    window.setTimeout(() => router.push("/login"), 900);
+    setIsSubmitting(true);
+    try {
+      // TODO: echtes Register (API/Auth)
+      setServerMsg("Account erstellt (Demo). Du kannst dich jetzt einloggen.");
+      window.setTimeout(() => router.push("/login"), 900);
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   const pwStrength = useMemo(() => {
@@ -129,6 +139,12 @@ export default function RegisterPage() {
     if (pw.length >= 6) return { label: "Mittel", ok: false };
     return { label: "Schwach", ok: false };
   }, [form.password]);
+
+  const oauthBtnBase =
+    "w-full h-11 rounded-xl border border-black/10 bg-white/70 backdrop-blur-md " +
+    "shadow-[0_14px_36px_rgba(0,0,0,0.10)] transition " +
+    "hover:bg-white/85 hover:-translate-y-[1px] active:translate-y-0 " +
+    "focus:outline-none focus-visible:ring-4";
 
   return (
     <main className="premium-light-bg relative min-h-[100svh] text-slate-900 overflow-x-hidden">
@@ -199,7 +215,58 @@ export default function RegisterPage() {
                 Entscheid-Dokumentation sauber zu verwalten.
               </p>
 
-              <form onSubmit={onSubmit} className="mt-6 space-y-4">
+              {/* Social register */}
+              <div className="mt-5 space-y-3">
+                <button
+                  type="button"
+                  onClick={() => startOAuth("apple")}
+                  className={oauthBtnBase}
+                  style={{ borderColor: `rgb(${BRAND_GREEN} / 0.20)` }}
+                >
+                  <div className="flex items-center justify-center gap-3">
+                    <span className="relative h-5 w-5">
+                      <Image
+                        src="/presets/Apple_logo_transparent.png"
+                        alt="Apple"
+                        fill
+                        sizes="20px"
+                        className="object-contain"
+                      />
+                    </span>
+                    <span className="text-sm font-semibold text-black/70">Mit Apple registrieren</span>
+                  </div>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => startOAuth("google")}
+                  className={oauthBtnBase}
+                  style={{ borderColor: `rgb(${BRAND_GREEN} / 0.20)` }}
+                >
+                  <div className="flex items-center justify-center gap-3">
+                    <span className="relative h-5 w-5">
+                      <Image
+                        src="/presets/Google_logo_transparent.png"
+                        alt="Google"
+                        fill
+                        sizes="20px"
+                        className="object-contain"
+                      />
+                    </span>
+                    <span className="text-sm font-semibold text-black/70">Mit Google registrieren</span>
+                  </div>
+                </button>
+
+                <div className="flex items-center gap-3 pt-1">
+                  <div className="h-px flex-1 bg-black/10" />
+                  <div className="text-[11px] uppercase tracking-[0.28em] text-black/35">
+                    oder
+                  </div>
+                  <div className="h-px flex-1 bg-black/10" />
+                </div>
+              </div>
+
+              <form onSubmit={onSubmit} className="mt-4 space-y-4" noValidate>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
                     <label className="block text-xs font-semibold text-black/60 mb-1.5">
@@ -212,6 +279,7 @@ export default function RegisterPage() {
                       className={inputClass(showError("firstName"))}
                       placeholder="Hans"
                       autoComplete="given-name"
+                      required
                     />
                     {showError("firstName") && (
                       <div className="mt-1.5 text-xs text-red-600/90">{errors.firstName}</div>
@@ -229,6 +297,7 @@ export default function RegisterPage() {
                       className={inputClass(showError("lastName"))}
                       placeholder="Mustermann"
                       autoComplete="family-name"
+                      required
                     />
                     {showError("lastName") && (
                       <div className="mt-1.5 text-xs text-red-600/90">{errors.lastName}</div>
@@ -274,6 +343,8 @@ export default function RegisterPage() {
                     placeholder="hans.mustermann@muster.ch"
                     autoComplete="email"
                     inputMode="email"
+                    type="email"
+                    required
                   />
                   {showError("email") && (
                     <div className="mt-1.5 text-xs text-red-600/90">{errors.email}</div>
@@ -293,6 +364,8 @@ export default function RegisterPage() {
                       placeholder="Min. 8 Zeichen + Zahl"
                       type="password"
                       autoComplete="new-password"
+                      required
+                      minLength={8}
                     />
                     <div className="mt-1.5 flex items-center justify-between text-xs">
                       <span className="text-black/45">
@@ -323,6 +396,7 @@ export default function RegisterPage() {
                       placeholder="Nochmals eingeben"
                       type="password"
                       autoComplete="new-password"
+                      required
                     />
                     {showError("confirmPassword") && (
                       <div className="mt-1.5 text-xs text-red-600/90">{errors.confirmPassword}</div>
@@ -347,6 +421,7 @@ export default function RegisterPage() {
                       onChange={(e) => set("acceptTerms", e.target.checked)}
                       onBlur={() => setTouched((t) => ({ ...t, acceptTerms: true }))}
                       className="mt-1 h-4 w-4"
+                      required
                     />
                     <div className="text-sm text-black/60 leading-relaxed">
                       Ich akzeptiere{" "}
@@ -369,7 +444,9 @@ export default function RegisterPage() {
                 <div
                   className={[
                     "transition-all duration-700 ease-out",
-                    showTrial ? "opacity-100 translate-y-0" : "opacity-0 translate-y-2 pointer-events-none h-0 overflow-hidden",
+                    showTrial
+                      ? "opacity-100 translate-y-0"
+                      : "opacity-0 translate-y-2 pointer-events-none h-0 overflow-hidden",
                   ].join(" ")}
                 >
                   <div
@@ -380,8 +457,8 @@ export default function RegisterPage() {
                       color: "rgba(0,0,0,0.72)",
                     }}
                   >
-                    <div className="font-semibold" style={{ color: `rgb(${BRAND_GREEN})` }}>
-                      14 Tage kostenlos testen
+                    <div className="font-extrabold tracking-[0.10em]" style={{ color: `rgb(${BRAND_GREEN})` }}>
+                      14 TAGE KOSTENLOSE TESTVERSION
                     </div>
                     <div className="mt-1 text-black/60">
                       Unsere Software können Sie 14 Tage kostenlos testen – ohne Risiko.
@@ -417,11 +494,13 @@ export default function RegisterPage() {
                     className={[
                       "rounded-full px-6 py-2.5 text-sm font-semibold transition",
                       "shadow-[0_16px_34px_rgba(0,0,0,0.10)] active:scale-[0.99]",
-                      canSubmit ? "text-white hover:brightness-[1.05]" : "bg-black/60 text-white/90 opacity-70 cursor-not-allowed",
+                      canSubmit
+                        ? "text-white hover:brightness-[1.05]"
+                        : "bg-black/60 text-white/90 opacity-70 cursor-not-allowed",
                     ].join(" ")}
                     style={canSubmit ? { background: `rgb(${BRAND_GREEN})` } : undefined}
                   >
-                    Account erstellen
+                    {isSubmitting ? "…" : "Account erstellen"}
                   </button>
                 </div>
               </form>
@@ -468,8 +547,7 @@ export default function RegisterPage() {
               </ul>
 
               <div className="mt-6 text-xs text-black/45 leading-relaxed">
-                Hinweis: Das ist aktuell UI/Validierung (MVP). Im nächsten Schritt hängen wir die echte
-                Auth dran.
+                Hinweis: UI/Validierung ist bereit. Auth-Anbindung kommt als nächster Schritt.
               </div>
             </div>
           </div>

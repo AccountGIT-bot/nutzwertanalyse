@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 
 type Errors = Partial<Record<"email" | "password", string>>;
 
@@ -62,20 +63,31 @@ export default function LoginPage() {
     e.preventDefault();
     setSubmitAttempted(true);
 
-    if (!Object.keys(errors).length) {
-      setIsSubmitting(true);
-      try {
-        // TODO: echtes Login (API/Auth) – hier nur Demo Navigation
-        // Security: keine Passwörter loggen / speichern / in LocalStorage.
-        router.push("/app");
-      } finally {
-        setIsSubmitting(false);
-      }
+    if (Object.keys(errors).length) return;
+
+    setIsSubmitting(true);
+    try {
+      // TODO: echtes Login (API/Auth)
+      router.push("/app");
+    } finally {
+      setIsSubmitting(false);
     }
+  }
+
+  function startOAuth(provider: "apple" | "google") {
+    // TODO: echte OAuth Anbindung (z.B. NextAuth/Clerk/Supabase)
+    // bewusst: keine Alerts, keine Passwörter loggen, keine LocalStorage Credentials.
+    console.warn(`[auth] OAuth not configured yet: ${provider}`);
   }
 
   const showEmailError = (touched.email || submitAttempted) && !!errors.email;
   const showPwError = (touched.password || submitAttempted) && !!errors.password;
+
+  const oauthBtnBase =
+    "w-full h-11 rounded-xl border border-black/10 bg-white/70 backdrop-blur-md " +
+    "shadow-[0_14px_36px_rgba(0,0,0,0.10)] transition " +
+    "hover:bg-white/85 hover:-translate-y-[1px] active:translate-y-0 " +
+    "focus:outline-none focus-visible:ring-4";
 
   return (
     <main className="premium-light-bg relative min-h-[100svh] text-slate-900 overflow-x-hidden">
@@ -135,7 +147,7 @@ export default function LoginPage() {
             ].join(" ")}
             style={{ zIndex: 20 }}
           >
-            <div className="relative overflow-hidden rounded-3xl border border-black/10 bg-white/55 backdrop-blur-md shadow-[0_22px_80px_rgba(0,0,0,0.10)] min-h-[270px]">
+            <div className="relative overflow-hidden rounded-3xl border border-black/10 bg-white/55 backdrop-blur-md shadow-[0_22px_80px_rgba(0,0,0,0.10)] min-h-[260px]">
               {/* Brand green bar */}
               <div
                 className="absolute top-0 bottom-0 right-0 w-[10px]"
@@ -197,7 +209,7 @@ export default function LoginPage() {
             </div>
           </div>
 
-          {/* Login card (stays centered; padding makes room later) */}
+          {/* Login card */}
           <div className="mx-auto lg:mx-0 max-w-xl relative" style={{ zIndex: 30 }}>
             <div className="relative overflow-hidden rounded-3xl border border-black/10 bg-white/70 backdrop-blur-md shadow-[0_22px_80px_rgba(0,0,0,0.12)]">
               {/* Brand green bar on login card */}
@@ -221,7 +233,6 @@ export default function LoginPage() {
                   Account • Login
                 </div>
 
-                {/* Back to previous look */}
                 <h1 className="mt-2 text-2xl sm:text-3xl font-semibold tracking-tight text-slate-900">
                   Willkommen zurück<span className="opacity-60">.</span>
                 </h1>
@@ -231,7 +242,58 @@ export default function LoginPage() {
                   auditfähig zu verwalten.
                 </p>
 
-                <form onSubmit={onSubmit} className="mt-6 space-y-4" noValidate>
+                {/* Social login */}
+                <div className="mt-5 space-y-3">
+                  <button
+                    type="button"
+                    onClick={() => startOAuth("apple")}
+                    className={oauthBtnBase}
+                    style={{ borderColor: `rgb(${BRAND_GREEN} / 0.20)` }}
+                  >
+                    <div className="flex items-center justify-center gap-3">
+                      <span className="relative h-5 w-5">
+                        <Image
+                          src="/presets/Apple_logo_transparent.png"
+                          alt="Apple"
+                          fill
+                          sizes="20px"
+                          className="object-contain"
+                        />
+                      </span>
+                      <span className="text-sm font-semibold text-black/70">Mit Apple anmelden</span>
+                    </div>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => startOAuth("google")}
+                    className={oauthBtnBase}
+                    style={{ borderColor: `rgb(${BRAND_GREEN} / 0.20)` }}
+                  >
+                    <div className="flex items-center justify-center gap-3">
+                      <span className="relative h-5 w-5">
+                        <Image
+                          src="/presets/Google_logo_transparent.png"
+                          alt="Google"
+                          fill
+                          sizes="20px"
+                          className="object-contain"
+                        />
+                      </span>
+                      <span className="text-sm font-semibold text-black/70">Mit Google anmelden</span>
+                    </div>
+                  </button>
+
+                  <div className="flex items-center gap-3 pt-1">
+                    <div className="h-px flex-1 bg-black/10" />
+                    <div className="text-[11px] uppercase tracking-[0.28em] text-black/35">
+                      oder
+                    </div>
+                    <div className="h-px flex-1 bg-black/10" />
+                  </div>
+                </div>
+
+                <form onSubmit={onSubmit} className="mt-4 space-y-4" noValidate>
                   <div>
                     <label className="block text-xs font-semibold text-black/60 mb-1.5">
                       E-Mail
@@ -261,7 +323,7 @@ export default function LoginPage() {
                       onChange={(e) => setPassword(e.target.value)}
                       onBlur={() => setTouched((t) => ({ ...t, password: true }))}
                       className={fieldClass(showPwError)}
-                      placeholder="••••••••••••••••"
+                      placeholder="••••••••••••••••••••"
                       type="password"
                       autoComplete="current-password"
                       required
@@ -276,7 +338,7 @@ export default function LoginPage() {
                     <button
                       type="button"
                       onClick={() => router.push("/login/forgot")}
-                      className="text-sm text-black/55 hover:text-black/80 underline underline-offset-4 decoration-black/20"
+                      className="text-sm text-black/55 hover:text-black/80 underline underline-offset-4 decoration-black/20 transition"
                     >
                       Passwort vergessen?
                     </button>
@@ -298,7 +360,7 @@ export default function LoginPage() {
                   </div>
                 </form>
 
-                {/* Mobile: invite appears after 3s as a block below */}
+                {/* Mobile invite */}
                 {showInvite && (
                   <div className="lg:hidden mt-6 overflow-hidden rounded-2xl border border-black/10 bg-white/55 backdrop-blur-md">
                     <div
