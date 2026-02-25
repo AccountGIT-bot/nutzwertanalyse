@@ -23,6 +23,7 @@ export default function LoginPage() {
   });
 
   const [submitAttempted, setSubmitAttempted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Right invite appears after 3s
   const [showInvite, setShowInvite] = useState(false);
@@ -34,8 +35,10 @@ export default function LoginPage() {
 
   const errors: Errors = useMemo(() => {
     const e: Errors = {};
-    if (!email.trim()) e.email = "Bitte E-Mail eingeben.";
-    else if (!isEmail(email)) e.email = "Bitte eine gültige E-Mail eingeben.";
+    const em = email.trim();
+
+    if (!em) e.email = "Bitte E-Mail eingeben.";
+    else if (!isEmail(em)) e.email = "Bitte eine gültige E-Mail eingeben.";
 
     if (!password) e.password = "Bitte Passwort eingeben.";
     else if (password.length < 6) e.password = "Passwort ist zu kurz (min. 6 Zeichen).";
@@ -43,7 +46,7 @@ export default function LoginPage() {
     return e;
   }, [email, password]);
 
-  const canSubmit = Object.keys(errors).length === 0;
+  const canSubmit = Object.keys(errors).length === 0 && !isSubmitting;
 
   function fieldClass(hasError: boolean) {
     return [
@@ -55,13 +58,20 @@ export default function LoginPage() {
     ].join(" ");
   }
 
-  function onSubmit(e: React.FormEvent) {
+  async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     setSubmitAttempted(true);
-    if (!canSubmit) return;
 
-    // TODO: echtes Login (API/Auth)
-    router.push("/app");
+    if (!Object.keys(errors).length) {
+      setIsSubmitting(true);
+      try {
+        // TODO: echtes Login (API/Auth) – hier nur Demo Navigation
+        // Security: keine Passwörter loggen / speichern / in LocalStorage.
+        router.push("/app");
+      } finally {
+        setIsSubmitting(false);
+      }
+    }
   }
 
   const showEmailError = (touched.email || submitAttempted) && !!errors.email;
@@ -125,7 +135,7 @@ export default function LoginPage() {
             ].join(" ")}
             style={{ zIndex: 20 }}
           >
-            <div className="relative overflow-hidden rounded-3xl border border-black/10 bg-white/55 backdrop-blur-md shadow-[0_22px_80px_rgba(0,0,0,0.10)] min-h-[320px]">
+            <div className="relative overflow-hidden rounded-3xl border border-black/10 bg-white/55 backdrop-blur-md shadow-[0_22px_80px_rgba(0,0,0,0.10)] min-h-[270px]">
               {/* Brand green bar */}
               <div
                 className="absolute top-0 bottom-0 right-0 w-[10px]"
@@ -183,18 +193,6 @@ export default function LoginPage() {
                     Zurück zur Startseite
                   </button>
                 </div>
-
-                <button
-                  type="button"
-                  onClick={() => router.push("/login")}
-                  className="mt-4 text-sm text-black/55 hover:text-black/80 underline underline-offset-4 decoration-black/20 transition"
-                >
-                  Bereits registriert? Zum Login
-                </button>
-
-                <div className="mt-4 text-xs text-black/45">
-                  DSG-konform • Pflichtfelder • klare Validierung
-                </div>
               </div>
             </div>
           </div>
@@ -223,10 +221,8 @@ export default function LoginPage() {
                   Account • Login
                 </div>
 
-                <h1
-                  className="mt-2 text-3xl sm:text-4xl font-extrabold tracking-tight"
-                  style={{ color: `rgb(${BRAND_GREEN})` }}
-                >
+                {/* Back to previous look */}
+                <h1 className="mt-2 text-2xl sm:text-3xl font-semibold tracking-tight text-slate-900">
                   Willkommen zurück<span className="opacity-60">.</span>
                 </h1>
 
@@ -235,7 +231,7 @@ export default function LoginPage() {
                   auditfähig zu verwalten.
                 </p>
 
-                <form onSubmit={onSubmit} className="mt-6 space-y-4">
+                <form onSubmit={onSubmit} className="mt-6 space-y-4" noValidate>
                   <div>
                     <label className="block text-xs font-semibold text-black/60 mb-1.5">
                       E-Mail
@@ -248,13 +244,8 @@ export default function LoginPage() {
                       placeholder="hans.mustermann@muster.ch"
                       autoComplete="email"
                       inputMode="email"
-                      style={
-                        showEmailError
-                          ? undefined
-                          : {
-                              borderColor: "rgba(0,0,0,0.10)",
-                            }
-                      }
+                      type="email"
+                      required
                     />
                     {showEmailError && (
                       <div className="mt-1.5 text-xs text-red-600/90">{errors.email}</div>
@@ -270,9 +261,11 @@ export default function LoginPage() {
                       onChange={(e) => setPassword(e.target.value)}
                       onBlur={() => setTouched((t) => ({ ...t, password: true }))}
                       className={fieldClass(showPwError)}
-                      placeholder="••••••••"
+                      placeholder="••••••••••••••••"
                       type="password"
                       autoComplete="current-password"
+                      required
+                      minLength={6}
                     />
                     {showPwError && (
                       <div className="mt-1.5 text-xs text-red-600/90">{errors.password}</div>
@@ -282,7 +275,7 @@ export default function LoginPage() {
                   <div className="flex items-center justify-between gap-3 pt-1">
                     <button
                       type="button"
-                      onClick={() => alert("TODO: Passwort-Reset")}
+                      onClick={() => router.push("/login/forgot")}
                       className="text-sm text-black/55 hover:text-black/80 underline underline-offset-4 decoration-black/20"
                     >
                       Passwort vergessen?
@@ -290,6 +283,7 @@ export default function LoginPage() {
 
                     <button
                       type="submit"
+                      disabled={!canSubmit}
                       className={[
                         "rounded-full px-6 py-2.5 text-sm font-semibold transition",
                         "shadow-[0_16px_34px_rgba(0,0,0,0.10)] active:scale-[0.99]",
@@ -298,14 +292,9 @@ export default function LoginPage() {
                           : "bg-black/60 text-white/90 opacity-70 cursor-not-allowed",
                       ].join(" ")}
                       style={canSubmit ? { background: `rgb(${BRAND_GREEN})` } : undefined}
-                      disabled={!canSubmit}
                     >
-                      Login
+                      {isSubmitting ? "…" : "Login"}
                     </button>
-                  </div>
-
-                  <div className="pt-2 text-xs text-black/45">
-                    Hinweis: Ohne Account kannst du trotzdem starten – Registrierung ist für Speichern/Export.
                   </div>
                 </form>
 
