@@ -1,0 +1,280 @@
+"use client";
+
+import { useState, useMemo } from "react";
+import { useAnalysis } from "@/app/lib/nwa/store";
+
+export function EvaluationMatrix() {
+  const { state, setRating, canProceedToNext, knockoutFailures } = useAnalysis();
+  const { alternatives, criteria, ratings, evaluators, decision } = state;
+  const packageLevel = decision.packageLevel;
+
+  const [selectedEvaluator, setSelectedEvaluator] = useState(
+    evaluators[0]?.id || undefined
+  );
+  const [hoveredCell, setHoveredCell] = useState<{
+    altId: string;
+    critId: string;
+  } | null>(null);
+
+  // Get rating value for a cell
+  const getRating = (altId: string, critId: string): number => {
+    const rating = ratings.find(
+      (r) =>
+        r.alternativeId === altId &&
+        r.criterionId === critId &&
+        (packageLevel !== "business" || r.evaluatorId === selectedEvaluator)
+    );
+    return rating?.score || 0;
+  };
+
+  // Calculate completion percentage
+  const completionPercent = useMemo(() => {
+    const total = alternatives.length * criteria.length;
+    const completed = new Set(
+      ratings
+        .filter(
+          (r) =>
+            r.score > 0 &&
+            (packageLevel !== "business" || r.evaluatorId === selectedEvaluator)
+        )
+        .map((r) => `${r.alternativeId}-${r.criterionId}`)
+    ).size;
+    return total > 0 ? Math.round((completed / total) * 100) : 0;
+  }, [alternatives, criteria, ratings, packageLevel, selectedEvaluator]);
+
+  const handleRating = (altId: string, critId: string, score: number) => {
+    setRating({
+      alternativeId: altId,
+      criterionId: critId,
+      score,
+      evaluatorId: packageLevel === "business" ? selectedEvaluator : undefined,
+    });
+  };
+
+  // Check if alternative failed knockout criteria
+  const isKnockout = (altId: string): boolean => {
+    return knockoutFailures.some((f) => f.alternativeId === altId);
+  };
+
+  const getFailedCriteria = (altId: string): string[] => {
+    const failure = knockoutFailures.find((f) => f.alternativeId === altId);
+    return failure?.failedCriteria || [];
+  };
+
+  return (
+    <div className="space-y-6">
+      <div>
+        <div className="text-sm text-white/60">Schritt 5</div>
+        <h2 className="mt-1 text-xl font-semibold text-white">
+          Alternativen bewerten
+        </h2>
+        <p className="mt-2 text-sm text-white/50">
+          Bewerten Sie jede Alternative für jedes Kriterium auf einer Skala von 1
+          bis 10.
+        </p>
+      </div>
+
+      {/* Evaluator selector (Business) */}
+      {packageLevel === "business" && evaluators.length > 1 && (
+        <div className="flex items-center gap-4">
+          <span className="text-sm text-white/60">Bewerter:</span>
+          <div className="flex gap-2">
+            {evaluators.map((evaluator) => (
+              <button
+                key={evaluator.id}
+                onClick={() => setSelectedEvaluator(evaluator.id)}
+                className={`px-4 py-2 rounded-lg text-sm transition ${
+                  selectedEvaluator === evaluator.id
+                    ? "bg-[rgb(var(--accent))] text-white"
+                    : "bg-white/10 text-white/60 hover:bg-white/20"
+                }`}
+              >
+                {evaluator.name}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Progress */}
+      <div className="rounded-xl border border-white/10 bg-white/5 p-4">
+        <div className="flex items-center justify-between mb-2">
+          <span className="text-sm text-white/60">Bewertungsfortschritt</span>
+          <span className="text-sm font-medium text-white">{completionPercent}%</span>
+        </div>
+        <div className="h-2 rounded-full bg-white/10 overflow-hidden">
+          <div
+            className="h-full rounded-full bg-[rgb(var(--accent))] transition-all"
+            style={{ width: `${completionPercent}%` }}
+          />
+        </div>
+      </div>
+
+      {/* Evaluation Matrix */}
+      <div className="overflow-x-auto">
+        <div className="min-w-[600px]">
+          {/* Header */}
+          <div className="flex gap-2 mb-3">
+            <div className="w-40 flex-shrink-0" />
+            {alternatives.map((alt) => (
+              <div
+                key={alt.id}
+                className={`flex-1 text-center text-sm font-medium truncate px-2 ${
+                  isKnockout(alt.id) ? "text-red-400" : "text-white"
+                }`}
+                title={alt.name}
+              >
+                {alt.name}
+                {isKnockout(alt.id) && (
+                  <div className="text-xs text-red-400/70 font-normal">K.O.</div>
+                )}
+              </div>
+            ))}
+          </div>
+
+          {/* Criteria rows */}
+          <div className="space-y-2">
+            {criteria.map((criterion) => {
+              const failedAlternatives = knockoutFailures
+                .filter((f) => f.failedCriteria.includes(criterion.id))
+                .map((f) => f.alternativeId);
+
+              return (
+                <div
+                  key={criterion.id}
+                  className="flex gap-2 items-center rounded-xl border border-white/10 bg-white/5 p-3"
+                >
+                  {/* Criterion label */}
+                  <div className="w-40 flex-shrink-0">
+                    <div className="text-sm font-medium text-white truncate">
+                      {criterion.name}
+                    </div>
+                    <div className="text-xs text-white/40">
+                      Gewicht: {(criterion.weight * 100).toFixed(0)}%
+                      {criterion.isKnockout && (
+                        <span className="ml-2 text-yellow-400">
+                          Min: {criterion.minThreshold}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Rating cells */}
+                  {alternatives.map((alt) => {
+                    const rating = getRating(alt.id, criterion.id);
+                    const isHovered =
+                      hoveredCell?.altId === alt.id &&
+                      hoveredCell?.critId === criterion.id;
+                    const isFailed = failedAlternatives.includes(alt.id);
+
+                    return (
+                      <div
+                        key={alt.id}
+                        className="flex-1"
+                        onMouseEnter={() =>
+                          setHoveredCell({ altId: alt.id, critId: criterion.id })
+                        }
+                        onMouseLeave={() => setHoveredCell(null)}
+                      >
+                        {isHovered ? (
+                          // Expanded rating buttons
+                          <div className="flex gap-0.5 justify-center">
+                            {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((score) => (
+                              <button
+                                key={score}
+                                onClick={() => handleRating(alt.id, criterion.id, score)}
+                                className={`h-8 w-6 rounded text-xs font-medium transition ${
+                                  rating === score
+                                    ? "bg-[rgb(var(--accent))] text-white"
+                                    : "bg-white/10 text-white/60 hover:bg-white/20"
+                                }`}
+                              >
+                                {score}
+                              </button>
+                            ))}
+                          </div>
+                        ) : (
+                          // Compact view
+                          <div
+                            className={`h-10 rounded-lg flex items-center justify-center cursor-pointer transition ${
+                              isFailed
+                                ? "bg-red-500/20 border border-red-500/30"
+                                : rating > 0
+                                ? "bg-[rgb(var(--accent))]/20"
+                                : "bg-white/10 hover:bg-white/15"
+                            }`}
+                          >
+                            {rating > 0 ? (
+                              <span
+                                className={`text-lg font-semibold ${
+                                  isFailed ? "text-red-400" : "text-[rgb(var(--accent))]"
+                                }`}
+                              >
+                                {rating}
+                              </span>
+                            ) : (
+                              <span className="text-white/30 text-sm">—</span>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+
+      {/* Knockout warnings */}
+      {knockoutFailures.length > 0 && (
+        <div className="rounded-xl border border-red-500/30 bg-red-500/10 p-4">
+          <div className="flex items-center gap-2 mb-2">
+            <div className="h-2 w-2 rounded-full bg-red-400" />
+            <span className="text-sm font-medium text-red-400">
+              K.O.-Kriterien nicht erfüllt
+            </span>
+          </div>
+          <div className="space-y-1">
+            {knockoutFailures.map((failure) => {
+              const alt = alternatives.find((a) => a.id === failure.alternativeId);
+              const failedCritNames = failure.failedCriteria
+                .map((cId) => criteria.find((c) => c.id === cId)?.name)
+                .filter(Boolean);
+              return (
+                <div key={failure.alternativeId} className="text-sm text-white/70">
+                  <span className="font-medium">{alt?.name}</span>: {failedCritNames.join(", ")}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* Legend */}
+      <div className="flex items-center gap-6 text-xs text-white/40">
+        <div className="flex items-center gap-2">
+          <div className="h-4 w-8 rounded bg-white/10" />
+          <span>Nicht bewertet</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <div className="h-4 w-8 rounded bg-[rgb(var(--accent))]/20" />
+          <span>Bewertet</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <div className="h-4 w-8 rounded bg-red-500/20 border border-red-500/30" />
+          <span>K.O. nicht bestanden</span>
+        </div>
+        <div className="ml-auto">1 = sehr schlecht, 10 = sehr gut</div>
+      </div>
+
+      {/* Validation */}
+      {!canProceedToNext && (
+        <div className="text-sm text-[rgb(var(--accent))]/80">
+          Bitte bewerten Sie alle Alternativen für alle Kriterien.
+        </div>
+      )}
+    </div>
+  );
+}
