@@ -2,6 +2,7 @@
 
 import { useEffect, useCallback, useMemo, useState } from "react";
 import { useAnalysis } from "@/app/lib/nwa/analysis-context";
+import { getPresetIcon } from "@/app/lib/nwa/preset-icons";
 import { DecisionSetup } from "./DecisionSetup";
 import { AlternativesManager } from "./AlternativesManager";
 import { CriteriaManager } from "./CriteriaManager";
@@ -183,33 +184,38 @@ return (
         {/* Header with step indicator */}
         <div className="border-b border-white/10 bg-black/20 backdrop-blur-md sticky top-[76px] z-20">
           <div className="mx-auto max-w-5xl px-5 sm:px-6 py-4">
-            {/* Package indicator */}
+            {/* Package and preset indicator */}
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-3">
-                <div
-                  className="h-8 w-8 rounded-lg flex items-center justify-center text-sm font-bold"
-                  style={{ background: `rgb(var(--accent) / 0.2)`, color: `rgb(var(--accent))` }}
-              >
-                {decision.packageLevel === "basic"
-                  ? "B"
-                  : decision.packageLevel === "advanced"
-                  ? "A"
-                  : "P"}
-              </div>
-              <div>
-                <div className="text-sm font-medium text-white">
-                  {decision.title || "Neue Analyse"}
+                {/* Show preset icon if available, otherwise package level */}
+                {decision.preset ? (() => {
+                  const PresetIcon = getPresetIcon(decision.preset);
+                  return (
+                    <div
+                      className="h-9 w-9 rounded-lg flex items-center justify-center"
+                      style={{ background: `rgb(var(--accent) / 0.15)`, color: `rgb(var(--accent))` }}
+                    >
+                      <PresetIcon size={20} />
+                    </div>
+                  );
+                })() : (
+                  <div
+                    className="h-9 w-9 rounded-lg flex items-center justify-center text-sm font-bold"
+                    style={{ background: `rgb(var(--accent) / 0.2)`, color: `rgb(var(--accent))` }}
+                  >
+                    {decision.packageLevel === "basic" ? "B" : decision.packageLevel === "advanced" ? "A" : "P"}
+                  </div>
+                )}
+                <div>
+                  <div className="text-sm font-medium text-white truncate max-w-[200px] sm:max-w-none">
+                    {decision.title || "Neue Analyse"}
+                  </div>
+                  <div className="text-xs text-white/50">
+                    {decision.packageLevel === "basic" ? "Basic" : decision.packageLevel === "advanced" ? "Advanced" : "Business"}
+                  </div>
                 </div>
-                <div className="text-xs text-white/50">
-                  {decision.packageLevel === "basic"
-                    ? "Basic"
-                    : decision.packageLevel === "advanced"
-                    ? "Advanced"
-: "Business"}{" "}
-              Paket
+              </div>
             </div>
-          </div>
-        </div>
         
         {/* Reset button */}
         <button
@@ -290,9 +296,14 @@ return (
         </div>
       </div>
 
-      {/* Main content */}
+      {/* Main content with fade transition */}
       <div className="flex-1 mx-auto max-w-5xl w-full px-5 sm:px-6 py-8">
-        {renderCurrentStep()}
+        <div 
+          key={currentStep}
+          className="animate-in fade-in slide-in-from-right-2 duration-300"
+        >
+          {renderCurrentStep()}
+        </div>
       </div>
 
       {/* Navigation footer */}

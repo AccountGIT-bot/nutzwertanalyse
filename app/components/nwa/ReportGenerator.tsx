@@ -475,8 +475,8 @@ export function ReportGenerator() {
       downloadLink.click();
       
       URL.revokeObjectURL(url);
-    } catch (error) {
-      console.error("[v0] Report generation error:", error);
+    } catch {
+      // Report generation failed silently - user can retry
     } finally {
       setIsGenerating(false);
     }

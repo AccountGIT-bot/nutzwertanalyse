@@ -3,58 +3,67 @@
 import { useEffect, useMemo, useRef, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import { 
+  getPresetIcon, 
+  type PresetId,
+  SupplierIcon,
+  SoftwareIcon,
+  InvestmentIcon,
+  MachinesIcon,
+  VehicleIcon,
+  EmployeeIcon,
+} from "@/app/lib/nwa/preset-icons";
 
 type Phase = "intro" | "landing";
-
-type PresetId =
-  | "supplier"
-  | "software"
-  | "investment"
-  | "machines"
-  | "vehicle"
-  | "employee";
 
 const PRESETS: Array<{
   id: PresetId;
   label: string;
   hint: string;
   image: string;
+  Icon: typeof SupplierIcon;
 }> = [
   {
     id: "supplier",
     label: "Lieferantenauswahl",
     hint: "Partner objektiv vergleichen",
     image: "/presets/Startseite_Lieferantenauswahl_komprimiert.jpg",
+    Icon: SupplierIcon,
   },
   {
     id: "software",
     label: "Softwarevergleich",
-    hint: "Tools effizient bewerten",
+    hint: "Tools systematisch bewerten",
     image: "/presets/Startseite_Softwarevergleich_komprimiert.jpg",
+    Icon: SoftwareIcon,
   },
   {
     id: "investment",
     label: "Investitionsentscheid",
-    hint: "Chancen & Risiken abwägen",
+    hint: "Rendite & Risiken abwägen",
     image: "/presets/Startseite_Investitionsentscheid_komprimiert.jpg",
+    Icon: InvestmentIcon,
   },
   {
     id: "machines",
     label: "Maschinenkauf",
     hint: "Leistung & Wirtschaftlichkeit",
     image: "/presets/Startseite_Maschinenkauf_komprimiert.jpg",
+    Icon: MachinesIcon,
   },
   {
     id: "vehicle",
     label: "Fahrzeuganschaffung",
-    hint: "Anschaffung & Nutzen",
+    hint: "Kosten & Nutzen optimieren",
     image: "/presets/Startseite_Fahrzeugauswahl_komprimiert.jpg",
+    Icon: VehicleIcon,
   },
   {
     id: "employee",
     label: "Mitarbeiterwahl",
-    hint: "Bewerber fair vergleichen",
+    hint: "Kandidaten fair vergleichen",
     image: "/presets/Startseite_Mitarbeiterwahl_komprimiert.jpg",
+    Icon: EmployeeIcon,
   },
 ];
 
@@ -179,9 +188,8 @@ export default function LandingWithIntro() {
   }, [text, goToApp]);
 
   const startFromPreset = useCallback((p: PresetId) => {
-    const draft =
-      text.trim() ||
-      `Vorlage: ${PRESETS.find((x) => x.id === p)?.label ?? "Auswahl"}`;
+    // Use user input if available, otherwise leave empty - the preset context is shown via icon
+    const draft = text.trim();
     goToApp({ draft, preset: p });
   }, [text, goToApp]);
 
@@ -446,17 +454,22 @@ export default function LandingWithIntro() {
 
                       <div className="relative z-10 p-3 sm:p-4">
                         <div
-                          className="inline-flex flex-col gap-1 rounded-2xl px-3.5 py-2.5 backdrop-blur-md"
+                          className="inline-flex items-start gap-3 rounded-2xl px-3.5 py-2.5 backdrop-blur-md"
                           style={{
                             background: "rgba(0,0,0,0.34)",
                             border: "1px solid rgba(255,255,255,0.14)",
                           }}
                         >
-                          <div className="text-sm sm:text-base font-semibold text-white leading-tight">
-                            {p.label}
+                          <div className="h-8 w-8 rounded-lg flex items-center justify-center bg-white/10 flex-shrink-0 mt-0.5">
+                            <p.Icon size={18} className="text-white/90" />
                           </div>
-                          <div className="text-[11px] sm:text-xs text-white/80">
-                            {p.hint}
+                          <div className="flex flex-col gap-0.5">
+                            <div className="text-sm sm:text-base font-semibold text-white leading-tight">
+                              {p.label}
+                            </div>
+                            <div className="text-[11px] sm:text-xs text-white/80">
+                              {p.hint}
+                            </div>
                           </div>
                         </div>
                       </div>
