@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useCallback, useMemo } from "react";
 import { useAnalysis } from "@/app/lib/nwa/analysis-context";
 import { DecisionSetup } from "./DecisionSetup";
 import { AlternativesManager } from "./AlternativesManager";
@@ -23,7 +23,10 @@ export function AnalysisWizard() {
   const { state, setStep, calculateResults, canProceedToNext } = useAnalysis();
   const { currentStep, decision } = state;
 
-  const currentStepIndex = STEPS.findIndex((s) => s.id === currentStep);
+  const currentStepIndex = useMemo(
+    () => STEPS.findIndex((s) => s.id === currentStep),
+    [currentStep]
+  );
 
   // Calculate results when entering results step
   useEffect(() => {
@@ -32,25 +35,25 @@ export function AnalysisWizard() {
     }
   }, [currentStep, calculateResults]);
 
-  const goToStep = (step: AnalysisStep) => {
+  const goToStep = useCallback((step: AnalysisStep) => {
     const targetIndex = STEPS.findIndex((s) => s.id === step);
     // Only allow going to previous steps or current step
     if (targetIndex <= currentStepIndex) {
       setStep(step);
     }
-  };
+  }, [currentStepIndex, setStep]);
 
-  const goNext = () => {
+  const goNext = useCallback(() => {
     if (canProceedToNext && currentStepIndex < STEPS.length - 1) {
       setStep(STEPS[currentStepIndex + 1].id);
     }
-  };
+  }, [canProceedToNext, currentStepIndex, setStep]);
 
-  const goBack = () => {
+  const goBack = useCallback(() => {
     if (currentStepIndex > 0) {
       setStep(STEPS[currentStepIndex - 1].id);
     }
-  };
+  }, [currentStepIndex, setStep]);
 
   const renderCurrentStep = () => {
     switch (currentStep) {

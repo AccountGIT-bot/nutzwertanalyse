@@ -47,6 +47,32 @@
 body {
   min-height: 100vh;
   font-family: Arial, Helvetica, sans-serif;
+  /* Enable hardware acceleration for smoother animations */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+/* Optimize rendering for interactive elements */
+button, input, textarea, select {
+  font: inherit;
+}
+
+/* Content visibility optimization for off-screen content */
+.content-auto {
+  content-visibility: auto;
+  contain-intrinsic-size: 0 500px;
+}
+
+/* Reduce paint areas with contain */
+.contain-layout {
+  contain: layout style;
+}
+
+/* Hardware-accelerated transforms for smoother animations */
+.gpu-accelerated {
+  will-change: transform;
+  transform: translateZ(0);
 }
 
 /* =========================================================

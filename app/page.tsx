@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 
@@ -155,26 +155,30 @@ export default function LandingWithIntro() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  function goToApp(payload: { draft: string; preset?: PresetId }) {
-    try {
-      localStorage.setItem("nwa_decisionDraft", payload.draft);
-      if (payload.preset) localStorage.setItem("nwa_preset", payload.preset);
-    } catch {}
+  const goToApp = useCallback((payload: { draft: string; preset?: PresetId }) => {
+    if (typeof window !== "undefined") {
+      try {
+        localStorage.setItem("nwa_decisionDraft", payload.draft);
+        if (payload.preset) localStorage.setItem("nwa_preset", payload.preset);
+      } catch {
+        // Silent fail for localStorage errors
+      }
+    }
     router.push("/app");
-  }
+  }, [router]);
 
-  function startFromInput() {
+  const startFromInput = useCallback(() => {
     const draft = text.trim();
     if (!draft) return;
     goToApp({ draft });
-  }
+  }, [text, goToApp]);
 
-  function startFromPreset(p: PresetId) {
+  const startFromPreset = useCallback((p: PresetId) => {
     const draft =
       text.trim() ||
       `Vorlage: ${PRESETS.find((x) => x.id === p)?.label ?? "Auswahl"}`;
     goToApp({ draft, preset: p });
-  }
+  }, [text, goToApp]);
 
   return (
     <main className="relative min-h-[100svh] text-slate-900 overflow-x-hidden">

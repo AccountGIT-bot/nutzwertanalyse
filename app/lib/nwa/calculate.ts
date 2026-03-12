@@ -31,6 +31,7 @@ export function normalizeWeights(criteria: Criterion[]): Criterion[] {
 /**
  * Calculate NWA scores for all alternatives
  * Score = Σ (criterion weight × alternative rating)
+ * Optimized with lookup maps for O(1) access instead of O(n) filters
  */
 export function calculateNwa(
   alternatives: Alternative[],
@@ -38,29 +39,51 @@ export function calculateNwa(
   ratings: Rating[],
   evaluators?: Evaluator[]
 ): NwaResult[] {
+  // Early return for empty inputs
+  if (alternatives.length === 0 || criteria.length === 0) {
+    return [];
+  }
+
   const normalizedCriteria = normalizeWeights(criteria);
   const results: NwaResult[] = [];
+
+  // Build rating lookup map for O(1) access: Map<altId-critId, Rating[]>
+  const ratingMap = new Map<string, Rating[]>();
+  for (const r of ratings) {
+    const key = `${r.alternativeId}-${r.criterionId}`;
+    const existing = ratingMap.get(key);
+    if (existing) {
+      existing.push(r);
+    } else {
+      ratingMap.set(key, [r]);
+    }
+  }
+
+  // Build evaluator lookup map for O(1) access
+  const evaluatorMap = new Map<string, number>();
+  if (evaluators) {
+    for (const e of evaluators) {
+      evaluatorMap.set(e.id, e.weight);
+    }
+  }
 
   for (const alt of alternatives) {
     const criteriaScores: CriterionScore[] = [];
     let total = 0;
 
     for (const criterion of normalizedCriteria) {
-      // Get all ratings for this alternative-criterion pair
-      const relevantRatings = ratings.filter(
-        (r) => r.alternativeId === alt.id && r.criterionId === criterion.id
-      );
+      // O(1) lookup instead of O(n) filter
+      const relevantRatings = ratingMap.get(`${alt.id}-${criterion.id}`) || [];
 
       let avgScore = 0;
       if (relevantRatings.length > 0) {
-        if (evaluators && evaluators.length > 0) {
-          // Weighted average by evaluator weight
+        if (evaluatorMap.size > 0) {
+          // Weighted average by evaluator weight - O(1) lookup
           let weightedSum = 0;
           let totalEvaluatorWeight = 0;
           
           for (const rating of relevantRatings) {
-            const evaluator = evaluators.find((e) => e.id === rating.evaluatorId);
-            const evalWeight = evaluator?.weight ?? 1;
+            const evalWeight = evaluatorMap.get(rating.evaluatorId) ?? 1;
             weightedSum += rating.score * evalWeight;
             totalEvaluatorWeight += evalWeight;
           }
@@ -420,7 +443,21 @@ export function checkKnockoutCriteria(
 
 /**
  * Generate unique ID
+ * Uses crypto.randomUUID when available (modern browsers)
+ * Falls back to performance.now() + random for older environments
  */
+let idCounter = 0;
 export function generateId(): string {
-  return `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+  // Prefer crypto.randomUUID for cryptographically unique IDs
+  if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
+    return crypto.randomUUID();
+  }
+  
+  // Fallback: use high-resolution time + random + counter for uniqueness
+  idCounter += 1;
+  const timestamp = typeof performance !== "undefined" 
+    ? Math.floor(performance.now() * 1000)
+    : idCounter;
+  const random = Math.random().toString(36).substring(2, 11);
+  return `nwa-${timestamp}-${random}-${idCounter}`;
 }
