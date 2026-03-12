@@ -63,7 +63,7 @@ export function calculateNwa(
   const evaluatorMap = new Map<string, number>();
   if (evaluators) {
     for (const e of evaluators) {
-      evaluatorMap.set(e.id, e.weight);
+      evaluatorMap.set(e.id, e.weight ?? 1);
     }
   }
 
