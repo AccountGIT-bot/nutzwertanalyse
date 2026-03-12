@@ -222,6 +222,46 @@ export function getPresetLabel(presetId: PresetId | string | undefined): string 
   }
 }
 
+// Map AI domains to German context labels - used for dynamic context from AI interpretation
+const DOMAIN_LABELS: Record<string, string> = {
+  supplier: "Lieferantenauswahl",
+  software: "Softwarevergleich",
+  investment: "Investitionsentscheid",
+  machines: "Maschinenkauf",
+  vehicle: "Fahrzeuganschaffung",
+  employee: "Mitarbeiterwahl",
+  personal: "Persoenliche Entscheidung",
+  technology: "Technologieauswahl",
+  service: "Dienstleisterauswahl",
+  other: "Allgemeine Entscheidung",
+};
+
+// Get context label from AI domain - always dynamic based on AI interpretation
+export function getDomainLabel(domain: string | undefined): string {
+  if (!domain) return "Individuelle Analyse";
+  return DOMAIN_LABELS[domain] || "Individuelle Analyse";
+}
+
+// Map AI domains to preset IDs for icon selection
+const DOMAIN_TO_PRESET_ID: Record<string, PresetId> = {
+  supplier: "supplier",
+  software: "software",
+  investment: "investment",
+  machines: "machines",
+  vehicle: "vehicle",
+  employee: "employee",
+  personal: "investment",
+  technology: "software",
+  service: "supplier",
+  other: "custom",
+};
+
+// Get icon for AI domain
+export function getDomainIcon(domain: string | undefined): (props: PresetIconProps) => ReactNode {
+  const presetId = domain ? DOMAIN_TO_PRESET_ID[domain] : undefined;
+  return getPresetIcon(presetId);
+}
+
 // Preset context indicator component - shows the selected preset with icon
 export function PresetIndicator({ 
   presetId, 

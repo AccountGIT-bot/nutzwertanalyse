@@ -183,8 +183,16 @@ export default function LandingWithIntro() {
   }) => {
     if (typeof window !== "undefined") {
       try {
+        // Clear previous values first to avoid mixing old and new data
+        localStorage.removeItem("nwa_decisionDraft");
+        localStorage.removeItem("nwa_preset");
+        localStorage.removeItem("nwa_aiInterpretation");
+        
+        // Set new values
         localStorage.setItem("nwa_decisionDraft", payload.draft);
-        if (payload.preset) localStorage.setItem("nwa_preset", payload.preset);
+        if (payload.preset) {
+          localStorage.setItem("nwa_preset", payload.preset);
+        }
         if (payload.interpretation) {
           localStorage.setItem("nwa_aiInterpretation", JSON.stringify(payload.interpretation));
         }

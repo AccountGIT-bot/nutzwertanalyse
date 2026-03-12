@@ -2,7 +2,7 @@
 
 import { useEffect, useCallback, useMemo, useState } from "react";
 import { useAnalysis } from "@/app/lib/nwa/analysis-context";
-import { getPresetIcon } from "@/app/lib/nwa/preset-icons";
+import { getPresetIcon, getDomainIcon, getDomainLabel } from "@/app/lib/nwa/preset-icons";
 import { DecisionSetup } from "./DecisionSetup";
 import { AlternativesManager } from "./AlternativesManager";
 import { CriteriaManager } from "./CriteriaManager";
@@ -119,7 +119,16 @@ export function AnalysisWizard() {
     }
   }, [currentStep]);
 
-  const PresetIconComponent = decision.preset ? getPresetIcon(decision.preset) : null;
+  // Use AI interpretation's domain for icon if available, otherwise fall back to preset
+  const hasAIContext = decision.aiInterpretation?.domain;
+  const ContextIconComponent = hasAIContext 
+    ? getDomainIcon(decision.aiInterpretation?.domain) 
+    : decision.preset 
+      ? getPresetIcon(decision.preset) 
+      : null;
+  const contextLabel = hasAIContext 
+    ? getDomainLabel(decision.aiInterpretation?.domain)
+    : null;
 
   return (
     <>
@@ -179,12 +188,12 @@ export function AnalysisWizard() {
           <div className="mx-auto max-w-5xl px-5 sm:px-6 py-4">
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-3">
-                {PresetIconComponent ? (
+                {ContextIconComponent ? (
                   <div
                     className="h-9 w-9 rounded-lg flex items-center justify-center"
                     style={{ background: "rgb(var(--accent) / 0.15)", color: "rgb(var(--accent))" }}
                   >
-                    <PresetIconComponent size={20} />
+                    <ContextIconComponent size={20} />
                   </div>
                 ) : (
                   <div
@@ -198,8 +207,14 @@ export function AnalysisWizard() {
                   <div className="text-sm font-medium text-white truncate max-w-[200px] sm:max-w-none">
                     {decision.title || "Neue Analyse"}
                   </div>
-                  <div className="text-xs text-white/50">
-                    {decision.packageLevel === "basic" ? "Basic" : decision.packageLevel === "advanced" ? "Advanced" : "Business"}
+                  <div className="text-xs text-white/50 flex items-center gap-1.5">
+                    <span>{decision.packageLevel === "basic" ? "Basic" : decision.packageLevel === "advanced" ? "Advanced" : "Business"}</span>
+                    {contextLabel && (
+                      <>
+                        <span className="text-white/30">•</span>
+                        <span>{contextLabel}</span>
+                      </>
+                    )}
                   </div>
                 </div>
               </div>

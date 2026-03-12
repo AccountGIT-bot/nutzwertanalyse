@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { AnalysisProvider } from "@/app/lib/nwa/analysis-context";
 import { AnalysisWizard } from "@/app/components/nwa/AnalysisWizard";
 import type { PackageLevel, AIDecisionInterpretation } from "@/app/lib/nwa/types";
-import { getPresetIcon, getPresetLabel } from "@/app/lib/nwa/preset-icons";
+import { getPresetIcon, getPresetLabel, getDomainIcon, getDomainLabel } from "@/app/lib/nwa/preset-icons";
 
 type Theme = "basic" | "advanced" | "business";
 
@@ -229,10 +229,18 @@ export default function AppPage() {
               Die Pakete unterscheiden sich in Tiefe, Methodik und Reportumfang.
             </p>
             
-            {/* Show selected preset context with icon - clean, no redundant label */}
-            {initialPreset && (() => {
-              const PresetIcon = getPresetIcon(initialPreset);
-              const presetLabel = getPresetLabel(initialPreset);
+            {/* Show context: AI interpretation domain takes priority over static preset */}
+            {(initialAIInterpretation || initialPreset) && (() => {
+              // Use AI interpretation's domain if available, otherwise fall back to preset
+              const hasAIContext = initialAIInterpretation?.domain;
+              const ContextIcon = hasAIContext 
+                ? getDomainIcon(initialAIInterpretation.domain) 
+                : getPresetIcon(initialPreset);
+              const contextLabel = hasAIContext 
+                ? getDomainLabel(initialAIInterpretation.domain) 
+                : getPresetLabel(initialPreset);
+              const isAIGenerated = !!hasAIContext;
+              
               return (
                 <div className="mt-4 flex items-center gap-3 rounded-xl border border-white/10 bg-white/5 px-4 py-3">
                   <div
@@ -242,12 +250,19 @@ export default function AppPage() {
                       color: `rgb(var(--accent))`,
                     }}
                   >
-                    <PresetIcon size={20} />
+                    <ContextIcon size={20} />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <div className="text-xs text-white/50">Anwendungsbereich</div>
+                    <div className="text-xs text-white/50 flex items-center gap-1.5">
+                      Anwendungsbereich
+                      {isAIGenerated && (
+                        <span className="px-1.5 py-0.5 rounded text-[10px] bg-white/10 text-white/60">
+                          KI-erkannt
+                        </span>
+                      )}
+                    </div>
                     <div className="text-sm text-white font-medium truncate">
-                      {presetLabel}
+                      {contextLabel}
                     </div>
                   </div>
                 </div>
