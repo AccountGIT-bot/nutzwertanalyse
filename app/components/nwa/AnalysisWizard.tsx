@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useCallback, useMemo } from "react";
+import { useEffect, useCallback, useMemo, useState } from "react";
 import { useAnalysis } from "@/app/lib/nwa/analysis-context";
 import { DecisionSetup } from "./DecisionSetup";
 import { AlternativesManager } from "./AlternativesManager";
@@ -20,20 +20,70 @@ const STEPS: { id: AnalysisStep; label: string; shortLabel: string }[] = [
 ];
 
 export function AnalysisWizard() {
-  const { state, setStep, calculateResults, canProceedToNext } = useAnalysis();
+  const { state, setStep, calculateResults, canProceedToNext, reset, saveDraft, hasDraft, loadDraft } = useAnalysis();
   const { currentStep, decision } = state;
+  const [showResetConfirm, setShowResetConfirm] = useState(false);
+  const [showDraftPrompt, setShowDraftPrompt] = useState(false);
+  const [draftChecked, setDraftChecked] = useState(false);
 
   const currentStepIndex = useMemo(
     () => STEPS.findIndex((s) => s.id === currentStep),
     [currentStep]
   );
 
-  // Calculate results when entering results step
+// Calculate results when entering results step
   useEffect(() => {
     if (currentStep === "results") {
       calculateResults();
     }
   }, [currentStep, calculateResults]);
+
+  // Auto-save draft on state changes (debounced)
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      saveDraft();
+    }, 2000); // 2 second debounce
+    return () => clearTimeout(timeoutId);
+  }, [state, saveDraft]);
+
+  // Check for existing draft on mount
+  useEffect(() => {
+    if (!draftChecked && hasDraft && currentStep === "decision" && !decision.title) {
+      setShowDraftPrompt(true);
+    }
+    setDraftChecked(true);
+  }, [draftChecked, hasDraft, currentStep, decision.title]);
+
+  // Handle draft restoration
+  const handleLoadDraft = useCallback(() => {
+    loadDraft();
+    setShowDraftPrompt(false);
+  }, [loadDraft]);
+
+  const handleDiscardDraft = useCallback(() => {
+    setShowDraftPrompt(false);
+    if (typeof window !== "undefined") {
+      try {
+        localStorage.removeItem("nwa_draft_state");
+      } catch {
+        // Ignore errors
+      }
+    }
+  }, []);
+
+  // Handle reset with confirmation
+  const handleResetClick = useCallback(() => {
+    setShowResetConfirm(true);
+  }, []);
+
+  const handleConfirmReset = useCallback(() => {
+    reset();
+    setShowResetConfirm(false);
+  }, [reset]);
+
+  const handleCancelReset = useCallback(() => {
+    setShowResetConfirm(false);
+  }, []);
 
   const goToStep = useCallback((step: AnalysisStep) => {
     const targetIndex = STEPS.findIndex((s) => s.id === step);
@@ -74,17 +124,71 @@ export function AnalysisWizard() {
     }
   };
 
-  return (
-    <div className="min-h-[calc(100vh-76px)] flex flex-col">
-      {/* Header with step indicator */}
-      <div className="border-b border-white/10 bg-black/20 backdrop-blur-md sticky top-[76px] z-20">
-        <div className="mx-auto max-w-5xl px-5 sm:px-6 py-4">
-          {/* Package indicator */}
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-3">
-              <div
-                className="h-8 w-8 rounded-lg flex items-center justify-center text-sm font-bold"
-                style={{ background: `rgb(var(--accent) / 0.2)`, color: `rgb(var(--accent))` }}
+return (
+    <>
+      {/* Draft Recovery Prompt */}
+      {showDraftPrompt && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+          <div className="bg-[#1a1a1a] border border-white/10 rounded-2xl p-6 max-w-md mx-4 shadow-2xl">
+            <h3 className="text-lg font-semibold text-white">Entwurf gefunden</h3>
+            <p className="mt-2 text-sm text-white/60">
+              Es wurde ein gespeicherter Entwurf gefunden. Möchten Sie diesen wiederherstellen?
+            </p>
+            <div className="mt-4 flex gap-3">
+              <button
+                onClick={handleDiscardDraft}
+                className="flex-1 px-4 py-2.5 rounded-xl text-sm font-medium text-white/70 bg-white/10 hover:bg-white/15 transition"
+              >
+                Verwerfen
+              </button>
+              <button
+                onClick={handleLoadDraft}
+                className="flex-1 px-4 py-2.5 rounded-xl text-sm font-semibold text-white transition"
+                style={{ background: `rgb(var(--accent))` }}
+              >
+                Wiederherstellen
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Reset Confirmation Modal */}
+      {showResetConfirm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+          <div className="bg-[#1a1a1a] border border-white/10 rounded-2xl p-6 max-w-md mx-4 shadow-2xl">
+            <h3 className="text-lg font-semibold text-white">Analyse zurücksetzen?</h3>
+            <p className="mt-2 text-sm text-white/60">
+              Sind Sie sicher, dass Sie die Analyse zurücksetzen möchten? Alle eingegebenen Daten werden gelöscht.
+            </p>
+            <div className="mt-4 flex gap-3">
+              <button
+                onClick={handleCancelReset}
+                className="flex-1 px-4 py-2.5 rounded-xl text-sm font-medium text-white/70 bg-white/10 hover:bg-white/15 transition"
+              >
+                Abbrechen
+              </button>
+              <button
+                onClick={handleConfirmReset}
+                className="flex-1 px-4 py-2.5 rounded-xl text-sm font-semibold text-white bg-red-600 hover:bg-red-500 transition"
+              >
+                Zurücksetzen
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <div className="min-h-[calc(100vh-76px)] flex flex-col">
+        {/* Header with step indicator */}
+        <div className="border-b border-white/10 bg-black/20 backdrop-blur-md sticky top-[76px] z-20">
+          <div className="mx-auto max-w-5xl px-5 sm:px-6 py-4">
+            {/* Package indicator */}
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-3">
+                <div
+                  className="h-8 w-8 rounded-lg flex items-center justify-center text-sm font-bold"
+                  style={{ background: `rgb(var(--accent) / 0.2)`, color: `rgb(var(--accent))` }}
               >
                 {decision.packageLevel === "basic"
                   ? "B"
@@ -101,15 +205,37 @@ export function AnalysisWizard() {
                     ? "Basic"
                     : decision.packageLevel === "advanced"
                     ? "Advanced"
-                    : "Business"}{" "}
-                  Paket
-                </div>
-              </div>
+: "Business"}{" "}
+              Paket
             </div>
           </div>
+        </div>
+        
+        {/* Reset button */}
+        <button
+          onClick={handleResetClick}
+          className="px-3 py-1.5 rounded-lg text-xs font-medium text-white/50 hover:text-white/70 hover:bg-white/10 transition"
+          title="Analyse zurücksetzen"
+        >
+          Neustart
+        </button>
+      </div>
 
-          {/* Step progress */}
-          <div className="flex items-center gap-1 overflow-x-auto pb-1">
+{/* Overall progress bar */}
+      <div className="mb-3">
+        <div className="h-1.5 rounded-full bg-white/10 overflow-hidden">
+          <div
+            className="h-full rounded-full transition-all duration-500"
+            style={{
+              width: `${((currentStepIndex + 1) / STEPS.length) * 100}%`,
+              background: `rgb(var(--accent))`,
+            }}
+          />
+        </div>
+      </div>
+
+      {/* Step progress */}
+      <div className="flex items-center gap-1 overflow-x-auto pb-1">
             {STEPS.map((step, index) => {
               const isActive = currentStep === step.id;
               const isCompleted = index < currentStepIndex;
@@ -219,9 +345,10 @@ export function AnalysisWizard() {
                 Weiter
               </button>
             )}
-          </div>
+</div>
         </div>
       </div>
     </div>
+    </>
   );
 }

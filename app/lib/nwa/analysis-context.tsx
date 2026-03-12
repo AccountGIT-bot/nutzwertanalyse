@@ -92,7 +92,9 @@ type Action =
   | { type: "SET_STEP"; payload: AnalysisStep }
   | { type: "CALCULATE_RESULTS" }
   | { type: "RESET" }
-  | { type: "LOAD_STATE"; payload: AnalysisState };
+  | { type: "LOAD_STATE"; payload: AnalysisState }
+  | { type: "DUPLICATE_ALTERNATIVE"; payload: string }
+  | { type: "DUPLICATE_CRITERION"; payload: string };
 
 // Reducer
 function analysisReducer(state: AnalysisState, action: Action): AnalysisState {
@@ -397,11 +399,39 @@ function analysisReducer(state: AnalysisState, action: Action): AnalysisState {
       };
     }
 
-    case "RESET":
-      return createInitialState(state.decision.packageLevel);
-
-    case "LOAD_STATE":
-      return action.payload;
+case "RESET":
+  return createInitialState(state.decision.packageLevel);
+  
+  case "LOAD_STATE":
+  return action.payload;
+  
+  case "DUPLICATE_ALTERNATIVE": {
+    const originalAlt = state.alternatives.find(a => a.id === action.payload);
+    if (!originalAlt) return state;
+    const newAlt: Alternative = {
+      ...originalAlt,
+      id: generateId(),
+      name: `${originalAlt.name} (Kopie)`,
+    };
+    return {
+      ...state,
+      alternatives: [...state.alternatives, newAlt],
+    };
+  }
+  
+  case "DUPLICATE_CRITERION": {
+    const originalCrit = state.criteria.find(c => c.id === action.payload);
+    if (!originalCrit) return state;
+    const newCrit: Criterion = {
+      ...originalCrit,
+      id: generateId(),
+      name: `${originalCrit.name} (Kopie)`,
+    };
+    return {
+      ...state,
+      criteria: [...state.criteria, newCrit],
+    };
+  }
 
     default:
       return state;
@@ -430,12 +460,17 @@ interface AnalysisContextType {
   updateEvaluator: (evaluator: Evaluator) => void;
   removeEvaluator: (id: string) => void;
   setStep: (step: AnalysisStep) => void;
-  calculateResults: () => void;
+calculateResults: () => void;
   reset: () => void;
+  duplicateAlternative: (id: string) => void;
+  duplicateCriterion: (id: string) => void;
+  saveDraft: () => void;
+  loadDraft: () => boolean;
+  hasDraft: boolean;
   // Computed values
   canProceedToNext: boolean;
   knockoutFailures: { alternativeId: string; failedCriteria: string[] }[];
-}
+  }
 
 const AnalysisContext = createContext<AnalysisContextType | null>(null);
 
@@ -535,8 +570,74 @@ export function AnalysisProvider({
     dispatch({ type: "CALCULATE_RESULTS" });
   }, []);
 
-  const reset = useCallback(() => {
+const reset = useCallback(() => {
     dispatch({ type: "RESET" });
+    // Also clear draft from localStorage
+    if (typeof window !== "undefined") {
+      try {
+        localStorage.removeItem("nwa_draft_state");
+      } catch {
+        // Ignore localStorage errors
+      }
+    }
+  }, []);
+  
+  const duplicateAlternative = useCallback((id: string) => {
+    dispatch({ type: "DUPLICATE_ALTERNATIVE", payload: id });
+  }, []);
+  
+  const duplicateCriterion = useCallback((id: string) => {
+    dispatch({ type: "DUPLICATE_CRITERION", payload: id });
+  }, []);
+  
+  // Local persistence - draft save/load
+  const saveDraft = useCallback(() => {
+    if (typeof window === "undefined") return;
+    try {
+      const stateToSave = {
+        ...state,
+        decision: {
+          ...state.decision,
+          updatedAt: new Date().toISOString(),
+        },
+      };
+      localStorage.setItem("nwa_draft_state", JSON.stringify(stateToSave));
+    } catch {
+      // Silent fail for localStorage errors (quota, private browsing)
+    }
+  }, [state]);
+  
+  const loadDraft = useCallback((): boolean => {
+    if (typeof window === "undefined") return false;
+    try {
+      const savedState = localStorage.getItem("nwa_draft_state");
+      if (savedState) {
+        const parsed = JSON.parse(savedState);
+        // Validate basic structure
+        if (parsed && parsed.decision && parsed.alternatives && parsed.criteria) {
+          dispatch({ type: "LOAD_STATE", payload: parsed });
+          return true;
+        }
+      }
+    } catch {
+      // Silent fail for parse errors
+    }
+    return false;
+  }, []);
+  
+  // Check if draft exists
+  const hasDraft = useMemo(() => {
+    if (typeof window === "undefined") return false;
+    try {
+      const savedState = localStorage.getItem("nwa_draft_state");
+      if (savedState) {
+        const parsed = JSON.parse(savedState);
+        return !!(parsed && parsed.decision && parsed.alternatives);
+      }
+    } catch {
+      // Ignore errors
+    }
+    return false;
   }, []);
 
   // Computed values
@@ -592,27 +693,33 @@ export function AnalysisProvider({
       addEvaluator,
       updateEvaluator,
       removeEvaluator,
-      setStep,
-      calculateResults,
-      reset,
-    }),
-    [
-      setPackageLevel, setDecision, addAlternative, updateAlternative, removeAlternative,
-      addCriterion, updateCriterion, removeCriterion, setCriteriaFromTemplate,
-      setRating, setWeightingMethod, setAHPComparison, addRisk,
-      addEvaluator, updateEvaluator, removeEvaluator, setStep, calculateResults, reset,
-    ]
+setStep,
+    calculateResults,
+    reset,
+    duplicateAlternative,
+    duplicateCriterion,
+    saveDraft,
+    loadDraft,
+  }),
+  [
+    setPackageLevel, setDecision, addAlternative, updateAlternative, removeAlternative,
+    addCriterion, updateCriterion, removeCriterion, setCriteriaFromTemplate,
+    setRating, setWeightingMethod, setAHPComparison, addRisk,
+    addEvaluator, updateEvaluator, removeEvaluator, setStep, calculateResults, reset,
+    duplicateAlternative, duplicateCriterion, saveDraft, loadDraft,
+  ]
   );
 
-  const value = useMemo(
+const value = useMemo(
     () => ({
       state,
       dispatch,
       ...actions,
+      hasDraft,
       canProceedToNext,
       knockoutFailures,
     }),
-    [state, actions, canProceedToNext, knockoutFailures]
+    [state, actions, hasDraft, canProceedToNext, knockoutFailures]
   );
 
   return (

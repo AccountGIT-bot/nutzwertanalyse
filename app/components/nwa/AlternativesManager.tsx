@@ -5,7 +5,7 @@ import { useAnalysis } from "@/app/lib/nwa/analysis-context";
 import type { Alternative } from "@/app/lib/nwa/types";
 
 export function AlternativesManager() {
-  const { state, addAlternative, updateAlternative, removeAlternative, canProceedToNext } = useAnalysis();
+  const { state, addAlternative, updateAlternative, removeAlternative, duplicateAlternative, canProceedToNext } = useAnalysis();
   const { alternatives, decision } = state;
   const packageLevel = decision.packageLevel;
 
@@ -131,17 +131,32 @@ export function AlternativesManager() {
                     />
                   </div>
                 )}
+</div>
+              
+              <div className="flex gap-2">
+                {/* Duplicate button */}
+                <button
+                  onClick={() => duplicateAlternative(alt.id)}
+                  disabled={alternatives.length >= maxAlts}
+                  className="flex-shrink-0 h-8 w-8 rounded-lg bg-white/5 text-white/50 hover:bg-white/10 hover:text-white/70 transition flex items-center justify-center disabled:opacity-30 disabled:cursor-not-allowed"
+                  title="Alternative duplizieren"
+                >
+                  <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                  </svg>
+                </button>
+                
+                {/* Delete button */}
+                <button
+                  onClick={() => removeAlternative(alt.id)}
+                  className="flex-shrink-0 h-8 w-8 rounded-lg bg-red-500/10 text-red-400 hover:bg-red-500/20 transition flex items-center justify-center"
+                  title="Alternative entfernen"
+                >
+                  <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
               </div>
-
-              <button
-                onClick={() => removeAlternative(alt.id)}
-                className="flex-shrink-0 h-8 w-8 rounded-lg bg-red-500/10 text-red-400 hover:bg-red-500/20 transition flex items-center justify-center"
-                title="Alternative entfernen"
-              >
-                <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
             </div>
           </div>
         ))}
