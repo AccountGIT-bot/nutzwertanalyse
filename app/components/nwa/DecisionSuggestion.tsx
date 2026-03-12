@@ -2,7 +2,7 @@
 
 import { useState, useCallback } from "react";
 import type { AIDecisionInterpretation } from "@/app/lib/nwa/types";
-import { getPresetIcon } from "@/app/lib/nwa/preset-icons";
+import { getDomainIcon, getDomainLabel } from "@/app/lib/nwa/preset-icons";
 
 interface DecisionSuggestionProps {
   interpretation: AIDecisionInterpretation;
@@ -12,19 +12,7 @@ interface DecisionSuggestionProps {
   onReject: () => void;
 }
 
-// Map AI domains to preset icons
-const DOMAIN_TO_PRESET: Record<AIDecisionInterpretation["domain"], string> = {
-  supplier: "supplier",
-  software: "software",
-  investment: "investment",
-  machines: "machines",
-  vehicle: "vehicle",
-  employee: "employee",
-  personal: "investment",
-  technology: "software",
-  service: "supplier",
-  other: "investment",
-};
+
 
 const CATEGORY_LABELS: Record<string, string> = {
   economic: "Wirtschaftlichkeit",
@@ -49,7 +37,8 @@ export function DecisionSuggestion({
 }: DecisionSuggestionProps) {
   const [expandedSection, setExpandedSection] = useState<string | null>("title");
   
-  const PresetIcon = getPresetIcon(DOMAIN_TO_PRESET[interpretation.domain]);
+  const DomainIcon = getDomainIcon(interpretation.domain);
+  const domainLabel = getDomainLabel(interpretation.domain);
   const confidenceInfo = CONFIDENCE_LABELS[interpretation.confidence];
 
   const toggleSection = useCallback((section: string) => {
@@ -65,10 +54,10 @@ export function DecisionSuggestion({
             className="h-10 w-10 rounded-xl flex items-center justify-center"
             style={{ background: "rgba(0,0,0,0.08)" }}
           >
-            <PresetIcon size={22} className="text-black/60" />
+            <DomainIcon size={22} className="text-black/60" />
           </div>
           <div>
-            <div className="text-xs text-black/50">KI-Interpretation</div>
+            <div className="text-xs text-black/50">KI-Interpretation - {domainLabel}</div>
             <div className="text-sm font-medium text-black/80">
               Ihre Entscheidung wurde analysiert
             </div>
