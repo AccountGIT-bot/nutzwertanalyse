@@ -115,10 +115,10 @@ export default function AppPage() {
     setInitialDecision(decision);
     setInitialPreset(preset);
     
-    // If coming from landing with a decision, skip to analysis
-    if (decision) {
-      setPhase("analysis");
-    }
+    // Note: Even if coming from landing with a decision/preset,
+    // we always start with package selection so the user can
+    // consciously choose the intensity level (Basic/Advanced/Business).
+    // The preset only determines the use case context, not the package level.
   }, []);
 
   useEffect(() => {
@@ -214,6 +214,27 @@ export default function AppPage() {
               Der Ablauf bleibt gleich: Kriterien definieren, gewichten, bewerten, dokumentieren.
               Die Pakete unterscheiden sich in Tiefe, Methodik und Reportumfang.
             </p>
+            
+            {/* Show selected preset/decision context if any */}
+            {(initialDecision || initialPreset) && (
+              <div className="mt-4 flex items-center gap-3 rounded-xl border border-white/10 bg-white/5 px-4 py-3">
+                <div
+                  className="h-8 w-8 rounded-lg flex items-center justify-center text-sm"
+                  style={{
+                    background: `rgb(var(--accent) / 0.2)`,
+                    color: `rgb(var(--accent))`,
+                  }}
+                >
+                  ✓
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="text-xs text-white/50">Ausgewählt</div>
+                  <div className="text-sm text-white truncate">
+                    {initialDecision || `Vorlage: ${initialPreset}`}
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
 
           <div className="grid gap-4 sm:gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">

@@ -235,22 +235,21 @@ return (
       </div>
 
       {/* Step progress */}
-      <div className="flex items-center gap-1 overflow-x-auto pb-1">
+          <div className="flex items-center gap-1 overflow-x-auto pb-1">
             {STEPS.map((step, index) => {
               const isActive = currentStep === step.id;
               const isCompleted = index < currentStepIndex;
               const isAccessible = index <= currentStepIndex;
 
               return (
-                <button
-                  key={step.id}
-                  onClick={() => goToStep(step.id)}
-                  disabled={!isAccessible}
-                  className={`flex-1 min-w-0 transition ${
-                    isAccessible ? "cursor-pointer" : "cursor-not-allowed"
-                  }`}
-                >
-                  <div className="flex items-center gap-2">
+                <div key={step.id} className="flex-1 min-w-0 flex items-center">
+                  <button
+                    onClick={() => goToStep(step.id)}
+                    disabled={!isAccessible}
+                    className={`flex items-center gap-2 transition ${
+                      isAccessible ? "cursor-pointer" : "cursor-not-allowed"
+                    }`}
+                  >
                     <div
                       className={`h-8 w-8 rounded-lg flex items-center justify-center text-sm font-medium flex-shrink-0 transition ${
                         isActive
@@ -273,10 +272,10 @@ return (
                     >
                       {step.label}
                     </span>
-                  </div>
-                  {/* Progress line */}
+                  </button>
+                  {/* Progress line - aligned horizontally */}
                   {index < STEPS.length - 1 && (
-                    <div className="hidden sm:block mt-2 ml-4">
+                    <div className="hidden sm:flex flex-1 items-center mx-2">
                       <div
                         className={`h-0.5 w-full ${
                           isCompleted ? "bg-[rgb(var(--accent))]" : "bg-white/10"
@@ -284,7 +283,7 @@ return (
                       />
                     </div>
                   )}
-                </button>
+                </div>
               );
             })}
           </div>
