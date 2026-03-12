@@ -63,7 +63,7 @@ export function AnalysisWizard() {
       try {
         localStorage.removeItem("nwa_draft_state");
       } catch {
-        // Ignore errors
+        /* ignore */
       }
     }
   }, []);
@@ -119,7 +119,6 @@ export function AnalysisWizard() {
     }
   }, [currentStep]);
 
-  // Use AI interpretation's domain for icon if available, otherwise fall back to preset
   const hasAIContext = decision.aiInterpretation?.domain;
   const ContextIconComponent = hasAIContext 
     ? getDomainIcon(decision.aiInterpretation?.domain) 
@@ -137,7 +136,7 @@ export function AnalysisWizard() {
       : "Business";
 
   return (
-    <>
+    <div className="wizard-root">
       {showDraftPrompt && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
           <div className="bg-[#1a1a1a] border border-white/10 rounded-2xl p-6 max-w-md mx-4 shadow-2xl">
@@ -215,12 +214,8 @@ export function AnalysisWizard() {
                   </div>
                   <div className="text-xs text-white/50 flex items-center gap-1.5">
                     <span>{packageLevelLabel}</span>
-                    {contextLabel && (
-                      <>
-                        <span className="text-white/30">{"•"}</span>
-                        <span>{contextLabel}</span>
-                      </>
-                    )}
+                    {contextLabel ? <span className="text-white/30">-</span> : null}
+                    {contextLabel ? <span>{contextLabel}</span> : null}
                   </div>
                 </div>
               </div>
@@ -336,6 +331,6 @@ export function AnalysisWizard() {
           </div>
         </div>
       </div>
-    </>
+    </div>
   );
 }
