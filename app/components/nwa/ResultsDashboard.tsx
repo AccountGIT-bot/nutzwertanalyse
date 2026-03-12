@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
-import { useAnalysis } from "@/app/lib/nwa/store";
+import { useAnalysis } from "@/app/lib/nwa/analysis-context";
 import { getRecommendation } from "@/app/lib/nwa/calculate";
 
 export function ResultsDashboard() {

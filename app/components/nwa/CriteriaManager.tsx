@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useAnalysis } from "@/app/lib/nwa/store";
+import { useAnalysis } from "@/app/lib/nwa/analysis-context";
 import { getTemplateByPreset } from "@/app/lib/nwa/templates";
 import type { Criterion } from "@/app/lib/nwa/types";
 

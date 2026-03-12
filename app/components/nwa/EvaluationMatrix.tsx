@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { useAnalysis } from "@/app/lib/nwa/store";
+import { useAnalysis } from "@/app/lib/nwa/analysis-context";
 
 export function EvaluationMatrix() {
   const { state, setRating, canProceedToNext, knockoutFailures } = useAnalysis();

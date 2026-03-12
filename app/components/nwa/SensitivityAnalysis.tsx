@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useMemo, useCallback } from "react";
-import { useAnalysis } from "@/app/lib/nwa/store";
+import { useAnalysis } from "@/app/lib/nwa/analysis-context";
 import { calculateNwa, normalizeWeights } from "@/app/lib/nwa/calculate";
 
 export function SensitivityAnalysis() {

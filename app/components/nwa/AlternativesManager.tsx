@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useAnalysis } from "@/app/lib/nwa/store";
+import { useAnalysis } from "@/app/lib/nwa/analysis-context";
 import type { Alternative } from "@/app/lib/nwa/types";
 
 export function AlternativesManager() {

@@ -1,6 +1,6 @@
 "use client";
 
-import { useAnalysis } from "@/app/lib/nwa/store";
+import { useAnalysis } from "@/app/lib/nwa/analysis-context";
 
 export function DecisionSetup() {
   const { state, setDecision, canProceedToNext } = useAnalysis();

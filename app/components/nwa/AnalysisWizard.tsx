@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import { useAnalysis } from "@/app/lib/nwa/store";
+import { useAnalysis } from "@/app/lib/nwa/analysis-context";
 import { DecisionSetup } from "./DecisionSetup";
 import { AlternativesManager } from "./AlternativesManager";
 import { CriteriaManager } from "./CriteriaManager";

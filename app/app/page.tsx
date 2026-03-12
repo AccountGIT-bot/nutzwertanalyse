@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { AnalysisProvider } from "@/app/lib/nwa/store";
+import { AnalysisProvider } from "@/app/lib/nwa/analysis-context";
 import { AnalysisWizard } from "@/app/components/nwa/AnalysisWizard";
 import type { PackageLevel } from "@/app/lib/nwa/types";
 

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useCallback } from "react";
-import { useAnalysis } from "@/app/lib/nwa/store";
+import { useAnalysis } from "@/app/lib/nwa/analysis-context";
 import { getRecommendation } from "@/app/lib/nwa/calculate";
 import type { AnalysisState, ReportConfig } from "@/app/lib/nwa/types";
 
