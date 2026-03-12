@@ -137,7 +137,7 @@ export function AnalysisWizard() {
       : "Business";
 
   return (
-    <>
+    <div className="wizard-container">
       {showDraftPrompt && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
           <div className="bg-[#1a1a1a] border border-white/10 rounded-2xl p-6 max-w-md mx-4 shadow-2xl">
@@ -216,10 +216,10 @@ export function AnalysisWizard() {
                   <div className="text-xs text-white/50 flex items-center gap-1.5">
                     <span>{packageLevelLabel}</span>
                     {contextLabel && (
-                      <>
-                        <span className="text-white/30">{"•"}</span>
-                        <span>{contextLabel}</span>
-                      </>
+                      <span className="text-white/30 mx-1">{"•"}</span>
+                    )}
+                    {contextLabel && (
+                      <span>{contextLabel}</span>
                     )}
                   </div>
                 </div>
@@ -336,6 +336,6 @@ export function AnalysisWizard() {
           </div>
         </div>
       </div>
-    </>
+    </div>
   );
 }
