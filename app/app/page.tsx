@@ -56,28 +56,45 @@ const MODELS = [
   },
 ];
 
+// Safe localStorage access with SSR guards
+const safeLocalStorage = {
+  get(key: string): string | null {
+    if (typeof window === "undefined") return null;
+    try {
+      return localStorage.getItem(key);
+    } catch {
+      return null;
+    }
+  },
+  set(key: string, value: string): void {
+    if (typeof window === "undefined") return;
+    try {
+      localStorage.setItem(key, value);
+    } catch {
+      // Silent fail for localStorage errors (quota, private browsing)
+    }
+  },
+  remove(key: string): void {
+    if (typeof window === "undefined") return;
+    try {
+      localStorage.removeItem(key);
+    } catch {
+      // Silent fail
+    }
+  },
+};
+
 function getSavedTheme(): Theme {
-  try {
-    return (localStorage.getItem("nwa_theme") as Theme | null) ?? "basic";
-  } catch {
-    return "basic";
-  }
+  const saved = safeLocalStorage.get("nwa_theme");
+  return (saved === "basic" || saved === "advanced" || saved === "business") ? saved : "basic";
 }
 
 function getSavedDecision(): string {
-  try {
-    return localStorage.getItem("nwa_decisionDraft") || "";
-  } catch {
-    return "";
-  }
+  return safeLocalStorage.get("nwa_decisionDraft") || "";
 }
 
 function getSavedPreset(): string | undefined {
-  try {
-    return localStorage.getItem("nwa_preset") || undefined;
-  } catch {
-    return undefined;
-  }
+  return safeLocalStorage.get("nwa_preset") || undefined;
 }
 
 export default function AppPage() {
@@ -123,8 +140,8 @@ export default function AppPage() {
 
   function choose(theme: Theme) {
     setSelectedTheme(theme);
-    localStorage.setItem("nwa_theme", theme);
-    localStorage.setItem("nwa_packageLevel", theme);
+    safeLocalStorage.set("nwa_theme", theme);
+    safeLocalStorage.set("nwa_packageLevel", theme);
     document.documentElement.dataset.theme = theme;
     setPhase("analysis");
   }
@@ -353,10 +370,8 @@ export default function AppPage() {
               <button
                 onClick={() => {
                   // Clear stored decision and go back to selection
-                  try {
-                    localStorage.removeItem("nwa_decisionDraft");
-                    localStorage.removeItem("nwa_preset");
-                  } catch {}
+                  safeLocalStorage.remove("nwa_decisionDraft");
+                  safeLocalStorage.remove("nwa_preset");
                   setInitialDecision("");
                   setInitialPreset(undefined);
                   setPhase("select");

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useCallback, useEffect } from "react";
 import { useAnalysis } from "@/app/lib/nwa/analysis-context";
 
 export function EvaluationMatrix() {
@@ -42,24 +42,32 @@ export function EvaluationMatrix() {
     return total > 0 ? Math.round((completed / total) * 100) : 0;
   }, [alternatives, criteria, ratings, packageLevel, selectedEvaluator]);
 
-  const handleRating = (altId: string, critId: string, score: number) => {
+  const handleRating = useCallback((altId: string, critId: string, score: number) => {
     setRating({
       alternativeId: altId,
       criterionId: critId,
       score,
       evaluatorId: packageLevel === "business" ? selectedEvaluator : undefined,
     });
-  };
+  }, [setRating, packageLevel, selectedEvaluator]);
 
-  // Check if alternative failed knockout criteria
-  const isKnockout = (altId: string): boolean => {
-    return knockoutFailures.some((f) => f.alternativeId === altId);
-  };
+  // Memoized knockout lookup map for O(1) access
+  const knockoutMap = useMemo(() => {
+    const map = new Map<string, string[]>();
+    for (const f of knockoutFailures) {
+      map.set(f.alternativeId, f.failedCriteria);
+    }
+    return map;
+  }, [knockoutFailures]);
 
-  const getFailedCriteria = (altId: string): string[] => {
-    const failure = knockoutFailures.find((f) => f.alternativeId === altId);
-    return failure?.failedCriteria || [];
-  };
+  // Check if alternative failed knockout criteria - O(1) with map
+  const isKnockout = useCallback((altId: string): boolean => {
+    return knockoutMap.has(altId);
+  }, [knockoutMap]);
+
+  const getFailedCriteria = useCallback((altId: string): string[] => {
+    return knockoutMap.get(altId) || [];
+  }, [knockoutMap]);
 
   return (
     <div className="space-y-6">

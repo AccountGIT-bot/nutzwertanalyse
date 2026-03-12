@@ -573,56 +573,46 @@ export function AnalysisProvider({
     return checkKnockoutCriteria(state.alternatives, state.criteria, state.ratings);
   }, [state.alternatives, state.criteria, state.ratings]);
 
+  // Stable actions object - these callbacks never change due to useCallback
+  const actions = useMemo(
+    () => ({
+      setPackageLevel,
+      setDecision,
+      addAlternative,
+      updateAlternative,
+      removeAlternative,
+      addCriterion,
+      updateCriterion,
+      removeCriterion,
+      setCriteriaFromTemplate,
+      setRating,
+      setWeightingMethod,
+      setAHPComparison,
+      addRisk,
+      addEvaluator,
+      updateEvaluator,
+      removeEvaluator,
+      setStep,
+      calculateResults,
+      reset,
+    }),
+    [
+      setPackageLevel, setDecision, addAlternative, updateAlternative, removeAlternative,
+      addCriterion, updateCriterion, removeCriterion, setCriteriaFromTemplate,
+      setRating, setWeightingMethod, setAHPComparison, addRisk,
+      addEvaluator, updateEvaluator, removeEvaluator, setStep, calculateResults, reset,
+    ]
+  );
+
   const value = useMemo(
     () => ({
       state,
       dispatch,
-      setPackageLevel,
-      setDecision,
-      addAlternative,
-      updateAlternative,
-      removeAlternative,
-      addCriterion,
-      updateCriterion,
-      removeCriterion,
-      setCriteriaFromTemplate,
-      setRating,
-      setWeightingMethod,
-      setAHPComparison,
-      addRisk,
-      addEvaluator,
-      updateEvaluator,
-      removeEvaluator,
-      setStep,
-      calculateResults,
-      reset,
+      ...actions,
       canProceedToNext,
       knockoutFailures,
     }),
-    [
-      state,
-      setPackageLevel,
-      setDecision,
-      addAlternative,
-      updateAlternative,
-      removeAlternative,
-      addCriterion,
-      updateCriterion,
-      removeCriterion,
-      setCriteriaFromTemplate,
-      setRating,
-      setWeightingMethod,
-      setAHPComparison,
-      addRisk,
-      addEvaluator,
-      updateEvaluator,
-      removeEvaluator,
-      setStep,
-      calculateResults,
-      reset,
-      canProceedToNext,
-      knockoutFailures,
-    ]
+    [state, actions, canProceedToNext, knockoutFailures]
   );
 
   return (

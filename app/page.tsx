@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 
@@ -61,7 +61,9 @@ const PRESETS: Array<{
 const INTRO_COOLDOWN_MS = 3 * 60 * 1000; // 3 Minuten
 const INTRO_KEY = "nwa_intro_lastShownAt";
 
-function shouldShowIntroNow() {
+// Safe localStorage access - only call on client side
+function shouldShowIntroNow(): boolean {
+  if (typeof window === "undefined") return false;
   try {
     const last = Number(localStorage.getItem(INTRO_KEY) || "0");
     return !last || Date.now() - last > INTRO_COOLDOWN_MS;
@@ -70,10 +72,13 @@ function shouldShowIntroNow() {
   }
 }
 
-function markIntroShownNow() {
+function markIntroShownNow(): void {
+  if (typeof window === "undefined") return;
   try {
     localStorage.setItem(INTRO_KEY, String(Date.now()));
-  } catch {}
+  } catch {
+    // Silent fail for localStorage errors
+  }
 }
 
 export default function LandingWithIntro() {
@@ -155,26 +160,30 @@ export default function LandingWithIntro() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  function goToApp(payload: { draft: string; preset?: PresetId }) {
-    try {
-      localStorage.setItem("nwa_decisionDraft", payload.draft);
-      if (payload.preset) localStorage.setItem("nwa_preset", payload.preset);
-    } catch {}
+  const goToApp = useCallback((payload: { draft: string; preset?: PresetId }) => {
+    if (typeof window !== "undefined") {
+      try {
+        localStorage.setItem("nwa_decisionDraft", payload.draft);
+        if (payload.preset) localStorage.setItem("nwa_preset", payload.preset);
+      } catch {
+        // Silent fail for localStorage errors
+      }
+    }
     router.push("/app");
-  }
+  }, [router]);
 
-  function startFromInput() {
+  const startFromInput = useCallback(() => {
     const draft = text.trim();
     if (!draft) return;
     goToApp({ draft });
-  }
+  }, [text, goToApp]);
 
-  function startFromPreset(p: PresetId) {
+  const startFromPreset = useCallback((p: PresetId) => {
     const draft =
       text.trim() ||
       `Vorlage: ${PRESETS.find((x) => x.id === p)?.label ?? "Auswahl"}`;
     goToApp({ draft, preset: p });
-  }
+  }, [text, goToApp]);
 
   return (
     <main className="relative min-h-[100svh] text-slate-900 overflow-x-hidden">

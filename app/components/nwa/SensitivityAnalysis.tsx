@@ -79,6 +79,9 @@ export function SensitivityAnalysis() {
         {sensitivityResults.map((sens) => {
           const criterion = criteria.find((c) => c.id === sens.criterionId);
           const isSelected = selectedCriterion === sens.criterionId;
+          
+          // Skip if criterion not found
+          if (!criterion) return null;
 
           return (
             <button
@@ -92,7 +95,7 @@ export function SensitivityAnalysis() {
             >
               <div className="flex items-center justify-between mb-2">
                 <div className="text-sm font-medium text-white truncate pr-2">
-                  {criterion?.name}
+                  {criterion.name}
                 </div>
                 <div
                   className={`px-2 py-0.5 rounded text-xs font-medium ${
@@ -111,7 +114,7 @@ export function SensitivityAnalysis() {
                 </div>
               </div>
               <div className="text-xs text-white/50">
-                Gewicht: {(criterion?.weight || 0) * 100}%
+                Gewicht: {((criterion.weight || 0) * 100).toFixed(0)}%
               </div>
               <div className="mt-2 h-1.5 rounded-full bg-white/10 overflow-hidden">
                 <div
