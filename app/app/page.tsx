@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { AnalysisProvider } from "@/app/lib/nwa/analysis-context";
 import { AnalysisWizard } from "@/app/components/nwa/AnalysisWizard";
-import type { PackageLevel } from "@/app/lib/nwa/types";
+import type { PackageLevel, AIDecisionInterpretation } from "@/app/lib/nwa/types";
 import { getPresetIcon, getPresetLabel } from "@/app/lib/nwa/preset-icons";
 
 type Theme = "basic" | "advanced" | "business";
@@ -98,6 +98,16 @@ function getSavedPreset(): string | undefined {
   return safeLocalStorage.get("nwa_preset") || undefined;
 }
 
+function getSavedAIInterpretation(): AIDecisionInterpretation | undefined {
+  const saved = safeLocalStorage.get("nwa_aiInterpretation");
+  if (!saved) return undefined;
+  try {
+    return JSON.parse(saved);
+  } catch {
+    return undefined;
+  }
+}
+
 export default function AppPage() {
   const router = useRouter();
   const [scrolled, setScrolled] = useState(false);
@@ -105,6 +115,7 @@ export default function AppPage() {
   const [selectedTheme, setSelectedTheme] = useState<Theme>("basic");
   const [initialDecision, setInitialDecision] = useState("");
   const [initialPreset, setInitialPreset] = useState<string | undefined>();
+  const [initialAIInterpretation, setInitialAIInterpretation] = useState<AIDecisionInterpretation | undefined>();
 
   useEffect(() => {
     const saved = getSavedTheme();
@@ -113,8 +124,10 @@ export default function AppPage() {
     
     const decision = getSavedDecision();
     const preset = getSavedPreset();
+    const aiInterpretation = getSavedAIInterpretation();
     setInitialDecision(decision);
     setInitialPreset(preset);
+    setInitialAIInterpretation(aiInterpretation);
     
     // Note: Even if coming from landing with a decision/preset,
     // we always start with package selection so the user can
@@ -380,6 +393,7 @@ export default function AppPage() {
       initialPackageLevel={selectedTheme as PackageLevel}
       initialDecision={initialDecision}
       initialPreset={initialPreset}
+      initialAIInterpretation={initialAIInterpretation}
     >
       <main className="min-h-[100svh] text-white">
         {/* Header */}

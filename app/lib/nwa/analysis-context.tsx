@@ -22,6 +22,7 @@ import {
   WeightingMethod,
   DecisionContext,
   Scenario,
+  AIDecisionInterpretation,
 } from "./types";
 import {
   generateId,
@@ -480,20 +481,54 @@ export function AnalysisProvider({
   initialPackageLevel = "basic",
   initialDecision,
   initialPreset,
+  initialAIInterpretation,
 }: {
   children: ReactNode;
   initialPackageLevel?: PackageLevel;
   initialDecision?: string;
   initialPreset?: string;
+  initialAIInterpretation?: AIDecisionInterpretation;
 }) {
   const [state, dispatch] = useReducer(analysisReducer, null, () => {
     const initialState = createInitialState(initialPackageLevel);
-    if (initialDecision) {
-      initialState.decision.title = initialDecision;
+    
+    // If we have an AI interpretation, apply its structured data
+    if (initialAIInterpretation) {
+      initialState.decision.title = initialAIInterpretation.title;
+      initialState.decision.description = initialAIInterpretation.description;
+      if (initialAIInterpretation.constraints) {
+        initialState.decision.constraints = initialAIInterpretation.constraints;
+      }
+      // Store the AI interpretation for reference
+      initialState.decision.aiInterpretation = initialAIInterpretation;
+      
+      // Add AI-suggested alternatives
+      initialState.alternatives = initialAIInterpretation.alternatives.map((alt, index) => ({
+        id: `ai-alt-${index}`,
+        name: alt.name,
+        description: alt.description || undefined,
+      }));
+      
+      // Add AI-suggested criteria
+      const defaultWeight = initialPackageLevel === "basic" ? 3 : 10;
+      initialState.criteria = initialAIInterpretation.criteria.map((crit, index) => ({
+        id: `ai-crit-${index}`,
+        name: crit.name,
+        description: crit.description,
+        categoryId: crit.categoryId,
+        weight: 0,
+        rawWeight: defaultWeight,
+      }));
+    } else {
+      // Use traditional initialization
+      if (initialDecision) {
+        initialState.decision.title = initialDecision;
+      }
+      if (initialPreset) {
+        initialState.decision.preset = initialPreset;
+      }
     }
-    if (initialPreset) {
-      initialState.decision.preset = initialPreset;
-    }
+    
     return initialState;
   });
 
