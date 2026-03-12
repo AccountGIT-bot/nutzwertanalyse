@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { AnalysisProvider } from "@/app/lib/nwa/analysis-context";
 import { AnalysisWizard } from "@/app/components/nwa/AnalysisWizard";
 import type { PackageLevel } from "@/app/lib/nwa/types";
+import { getPresetIcon, getPresetLabel } from "@/app/lib/nwa/preset-icons";
 
 type Theme = "basic" | "advanced" | "business";
 
@@ -12,46 +13,46 @@ const MODELS = [
   {
     id: "basic" as Theme,
     title: "BASIC",
-    subtitle: "Klar & schnell",
+    subtitle: "Schnell & übersichtlich",
     accent: "37 99 235",
     accent2: "59 130 246",
     features: [
-      "Klare Zielformulierung",
-      "2–5 Alternativen",
-      "Erprobte Kriterien-Sets",
-      "Einfache Gewichtung (1–5)",
-      "Intuitive Bewertungsskala",
-      "Kompakter Entscheidungsreport (PDF)",
+      "Klare Entscheidungsformulierung",
+      "2-5 Alternativen vergleichen",
+      "Bewährte Kriterien-Vorlagen",
+      "Einfache Gewichtung (1-5 Skala)",
+      "Übersichtliche Bewertungsmatrix",
+      "Kompakter Entscheidungsreport",
     ],
   },
   {
     id: "advanced" as Theme,
     title: "ADVANCED",
-    subtitle: "Analytisch & flexibel",
+    subtitle: "Detailliert & flexibel",
     accent: "16 185 129",
     accent2: "45 212 191",
     features: [
-      "Ziel + Randbedingungen",
-      "Alternativen mit Annahmen",
-      "Kriterien + Kategorien + Definitionen",
-      "100%-Methode oder AHP light",
-      "Sensitivitätsanalyse",
+      "Ziel inkl. Randbedingungen",
+      "Mehr Alternativen, mit Annahmen",
+      "Kriterien nach Kategorien gruppiert",
+      "Prozentuale oder paarweise Gewichtung",
+      "Sensitivitätsanalyse inklusive",
       "Vollständiger Analysebericht",
     ],
   },
   {
     id: "business" as Theme,
     title: "BUSINESS",
-    subtitle: "Strategisch & auditfähig",
+    subtitle: "Nachvollziehbar & revisionssicher",
     accent: "245 158 11",
     accent2: "168 85 247",
     features: [
-      "Strategische Entscheidungsfrage",
-      "Szenarien & Varianten",
-      "Governance-konforme Kriterien",
-      "Vollständige AHP + Konsistenzprüfung",
-      "Mehrpersonen-Bewertung",
-      "Executive Report + Audit-Dokumentation",
+      "Strategische Fragestellung",
+      "Szenarien und Varianten möglich",
+      "Strukturierte Kriterienhierarchie",
+      "AHP-Gewichtung mit Konsistenzprüfung",
+      "Team-Bewertung (mehrere Bewerter)",
+      "Vollständige Dokumentation für Gremien",
     ],
   },
 ];
@@ -215,26 +216,30 @@ export default function AppPage() {
               Die Pakete unterscheiden sich in Tiefe, Methodik und Reportumfang.
             </p>
             
-            {/* Show selected preset/decision context if any */}
-            {(initialDecision || initialPreset) && (
-              <div className="mt-4 flex items-center gap-3 rounded-xl border border-white/10 bg-white/5 px-4 py-3">
-                <div
-                  className="h-8 w-8 rounded-lg flex items-center justify-center text-sm"
-                  style={{
-                    background: `rgb(var(--accent) / 0.2)`,
-                    color: `rgb(var(--accent))`,
-                  }}
-                >
-                  ✓
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="text-xs text-white/50">Ausgewählt</div>
-                  <div className="text-sm text-white truncate">
-                    {initialDecision || `Vorlage: ${initialPreset}`}
+            {/* Show selected preset context with icon - clean, no redundant label */}
+            {initialPreset && (() => {
+              const PresetIcon = getPresetIcon(initialPreset);
+              const presetLabel = getPresetLabel(initialPreset);
+              return (
+                <div className="mt-4 flex items-center gap-3 rounded-xl border border-white/10 bg-white/5 px-4 py-3">
+                  <div
+                    className="h-9 w-9 rounded-lg flex items-center justify-center"
+                    style={{
+                      background: `rgb(var(--accent) / 0.15)`,
+                      color: `rgb(var(--accent))`,
+                    }}
+                  >
+                    <PresetIcon size={20} />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="text-xs text-white/50">Anwendungsbereich</div>
+                    <div className="text-sm text-white font-medium truncate">
+                      {presetLabel}
+                    </div>
                   </div>
                 </div>
-              </div>
-            )}
+              );
+            })()}
           </div>
 
           <div className="grid gap-4 sm:gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">

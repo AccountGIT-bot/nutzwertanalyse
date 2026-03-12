@@ -2,6 +2,7 @@
 
 import { useEffect, useCallback, useMemo, useState } from "react";
 import { useAnalysis } from "@/app/lib/nwa/analysis-context";
+import { getPresetIcon } from "@/app/lib/nwa/preset-icons";
 import { DecisionSetup } from "./DecisionSetup";
 import { AlternativesManager } from "./AlternativesManager";
 import { CriteriaManager } from "./CriteriaManager";
@@ -31,22 +32,19 @@ export function AnalysisWizard() {
     [currentStep]
   );
 
-// Calculate results when entering results step
   useEffect(() => {
     if (currentStep === "results") {
       calculateResults();
     }
   }, [currentStep, calculateResults]);
 
-  // Auto-save draft on state changes (debounced)
   useEffect(() => {
     const timeoutId = setTimeout(() => {
       saveDraft();
-    }, 2000); // 2 second debounce
+    }, 2000);
     return () => clearTimeout(timeoutId);
   }, [state, saveDraft]);
 
-  // Check for existing draft on mount
   useEffect(() => {
     if (!draftChecked && hasDraft && currentStep === "decision" && !decision.title) {
       setShowDraftPrompt(true);
@@ -54,7 +52,6 @@ export function AnalysisWizard() {
     setDraftChecked(true);
   }, [draftChecked, hasDraft, currentStep, decision.title]);
 
-  // Handle draft restoration
   const handleLoadDraft = useCallback(() => {
     loadDraft();
     setShowDraftPrompt(false);
@@ -71,7 +68,6 @@ export function AnalysisWizard() {
     }
   }, []);
 
-  // Handle reset with confirmation
   const handleResetClick = useCallback(() => {
     setShowResetConfirm(true);
   }, []);
@@ -87,7 +83,6 @@ export function AnalysisWizard() {
 
   const goToStep = useCallback((step: AnalysisStep) => {
     const targetIndex = STEPS.findIndex((s) => s.id === step);
-    // Only allow going to previous steps or current step
     if (targetIndex <= currentStepIndex) {
       setStep(step);
     }
@@ -124,9 +119,8 @@ export function AnalysisWizard() {
     }
   };
 
-return (
+  return (
     <>
-      {/* Draft Recovery Prompt */}
       {showDraftPrompt && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
           <div className="bg-[#1a1a1a] border border-white/10 rounded-2xl p-6 max-w-md mx-4 shadow-2xl">
@@ -144,7 +138,7 @@ return (
               <button
                 onClick={handleLoadDraft}
                 className="flex-1 px-4 py-2.5 rounded-xl text-sm font-semibold text-white transition"
-                style={{ background: `rgb(var(--accent))` }}
+                style={{ background: "rgb(var(--accent))" }}
               >
                 Wiederherstellen
               </button>
@@ -153,7 +147,6 @@ return (
         </div>
       )}
 
-      {/* Reset Confirmation Modal */}
       {showResetConfirm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
           <div className="bg-[#1a1a1a] border border-white/10 rounded-2xl p-6 max-w-md mx-4 shadow-2xl">
@@ -180,174 +173,149 @@ return (
       )}
 
       <div className="min-h-[calc(100vh-76px)] flex flex-col">
-        {/* Header with step indicator */}
         <div className="border-b border-white/10 bg-black/20 backdrop-blur-md sticky top-[76px] z-20">
           <div className="mx-auto max-w-5xl px-5 sm:px-6 py-4">
-            {/* Package indicator */}
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-3">
-                <div
-                  className="h-8 w-8 rounded-lg flex items-center justify-center text-sm font-bold"
-                  style={{ background: `rgb(var(--accent) / 0.2)`, color: `rgb(var(--accent))` }}
-              >
-                {decision.packageLevel === "basic"
-                  ? "B"
-                  : decision.packageLevel === "advanced"
-                  ? "A"
-                  : "P"}
-              </div>
-              <div>
-                <div className="text-sm font-medium text-white">
-                  {decision.title || "Neue Analyse"}
-                </div>
-                <div className="text-xs text-white/50">
-                  {decision.packageLevel === "basic"
-                    ? "Basic"
-                    : decision.packageLevel === "advanced"
-                    ? "Advanced"
-: "Business"}{" "}
-              Paket
-            </div>
-          </div>
-        </div>
-        
-        {/* Reset button */}
-        <button
-          onClick={handleResetClick}
-          className="px-3 py-1.5 rounded-lg text-xs font-medium text-white/50 hover:text-white/70 hover:bg-white/10 transition"
-          title="Analyse zurücksetzen"
-        >
-          Neustart
-        </button>
-      </div>
-
-{/* Overall progress bar */}
-      <div className="mb-3">
-        <div className="h-1.5 rounded-full bg-white/10 overflow-hidden">
-          <div
-            className="h-full rounded-full transition-all duration-500"
-            style={{
-              width: `${((currentStepIndex + 1) / STEPS.length) * 100}%`,
-              background: `rgb(var(--accent))`,
-            }}
-          />
-        </div>
-      </div>
-
-      {/* Step progress */}
-          <div className="flex items-center gap-1 overflow-x-auto pb-1">
-            {STEPS.map((step, index) => {
-              const isActive = currentStep === step.id;
-              const isCompleted = index < currentStepIndex;
-              const isAccessible = index <= currentStepIndex;
-
-              return (
-                <div key={step.id} className="flex-1 min-w-0 flex items-center">
-                  <button
-                    onClick={() => goToStep(step.id)}
-                    disabled={!isAccessible}
-                    className={`flex items-center gap-2 transition ${
-                      isAccessible ? "cursor-pointer" : "cursor-not-allowed"
-                    }`}
-                  >
+                {decision.preset ? (() => {
+                  const PresetIcon = getPresetIcon(decision.preset);
+                  return (
                     <div
-                      className={`h-8 w-8 rounded-lg flex items-center justify-center text-sm font-medium flex-shrink-0 transition ${
-                        isActive
-                          ? "bg-[rgb(var(--accent))] text-white"
-                          : isCompleted
-                          ? "bg-[rgb(var(--accent))]/30 text-[rgb(var(--accent))]"
-                          : "bg-white/10 text-white/40"
-                      }`}
+                      className="h-9 w-9 rounded-lg flex items-center justify-center"
+                      style={{ background: "rgb(var(--accent) / 0.15)", color: "rgb(var(--accent))" }}
                     >
-                      {isCompleted ? "✓" : index + 1}
+                      <PresetIcon size={20} />
                     </div>
-                    <span
-                      className={`text-sm truncate hidden sm:block ${
-                        isActive
-                          ? "text-white font-medium"
-                          : isCompleted
-                          ? "text-white/60"
-                          : "text-white/40"
-                      }`}
-                    >
-                      {step.label}
-                    </span>
-                  </button>
-                  {/* Progress line - aligned horizontally */}
-                  {index < STEPS.length - 1 && (
-                    <div className="hidden sm:flex flex-1 items-center mx-2">
-                      <div
-                        className={`h-0.5 w-full ${
-                          isCompleted ? "bg-[rgb(var(--accent))]" : "bg-white/10"
-                        }`}
-                      />
-                    </div>
-                  )}
+                  );
+                })() : (
+                  <div
+                    className="h-9 w-9 rounded-lg flex items-center justify-center text-sm font-bold"
+                    style={{ background: "rgb(var(--accent) / 0.2)", color: "rgb(var(--accent))" }}
+                  >
+                    {decision.packageLevel === "basic" ? "B" : decision.packageLevel === "advanced" ? "A" : "P"}
+                  </div>
+                )}
+                <div>
+                  <div className="text-sm font-medium text-white truncate max-w-[200px] sm:max-w-none">
+                    {decision.title || "Neue Analyse"}
+                  </div>
+                  <div className="text-xs text-white/50">
+                    {decision.packageLevel === "basic" ? "Basic" : decision.packageLevel === "advanced" ? "Advanced" : "Business"}
+                  </div>
                 </div>
-              );
-            })}
+              </div>
+              <button
+                onClick={handleResetClick}
+                className="px-3 py-1.5 rounded-lg text-xs font-medium text-white/50 hover:text-white/70 hover:bg-white/10 transition"
+                title="Analyse zurücksetzen"
+              >
+                Neustart
+              </button>
+            </div>
+
+            <div className="mb-3">
+              <div className="h-1.5 rounded-full bg-white/10 overflow-hidden">
+                <div
+                  className="h-full rounded-full transition-all duration-500"
+                  style={{
+                    width: `${((currentStepIndex + 1) / STEPS.length) * 100}%`,
+                    background: "rgb(var(--accent))",
+                  }}
+                />
+              </div>
+            </div>
+
+            <div className="flex items-center gap-1 overflow-x-auto pb-1">
+              {STEPS.map((step, index) => {
+                const isActive = currentStep === step.id;
+                const isCompleted = index < currentStepIndex;
+                const isAccessible = index <= currentStepIndex;
+
+                return (
+                  <div key={step.id} className="flex-1 min-w-0 flex items-center">
+                    <button
+                      onClick={() => goToStep(step.id)}
+                      disabled={!isAccessible}
+                      className={`flex items-center gap-2 transition ${isAccessible ? "cursor-pointer" : "cursor-not-allowed"}`}
+                    >
+                      <div
+                        className={`h-8 w-8 rounded-lg flex items-center justify-center text-sm font-medium flex-shrink-0 transition ${
+                          isActive
+                            ? "bg-[rgb(var(--accent))] text-white"
+                            : isCompleted
+                            ? "bg-[rgb(var(--accent))]/30 text-[rgb(var(--accent))]"
+                            : "bg-white/10 text-white/40"
+                        }`}
+                      >
+                        {isCompleted ? "✓" : index + 1}
+                      </div>
+                      <span
+                        className={`text-sm truncate hidden sm:block ${
+                          isActive ? "text-white font-medium" : isCompleted ? "text-white/60" : "text-white/40"
+                        }`}
+                      >
+                        {step.label}
+                      </span>
+                    </button>
+                    {index < STEPS.length - 1 && (
+                      <div className="hidden sm:flex flex-1 items-center mx-2">
+                        <div className={`h-0.5 w-full ${isCompleted ? "bg-[rgb(var(--accent))]" : "bg-white/10"}`} />
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+
+        <div className="flex-1 mx-auto max-w-5xl w-full px-5 sm:px-6 py-8">
+          <div key={currentStep} className="animate-in fade-in slide-in-from-right-2 duration-300">
+            {renderCurrentStep()}
+          </div>
+        </div>
+
+        <div className="border-t border-white/10 bg-black/20 backdrop-blur-md sticky bottom-0 z-20">
+          <div className="mx-auto max-w-5xl px-5 sm:px-6 py-4">
+            <div className="flex items-center justify-between">
+              <button
+                onClick={goBack}
+                disabled={currentStepIndex === 0}
+                className={`px-5 py-2.5 rounded-xl text-sm font-medium transition ${
+                  currentStepIndex === 0 ? "text-white/30 cursor-not-allowed" : "text-white/70 hover:text-white hover:bg-white/10"
+                }`}
+              >
+                Zurück
+              </button>
+              <div className="text-sm text-white/40">
+                Schritt {currentStepIndex + 1} von {STEPS.length}
+              </div>
+              {currentStep === "results" ? (
+                <button
+                  className="px-6 py-2.5 rounded-xl text-sm font-semibold transition"
+                  style={{ background: "rgb(var(--accent))", color: "white" }}
+                >
+                  Export PDF
+                </button>
+              ) : (
+                <button
+                  onClick={goNext}
+                  disabled={!canProceedToNext}
+                  className={`px-6 py-2.5 rounded-xl text-sm font-semibold transition ${
+                    canProceedToNext ? "hover:brightness-110" : "opacity-50 cursor-not-allowed"
+                  }`}
+                  style={{
+                    background: canProceedToNext ? "rgb(var(--accent))" : "rgb(var(--accent) / 0.5)",
+                    color: "white",
+                  }}
+                >
+                  Weiter
+                </button>
+              )}
+            </div>
           </div>
         </div>
       </div>
-
-      {/* Main content */}
-      <div className="flex-1 mx-auto max-w-5xl w-full px-5 sm:px-6 py-8">
-        {renderCurrentStep()}
-      </div>
-
-      {/* Navigation footer */}
-      <div className="border-t border-white/10 bg-black/20 backdrop-blur-md sticky bottom-0 z-20">
-        <div className="mx-auto max-w-5xl px-5 sm:px-6 py-4">
-          <div className="flex items-center justify-between">
-            <button
-              onClick={goBack}
-              disabled={currentStepIndex === 0}
-              className={`px-5 py-2.5 rounded-xl text-sm font-medium transition ${
-                currentStepIndex === 0
-                  ? "text-white/30 cursor-not-allowed"
-                  : "text-white/70 hover:text-white hover:bg-white/10"
-              }`}
-            >
-              Zurück
-            </button>
-
-            <div className="text-sm text-white/40">
-              Schritt {currentStepIndex + 1} von {STEPS.length}
-            </div>
-
-            {currentStep === "results" ? (
-              <button
-                className="px-6 py-2.5 rounded-xl text-sm font-semibold transition"
-                style={{
-                  background: `rgb(var(--accent))`,
-                  color: "white",
-                }}
-              >
-                Export PDF
-              </button>
-            ) : (
-              <button
-                onClick={goNext}
-                disabled={!canProceedToNext}
-                className={`px-6 py-2.5 rounded-xl text-sm font-semibold transition ${
-                  canProceedToNext
-                    ? "hover:brightness-110"
-                    : "opacity-50 cursor-not-allowed"
-                }`}
-                style={{
-                  background: canProceedToNext
-                    ? `rgb(var(--accent))`
-                    : `rgb(var(--accent) / 0.5)`,
-                  color: "white",
-                }}
-              >
-                Weiter
-              </button>
-            )}
-</div>
-        </div>
-      </div>
-    </div>
     </>
   );
 }

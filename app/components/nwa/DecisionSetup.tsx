@@ -64,7 +64,7 @@ export function DecisionSetup() {
             <textarea
               value={decision.constraints || ""}
               onChange={(e) => setDecision({ constraints: e.target.value })}
-              placeholder="z.B. Budget max. 50.000 EUR, Umsetzung bis Q3, etc."
+              placeholder="z.B. Budget max. CHF 50'000, Umsetzung bis Q3, interne Ressourcen"
               rows={2}
               className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/30 outline-none focus:border-[rgb(var(--accent))] focus:ring-2 focus:ring-[rgb(var(--accent))]/20 transition resize-none"
             />
@@ -75,11 +75,12 @@ export function DecisionSetup() {
           <div className="rounded-xl border border-white/10 bg-white/5 p-4">
             <div className="flex items-center gap-2 text-sm font-medium text-white/70 mb-3">
               <span className="h-2 w-2 rounded-full bg-[rgb(var(--accent))]" />
-              Governance-Hinweis
+              Dokumentationsstandard
             </div>
             <p className="text-sm text-white/50">
-              Im Business-Paket werden alle Eingaben für eine auditfähige
-              Dokumentation erfasst. Formulieren Sie präzise und nachvollziehbar.
+              Alle Eingaben werden vollständig dokumentiert und können später für 
+              Revisionen, Gremienentscheide oder Compliance-Nachweise verwendet werden.
+              Formulieren Sie sachlich und nachvollziehbar.
             </p>
           </div>
         )}

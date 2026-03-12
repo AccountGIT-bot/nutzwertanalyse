@@ -111,8 +111,8 @@ export default function RegisterPage() {
     ].join(" ");
   }
 
-  function startOAuth(provider: "apple" | "google") {
-    console.warn(`[auth] OAuth not configured yet: ${provider}`);
+  function startOAuth(_provider: "apple" | "google") {
+    // OAuth not configured yet - will be implemented with auth provider
   }
 
   async function onSubmit(e: React.FormEvent) {
