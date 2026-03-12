@@ -74,10 +74,10 @@ export default function LoginPage() {
     }
   }
 
-  function startOAuth(provider: "apple" | "google") {
+  function startOAuth(_provider: "apple" | "google") {
     // TODO: echte OAuth Anbindung (z.B. NextAuth/Clerk/Supabase)
     // bewusst: keine Alerts, keine Passwörter loggen, keine LocalStorage Credentials.
-    console.warn(`[auth] OAuth not configured yet: ${provider}`);
+    // OAuth wird konfiguriert und leitet dann direkt um.
   }
 
   const showEmailError = (touched.email || submitAttempted) && !!errors.email;

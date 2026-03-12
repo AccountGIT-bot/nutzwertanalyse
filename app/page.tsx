@@ -61,7 +61,9 @@ const PRESETS: Array<{
 const INTRO_COOLDOWN_MS = 3 * 60 * 1000; // 3 Minuten
 const INTRO_KEY = "nwa_intro_lastShownAt";
 
-function shouldShowIntroNow() {
+// Safe localStorage access - only call on client side
+function shouldShowIntroNow(): boolean {
+  if (typeof window === "undefined") return false;
   try {
     const last = Number(localStorage.getItem(INTRO_KEY) || "0");
     return !last || Date.now() - last > INTRO_COOLDOWN_MS;
@@ -70,10 +72,13 @@ function shouldShowIntroNow() {
   }
 }
 
-function markIntroShownNow() {
+function markIntroShownNow(): void {
+  if (typeof window === "undefined") return;
   try {
     localStorage.setItem(INTRO_KEY, String(Date.now()));
-  } catch {}
+  } catch {
+    // Silent fail for localStorage errors
+  }
 }
 
 export default function LandingWithIntro() {
