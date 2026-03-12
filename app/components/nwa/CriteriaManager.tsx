@@ -55,7 +55,9 @@ export function CriteriaManager() {
   };
 
   // Group criteria by category for Advanced/Business
-  const groupedCriteria =
+  type CriteriaGroup = { category: typeof categories[number] | null; criteria: typeof criteria };
+  
+  const groupedCriteria: CriteriaGroup[] =
     packageLevel !== "basic" && categories.length > 0
       ? categories.map((cat) => ({
           category: cat,
