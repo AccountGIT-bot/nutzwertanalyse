@@ -130,6 +130,12 @@ export function AnalysisWizard() {
     ? getDomainLabel(decision.aiInterpretation?.domain)
     : null;
 
+  const packageLevelLabel = decision.packageLevel === "basic" 
+    ? "Basic" 
+    : decision.packageLevel === "advanced" 
+      ? "Advanced" 
+      : "Business";
+
   return (
     <>
       {showDraftPrompt && (
@@ -208,10 +214,10 @@ export function AnalysisWizard() {
                     {decision.title || "Neue Analyse"}
                   </div>
                   <div className="text-xs text-white/50 flex items-center gap-1.5">
-                    <span>{decision.packageLevel === "basic" ? "Basic" : decision.packageLevel === "advanced" ? "Advanced" : "Business"}</span>
+                    <span>{packageLevelLabel}</span>
                     {contextLabel && (
                       <>
-                        <span className="text-white/30">•</span>
+                        <span className="text-white/30">{"•"}</span>
                         <span>{contextLabel}</span>
                       </>
                     )}
@@ -261,7 +267,7 @@ export function AnalysisWizard() {
                             : "bg-white/10 text-white/40"
                         }`}
                       >
-                        {isCompleted ? "✓" : index + 1}
+                        {isCompleted ? "\u2713" : index + 1}
                       </div>
                       <span
                         className={`text-sm truncate hidden sm:block ${

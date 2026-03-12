@@ -18,6 +18,144 @@ import type { AIDecisionInterpretation } from "@/app/lib/nwa/types";
 
 type Phase = "intro" | "landing" | "analyzing" | "suggestion";
 
+// Client-side fallback interpretation for simple inputs
+type CategoryId = "economic" | "quality" | "strategic" | "risk" | "other";
+
+function createFallbackInterpretation(input: string): AIDecisionInterpretation {
+  const trimmed = input.trim();
+  
+  // Detect various comparison patterns:
+  // "X oder Y", "X vs Y", "X oder Y?", etc.
+  const orPattern = /^(.+?)\s+(?:oder|vs\.?|versus|oder\s+doch|oder\s+lieber)\s+(.+?)[\?\.\!]?$/i;
+  const match = trimmed.match(orPattern);
+  
+  // Also detect "Soll ich X oder Y" patterns
+  const sollIchPattern = /^(?:soll\s+ich|sollte\s+ich|welche[rns]?|was\s+soll|ich\s+(?:moechte|will|wuerde))\s+.*?(.+?)\s+(?:oder|vs\.?)\s+(.+?)[\?\.\!]?$/i;
+  const sollIchMatch = trimmed.match(sollIchPattern);
+  
+  let alternatives: { name: string; description: string | null }[] = [];
+  let title = trimmed;
+  let domain: AIDecisionInterpretation["domain"] = "other";
+  
+  // Use either match
+  const actualMatch = match || sollIchMatch;
+  
+  if (actualMatch) {
+    const alt1 = actualMatch[1].trim();
+    const alt2 = actualMatch[2].trim();
+    alternatives = [
+      { name: alt1, description: null },
+      { name: alt2, description: null },
+    ];
+    title = `Vergleich: ${alt1} vs. ${alt2}`;
+    
+    // Try to detect domain from keywords
+    const combined = (alt1 + " " + alt2).toLowerCase();
+    if (/bmw|audi|mercedes|vw|volkswagen|ford|toyota|auto|fahrzeug|wagen|pkw/.test(combined)) {
+      domain = "vehicle";
+      title = `Fahrzeugvergleich: ${alt1} vs. ${alt2}`;
+    } else if (/software|app|tool|crm|erp|system|programm/.test(combined)) {
+      domain = "software";
+      title = `Softwarevergleich: ${alt1} vs. ${alt2}`;
+    } else if (/lieferant|anbieter|supplier|partner|firma|unternehmen/.test(combined)) {
+      domain = "supplier";
+      title = `Lieferantenvergleich: ${alt1} vs. ${alt2}`;
+    } else if (/maschine|anlage|geraet|equipment/.test(combined)) {
+      domain = "machines";
+      title = `Maschinenvergleich: ${alt1} vs. ${alt2}`;
+    } else if (/mitarbeiter|bewerber|kandidat|personal/.test(combined)) {
+      domain = "employee";
+      title = `Kandidatenvergleich: ${alt1} vs. ${alt2}`;
+    } else if (/invest|aktie|fonds|anlage|rendite|kaufen|mieten/.test(combined)) {
+      domain = "investment";
+      title = `Investitionsentscheidung: ${alt1} vs. ${alt2}`;
+    } else if (/katze|hund|haustier|tier|pet/.test(combined)) {
+      domain = "personal";
+      title = `Persoenliche Entscheidung: ${alt1} vs. ${alt2}`;
+    } else {
+      domain = "personal";
+    }
+  } else {
+    // No pattern match - use input as title, create generic alternatives
+    alternatives = [
+      { name: "Option A", description: null },
+      { name: "Option B", description: null },
+    ];
+  }
+  
+  // Generate domain-appropriate default criteria
+  const criteriaMap: Record<string, { name: string; description: string; categoryId: CategoryId }[]> = {
+    vehicle: [
+      { name: "Anschaffungskosten", description: "Kaufpreis inkl. Nebenkosten", categoryId: "economic" },
+      { name: "Unterhaltskosten", description: "Laufende Kosten pro Jahr", categoryId: "economic" },
+      { name: "Zuverlaessigkeit", description: "Erwartete Pannenhaeufigkeit", categoryId: "quality" },
+      { name: "Komfort", description: "Fahrkomfort und Ausstattung", categoryId: "quality" },
+      { name: "Verbrauch", description: "Kraftstoff- oder Energieverbrauch", categoryId: "economic" },
+    ],
+    software: [
+      { name: "Lizenzkosten", description: "Einmalige oder laufende Kosten", categoryId: "economic" },
+      { name: "Funktionsumfang", description: "Abdeckung der Anforderungen", categoryId: "quality" },
+      { name: "Benutzerfreundlichkeit", description: "Intuitive Bedienung", categoryId: "quality" },
+      { name: "Integration", description: "Anbindung an bestehende Systeme", categoryId: "strategic" },
+      { name: "Support", description: "Qualitaet des Kundenservice", categoryId: "quality" },
+    ],
+    supplier: [
+      { name: "Preis", description: "Gesamtkosten des Angebots", categoryId: "economic" },
+      { name: "Qualitaet", description: "Produkt- oder Servicequalitaet", categoryId: "quality" },
+      { name: "Lieferzeit", description: "Schnelligkeit der Lieferung", categoryId: "quality" },
+      { name: "Zuverlaessigkeit", description: "Termintreue und Konstanz", categoryId: "risk" },
+      { name: "Flexibilitaet", description: "Anpassungsfaehigkeit an Aenderungen", categoryId: "strategic" },
+    ],
+    machines: [
+      { name: "Anschaffungspreis", description: "Kaufpreis der Maschine", categoryId: "economic" },
+      { name: "Leistung", description: "Technische Leistungsfaehigkeit", categoryId: "quality" },
+      { name: "Wartungskosten", description: "Laufende Wartungsaufwendungen", categoryId: "economic" },
+      { name: "Zuverlaessigkeit", description: "Ausfallsicherheit und Langlebigkeit", categoryId: "risk" },
+      { name: "Produktivitaet", description: "Output pro Zeiteinheit", categoryId: "quality" },
+    ],
+    investment: [
+      { name: "Kapitalaufwand", description: "Benoetigte Investitionssumme", categoryId: "economic" },
+      { name: "Renditeerwartung", description: "Erwartete Rendite", categoryId: "economic" },
+      { name: "Risiko", description: "Verlustrisiko der Investition", categoryId: "risk" },
+      { name: "Liquiditaet", description: "Verfuegbarkeit des Kapitals", categoryId: "strategic" },
+      { name: "Zeithorizont", description: "Anlagedauer", categoryId: "strategic" },
+    ],
+    employee: [
+      { name: "Qualifikation", description: "Fachliche Eignung", categoryId: "quality" },
+      { name: "Erfahrung", description: "Relevante Berufserfahrung", categoryId: "quality" },
+      { name: "Gehaltsvorstellung", description: "Erwartetes Gehalt", categoryId: "economic" },
+      { name: "Teamfit", description: "Passung ins Team", categoryId: "strategic" },
+      { name: "Entwicklungspotenzial", description: "Weiterentwicklungsmoeglichkeiten", categoryId: "strategic" },
+    ],
+    personal: [
+      { name: "Kosten", description: "Finanzielle Aufwendungen", categoryId: "economic" },
+      { name: "Nutzen", description: "Erwarteter persoenlicher Nutzen", categoryId: "quality" },
+      { name: "Zeitaufwand", description: "Benoetigte Zeit", categoryId: "economic" },
+      { name: "Freude", description: "Emotionaler Wert", categoryId: "quality" },
+      { name: "Risiko", description: "Moegliche negative Folgen", categoryId: "risk" },
+    ],
+    other: [
+      { name: "Kosten", description: "Gesamtkosten der Option", categoryId: "economic" },
+      { name: "Nutzen", description: "Erwarteter Mehrwert", categoryId: "quality" },
+      { name: "Aufwand", description: "Benoetigte Ressourcen", categoryId: "economic" },
+      { name: "Risiko", description: "Potenzielle Nachteile", categoryId: "risk" },
+      { name: "Strategischer Fit", description: "Passung zu langfristigen Zielen", categoryId: "strategic" },
+    ],
+  };
+  
+  const criteria = criteriaMap[domain] || criteriaMap.other;
+  
+  return {
+    title,
+    description: `Strukturierte Entscheidungsfindung: ${trimmed}`,
+    domain,
+    alternatives,
+    criteria,
+    constraints: null,
+    confidence: "medium",
+  };
+}
+
 const PRESETS: Array<{
   id: PresetId;
   label: string;
@@ -203,7 +341,7 @@ export default function LandingWithIntro() {
     router.push("/app");
   }, [router]);
 
-  // Analyze user input with AI
+  // Analyze user input with AI - with robust fallback
   const analyzeInput = useCallback(async () => {
     const draft = text.trim();
     if (!draft || draft.length < 5) return;
@@ -231,28 +369,34 @@ export default function LandingWithIntro() {
         throw new Error("No interpretation returned");
       }
     } catch (err) {
-      console.error("[v0] AI interpretation error:", err);
-      setAiError("Die Analyse konnte nicht durchgefuhrt werden. Bitte versuchen Sie es erneut.");
-      setPhase("landing");
+      console.error("[v0] AI interpretation error, using fallback:", err);
+      // Instead of showing error and going back, use client-side fallback
+      const fallback = createFallbackInterpretation(draft);
+      setAiInterpretation(fallback);
+      setPhase("suggestion");
+      // Show a subtle warning that we used fallback
+      setAiError("KI-Analyse nicht verfuegbar - automatische Interpretation wurde verwendet.");
     } finally {
       setIsAnalyzing(false);
     }
   }, [text]);
 
-  // Start from input - now triggers AI analysis
+  // Start from input - triggers AI analysis or uses fallback for simple inputs
   const startFromInput = useCallback(() => {
     const draft = text.trim();
     if (!draft) return;
     
-    // If input is very short (< 10 chars), skip AI and go direct
-    if (draft.length < 10) {
-      goToApp({ draft });
+    // For very short inputs (< 8 chars), use fallback immediately without API call
+    if (draft.length < 8) {
+      const fallback = createFallbackInterpretation(draft);
+      setAiInterpretation(fallback);
+      setPhase("suggestion");
       return;
     }
     
-    // Trigger AI analysis
+    // Trigger AI analysis (which has its own fallback on error)
     analyzeInput();
-  }, [text, goToApp, analyzeInput]);
+  }, [text, analyzeInput]);
 
   // Handle AI suggestion acceptance
   const handleAcceptSuggestion = useCallback((interpretation: AIDecisionInterpretation) => {
@@ -435,6 +579,21 @@ export default function LandingWithIntro() {
             {/* Suggestion Phase */}
             {phase === "suggestion" && aiInterpretation && (
               <div className="flex-1 py-8 overflow-y-auto">
+                {/* Warning if fallback was used */}
+                {aiError && (
+                  <div className="max-w-4xl mx-auto mb-4 px-4 py-3 rounded-xl bg-amber-50 border border-amber-200 text-sm text-amber-700 flex items-center gap-2">
+                    <svg className="h-4 w-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <span>{aiError}</span>
+                    <button
+                      onClick={() => setAiError(null)}
+                      className="ml-auto text-amber-600 hover:text-amber-800 font-medium"
+                    >
+                      OK
+                    </button>
+                  </div>
+                )}
                 <DecisionSuggestion
                   interpretation={aiInterpretation}
                   originalInput={text}
