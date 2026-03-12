@@ -100,7 +100,7 @@ export function AnalysisWizard() {
     }
   }, [currentStepIndex, setStep]);
 
-  const renderCurrentStep = () => {
+  const renderCurrentStep = useCallback(() => {
     switch (currentStep) {
       case "decision":
         return <DecisionSetup />;
@@ -117,7 +117,9 @@ export function AnalysisWizard() {
       default:
         return null;
     }
-  };
+  }, [currentStep]);
+
+  const PresetIconComponent = decision.preset ? getPresetIcon(decision.preset) : null;
 
   return (
     <>
@@ -126,7 +128,7 @@ export function AnalysisWizard() {
           <div className="bg-[#1a1a1a] border border-white/10 rounded-2xl p-6 max-w-md mx-4 shadow-2xl">
             <h3 className="text-lg font-semibold text-white">Entwurf gefunden</h3>
             <p className="mt-2 text-sm text-white/60">
-              Es wurde ein gespeicherter Entwurf gefunden. Möchten Sie diesen wiederherstellen?
+              Es wurde ein gespeicherter Entwurf gefunden. Moechten Sie diesen wiederherstellen?
             </p>
             <div className="mt-4 flex gap-3">
               <button
@@ -150,9 +152,9 @@ export function AnalysisWizard() {
       {showResetConfirm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
           <div className="bg-[#1a1a1a] border border-white/10 rounded-2xl p-6 max-w-md mx-4 shadow-2xl">
-            <h3 className="text-lg font-semibold text-white">Analyse zurücksetzen?</h3>
+            <h3 className="text-lg font-semibold text-white">Analyse zuruecksetzen?</h3>
             <p className="mt-2 text-sm text-white/60">
-              Sind Sie sicher, dass Sie die Analyse zurücksetzen möchten? Alle eingegebenen Daten werden gelöscht.
+              Sind Sie sicher, dass Sie die Analyse zuruecksetzen moechten? Alle eingegebenen Daten werden geloescht.
             </p>
             <div className="mt-4 flex gap-3">
               <button
@@ -165,7 +167,7 @@ export function AnalysisWizard() {
                 onClick={handleConfirmReset}
                 className="flex-1 px-4 py-2.5 rounded-xl text-sm font-semibold text-white bg-red-600 hover:bg-red-500 transition"
               >
-                Zurücksetzen
+                Zuruecksetzen
               </button>
             </div>
           </div>
@@ -177,17 +179,14 @@ export function AnalysisWizard() {
           <div className="mx-auto max-w-5xl px-5 sm:px-6 py-4">
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-3">
-                {decision.preset ? (() => {
-                  const PresetIcon = getPresetIcon(decision.preset);
-                  return (
-                    <div
-                      className="h-9 w-9 rounded-lg flex items-center justify-center"
-                      style={{ background: "rgb(var(--accent) / 0.15)", color: "rgb(var(--accent))" }}
-                    >
-                      <PresetIcon size={20} />
-                    </div>
-                  );
-                })() : (
+                {PresetIconComponent ? (
+                  <div
+                    className="h-9 w-9 rounded-lg flex items-center justify-center"
+                    style={{ background: "rgb(var(--accent) / 0.15)", color: "rgb(var(--accent))" }}
+                  >
+                    <PresetIconComponent size={20} />
+                  </div>
+                ) : (
                   <div
                     className="h-9 w-9 rounded-lg flex items-center justify-center text-sm font-bold"
                     style={{ background: "rgb(var(--accent) / 0.2)", color: "rgb(var(--accent))" }}
@@ -207,7 +206,7 @@ export function AnalysisWizard() {
               <button
                 onClick={handleResetClick}
                 className="px-3 py-1.5 rounded-lg text-xs font-medium text-white/50 hover:text-white/70 hover:bg-white/10 transition"
-                title="Analyse zurücksetzen"
+                title="Analyse zuruecksetzen"
               >
                 Neustart
               </button>
@@ -285,7 +284,7 @@ export function AnalysisWizard() {
                   currentStepIndex === 0 ? "text-white/30 cursor-not-allowed" : "text-white/70 hover:text-white hover:bg-white/10"
                 }`}
               >
-                Zurück
+                Zurueck
               </button>
               <div className="text-sm text-white/40">
                 Schritt {currentStepIndex + 1} von {STEPS.length}

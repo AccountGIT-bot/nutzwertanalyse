@@ -13,8 +13,10 @@ import {
   VehicleIcon,
   EmployeeIcon,
 } from "@/app/lib/nwa/preset-icons";
+import { DecisionSuggestion } from "@/app/components/nwa/DecisionSuggestion";
+import type { AIDecisionInterpretation } from "@/app/lib/nwa/types";
 
-type Phase = "intro" | "landing";
+type Phase = "intro" | "landing" | "analyzing" | "suggestion";
 
 const PRESETS: Array<{
   id: PresetId;
@@ -107,6 +109,11 @@ export default function LandingWithIntro() {
 
   const [scrolled, setScrolled] = useState(false);
 
+  // AI interpretation state
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [aiInterpretation, setAiInterpretation] = useState<AIDecisionInterpretation | null>(null);
+  const [aiError, setAiError] = useState<string | null>(null);
+
   const canStart = useMemo(() => text.trim().length > 0, [text]);
   const placeholderText = "WELCHE ENTSCHEIDUNG SOLL HEUTE STRUKTURIERT WERDEN?";
 
@@ -169,11 +176,18 @@ export default function LandingWithIntro() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  const goToApp = useCallback((payload: { draft: string; preset?: PresetId }) => {
+  const goToApp = useCallback((payload: { 
+    draft: string; 
+    preset?: PresetId;
+    interpretation?: AIDecisionInterpretation;
+  }) => {
     if (typeof window !== "undefined") {
       try {
         localStorage.setItem("nwa_decisionDraft", payload.draft);
         if (payload.preset) localStorage.setItem("nwa_preset", payload.preset);
+        if (payload.interpretation) {
+          localStorage.setItem("nwa_aiInterpretation", JSON.stringify(payload.interpretation));
+        }
       } catch {
         // Silent fail for localStorage errors
       }
@@ -181,11 +195,80 @@ export default function LandingWithIntro() {
     router.push("/app");
   }, [router]);
 
+  // Analyze user input with AI
+  const analyzeInput = useCallback(async () => {
+    const draft = text.trim();
+    if (!draft || draft.length < 5) return;
+
+    setIsAnalyzing(true);
+    setAiError(null);
+    setPhase("analyzing");
+
+    try {
+      const response = await fetch("/api/interpret-decision", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userInput: draft }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to analyze decision");
+      }
+
+      const data = await response.json();
+      if (data.interpretation) {
+        setAiInterpretation(data.interpretation);
+        setPhase("suggestion");
+      } else {
+        throw new Error("No interpretation returned");
+      }
+    } catch (err) {
+      console.error("[v0] AI interpretation error:", err);
+      setAiError("Die Analyse konnte nicht durchgefuhrt werden. Bitte versuchen Sie es erneut.");
+      setPhase("landing");
+    } finally {
+      setIsAnalyzing(false);
+    }
+  }, [text]);
+
+  // Start from input - now triggers AI analysis
   const startFromInput = useCallback(() => {
     const draft = text.trim();
     if (!draft) return;
-    goToApp({ draft });
-  }, [text, goToApp]);
+    
+    // If input is very short (< 10 chars), skip AI and go direct
+    if (draft.length < 10) {
+      goToApp({ draft });
+      return;
+    }
+    
+    // Trigger AI analysis
+    analyzeInput();
+  }, [text, goToApp, analyzeInput]);
+
+  // Handle AI suggestion acceptance
+  const handleAcceptSuggestion = useCallback((interpretation: AIDecisionInterpretation) => {
+    goToApp({ 
+      draft: interpretation.title, 
+      interpretation,
+    });
+  }, [goToApp]);
+
+  // Handle AI suggestion edit
+  const handleEditSuggestion = useCallback((interpretation: AIDecisionInterpretation) => {
+    // Go to app with interpretation but allow editing
+    goToApp({ 
+      draft: text.trim(), 
+      interpretation,
+    });
+  }, [goToApp, text]);
+
+  // Handle AI suggestion rejection
+  const handleRejectSuggestion = useCallback(() => {
+    setAiInterpretation(null);
+    setPhase("landing");
+    // Focus on input
+  }, []);
 
   const startFromPreset = useCallback((p: PresetId) => {
     // Use user input if available, otherwise leave empty - the preset context is shown via icon
@@ -314,228 +397,286 @@ export default function LandingWithIntro() {
         {/* Content */}
         <section className="flex-1 min-h-0">
           <div className="mx-auto max-w-6xl px-5 sm:px-6 h-full flex flex-col">
-            <div className="pt-5 sm:pt-7">
-              <div className="max-w-3xl">
-                <div className="text-[11px] sm:text-xs tracking-[0.28em] uppercase text-black/45">
-                  Nutzwertanalyse • Dokumentation • Vergleichbarkeit
+            {/* Analyzing Phase */}
+            {phase === "analyzing" && (
+              <div className="flex-1 flex items-center justify-center py-12">
+                <div className="text-center">
+                  <div className="relative mx-auto w-16 h-16 mb-6">
+                    <div className="absolute inset-0 rounded-full border-2 border-black/10" />
+                    <div 
+                      className="absolute inset-0 rounded-full border-2 border-transparent border-t-black/60 animate-spin"
+                      style={{ animationDuration: "1s" }}
+                    />
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <span className="text-black/60 text-xl">⌁</span>
+                    </div>
+                  </div>
+                  <h2 className="text-xl font-semibold text-slate-900 mb-2">
+                    Analysiere Ihre Entscheidung...
+                  </h2>
+                  <p className="text-sm text-black/50 max-w-md mx-auto">
+                    Wir interpretieren Ihre Eingabe und generieren passende Alternativen und Kriterien.
+                  </p>
+                  <div className="mt-4 px-4 py-2 rounded-xl bg-black/5 inline-block">
+                    <div className="text-sm text-black/60 italic">{`"${text}"`}</div>
+                  </div>
                 </div>
-
-                <h1 className="mt-2 text-3xl sm:text-4xl font-semibold tracking-tight text-slate-900">
-                  Entscheidungen dokumentieren.{" "}
-                  <span className="opacity-70">Sauber begründet.</span>
-                </h1>
-
-                <p className="mt-3 text-sm sm:text-base text-black/55 leading-relaxed">
-                  Starte mit einer Entscheidung oder einer Vorlage. Du erhältst
-                  einen strukturierten Bewertungsprozess (Kriterien, Gewichtung,
-                  Bewertung) und eine nachvollziehbare Dokumentation – für Team,
-                  Management und Compliance.
-                </p>
               </div>
-            </div>
+            )}
 
-            {/* Search */}
-            <div className="mt-5 sm:mt-6">
-              <div className="w-full max-w-4xl">
-                <div className="relative rounded-[999px] bg-white/74 border border-black/10 shadow-[0_26px_72px_rgba(0,0,0,0.10)] backdrop-blur-md px-3 sm:px-4 py-3">
-                  <div className="flex items-center gap-3 sm:gap-4">
-                    <div
-                      className="h-11 w-11 sm:h-12 sm:w-12 shrink-0 rounded-full flex items-center justify-center"
-                      style={{
-                        background: "rgba(0,0,0,0.04)",
-                        border: "1px solid rgba(0,0,0,0.10)",
-                      }}
-                      aria-hidden="true"
-                    >
-                      <span className="text-black/60" style={{ fontSize: 18 }}>
-                        ⌁
-                      </span>
+            {/* Suggestion Phase */}
+            {phase === "suggestion" && aiInterpretation && (
+              <div className="flex-1 py-8 overflow-y-auto">
+                <DecisionSuggestion
+                  interpretation={aiInterpretation}
+                  originalInput={text}
+                  onAccept={handleAcceptSuggestion}
+                  onEdit={handleEditSuggestion}
+                  onReject={handleRejectSuggestion}
+                />
+              </div>
+            )}
+
+            {/* Normal Landing Phase */}
+            {(phase === "landing" || phase === "intro") && (
+              <>
+                <div className="pt-5 sm:pt-7">
+                  <div className="max-w-3xl">
+                    <div className="text-[11px] sm:text-xs tracking-[0.28em] uppercase text-black/45">
+                      Nutzwertanalyse • Dokumentation • Vergleichbarkeit
                     </div>
 
-                    <div className="relative w-full">
-                      <input
-                        value={text}
-                        onChange={(e) => setText(e.target.value)}
-                        onKeyDown={(e) => {
-                          if (e.key === "Enter") startFromInput();
-                        }}
-                        onFocus={() => setIsFocused(true)}
-                        onBlur={() => setIsFocused(false)}
-                        className={[
-                          "w-full bg-transparent outline-none font-medium tracking-wide",
-                          "text-sm sm:text-base",
-                          "placeholder:text-transparent",
-                          "pr-2",
-                        ].join(" ")}
-                        placeholder={placeholderText}
-                        aria-label="Entscheidung eingeben"
-                      />
+                    <h1 className="mt-2 text-3xl sm:text-4xl font-semibold tracking-tight text-slate-900">
+                      Entscheidungen dokumentieren.{" "}
+                      <span className="opacity-70">Sauber begründet.</span>
+                    </h1>
 
-                      {!text && !isFocused && (
-                        <div className="pointer-events-none absolute inset-y-0 left-0 hidden sm:flex items-center">
-                          <span className="text-black/55 text-sm sm:text-base font-semibold tracking-[0.12em] uppercase">
-                            {placeholderText}
+                    <p className="mt-3 text-sm sm:text-base text-black/55 leading-relaxed">
+                      Starte mit einer Entscheidung oder einer Vorlage. Du erhaltst
+                      einen strukturierten Bewertungsprozess (Kriterien, Gewichtung,
+                      Bewertung) und eine nachvollziehbare Dokumentation - fur Team,
+                      Management und Compliance.
+                    </p>
+                  </div>
+                </div>
+
+                {/* AI Error Message */}
+                {aiError && (
+                  <div className="mt-4 px-4 py-3 rounded-xl bg-red-50 border border-red-200 text-sm text-red-700">
+                    {aiError}
+                    <button
+                      onClick={() => setAiError(null)}
+                      className="ml-2 text-red-500 hover:text-red-700 font-medium"
+                    >
+                      Schliessen
+                    </button>
+                  </div>
+                )}
+
+                {/* Search */}
+                <div className="mt-5 sm:mt-6">
+                  <div className="w-full max-w-4xl">
+                    <div className="relative rounded-[999px] bg-white/74 border border-black/10 shadow-[0_26px_72px_rgba(0,0,0,0.10)] backdrop-blur-md px-3 sm:px-4 py-3">
+                      <div className="flex items-center gap-3 sm:gap-4">
+                        <div
+                          className="h-11 w-11 sm:h-12 sm:w-12 shrink-0 rounded-full flex items-center justify-center"
+                          style={{
+                            background: "rgba(0,0,0,0.04)",
+                            border: "1px solid rgba(0,0,0,0.10)",
+                          }}
+                          aria-hidden="true"
+                        >
+                          <span className="text-black/60" style={{ fontSize: 18 }}>
+                            ⌁
                           </span>
                         </div>
-                      )}
 
-                      {!text && !isFocused && (
-                        <div className="pointer-events-none absolute inset-y-0 left-0 flex sm:hidden items-center w-full overflow-hidden">
-                          <div className="w-full landing-marquee-mask">
-                            <div className="landing-marquee text-black/55 text-sm font-semibold tracking-[0.12em] uppercase whitespace-nowrap">
-                              {placeholderText}&nbsp;&nbsp;&nbsp;•&nbsp;&nbsp;&nbsp;
-                              {placeholderText}
+                        <div className="relative w-full">
+                          <input
+                            value={text}
+                            onChange={(e) => setText(e.target.value)}
+                            onKeyDown={(e) => {
+                              if (e.key === "Enter") startFromInput();
+                            }}
+                            onFocus={() => setIsFocused(true)}
+                            onBlur={() => setIsFocused(false)}
+                            className={[
+                              "w-full bg-transparent outline-none font-medium tracking-wide",
+                              "text-sm sm:text-base",
+                              "placeholder:text-transparent",
+                              "pr-2",
+                            ].join(" ")}
+                            placeholder={placeholderText}
+                            aria-label="Entscheidung eingeben"
+                          />
+
+                          {!text && !isFocused && (
+                            <div className="pointer-events-none absolute inset-y-0 left-0 hidden sm:flex items-center">
+                              <span className="text-black/55 text-sm sm:text-base font-semibold tracking-[0.12em] uppercase">
+                                {placeholderText}
+                              </span>
                             </div>
-                          </div>
+                          )}
+
+                          {!text && !isFocused && (
+                            <div className="pointer-events-none absolute inset-y-0 left-0 flex sm:hidden items-center w-full overflow-hidden">
+                              <div className="w-full landing-marquee-mask">
+                                <div className="landing-marquee text-black/55 text-sm font-semibold tracking-[0.12em] uppercase whitespace-nowrap">
+                                  {placeholderText}&nbsp;&nbsp;&nbsp;•&nbsp;&nbsp;&nbsp;
+                                  {placeholderText}
+                                </div>
+                              </div>
+                            </div>
+                          )}
                         </div>
-                      )}
-                    </div>
 
-                    <button
-                      onClick={startFromInput}
-                      disabled={!canStart}
-                      className={[
-                        "shrink-0 rounded-full px-6 sm:px-8 py-2.5",
-                        "text-sm sm:text-base font-semibold",
-                        "transition-all duration-200",
-                        "shadow-[0_16px_34px_rgba(0,0,0,0.10)]",
-                        "active:scale-[0.99]",
-                        canStart
-                          ? "hover:brightness-[1.04]"
-                          : "opacity-65 cursor-not-allowed",
-                      ].join(" ")}
-                      style={{ background: "#0b0f14", color: "white" }}
-                      aria-label="Start"
-                      title="Start"
-                    >
-                      Start
-                    </button>
-                  </div>
-                </div>
-
-                <div className="mt-2 text-xs sm:text-sm text-black/45">
-                  Ohne Login starten – Account erst für Speichern/Export.
-                </div>
-              </div>
-            </div>
-
-            {/* Presets */}
-            <div className="mt-5 sm:mt-6 flex-1 min-h-0">
-              <div className="h-full flex flex-col">
-                <div className="grid gap-3 sm:gap-4 grid-cols-2 md:grid-cols-3">
-                  {PRESETS.map((p) => (
-                    <button
-                      key={p.id}
-                      onClick={() => startFromPreset(p.id)}
-                      className={[
-                        "group relative overflow-hidden rounded-3xl text-left",
-                        "border border-black/10",
-                        "shadow-[0_16px_42px_rgba(0,0,0,0.12)]",
-                        "transition duration-300 ease-out",
-                        "hover:-translate-y-0.5 hover:shadow-[0_22px_55px_rgba(0,0,0,0.16)]",
-                        "active:translate-y-0",
-                        "focus:outline-none focus-visible:ring-2 focus-visible:ring-black/20",
-                        "h-[clamp(132px,18.5vh,182px)]",
-                      ].join(" ")}
-                    >
-                      <div className="absolute inset-0">
-                        <Image
-                          src={p.image}
-                          alt=""
-                          fill
-                          sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 33vw"
-                          className="object-cover object-[74%_50%] scale-[1.10] transition-transform duration-500 ease-out group-hover:scale-[1.14]"
-                          priority={p.id === "supplier"}
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/72 via-black/16 to-black/0" />
-                        <div className="absolute inset-0 bg-[radial-gradient(900px_280px_at_20%_100%,rgba(0,0,0,0.35),transparent_65%)]" />
-                        <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition duration-300 landing-card-sheen" />
-                      </div>
-
-                      <div className="relative z-10 p-3 sm:p-4">
-                        <div
-                          className="inline-flex items-start gap-3 rounded-2xl px-3.5 py-2.5 backdrop-blur-md"
-                          style={{
-                            background: "rgba(0,0,0,0.34)",
-                            border: "1px solid rgba(255,255,255,0.14)",
-                          }}
+                        <button
+                          onClick={startFromInput}
+                          disabled={!canStart || isAnalyzing}
+                          className={[
+                            "shrink-0 rounded-full px-6 sm:px-8 py-2.5",
+                            "text-sm sm:text-base font-semibold",
+                            "transition-all duration-200",
+                            "shadow-[0_16px_34px_rgba(0,0,0,0.10)]",
+                            "active:scale-[0.99]",
+                            canStart && !isAnalyzing
+                              ? "hover:brightness-[1.04]"
+                              : "opacity-65 cursor-not-allowed",
+                          ].join(" ")}
+                          style={{ background: "#0b0f14", color: "white" }}
+                          aria-label="Start"
+                          title="Start"
                         >
-                          <div className="h-8 w-8 rounded-lg flex items-center justify-center bg-white/10 flex-shrink-0 mt-0.5">
-                            <p.Icon size={18} className="text-white/90" />
+                          {isAnalyzing ? "..." : "Start"}
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="mt-2 text-xs sm:text-sm text-black/45">
+                      Ohne Login starten - KI analysiert und strukturiert deine Entscheidung.
+                    </div>
+                  </div>
+                </div>
+
+                {/* Presets */}
+                <div className="mt-5 sm:mt-6 flex-1 min-h-0">
+                  <div className="h-full flex flex-col">
+                    <div className="grid gap-3 sm:gap-4 grid-cols-2 md:grid-cols-3">
+                      {PRESETS.map((p) => (
+                        <button
+                          key={p.id}
+                          onClick={() => startFromPreset(p.id)}
+                          className={[
+                            "group relative overflow-hidden rounded-3xl text-left",
+                            "border border-black/10",
+                            "shadow-[0_16px_42px_rgba(0,0,0,0.12)]",
+                            "transition duration-300 ease-out",
+                            "hover:-translate-y-0.5 hover:shadow-[0_22px_55px_rgba(0,0,0,0.16)]",
+                            "active:translate-y-0",
+                            "focus:outline-none focus-visible:ring-2 focus-visible:ring-black/20",
+                            "h-[clamp(132px,18.5vh,182px)]",
+                          ].join(" ")}
+                        >
+                          <div className="absolute inset-0">
+                            <Image
+                              src={p.image}
+                              alt=""
+                              fill
+                              sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 33vw"
+                              className="object-cover object-[74%_50%] scale-[1.10] transition-transform duration-500 ease-out group-hover:scale-[1.14]"
+                              priority={p.id === "supplier"}
+                            />
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/72 via-black/16 to-black/0" />
+                            <div className="absolute inset-0 bg-[radial-gradient(900px_280px_at_20%_100%,rgba(0,0,0,0.35),transparent_65%)]" />
+                            <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition duration-300 landing-card-sheen" />
                           </div>
-                          <div className="flex flex-col gap-0.5">
-                            <div className="text-sm sm:text-base font-semibold text-white leading-tight">
-                              {p.label}
-                            </div>
-                            <div className="text-[11px] sm:text-xs text-white/80">
-                              {p.hint}
+
+                          <div className="relative z-10 p-3 sm:p-4">
+                            <div
+                              className="inline-flex items-start gap-3 rounded-2xl px-3.5 py-2.5 backdrop-blur-md"
+                              style={{
+                                background: "rgba(0,0,0,0.34)",
+                                border: "1px solid rgba(255,255,255,0.14)",
+                              }}
+                            >
+                              <div className="h-8 w-8 rounded-lg flex items-center justify-center bg-white/10 flex-shrink-0 mt-0.5">
+                                <p.Icon size={18} className="text-white/90" />
+                              </div>
+                              <div className="flex flex-col gap-0.5">
+                                <div className="text-sm sm:text-base font-semibold text-white leading-tight">
+                                  {p.label}
+                                </div>
+                                <div className="text-[11px] sm:text-xs text-white/80">
+                                  {p.hint}
+                                </div>
+                              </div>
                             </div>
                           </div>
+                        </button>
+                      ))}
+                    </div>
+
+                    <div className="mt-3 hidden sm:grid grid-cols-3 gap-3 text-[11px] text-black/45">
+                      <div
+                        id="principles"
+                        className="rounded-2xl border border-black/10 bg-white/55 backdrop-blur-md px-4 py-3"
+                      >
+                        <div className="font-semibold text-black/70">Prinzipien</div>
+                        <div className="mt-1">
+                          Transparenz, Fairness, Nachvollziehbarkeit - klare Kriterien statt Bauchgefuhl.
                         </div>
                       </div>
-                    </button>
-                  ))}
-                </div>
 
-                <div className="mt-3 hidden sm:grid grid-cols-3 gap-3 text-[11px] text-black/45">
-                  <div
-                    id="principles"
-                    className="rounded-2xl border border-black/10 bg-white/55 backdrop-blur-md px-4 py-3"
-                  >
-                    <div className="font-semibold text-black/70">Prinzipien</div>
-                    <div className="mt-1">
-                      Transparenz, Fairness, Nachvollziehbarkeit – klare Kriterien statt Bauchgefühl.
-                    </div>
-                  </div>
+                      <div
+                        id="framework"
+                        className="rounded-2xl border border-black/10 bg-white/55 backdrop-blur-md px-4 py-3"
+                      >
+                        <div className="font-semibold text-black/70">Framework</div>
+                        <div className="mt-1">
+                          Kriterien - Gewichtung - Bewertung - Sensitivitat - dokumentiert & vergleichbar.
+                        </div>
+                      </div>
 
-                  <div
-                    id="framework"
-                    className="rounded-2xl border border-black/10 bg-white/55 backdrop-blur-md px-4 py-3"
-                  >
-                    <div className="font-semibold text-black/70">Framework</div>
-                    <div className="mt-1">
-                      Kriterien • Gewichtung • Bewertung • Sensitivität – dokumentiert & vergleichbar.
-                    </div>
-                  </div>
-
-                  <div className="rounded-2xl border border-black/10 bg-white/55 backdrop-blur-md px-4 py-3">
-                    <div className="font-semibold text-black/70">Recht</div>
-                    <div className="mt-1">
-                      <a className="underline underline-offset-2 decoration-black/20" href="/datenschutz">
-                        Datenschutz (DSG)
-                      </a>{" "}
-                      •{" "}
-                      <a className="underline underline-offset-2 decoration-black/20" href="/agb">
-                        AGB
-                      </a>{" "}
-                      •{" "}
-                      <a className="underline underline-offset-2 decoration-black/20" href="/impressum">
-                        Impressum
-                      </a>
+                      <div className="rounded-2xl border border-black/10 bg-white/55 backdrop-blur-md px-4 py-3">
+                        <div className="font-semibold text-black/70">Recht</div>
+                        <div className="mt-1">
+                          <a className="underline underline-offset-2 decoration-black/20" href="/datenschutz">
+                            Datenschutz (DSG)
+                          </a>{" "}
+                          -{" "}
+                          <a className="underline underline-offset-2 decoration-black/20" href="/agb">
+                            AGB
+                          </a>{" "}
+                          -{" "}
+                          <a className="underline underline-offset-2 decoration-black/20" href="/impressum">
+                            Impressum
+                          </a>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            </div>
 
-            {/* Footer */}
-            <footer className="mt-4 pb-4 sm:pb-5">
-              <div className="h-px bg-black/10" />
-              <div className="pt-3 text-[10px] sm:text-[11px] text-black/40 flex flex-col sm:flex-row gap-2 sm:items-center sm:justify-between">
-                <div>© {new Date().getFullYear()} Nutzwertanalyse.tool • Draft-first</div>
-                <div className="flex flex-wrap gap-x-3 gap-y-1">
-                  <a href="/impressum" className="underline underline-offset-2 decoration-black/20">
-                    Impressum
-                  </a>
-                  <a href="/agb" className="underline underline-offset-2 decoration-black/20">
-                    AGB
-                  </a>
-                  <a href="/datenschutz" className="underline underline-offset-2 decoration-black/20">
-                    Datenschutz
-                  </a>
+              {/* Footer */}
+              <footer className="mt-4 pb-4 sm:pb-5">
+                <div className="h-px bg-black/10" />
+                <div className="pt-3 text-[10px] sm:text-[11px] text-black/40 flex flex-col sm:flex-row gap-2 sm:items-center sm:justify-between">
+                  <div>© {new Date().getFullYear()} Nutzwertanalyse.tool • Draft-first</div>
+                  <div className="flex flex-wrap gap-x-3 gap-y-1">
+                    <a href="/impressum" className="underline underline-offset-2 decoration-black/20">
+                      Impressum
+                    </a>
+                    <a href="/agb" className="underline underline-offset-2 decoration-black/20">
+                      AGB
+                    </a>
+                    <a href="/datenschutz" className="underline underline-offset-2 decoration-black/20">
+                      Datenschutz
+                    </a>
+                  </div>
                 </div>
-              </div>
-            </footer>
+              </footer>
+            </>
+            )}
           </div>
         </section>
       </div>

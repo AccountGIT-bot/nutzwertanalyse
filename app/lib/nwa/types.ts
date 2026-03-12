@@ -13,6 +13,8 @@ export interface DecisionContext {
   constraints?: string;
   strategicQuestion?: string;
   scenarios?: Scenario[];
+  // AI interpretation (if generated)
+  aiInterpretation?: AIDecisionInterpretation;
 }
 
 // Scenarios (Business package)
@@ -168,4 +170,34 @@ export interface ReportConfig {
   includeRiskAssessment: boolean;
   includeAuditTrail: boolean;
   includeMethodologyNotes: boolean;
+}
+
+// AI Decision Interpretation
+export interface AIInterpretedAlternative {
+  name: string;
+  description: string | null;
+}
+
+export interface AIInterpretedCriterion {
+  name: string;
+  description: string;
+  categoryId: "economic" | "quality" | "strategic" | "risk" | "other";
+}
+
+export interface AIDecisionInterpretation {
+  title: string;
+  description: string;
+  domain: "supplier" | "software" | "investment" | "machines" | "vehicle" | "employee" | "personal" | "technology" | "service" | "other";
+  alternatives: AIInterpretedAlternative[];
+  criteria: AIInterpretedCriterion[];
+  constraints: string | null;
+  confidence: "high" | "medium" | "low";
+}
+
+// AI Decision Suggestion State
+export interface AIDecisionSuggestion {
+  isLoading: boolean;
+  error: string | null;
+  interpretation: AIDecisionInterpretation | null;
+  originalInput: string;
 }
