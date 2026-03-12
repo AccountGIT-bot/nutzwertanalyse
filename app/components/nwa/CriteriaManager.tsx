@@ -6,11 +6,12 @@ import { getTemplateByPreset } from "@/app/lib/nwa/templates";
 import type { Criterion } from "@/app/lib/nwa/types";
 
 export function CriteriaManager() {
-  const {
+const {
     state,
     addCriterion,
     updateCriterion,
     removeCriterion,
+    duplicateCriterion,
     setCriteriaFromTemplate,
     canProceedToNext,
   } = useAnalysis();
@@ -291,30 +292,34 @@ export function CriteriaManager() {
                           )}
                         </>
                       )}
-                    </div>
-
-                    <button
-                      onClick={() => removeCriterion(criterion.id)}
-                      className="flex-shrink-0 h-8 w-8 rounded-lg bg-red-500/10 text-red-400 hover:bg-red-500/20 transition flex items-center justify-center"
-                      title="Kriterium entfernen"
-                    >
-                      <svg
-                        className="h-4 w-4"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M6 18L18 6M6 6l12 12"
-                        />
-                      </svg>
-                    </button>
-                  </div>
-                </div>
-              ))}
+</div>
+              
+              <div className="flex gap-2">
+                {/* Duplicate button */}
+                <button
+                  onClick={() => duplicateCriterion(criterion.id)}
+                  className="flex-shrink-0 h-8 w-8 rounded-lg bg-white/5 text-white/50 hover:bg-white/10 hover:text-white/70 transition flex items-center justify-center"
+                  title="Kriterium duplizieren"
+                >
+                  <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                  </svg>
+                </button>
+                
+                {/* Delete button */}
+                <button
+                  onClick={() => removeCriterion(criterion.id)}
+                  className="flex-shrink-0 h-8 w-8 rounded-lg bg-red-500/10 text-red-400 hover:bg-red-500/20 transition flex items-center justify-center"
+                  title="Kriterium entfernen"
+                >
+                  <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+        ))}
             </div>
           </div>
         ))}

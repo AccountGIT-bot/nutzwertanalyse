@@ -83,7 +83,7 @@ export function calculateNwa(
           let totalEvaluatorWeight = 0;
           
           for (const rating of relevantRatings) {
-            const evalWeight = evaluatorMap.get(rating.evaluatorId) ?? 1;
+            const evalWeight = rating.evaluatorId ? evaluatorMap.get(rating.evaluatorId) ?? 1 : 1;
             weightedSum += rating.score * evalWeight;
             totalEvaluatorWeight += evalWeight;
           }

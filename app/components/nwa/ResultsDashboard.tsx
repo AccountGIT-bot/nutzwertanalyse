@@ -1,13 +1,15 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { useAnalysis } from "@/app/lib/nwa/analysis-context";
 import { getRecommendation } from "@/app/lib/nwa/calculate";
+import { ReportGenerator } from "./ReportGenerator";
 
 export function ResultsDashboard() {
   const { state, knockoutFailures } = useAnalysis();
   const { alternatives, criteria, results, sensitivityResults, decision, ahpConsistency } = state;
   const packageLevel = decision.packageLevel;
+  const [showExport, setShowExport] = useState(false);
 
   // Get recommendation
   const recommendation = useMemo(
@@ -336,10 +338,51 @@ export function ResultsDashboard() {
           </div>
           <p className="text-sm text-white/70">{ahpConsistency.message}</p>
           <div className="mt-2 text-xs text-white/50">
-            Konsistenzratio (CR): {(ahpConsistency.consistencyRatio * 100).toFixed(1)}%
-          </div>
+Konsistenzratio (CR): {(ahpConsistency.consistencyRatio * 100).toFixed(1)}%
         </div>
+      </div>
       )}
+
+      {/* Export Section */}
+      <div className="mt-8 rounded-xl border border-white/10 bg-white/5 p-4">
+        <button
+          onClick={() => setShowExport(!showExport)}
+          className="w-full flex items-center justify-between text-left"
+        >
+          <div>
+            <div className="text-sm font-medium text-white/70">Report exportieren</div>
+            <div className="text-xs text-white/50 mt-1">
+              {packageLevel === "basic"
+                ? "Kompakter Entscheidungsreport"
+                : packageLevel === "advanced"
+                ? "Vollstandiger Analysebericht"
+                : "Executive Report mit Audit-Dokumentation"}
+            </div>
+          </div>
+          <div
+            className={`h-8 w-8 rounded-lg flex items-center justify-center transition ${
+              showExport
+                ? "bg-[rgb(var(--accent))] text-white"
+                : "bg-white/10 text-white/60"
+            }`}
+          >
+            <svg
+              className={`h-4 w-4 transition-transform ${showExport ? "rotate-180" : ""}`}
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+            </svg>
+          </div>
+        </button>
+        
+        {showExport && (
+          <div className="mt-4 pt-4 border-t border-white/10">
+            <ReportGenerator />
+          </div>
+        )}
+      </div>
     </div>
   );
 }
