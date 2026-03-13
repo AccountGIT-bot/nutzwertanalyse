@@ -399,14 +399,14 @@ export default function AppPage() {
       initialAIInterpretation={initialAIInterpretation}
     >
       <main className="min-h-[100svh] text-white">
-        {/* Header - Light theme */}
+        {/* Header - Light theme with smooth transition */}
         <header className="sticky top-0 z-30">
           <div
             className={[
-              "transition-all duration-300",
+              "transition-all duration-300 relative",
               scrolled
-                ? "bg-white/95 backdrop-blur-xl shadow-[0_4px_20px_rgba(0,0,0,0.08)]"
-                : "bg-white/90 backdrop-blur-sm",
+                ? "bg-white shadow-[0_4px_30px_rgba(0,0,0,0.15)]"
+                : "bg-white",
             ].join(" ")}
           >
             <div className="mx-auto max-w-6xl px-5 sm:px-6 h-[68px] sm:h-[76px] flex items-center justify-between">
@@ -453,7 +453,8 @@ export default function AppPage() {
                 </button>
               </div>
             </div>
-            <div className="h-px bg-slate-200/60" />
+            {/* Gradient fade from white to transparent for smooth transition */}
+            <div className="absolute left-0 right-0 top-full h-8 bg-gradient-to-b from-white/80 via-white/40 to-transparent pointer-events-none" />
           </div>
         </header>
 
