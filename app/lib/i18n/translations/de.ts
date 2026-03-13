@@ -28,6 +28,10 @@ export const de = {
     },
     description: "Beschreibe deine Entscheidung in eigenen Worten. Unsere KI analysiert deinen Text und erstellt automatisch passende Alternativen und Bewertungskriterien – keine Vorlage nötig, funktioniert mit jedem Thema.",
     searchPlaceholder: "Beschreibe deine Entscheidung...",
+    searchInputPlaceholder: "WELCHE ENTSCHEIDUNG SOLL HEUTE STRUKTURIERT WERDEN?",
+    searchInputAriaLabel: "Entscheidung eingeben",
+    startButton: "Start",
+    startButtonLoading: "...",
     searchHint: "Sofort starten – KI analysiert und strukturiert deine Eingabe automatisch",
     orChooseTemplate: "Oder wähle eine Vorlage",
     footer: {

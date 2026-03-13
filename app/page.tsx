@@ -105,7 +105,7 @@ export default function LandingWithIntro() {
   const [aiError, setAiError] = useState<string | null>(null);
 
   const canStart = useMemo(() => text.trim().length > 0, [text]);
-  const placeholderText = "WELCHE ENTSCHEIDUNG SOLL HEUTE STRUKTURIERT WERDEN?";
+  const placeholderText = t.landing.searchInputPlaceholder;
 
   useEffect(() => {
     // Decide intro only once on mount
@@ -557,7 +557,7 @@ export default function LandingWithIntro() {
                               "pr-1 sm:pr-2",
                             ].join(" ")}
                             placeholder={placeholderText}
-                            aria-label="Entscheidung eingeben"
+                            aria-label={t.landing.searchInputAriaLabel}
                           />
 
                           {!text && !isFocused && (
@@ -594,10 +594,10 @@ export default function LandingWithIntro() {
                               : "opacity-65 cursor-not-allowed",
                           ].join(" ")}
                           style={{ background: "#0b0f14", color: "white" }}
-                          aria-label="Start"
-                          title="Start"
+                          aria-label={t.landing.startButton}
+                          title={t.landing.startButton}
                         >
-                          {isAnalyzing ? "..." : "Start"}
+                          {isAnalyzing ? t.landing.startButtonLoading : t.landing.startButton}
                         </button>
                       </div>
                     </div>

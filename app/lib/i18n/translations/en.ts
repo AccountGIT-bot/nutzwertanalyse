@@ -28,6 +28,10 @@ export const en = {
     },
     description: "Describe your decision in your own words. Our AI analyzes your text and automatically creates matching alternatives and evaluation criteria – no template needed, works with any topic.",
     searchPlaceholder: "Describe your decision...",
+    searchInputPlaceholder: "WHAT DECISION SHOULD BE STRUCTURED TODAY?",
+    searchInputAriaLabel: "Enter decision",
+    startButton: "Start",
+    startButtonLoading: "...",
     searchHint: "Start immediately – AI analyzes and structures your input automatically",
     orChooseTemplate: "Or choose a template",
     footer: {
