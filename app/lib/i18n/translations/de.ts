@@ -358,5 +358,3 @@ export const de = {
     exportFailed: "Export fehlgeschlagen. Bitte versuchen Sie es erneut.",
   },
 } as const;
-
-export type Translations = typeof de;
