@@ -76,22 +76,21 @@ export function EvaluationMatrix() {
     <div className="space-y-6">
       <div>
         <div className="text-sm text-white/60 flex items-center gap-2">
-          Schritt 5
+          {t.steps.step} 5
           <StepInfoButton stepId="rating" />
         </div>
         <h2 className="mt-1 text-xl font-semibold text-white">
-          Alternativen bewerten
+          {t.evaluationSetup.title}
         </h2>
         <p className="mt-2 text-sm text-white/50">
-          Bewerten Sie jede Alternative für jedes Kriterium auf einer Skala von 1
-          bis 10.
+          {t.evaluationSetup.description}
         </p>
       </div>
 
       {/* Evaluator selector (Business) */}
       {packageLevel === "business" && evaluators.length > 1 && (
         <div className="flex items-center gap-4">
-          <span className="text-sm text-white/60">Bewerter:</span>
+          <span className="text-sm text-white/60">{t.evaluationSetup.evaluator}:</span>
           <div className="flex gap-2">
             {evaluators.map((evaluator) => (
               <button
@@ -113,7 +112,7 @@ export function EvaluationMatrix() {
       {/* Progress */}
       <div className="rounded-xl border border-white/10 bg-white/5 p-4">
         <div className="flex items-center justify-between mb-2">
-          <span className="text-sm text-white/60">Bewertungsfortschritt</span>
+          <span className="text-sm text-white/60">{t.evaluationSetup.progress}</span>
           <span className="text-sm font-medium text-white">{completionPercent}%</span>
         </div>
         <div className="h-2 rounded-full bg-white/10 overflow-hidden">
@@ -164,10 +163,10 @@ export function EvaluationMatrix() {
                       {criterion.name}
                     </div>
                     <div className="text-xs text-white/40">
-                      Gewicht: {(criterion.weight * 100).toFixed(0)}%
+                      {t.evaluationSetup.weight}: {(criterion.weight * 100).toFixed(0)}%
                       {criterion.isKnockout && (
                         <span className="ml-2 text-yellow-400">
-                          Min: {criterion.minThreshold}
+                          {t.criteriaSetup.knockoutThreshold}: {criterion.minThreshold}
                         </span>
                       )}
                     </div>
@@ -247,7 +246,7 @@ export function EvaluationMatrix() {
           <div className="flex items-center gap-2 mb-2">
             <div className="h-2 w-2 rounded-full bg-red-400" />
             <span className="text-sm font-medium text-red-400">
-              K.O.-Kriterien nicht erfüllt
+              {t.evaluationSetup.knockoutFailed}
             </span>
           </div>
           <div className="space-y-1">
@@ -270,23 +269,23 @@ export function EvaluationMatrix() {
       <div className="flex items-center gap-6 text-xs text-white/40">
         <div className="flex items-center gap-2">
           <div className="h-4 w-8 rounded bg-white/10" />
-          <span>Nicht bewertet</span>
+          <span>{t.evaluationSetup.legend.notRated}</span>
         </div>
         <div className="flex items-center gap-2">
           <div className="h-4 w-8 rounded bg-[rgb(var(--accent))]/20" />
-          <span>Bewertet</span>
+          <span>{t.evaluationSetup.legend.rated}</span>
         </div>
         <div className="flex items-center gap-2">
           <div className="h-4 w-8 rounded bg-red-500/20 border border-red-500/30" />
-          <span>K.O. nicht bestanden</span>
+          <span>{t.evaluationSetup.legend.knockoutFailed}</span>
         </div>
-        <div className="ml-auto">1 = sehr schlecht, 10 = sehr gut</div>
+        <div className="ml-auto">{t.evaluationSetup.scale}</div>
       </div>
 
       {/* Validation */}
       {!canProceedToNext && (
         <div className="text-sm text-[rgb(var(--accent))]/80">
-          Bitte bewerten Sie alle Alternativen für alle Kriterien.
+          {t.evaluationSetup.validation}
         </div>
       )}
     </div>

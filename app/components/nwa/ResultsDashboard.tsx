@@ -5,12 +5,14 @@ import { useAnalysis } from "@/app/lib/nwa/analysis-context";
 import { getRecommendation } from "@/app/lib/nwa/calculate";
 import { ReportGenerator } from "./ReportGenerator";
 import { StepInfoButton } from "./StepInfoButton";
+import { useTranslations } from "@/app/lib/i18n";
 
 export function ResultsDashboard() {
   const { state, knockoutFailures } = useAnalysis();
   const { alternatives, criteria, results, sensitivityResults, decision, ahpConsistency } = state;
   const packageLevel = decision.packageLevel;
   const [showExport, setShowExport] = useState(false);
+  const t = useTranslations();
 
   // Get recommendation
   const recommendation = useMemo(
@@ -29,9 +31,9 @@ export function ResultsDashboard() {
   if (results.length === 0) {
     return (
       <div className="rounded-xl border border-white/10 bg-white/5 p-8 text-center">
-        <div className="text-white/40">Keine Ergebnisse verfügbar</div>
+        <div className="text-white/40">{t.results.noResults}</div>
         <div className="text-sm text-white/30 mt-1">
-          Bitte vervollständigen Sie alle vorherigen Schritte.
+          {t.results.completeSteps}
         </div>
       </div>
     );
@@ -41,11 +43,11 @@ export function ResultsDashboard() {
     <div className="space-y-6">
       <div>
         <div className="text-sm text-white/60 flex items-center gap-2">
-          Schritt 6 – Ergebnis
+          {t.steps.step} 6 – {t.steps.results}
           <StepInfoButton stepId="results" />
         </div>
         <h2 className="mt-1 text-xl font-semibold text-white">
-          Analyse-Ergebnis & Entscheidungsempfehlung
+          {t.results.title}
         </h2>
       </div>
 
@@ -69,13 +71,13 @@ export function ResultsDashboard() {
               : "?"}
           </div>
           <div className="flex-1">
-            <div className="text-sm text-white/60 mb-1">Empfehlung</div>
+            <div className="text-sm text-white/60 mb-1">{t.results.recommendation}</div>
             <div className="text-xl font-semibold text-white">
-              {recommendation.recommended?.name || "Keine klare Empfehlung"}
+              {recommendation.recommended?.name || t.results.noRecommendation}
             </div>
             <div className="text-sm text-white/60 mt-2">{recommendation.reasoning}</div>
             <div className="mt-3 flex items-center gap-2">
-              <span className="text-xs text-white/50">Konfidenz:</span>
+              <span className="text-xs text-white/50">{t.results.confidence}:</span>
               <div className="flex gap-1">
                 {["high", "medium", "low"].map((level, i) => (
                   <div
@@ -94,10 +96,10 @@ export function ResultsDashboard() {
               </div>
               <span className="text-xs text-white/50 capitalize">
                 {recommendation.confidence === "high"
-                  ? "Hoch"
+                  ? t.results.confidenceHigh
                   : recommendation.confidence === "medium"
-                  ? "Mittel"
-                  : "Niedrig"}
+                  ? t.results.confidenceMedium
+                  : t.results.confidenceLow}
               </span>
             </div>
           </div>
@@ -106,7 +108,7 @@ export function ResultsDashboard() {
 
       {/* Rankings */}
       <div className="space-y-3">
-        <div className="text-sm font-medium text-white/70">Ranking</div>
+        <div className="text-sm font-medium text-white/70">{t.results.ranking}</div>
         {validResults.map((result, index) => {
           const alt = alternatives.find((a) => a.id === result.alternativeId);
           const barWidth = (result.totalScore / maxScore) * 100;
@@ -149,9 +151,9 @@ export function ResultsDashboard() {
                     />
                   </div>
                   <div className="text-xs text-white/40 mt-1">
-                    Normalisiert: {result.normalizedScore.toFixed(0)}%
+                    {t.results.normalized}: {result.normalizedScore.toFixed(0)}%
                     {result.riskScore !== undefined && (
-                      <span className="ml-4">Risiko-Score: {result.riskScore.toFixed(2)}</span>
+                      <span className="ml-4">{t.results.riskScore}: {result.riskScore.toFixed(2)}</span>
                     )}
                   </div>
                 </div>
@@ -164,7 +166,7 @@ export function ResultsDashboard() {
         {knockoutFailures.length > 0 && (
           <div className="mt-4">
             <div className="text-sm font-medium text-red-400/70 mb-2">
-              Ausgeschieden (K.O.-Kriterien)
+              {t.results.eliminated}
             </div>
             {knockoutFailures.map((failure) => {
               const alt = alternatives.find((a) => a.id === failure.alternativeId);
@@ -184,7 +186,7 @@ export function ResultsDashboard() {
                     <div>
                       <div className="font-medium text-white/60">{alt?.name}</div>
                       <div className="text-xs text-red-400/70">
-                        Nicht bestanden: {failedCritNames.join(", ")}
+                        {t.results.notPassed}: {failedCritNames.join(", ")}
                       </div>
                     </div>
                   </div>
@@ -198,17 +200,17 @@ export function ResultsDashboard() {
       {/* Criteria breakdown */}
       <div className="rounded-xl border border-white/10 bg-white/5 p-4">
         <div className="text-sm font-medium text-white/70 mb-4">
-          Detailanalyse nach Kriterien
+          {t.results.detailAnalysis}
         </div>
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-white/10">
                 <th className="text-left py-2 pr-4 text-white/50 font-medium">
-                  Kriterium
+                  {t.results.criterion}
                 </th>
                 <th className="text-left py-2 pr-4 text-white/50 font-medium">
-                  Gewicht
+                  {t.evaluationSetup.weight}
                 </th>
                 {validResults.slice(0, 5).map((r) => {
                   const alt = alternatives.find((a) => a.id === r.alternativeId);
@@ -246,7 +248,7 @@ export function ResultsDashboard() {
                 </tr>
               ))}
               <tr className="font-semibold">
-                <td className="py-3 pr-4 text-white">Gesamtscore</td>
+                <td className="py-3 pr-4 text-white">{t.results.totalScore}</td>
                 <td className="py-3 pr-4 text-white/50">100%</td>
                 {validResults.slice(0, 5).map((r) => (
                   <td
@@ -266,10 +268,10 @@ export function ResultsDashboard() {
       {packageLevel !== "basic" && sensitivityResults.length > 0 && (
         <div className="rounded-xl border border-white/10 bg-white/5 p-4">
           <div className="text-sm font-medium text-white/70 mb-4">
-            Sensitivitätsanalyse
+            {t.results.sensitivityAnalysis}
           </div>
           <p className="text-xs text-white/50 mb-4">
-            Zeigt, wie empfindlich das Ranking auf Änderungen der Gewichtung reagiert.
+            {t.results.sensitivityDescription}
           </p>
           <div className="space-y-3">
             {sensitivityResults.slice(0, 5).map((sens) => {
@@ -292,10 +294,10 @@ export function ResultsDashboard() {
                       }`}
                     >
                       {sens.impactOnRanking === "high"
-                        ? "Hoch"
+                        ? t.results.confidenceHigh
                         : sens.impactOnRanking === "medium"
-                        ? "Mittel"
-                        : "Niedrig"}
+                        ? t.results.confidenceMedium
+                        : t.results.confidenceLow}
                     </div>
                     <div className="w-20 h-2 rounded-full bg-white/10 overflow-hidden">
                       <div
@@ -337,14 +339,14 @@ export function ResultsDashboard() {
                 ahpConsistency.isConsistent ? "text-green-400" : "text-yellow-400"
               }`}
             >
-              AHP-Konsistenzprüfung
+              {t.results.ahpConsistency}
             </span>
           </div>
           <p className="text-sm text-white/70">{ahpConsistency.message}</p>
           <div className="mt-2 text-xs text-white/50">
-Konsistenzratio (CR): {(ahpConsistency.consistencyRatio * 100).toFixed(1)}%
+            {t.results.consistencyRatio}: {(ahpConsistency.consistencyRatio * 100).toFixed(1)}%
+          </div>
         </div>
-      </div>
       )}
 
       {/* Export Section */}
@@ -354,13 +356,13 @@ Konsistenzratio (CR): {(ahpConsistency.consistencyRatio * 100).toFixed(1)}%
           className="w-full flex items-center justify-between text-left"
         >
           <div>
-            <div className="text-sm font-medium text-white/70">Report exportieren</div>
+            <div className="text-sm font-medium text-white/70">{t.results.exportReport}</div>
             <div className="text-xs text-white/50 mt-1">
               {packageLevel === "basic"
-                ? "Kompakter Entscheidungsreport"
+                ? t.results.exportBasic
                 : packageLevel === "advanced"
-                ? "Vollstandiger Analysebericht"
-                : "Executive Report mit Audit-Dokumentation"}
+                ? t.results.exportAdvanced
+                : t.results.exportBusiness}
             </div>
           </div>
           <div
