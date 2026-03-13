@@ -4,6 +4,11 @@ const nextConfig: NextConfig = {
   // Enable React Strict Mode for better development experience
   reactStrictMode: true,
 
+  // Turbopack configuration
+  turbopack: {
+    root: process.cwd(),
+  },
+
   // Image optimization configuration
   images: {
     remotePatterns: [],
