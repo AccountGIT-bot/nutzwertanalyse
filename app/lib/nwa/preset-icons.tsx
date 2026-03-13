@@ -230,7 +230,7 @@ const DOMAIN_LABELS: Record<string, string> = {
   machines: "Maschinenkauf",
   vehicle: "Fahrzeuganschaffung",
   employee: "Mitarbeiterwahl",
-  personal: "Persoenliche Entscheidung",
+  personal: "Persönliche Entscheidung",
   technology: "Technologieauswahl",
   service: "Dienstleisterauswahl",
   other: "Allgemeine Entscheidung",

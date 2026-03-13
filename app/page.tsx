@@ -238,7 +238,7 @@ export default function LandingWithIntro() {
       setPhase("suggestion");
       // Show subtle notice that local interpretation was used
       if (fallback.confidence === "low") {
-        setAiError("Automatische Interpretation wurde verwendet. Sie koennen alle Felder anpassen.");
+        setAiError("Automatische Interpretation wurde verwendet. Sie können alle Felder anpassen.");
       }
     } finally {
       setIsAnalyzing(false);
@@ -477,16 +477,16 @@ export default function LandingWithIntro() {
                       Nutzwertanalyse • Dokumentation • Vergleichbarkeit
                     </div>
 
-                    <h1 className="mt-2 text-3xl sm:text-4xl font-semibold tracking-tight text-slate-900">
-                      Entscheidungen dokumentieren.{" "}
-                      <span className="opacity-70">Sauber begründet.</span>
+                    <h1 className="mt-2 text-3xl sm:text-4xl lg:text-5xl font-semibold tracking-tight text-slate-900">
+                      <span className="inline-block animate-fade-in-up">Entscheidungen.</span>{" "}
+                      <span className="inline-block animate-fade-in-up animation-delay-100 bg-gradient-to-r from-slate-900 via-slate-700 to-slate-900 bg-clip-text text-transparent">Strukturiert.</span>{" "}
+                      <span className="inline-block animate-fade-in-up animation-delay-200 opacity-60">Begründet.</span>
                     </h1>
 
-                    <p className="mt-3 text-sm sm:text-base text-black/55 leading-relaxed">
-                      Starte mit einer Entscheidung oder einer Vorlage. Du erhaltst
-                      einen strukturierten Bewertungsprozess (Kriterien, Gewichtung,
-                      Bewertung) und eine nachvollziehbare Dokumentation - fur Team,
-                      Management und Compliance.
+                    <p className="mt-4 text-sm sm:text-base text-black/55 leading-relaxed max-w-2xl">
+                      Beschreibe deine Entscheidung in eigenen Worten. Unsere KI analysiert 
+                      deinen Text und erstellt automatisch passende Alternativen und Bewertungskriterien 
+                      – keine Vorlage nötig, funktioniert mit jedem Thema.
                     </p>
                   </div>
                 </div>
@@ -583,8 +583,9 @@ export default function LandingWithIntro() {
                       </div>
                     </div>
 
-                    <div className="mt-2 text-xs sm:text-sm text-black/45">
-                      Ohne Login starten - KI analysiert und strukturiert deine Entscheidung.
+                    <div className="mt-2 text-xs sm:text-sm text-black/45 flex items-center gap-2">
+                      <span className="inline-flex h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                      Sofort starten – KI analysiert und strukturiert deine Eingabe automatisch
                     </div>
                   </div>
                 </div>
@@ -654,7 +655,7 @@ export default function LandingWithIntro() {
                       >
                         <div className="font-semibold text-black/70">Prinzipien</div>
                         <div className="mt-1">
-                          Transparenz, Fairness, Nachvollziehbarkeit - klare Kriterien statt Bauchgefuhl.
+                          Transparenz, Fairness, Nachvollziehbarkeit – klare Kriterien statt Bauchgefühl.
                         </div>
                       </div>
 
@@ -664,7 +665,7 @@ export default function LandingWithIntro() {
                       >
                         <div className="font-semibold text-black/70">Framework</div>
                         <div className="mt-1">
-                          Kriterien - Gewichtung - Bewertung - Sensitivitat - dokumentiert & vergleichbar.
+                          Kriterien – Gewichtung – Bewertung – Sensitivität – dokumentiert & vergleichbar.
                         </div>
                       </div>
 
@@ -713,6 +714,27 @@ export default function LandingWithIntro() {
       </div>
 
       <style jsx global>{`
+        @keyframes fade-in-up {
+          from {
+            opacity: 0;
+            transform: translateY(12px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        .animate-fade-in-up {
+          animation: fade-in-up 0.6s ease-out forwards;
+        }
+        .animation-delay-100 {
+          animation-delay: 0.1s;
+          opacity: 0;
+        }
+        .animation-delay-200 {
+          animation-delay: 0.2s;
+          opacity: 0;
+        }
         .landing-sheen2 {
           background: radial-gradient(
             800px 420px at 22% 18%,

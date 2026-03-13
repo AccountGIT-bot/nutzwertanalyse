@@ -76,7 +76,7 @@ export function DecisionSetup() {
             ? presetContext.titleHelperText
             : packageLevel === "advanced"
             ? "Definieren Sie die Entscheidung und relevante Randbedingungen."
-            : "Formulieren Sie die strategische Fragestellung fuer eine auditfaehige Dokumentation."}
+            : "Formulieren Sie die strategische Fragestellung für eine auditfähige Dokumentation."}
         </p>
       </div>
 
@@ -91,7 +91,7 @@ export function DecisionSetup() {
             onChange={(e) => setDecision({ title: e.target.value })}
             placeholder={
               packageLevel === "business"
-                ? "z.B. Welcher strategische Partner fuer die Marktexpansion?"
+                ? "z.B. Welcher strategische Partner für die Marktexpansion?"
                 : titlePlaceholder
             }
             className="w-full h-12 px-4 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/30 outline-none focus:border-[rgb(var(--accent))] focus:ring-2 focus:ring-[rgb(var(--accent))]/20 transition"
@@ -121,7 +121,7 @@ export function DecisionSetup() {
         {(packageLevel === "advanced" || packageLevel === "business") && (
           <div>
             <label className="block text-sm font-medium text-white/70 mb-2">
-              Randbedingungen & Einschraenkungen
+              Randbedingungen & Einschränkungen
             </label>
             <textarea
               value={decision.constraints || ""}
@@ -147,7 +147,7 @@ export function DecisionSetup() {
               Dokumentationsstandard
             </div>
             <p className="text-sm text-white/50">
-              Alle Eingaben werden vollstaendig dokumentiert und koennen spaeter fuer 
+              Alle Eingaben werden vollständig dokumentiert und können später für 
               Revisionen, Gremienentscheide oder Compliance-Nachweise verwendet werden.
               Formulieren Sie sachlich und nachvollziehbar.
             </p>
@@ -158,7 +158,7 @@ export function DecisionSetup() {
       {/* Validation feedback */}
       {!canProceedToNext && decision.title.trim().length === 0 && (
         <div className="text-sm text-[rgb(var(--accent))]/80">
-          Bitte geben Sie einen Titel fuer die Entscheidung ein.
+          Bitte geben Sie einen Titel für die Entscheidung ein.
         </div>
       )}
     </div>

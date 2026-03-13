@@ -51,7 +51,7 @@ export function AlternativesManager() {
         <h2 className="mt-1 text-xl font-semibold text-white">Alternativen definieren</h2>
         <p className="mt-2 text-sm text-white/50">
           {presetContext.alternativeHelperText}
-          {packageLevel !== "basic" && " Sie koennen auch Annahmen zu jeder Alternative dokumentieren."}
+          {packageLevel !== "basic" && " Sie können auch Annahmen zu jeder Alternative dokumentieren."}
         </p>
       </div>
 
