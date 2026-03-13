@@ -3,6 +3,7 @@
 import { useState, useCallback } from "react";
 import type { AIDecisionInterpretation } from "@/app/lib/nwa/types";
 import { getDomainIcon, getDomainLabel } from "@/app/lib/nwa/preset-icons";
+import { getDomainSuggestions } from "@/app/lib/nwa/preset-context";
 
 interface DecisionSuggestionProps {
   interpretation: AIDecisionInterpretation;
@@ -12,11 +13,9 @@ interface DecisionSuggestionProps {
   onReject: () => void;
 }
 
-
-
 const CATEGORY_LABELS: Record<string, string> = {
   economic: "Wirtschaftlichkeit",
-  quality: "Qualitat",
+  quality: "Qualitaet",
   strategic: "Strategie",
   risk: "Risiko",
   other: "Sonstige",
@@ -40,6 +39,7 @@ export function DecisionSuggestion({
   const DomainIcon = getDomainIcon(interpretation.domain);
   const domainLabel = getDomainLabel(interpretation.domain);
   const confidenceInfo = CONFIDENCE_LABELS[interpretation.confidence];
+  const domainSuggestions = getDomainSuggestions(interpretation.domain);
 
   const toggleSection = useCallback((section: string) => {
     setExpandedSection((prev) => (prev === section ? null : section));
@@ -47,19 +47,19 @@ export function DecisionSuggestion({
 
   return (
     <div className="w-full max-w-4xl mx-auto">
-      {/* Header with confidence indicator */}
+      {/* Header with domain icon and confidence indicator */}
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-3">
           <div
-            className="h-10 w-10 rounded-xl flex items-center justify-center"
+            className="h-12 w-12 rounded-xl flex items-center justify-center"
             style={{ background: "rgba(0,0,0,0.08)" }}
           >
-            <DomainIcon size={22} className="text-black/60" />
+            <DomainIcon size={26} className="text-black/70" />
           </div>
           <div>
-            <div className="text-xs text-black/50">KI-Interpretation - {domainLabel}</div>
-            <div className="text-sm font-medium text-black/80">
-              Ihre Entscheidung wurde analysiert
+            <div className="text-sm font-medium text-black/80">{domainLabel}</div>
+            <div className="text-xs text-black/50">
+              KI-Interpretation Ihrer Eingabe
             </div>
           </div>
         </div>
@@ -82,6 +82,22 @@ export function DecisionSuggestion({
       <div className="mb-4 px-4 py-3 rounded-xl bg-black/5 border border-black/10">
         <div className="text-[11px] text-black/50 mb-1">Ihre Eingabe</div>
         <div className="text-sm text-black/70 italic">{`"${originalInput}"`}</div>
+      </div>
+
+      {/* 5 Domain-specific suggestions chips */}
+      <div className="mb-4">
+        <div className="text-xs text-black/50 mb-2">Relevante Aspekte fuer diesen Bereich:</div>
+        <div className="flex flex-wrap gap-2">
+          {domainSuggestions.map((suggestion, index) => (
+            <div
+              key={index}
+              className="px-3 py-1.5 rounded-full bg-black/5 border border-black/10 text-xs text-black/70 hover:bg-black/10 transition cursor-default"
+              title={suggestion.description}
+            >
+              {suggestion.label}
+            </div>
+          ))}
+        </div>
       </div>
 
       {/* Suggestion sections */}
@@ -274,7 +290,7 @@ export function DecisionSuggestion({
           className="flex-1 px-6 py-3 rounded-full text-sm font-semibold text-white transition shadow-lg hover:shadow-xl active:scale-[0.99]"
           style={{ background: "#0b0f14" }}
         >
-          Vorschlage ubernehmen
+          Vorschlaege uebernehmen
         </button>
         <button
           onClick={() => onEdit(interpretation)}
@@ -292,7 +308,7 @@ export function DecisionSuggestion({
 
       {/* Hint */}
       <div className="mt-4 text-center text-xs text-black/45">
-        Sie konnen alle Vorschlage im nachsten Schritt anpassen oder erweitern.
+        Sie koennen alle Vorschlaege im naechsten Schritt anpassen oder erweitern.
       </div>
     </div>
   );

@@ -15,146 +15,9 @@ import {
 } from "@/app/lib/nwa/preset-icons";
 import { DecisionSuggestion } from "@/app/components/nwa/DecisionSuggestion";
 import type { AIDecisionInterpretation } from "@/app/lib/nwa/types";
+import { interpretDecisionInput, sanitizeInput } from "@/app/lib/nwa/interpretation-engine";
 
 type Phase = "intro" | "landing" | "analyzing" | "suggestion";
-
-// Client-side fallback interpretation for simple inputs
-type CategoryId = "economic" | "quality" | "strategic" | "risk" | "other";
-
-function createFallbackInterpretation(input: string): AIDecisionInterpretation {
-  const trimmed = input.trim();
-  
-  // Detect various comparison patterns:
-  // "X oder Y", "X vs Y", "X oder Y?", etc.
-  const orPattern = /^(.+?)\s+(?:oder|vs\.?|versus|oder\s+doch|oder\s+lieber)\s+(.+?)[\?\.\!]?$/i;
-  const match = trimmed.match(orPattern);
-  
-  // Also detect "Soll ich X oder Y" patterns
-  const sollIchPattern = /^(?:soll\s+ich|sollte\s+ich|welche[rns]?|was\s+soll|ich\s+(?:moechte|will|wuerde))\s+.*?(.+?)\s+(?:oder|vs\.?)\s+(.+?)[\?\.\!]?$/i;
-  const sollIchMatch = trimmed.match(sollIchPattern);
-  
-  let alternatives: { name: string; description: string | null }[] = [];
-  let title = trimmed;
-  let domain: AIDecisionInterpretation["domain"] = "other";
-  
-  // Use either match
-  const actualMatch = match || sollIchMatch;
-  
-  if (actualMatch) {
-    const alt1 = actualMatch[1].trim();
-    const alt2 = actualMatch[2].trim();
-    alternatives = [
-      { name: alt1, description: null },
-      { name: alt2, description: null },
-    ];
-    title = `Vergleich: ${alt1} vs. ${alt2}`;
-    
-    // Try to detect domain from keywords
-    const combined = (alt1 + " " + alt2).toLowerCase();
-    if (/bmw|audi|mercedes|vw|volkswagen|ford|toyota|auto|fahrzeug|wagen|pkw/.test(combined)) {
-      domain = "vehicle";
-      title = `Fahrzeugvergleich: ${alt1} vs. ${alt2}`;
-    } else if (/software|app|tool|crm|erp|system|programm/.test(combined)) {
-      domain = "software";
-      title = `Softwarevergleich: ${alt1} vs. ${alt2}`;
-    } else if (/lieferant|anbieter|supplier|partner|firma|unternehmen/.test(combined)) {
-      domain = "supplier";
-      title = `Lieferantenvergleich: ${alt1} vs. ${alt2}`;
-    } else if (/maschine|anlage|geraet|equipment/.test(combined)) {
-      domain = "machines";
-      title = `Maschinenvergleich: ${alt1} vs. ${alt2}`;
-    } else if (/mitarbeiter|bewerber|kandidat|personal/.test(combined)) {
-      domain = "employee";
-      title = `Kandidatenvergleich: ${alt1} vs. ${alt2}`;
-    } else if (/invest|aktie|fonds|anlage|rendite|kaufen|mieten/.test(combined)) {
-      domain = "investment";
-      title = `Investitionsentscheidung: ${alt1} vs. ${alt2}`;
-    } else if (/katze|hund|haustier|tier|pet/.test(combined)) {
-      domain = "personal";
-      title = `Persoenliche Entscheidung: ${alt1} vs. ${alt2}`;
-    } else {
-      domain = "personal";
-    }
-  } else {
-    // No pattern match - use input as title, create generic alternatives
-    alternatives = [
-      { name: "Option A", description: null },
-      { name: "Option B", description: null },
-    ];
-  }
-  
-  // Generate domain-appropriate default criteria
-  const criteriaMap: Record<string, { name: string; description: string; categoryId: CategoryId }[]> = {
-    vehicle: [
-      { name: "Anschaffungskosten", description: "Kaufpreis inkl. Nebenkosten", categoryId: "economic" },
-      { name: "Unterhaltskosten", description: "Laufende Kosten pro Jahr", categoryId: "economic" },
-      { name: "Zuverlaessigkeit", description: "Erwartete Pannenhaeufigkeit", categoryId: "quality" },
-      { name: "Komfort", description: "Fahrkomfort und Ausstattung", categoryId: "quality" },
-      { name: "Verbrauch", description: "Kraftstoff- oder Energieverbrauch", categoryId: "economic" },
-    ],
-    software: [
-      { name: "Lizenzkosten", description: "Einmalige oder laufende Kosten", categoryId: "economic" },
-      { name: "Funktionsumfang", description: "Abdeckung der Anforderungen", categoryId: "quality" },
-      { name: "Benutzerfreundlichkeit", description: "Intuitive Bedienung", categoryId: "quality" },
-      { name: "Integration", description: "Anbindung an bestehende Systeme", categoryId: "strategic" },
-      { name: "Support", description: "Qualitaet des Kundenservice", categoryId: "quality" },
-    ],
-    supplier: [
-      { name: "Preis", description: "Gesamtkosten des Angebots", categoryId: "economic" },
-      { name: "Qualitaet", description: "Produkt- oder Servicequalitaet", categoryId: "quality" },
-      { name: "Lieferzeit", description: "Schnelligkeit der Lieferung", categoryId: "quality" },
-      { name: "Zuverlaessigkeit", description: "Termintreue und Konstanz", categoryId: "risk" },
-      { name: "Flexibilitaet", description: "Anpassungsfaehigkeit an Aenderungen", categoryId: "strategic" },
-    ],
-    machines: [
-      { name: "Anschaffungspreis", description: "Kaufpreis der Maschine", categoryId: "economic" },
-      { name: "Leistung", description: "Technische Leistungsfaehigkeit", categoryId: "quality" },
-      { name: "Wartungskosten", description: "Laufende Wartungsaufwendungen", categoryId: "economic" },
-      { name: "Zuverlaessigkeit", description: "Ausfallsicherheit und Langlebigkeit", categoryId: "risk" },
-      { name: "Produktivitaet", description: "Output pro Zeiteinheit", categoryId: "quality" },
-    ],
-    investment: [
-      { name: "Kapitalaufwand", description: "Benoetigte Investitionssumme", categoryId: "economic" },
-      { name: "Renditeerwartung", description: "Erwartete Rendite", categoryId: "economic" },
-      { name: "Risiko", description: "Verlustrisiko der Investition", categoryId: "risk" },
-      { name: "Liquiditaet", description: "Verfuegbarkeit des Kapitals", categoryId: "strategic" },
-      { name: "Zeithorizont", description: "Anlagedauer", categoryId: "strategic" },
-    ],
-    employee: [
-      { name: "Qualifikation", description: "Fachliche Eignung", categoryId: "quality" },
-      { name: "Erfahrung", description: "Relevante Berufserfahrung", categoryId: "quality" },
-      { name: "Gehaltsvorstellung", description: "Erwartetes Gehalt", categoryId: "economic" },
-      { name: "Teamfit", description: "Passung ins Team", categoryId: "strategic" },
-      { name: "Entwicklungspotenzial", description: "Weiterentwicklungsmoeglichkeiten", categoryId: "strategic" },
-    ],
-    personal: [
-      { name: "Kosten", description: "Finanzielle Aufwendungen", categoryId: "economic" },
-      { name: "Nutzen", description: "Erwarteter persoenlicher Nutzen", categoryId: "quality" },
-      { name: "Zeitaufwand", description: "Benoetigte Zeit", categoryId: "economic" },
-      { name: "Freude", description: "Emotionaler Wert", categoryId: "quality" },
-      { name: "Risiko", description: "Moegliche negative Folgen", categoryId: "risk" },
-    ],
-    other: [
-      { name: "Kosten", description: "Gesamtkosten der Option", categoryId: "economic" },
-      { name: "Nutzen", description: "Erwarteter Mehrwert", categoryId: "quality" },
-      { name: "Aufwand", description: "Benoetigte Ressourcen", categoryId: "economic" },
-      { name: "Risiko", description: "Potenzielle Nachteile", categoryId: "risk" },
-      { name: "Strategischer Fit", description: "Passung zu langfristigen Zielen", categoryId: "strategic" },
-    ],
-  };
-  
-  const criteria = criteriaMap[domain] || criteriaMap.other;
-  
-  return {
-    title,
-    description: `Strukturierte Entscheidungsfindung: ${trimmed}`,
-    domain,
-    alternatives,
-    criteria,
-    constraints: null,
-    confidence: "medium",
-  };
-}
 
 const PRESETS: Array<{
   id: PresetId;
@@ -341,10 +204,10 @@ export default function LandingWithIntro() {
     router.push("/app");
   }, [router]);
 
-  // Analyze user input with AI - with robust fallback
+  // Analyze user input with AI - with robust fallback using interpretation engine
   const analyzeInput = useCallback(async () => {
-    const draft = text.trim();
-    if (!draft || draft.length < 5) return;
+    const draft = sanitizeInput(text);
+    if (!draft || draft.length < 3) return;
 
     setIsAnalyzing(true);
     setAiError(null);
@@ -369,32 +232,33 @@ export default function LandingWithIntro() {
         throw new Error("No interpretation returned");
       }
     } catch (err) {
-      console.error("[v0] AI interpretation error, using fallback:", err);
-      // Instead of showing error and going back, use client-side fallback
-      const fallback = createFallbackInterpretation(draft);
+      // Use robust client-side interpretation engine as fallback
+      const fallback = interpretDecisionInput(draft);
       setAiInterpretation(fallback);
       setPhase("suggestion");
-      // Show a subtle warning that we used fallback
-      setAiError("KI-Analyse nicht verfuegbar - automatische Interpretation wurde verwendet.");
+      // Show subtle notice that local interpretation was used
+      if (fallback.confidence === "low") {
+        setAiError("Automatische Interpretation wurde verwendet. Sie koennen alle Felder anpassen.");
+      }
     } finally {
       setIsAnalyzing(false);
     }
   }, [text]);
 
-  // Start from input - triggers AI analysis or uses fallback for simple inputs
+  // Start from input - triggers AI analysis or uses local interpretation for simple inputs
   const startFromInput = useCallback(() => {
-    const draft = text.trim();
+    const draft = sanitizeInput(text);
     if (!draft) return;
     
-    // For very short inputs (< 8 chars), use fallback immediately without API call
-    if (draft.length < 8) {
-      const fallback = createFallbackInterpretation(draft);
-      setAiInterpretation(fallback);
+    // For very short inputs (< 6 chars), use local interpretation immediately
+    if (draft.length < 6) {
+      const interpretation = interpretDecisionInput(draft);
+      setAiInterpretation(interpretation);
       setPhase("suggestion");
       return;
     }
     
-    // Trigger AI analysis (which has its own fallback on error)
+    // Trigger AI analysis (which has robust fallback on error)
     analyzeInput();
   }, [text, analyzeInput]);
 
