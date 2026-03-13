@@ -612,7 +612,7 @@ export default function LandingWithIntro() {
                 {/* Presets */}
                 <div className="mt-5 sm:mt-6 flex-1 min-h-0">
                   <div className="h-full flex flex-col">
-                    <div className="grid gap-3 sm:gap-4 grid-cols-2 md:grid-cols-3">
+                    <div className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-3">
                       {PRESET_CONFIG.map((p) => {
                         const presetTranslations = t.presets[p.id as keyof typeof t.presets];
                         return (
