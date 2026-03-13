@@ -16,55 +16,43 @@ import {
 import { DecisionSuggestion } from "@/app/components/nwa/DecisionSuggestion";
 import type { AIDecisionInterpretation } from "@/app/lib/nwa/types";
 import { interpretDecisionInput, sanitizeInput } from "@/app/lib/nwa/interpretation-engine";
+import { useTranslations } from "@/app/lib/i18n";
+import { LanguageSwitcher } from "@/app/components/LanguageSwitcher";
 
 type Phase = "intro" | "landing" | "analyzing" | "suggestion";
 
-const PRESETS: Array<{
+const PRESET_CONFIG: Array<{
   id: PresetId;
-  label: string;
-  hint: string;
   image: string;
   Icon: typeof SupplierIcon;
 }> = [
   {
     id: "supplier",
-    label: "Lieferantenauswahl",
-    hint: "Partner objektiv vergleichen",
     image: "/presets/Startseite_Lieferantenauswahl_komprimiert.jpg",
     Icon: SupplierIcon,
   },
   {
     id: "software",
-    label: "Softwarevergleich",
-    hint: "Tools systematisch bewerten",
     image: "/presets/Startseite_Softwarevergleich_komprimiert.jpg",
     Icon: SoftwareIcon,
   },
   {
     id: "investment",
-    label: "Investitionsentscheid",
-    hint: "Rendite & Risiken abwägen",
     image: "/presets/Startseite_Investitionsentscheid_komprimiert.jpg",
     Icon: InvestmentIcon,
   },
   {
     id: "machines",
-    label: "Maschinenkauf",
-    hint: "Leistung & Wirtschaftlichkeit",
     image: "/presets/Startseite_Maschinenkauf_komprimiert.jpg",
     Icon: MachinesIcon,
   },
   {
     id: "vehicle",
-    label: "Fahrzeuganschaffung",
-    hint: "Kosten & Nutzen optimieren",
     image: "/presets/Startseite_Fahrzeugauswahl_komprimiert.jpg",
     Icon: VehicleIcon,
   },
   {
     id: "employee",
-    label: "Mitarbeiterwahl",
-    hint: "Kandidaten fair vergleichen",
     image: "/presets/Startseite_Mitarbeiterwahl_komprimiert.jpg",
     Icon: EmployeeIcon,
   },
@@ -95,6 +83,7 @@ function markIntroShownNow(): void {
 
 export default function LandingWithIntro() {
   const router = useRouter();
+  const t = useTranslations();
 
   // Determine intro on client to avoid SSR mismatch
   const [phase, setPhase] = useState<Phase>("landing");
@@ -300,7 +289,7 @@ export default function LandingWithIntro() {
           <svg className="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
           </svg>
-          <span>Diese Website befindet sich noch im Aufbau – einige Funktionen sind in Entwicklung</span>
+          <span>{t.constructionBanner.text}</span>
           <svg className="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
           </svg>
@@ -413,27 +402,30 @@ export default function LandingWithIntro() {
 
               <nav className="hidden lg:flex items-center gap-6 text-sm text-black/55">
                 <a className="hover:text-black/80 transition" href="#principles">
-                  Prinzipien
+                  {t.landing.footer.principles}
                 </a>
                 <a className="hover:text-black/80 transition" href="#framework">
-                  Framework
+                  {t.landing.footer.framework}
                 </a>
                 <a className="hover:text-black/80 transition" href="/datenschutz">
-                  Datenschutz
+                  {t.landing.footer.privacy}
                 </a>
               </nav>
 
-              <button
-                onClick={() => router.push("/login")}
-                className={[
-                  "rounded-full px-4 py-2 text-sm font-semibold",
-                  "border border-black/10",
-                  "bg-white/70 backdrop-blur-md",
-                  "hover:bg-white/85 transition",
-                ].join(" ")}
-              >
-                Login
-              </button>
+              <div className="flex items-center gap-3">
+                <LanguageSwitcher />
+                <button
+                  onClick={() => router.push("/login")}
+                  className={[
+                    "rounded-full px-4 py-2 text-sm font-semibold",
+                    "border border-black/10",
+                    "bg-white/70 backdrop-blur-md",
+                    "hover:bg-white/85 transition",
+                  ].join(" ")}
+                >
+                  Login
+                </button>
+              </div>
             </div>
             <div className="h-px bg-black/10" />
           </div>
@@ -507,15 +499,13 @@ export default function LandingWithIntro() {
                     </div>
 
                     <h1 className="mt-2 text-3xl sm:text-4xl lg:text-5xl font-semibold tracking-tight text-slate-900">
-                      <span className="inline-block animate-fade-in-up">Entscheidungen.</span>{" "}
-                      <span className="inline-block animate-fade-in-up animation-delay-100 bg-gradient-to-r from-slate-900 via-slate-700 to-slate-900 bg-clip-text text-transparent">Strukturiert.</span>{" "}
-                      <span className="inline-block animate-fade-in-up animation-delay-200 opacity-60">Begründet.</span>
+                      <span className="inline-block animate-fade-in-up">{t.landing.headline.part1}</span>{" "}
+                      <span className="inline-block animate-fade-in-up animation-delay-100 bg-gradient-to-r from-slate-900 via-slate-700 to-slate-900 bg-clip-text text-transparent">{t.landing.headline.part2}</span>{" "}
+                      <span className="inline-block animate-fade-in-up animation-delay-200 opacity-60">{t.landing.headline.part3}</span>
                     </h1>
 
                     <p className="mt-4 text-sm sm:text-base text-black/55 leading-relaxed max-w-2xl">
-                      Beschreibe deine Entscheidung in eigenen Worten. Unsere KI analysiert 
-                      deinen Text und erstellt automatisch passende Alternativen und Bewertungskriterien 
-                      – keine Vorlage nötig, funktioniert mit jedem Thema.
+                      {t.landing.description}
                     </p>
                   </div>
                 </div>
@@ -614,7 +604,7 @@ export default function LandingWithIntro() {
 
                     <div className="mt-2 text-xs sm:text-sm text-black/45 flex items-center gap-2">
                       <span className="inline-flex h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                      Sofort starten – KI analysiert und strukturiert deine Eingabe automatisch
+                      {t.landing.searchHint}
                     </div>
                   </div>
                 </div>
@@ -623,58 +613,61 @@ export default function LandingWithIntro() {
                 <div className="mt-5 sm:mt-6 flex-1 min-h-0">
                   <div className="h-full flex flex-col">
                     <div className="grid gap-3 sm:gap-4 grid-cols-2 md:grid-cols-3">
-                      {PRESETS.map((p) => (
-                        <button
-                          key={p.id}
-                          onClick={() => startFromPreset(p.id)}
-                          className={[
-                            "group relative overflow-hidden rounded-3xl text-left",
-                            "border border-black/10",
-                            "shadow-[0_16px_42px_rgba(0,0,0,0.12)]",
-                            "transition duration-300 ease-out",
-                            "hover:-translate-y-0.5 hover:shadow-[0_22px_55px_rgba(0,0,0,0.16)]",
-                            "active:translate-y-0",
-                            "focus:outline-none focus-visible:ring-2 focus-visible:ring-black/20",
-                            "h-[clamp(132px,18.5vh,182px)]",
-                          ].join(" ")}
-                        >
-                          <div className="absolute inset-0">
-                            <Image
-                              src={p.image}
-                              alt=""
-                              fill
-                              sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 33vw"
-                              className="object-cover object-[74%_50%] scale-[1.10] transition-transform duration-500 ease-out group-hover:scale-[1.14]"
-                              priority={p.id === "supplier"}
-                            />
-                            <div className="absolute inset-0 bg-gradient-to-t from-black/72 via-black/16 to-black/0" />
-                            <div className="absolute inset-0 bg-[radial-gradient(900px_280px_at_20%_100%,rgba(0,0,0,0.35),transparent_65%)]" />
-                            <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition duration-300 landing-card-sheen" />
-                          </div>
+                      {PRESET_CONFIG.map((p) => {
+                        const presetTranslations = t.presets[p.id as keyof typeof t.presets];
+                        return (
+                          <button
+                            key={p.id}
+                            onClick={() => startFromPreset(p.id)}
+                            className={[
+                              "group relative overflow-hidden rounded-3xl text-left",
+                              "border border-black/10",
+                              "shadow-[0_16px_42px_rgba(0,0,0,0.12)]",
+                              "transition duration-300 ease-out",
+                              "hover:-translate-y-0.5 hover:shadow-[0_22px_55px_rgba(0,0,0,0.16)]",
+                              "active:translate-y-0",
+                              "focus:outline-none focus-visible:ring-2 focus-visible:ring-black/20",
+                              "h-[clamp(132px,18.5vh,182px)]",
+                            ].join(" ")}
+                          >
+                            <div className="absolute inset-0">
+                              <Image
+                                src={p.image}
+                                alt=""
+                                fill
+                                sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 33vw"
+                                className="object-cover object-[74%_50%] scale-[1.10] transition-transform duration-500 ease-out group-hover:scale-[1.14]"
+                                priority={p.id === "supplier"}
+                              />
+                              <div className="absolute inset-0 bg-gradient-to-t from-black/72 via-black/16 to-black/0" />
+                              <div className="absolute inset-0 bg-[radial-gradient(900px_280px_at_20%_100%,rgba(0,0,0,0.35),transparent_65%)]" />
+                              <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition duration-300 landing-card-sheen" />
+                            </div>
 
-                          <div className="relative z-10 p-3 sm:p-4">
-                            <div
-                              className="inline-flex items-start gap-3 rounded-2xl px-3.5 py-2.5 backdrop-blur-md"
-                              style={{
-                                background: "rgba(0,0,0,0.34)",
-                                border: "1px solid rgba(255,255,255,0.14)",
-                              }}
-                            >
-                              <div className="h-8 w-8 rounded-lg flex items-center justify-center bg-white/10 flex-shrink-0 mt-0.5">
-                                <p.Icon size={18} className="text-white/90" />
-                              </div>
-                              <div className="flex flex-col gap-0.5">
-                                <div className="text-sm sm:text-base font-semibold text-white leading-tight">
-                                  {p.label}
+                            <div className="relative z-10 p-3 sm:p-4">
+                              <div
+                                className="inline-flex items-start gap-3 rounded-2xl px-3.5 py-2.5 backdrop-blur-md"
+                                style={{
+                                  background: "rgba(0,0,0,0.34)",
+                                  border: "1px solid rgba(255,255,255,0.14)",
+                                }}
+                              >
+                                <div className="h-8 w-8 rounded-lg flex items-center justify-center bg-white/10 flex-shrink-0 mt-0.5">
+                                  <p.Icon size={18} className="text-white/90" />
                                 </div>
-                                <div className="text-[11px] sm:text-xs text-white/80">
-                                  {p.hint}
+                                <div className="flex flex-col gap-0.5">
+                                  <div className="text-sm sm:text-base font-semibold text-white leading-tight">
+                                    {presetTranslations.label}
+                                  </div>
+                                  <div className="text-[11px] sm:text-xs text-white/80">
+                                    {presetTranslations.hint}
+                                  </div>
                                 </div>
                               </div>
                             </div>
-                          </div>
-                        </button>
-                      ))}
+                          </button>
+                        );
+                      })}
                     </div>
 
                     <div className="mt-3 hidden sm:grid grid-cols-3 gap-3 text-[11px] text-black/45">
@@ -682,9 +675,9 @@ export default function LandingWithIntro() {
                         id="principles"
                         className="rounded-2xl border border-black/10 bg-white/55 backdrop-blur-md px-4 py-3"
                       >
-                        <div className="font-semibold text-black/70">Prinzipien</div>
+                        <div className="font-semibold text-black/70">{t.landing.footer.principles}</div>
                         <div className="mt-1">
-                          Transparenz, Fairness, Nachvollziehbarkeit – klare Kriterien statt Bauchgefühl.
+                          {t.landing.footer.principlesText}
                         </div>
                       </div>
 
@@ -692,25 +685,25 @@ export default function LandingWithIntro() {
                         id="framework"
                         className="rounded-2xl border border-black/10 bg-white/55 backdrop-blur-md px-4 py-3"
                       >
-                        <div className="font-semibold text-black/70">Framework</div>
+                        <div className="font-semibold text-black/70">{t.landing.footer.framework}</div>
                         <div className="mt-1">
-                          Kriterien – Gewichtung – Bewertung – Sensitivität – dokumentiert & vergleichbar.
+                          {t.landing.footer.frameworkText}
                         </div>
                       </div>
 
                       <div className="rounded-2xl border border-black/10 bg-white/55 backdrop-blur-md px-4 py-3">
-                        <div className="font-semibold text-black/70">Recht</div>
+                        <div className="font-semibold text-black/70">{t.landing.footer.legal}</div>
                         <div className="mt-1">
                           <a className="underline underline-offset-2 decoration-black/20" href="/datenschutz">
-                            Datenschutz (DSG)
+                            {t.landing.footer.privacy}
                           </a>{" "}
                           -{" "}
                           <a className="underline underline-offset-2 decoration-black/20" href="/agb">
-                            AGB
+                            {t.landing.footer.terms}
                           </a>{" "}
                           -{" "}
                           <a className="underline underline-offset-2 decoration-black/20" href="/impressum">
-                            Impressum
+                            {t.landing.footer.imprint}
                           </a>
                         </div>
                       </div>
@@ -725,13 +718,13 @@ export default function LandingWithIntro() {
                   <div>© {new Date().getFullYear()} Nutzwertanalyse.tool • Draft-first</div>
                   <div className="flex flex-wrap gap-x-3 gap-y-1">
                     <a href="/impressum" className="underline underline-offset-2 decoration-black/20">
-                      Impressum
+                      {t.landing.footer.imprint}
                     </a>
                     <a href="/agb" className="underline underline-offset-2 decoration-black/20">
-                      AGB
+                      {t.landing.footer.terms}
                     </a>
                     <a href="/datenschutz" className="underline underline-offset-2 decoration-black/20">
-                      Datenschutz
+                      {t.landing.footer.privacy}
                     </a>
                   </div>
                 </div>
