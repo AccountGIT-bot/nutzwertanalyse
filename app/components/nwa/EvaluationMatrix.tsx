@@ -3,11 +3,13 @@
 import { useState, useMemo, useCallback, useEffect } from "react";
 import { useAnalysis } from "@/app/lib/nwa/analysis-context";
 import { StepInfoButton } from "./StepInfoButton";
+import { useTranslations } from "@/app/lib/i18n";
 
 export function EvaluationMatrix() {
   const { state, setRating, canProceedToNext, knockoutFailures } = useAnalysis();
   const { alternatives, criteria, ratings, evaluators, decision } = state;
   const packageLevel = decision.packageLevel;
+  const t = useTranslations();
 
   const [selectedEvaluator, setSelectedEvaluator] = useState(
     evaluators[0]?.id || undefined

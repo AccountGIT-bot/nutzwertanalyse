@@ -4,6 +4,7 @@ import { useState, useMemo } from "react";
 import { useAnalysis } from "@/app/lib/nwa/analysis-context";
 import type { WeightingMethod } from "@/app/lib/nwa/types";
 import { StepInfoButton } from "./StepInfoButton";
+import { useTranslations } from "@/app/lib/i18n";
 
 const AHP_SCALE = [
   { value: 1 / 9, label: "1/9", desc: "Extrem weniger wichtig" },
@@ -27,6 +28,7 @@ export function WeightingModule() {
   } = useAnalysis();
   const { criteria, decision, weightingMethod, ahpComparisons, ahpConsistency } = state;
   const packageLevel = decision.packageLevel;
+  const t = useTranslations();
 
   const [activeAHPPair, setActiveAHPPair] = useState<[number, number] | null>(null);
 
@@ -302,27 +304,27 @@ export function WeightingModule() {
   // Determine available methods based on package
   const availableMethods: { id: WeightingMethod; label: string; desc: string }[] =
     packageLevel === "basic"
-      ? [{ id: "simple", label: "Einfache Gewichtung (1-5)", desc: "Schnell und intuitiv" }]
+      ? [{ id: "simple", label: t.weightingSetup.methods.simple, desc: t.weightingSetup.methods.simpleDesc }]
       : packageLevel === "advanced"
       ? [
-          { id: "percentage", label: "Prozentuale Gewichtung", desc: "Verteilung auf 100%" },
-          { id: "ahp-light", label: "AHP Light", desc: "Paarweiser Vergleich" },
+          { id: "percentage", label: t.weightingSetup.methods.percentage, desc: t.weightingSetup.methods.percentageDesc },
+          { id: "ahp-light", label: t.weightingSetup.methods.ahpLight, desc: t.weightingSetup.methods.ahpLightDesc },
         ]
       : [
-          { id: "percentage", label: "Prozentuale Gewichtung", desc: "Verteilung auf 100%" },
-          { id: "ahp-full", label: "Vollständige AHP", desc: "Mit Konsistenzprüfung" },
+          { id: "percentage", label: t.weightingSetup.methods.percentage, desc: t.weightingSetup.methods.percentageDesc },
+          { id: "ahp-full", label: t.weightingSetup.methods.ahpFull, desc: t.weightingSetup.methods.ahpFullDesc },
         ];
 
   return (
     <div className="space-y-6">
       <div>
         <div className="text-sm text-white/60 flex items-center gap-2">
-          Schritt 4
+          {t.steps.step} 4
           <StepInfoButton stepId="weighting" />
         </div>
-        <h2 className="mt-1 text-xl font-semibold text-white">Kriterien gewichten</h2>
+        <h2 className="mt-1 text-xl font-semibold text-white">{t.weightingSetup.title}</h2>
         <p className="mt-2 text-sm text-white/50">
-          Bestimmen Sie die relative Wichtigkeit der Kriterien.
+          {t.weightingSetup.description}
         </p>
       </div>
 
@@ -356,8 +358,8 @@ export function WeightingModule() {
       {!canProceedToNext && (
         <div className="text-sm text-[rgb(var(--accent))]/80">
           {weightingMethod === "percentage" && totalWeight !== 100
-            ? "Die Summe der Gewichtungen sollte 100% betragen."
-            : "Bitte vergeben Sie Gewichtungen für alle Kriterien."}
+            ? t.weightingSetup.validation.percentage
+            : t.weightingSetup.validation.general}
         </div>
       )}
     </div>

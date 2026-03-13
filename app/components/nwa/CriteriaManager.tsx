@@ -5,8 +5,10 @@ import { useAnalysis } from "@/app/lib/nwa/analysis-context";
 import { getTemplateByPreset } from "@/app/lib/nwa/templates";
 import type { Criterion } from "@/app/lib/nwa/types";
 import { StepInfoButton } from "./StepInfoButton";
+import { useTranslations } from "@/app/lib/i18n";
 
 export function CriteriaManager() {
+  const t = useTranslations();
 const {
     state,
     addCriterion,
@@ -79,14 +81,14 @@ const {
     <div className="space-y-6">
       <div>
         <div className="text-sm text-white/60 flex items-center gap-2">
-          Schritt 3
+          {t.steps.step} 3
           <StepInfoButton stepId="criteria" />
         </div>
-        <h2 className="mt-1 text-xl font-semibold text-white">Kriterien festlegen</h2>
+        <h2 className="mt-1 text-xl font-semibold text-white">{t.criteriaSetup.title}</h2>
         <p className="mt-2 text-sm text-white/50">
           {packageLevel === "basic"
-            ? "Definieren Sie die Kriterien, nach denen Sie die Alternativen bewerten möchten."
-            : "Legen Sie Kriterien fest und ordnen Sie diese bei Bedarf Kategorien zu."}
+            ? t.criteriaSetup.description
+            : t.criteriaSetup.descriptionAdvanced}
         </p>
       </div>
 
@@ -96,11 +98,10 @@ const {
           <div className="flex items-start gap-4">
             <div className="flex-1">
               <div className="font-medium text-white">
-                Vorlage verfügbar: {template.name}
+                {t.criteriaSetup.templateAvailable}: {template.name}
               </div>
               <div className="text-sm text-white/60 mt-1">
-                {template.criteria.length} vordefinierte Kriterien für diesen
-                Anwendungsfall
+                {template.criteria.length} {t.criteriaSetup.templateCriteria}
               </div>
             </div>
             <div className="flex gap-2">
@@ -108,7 +109,7 @@ const {
                 onClick={() => setShowTemplateHint(false)}
                 className="px-4 py-2 rounded-lg text-sm text-white/60 hover:text-white transition"
               >
-                Ignorieren
+                {t.common.ignore}
               </button>
               <button
                 onClick={handleUseTemplate}
@@ -118,7 +119,7 @@ const {
                   color: "white",
                 }}
               >
-                Vorlage nutzen
+                {t.common.useTemplate}
               </button>
             </div>
           </div>
@@ -132,7 +133,7 @@ const {
           value={newName}
           onChange={(e) => setNewName(e.target.value)}
           onKeyDown={handleKeyDown}
-          placeholder="Name des Kriteriums..."
+          placeholder={t.criteriaSetup.placeholder}
           className="flex-1 h-12 px-4 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/30 outline-none focus:border-[rgb(var(--accent))] focus:ring-2 focus:ring-[rgb(var(--accent))]/20 transition"
         />
 
@@ -142,7 +143,7 @@ const {
             onChange={(e) => setNewCategory(e.target.value)}
             className="h-12 px-4 rounded-xl bg-slate-800 border border-white/10 text-white outline-none focus:border-[rgb(var(--accent))] transition [&>option]:bg-slate-800 [&>option]:text-white"
           >
-            <option value="">Kategorie wählen...</option>
+            <option value="">{t.criteriaSetup.selectCategory}</option>
             {categories.map((cat) => (
               <option key={cat.id} value={cat.id}>
                 {cat.name}
@@ -161,7 +162,7 @@ const {
             border: `1px solid rgb(var(--accent) / 0.3)`,
           }}
         >
-          Hinzufügen
+          {t.common.add}
         </button>
       </div>
 
@@ -228,7 +229,7 @@ const {
                                 }
                                 className="h-9 px-3 rounded-lg bg-slate-800 border border-white/10 text-sm text-white/70 outline-none [&>option]:bg-slate-800 [&>option]:text-white"
                               >
-                                <option value="">Keine Kategorie</option>
+                                <option value="">{t.criteriaSetup.noCategory}</option>
                                 {categories.map((cat) => (
                                   <option key={cat.id} value={cat.id}>
                                     {cat.name}
@@ -249,12 +250,12 @@ const {
                                 }
                                 className="rounded border-white/20 bg-white/5 text-[rgb(var(--accent))] focus:ring-[rgb(var(--accent))]/20"
                               />
-                              K.O.-Kriterium
+                              {t.criteriaSetup.knockout}
                             </label>
 
                             {criterion.isKnockout && (
                               <div className="flex items-center gap-2">
-                                <span className="text-xs text-white/50">Min:</span>
+                                <span className="text-xs text-white/50">{t.criteriaSetup.knockoutThreshold}:</span>
                                 <input
                                   type="number"
                                   min={1}

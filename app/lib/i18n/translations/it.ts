@@ -1,25 +1,16 @@
 import type { Translations } from "./de";
 
 export const it: Translations = {
-  // Meta
   meta: {
-    title: "Nutzwertanalyse.tool",
-    description: "Prendi decisioni strutturate – con l'analisi del valore d'uso. Definire, ponderare, valutare e documentare i criteri.",
+    title: "Strumento di Analisi dell'Utilità",
+    description: "Prendi decisioni strutturate – con l'analisi dell'utilità. Definire, ponderare, valutare e documentare i criteri.",
   },
-  
-  // Construction Banner
   constructionBanner: {
     text: "Questo sito è in costruzione – alcune funzionalità sono in sviluppo",
   },
-  
-  // Landing Page
   landing: {
-    headline: {
-      part1: "Decisioni.",
-      part2: "Strutturate.",
-      part3: "Giustificate.",
-    },
-    description: "Descrivi la tua decisione con le tue parole. La nostra IA analizza il tuo testo e crea automaticamente alternative e criteri di valutazione adatti – nessun modello necessario, funziona con qualsiasi argomento.",
+    headline: { part1: "Decisioni.", part2: "Strutturate.", part3: "Giustificate." },
+    description: "Descrivi la tua decisione con parole tue. La nostra IA analizza il tuo testo e crea automaticamente alternative e criteri di valutazione adatti.",
     searchPlaceholder: "Descrivi la tua decisione...",
     searchHint: "Inizia subito – l'IA analizza e struttura il tuo input automaticamente",
     orChooseTemplate: "Oppure scegli un modello",
@@ -27,128 +18,137 @@ export const it: Translations = {
       principles: "Principi",
       principlesText: "Trasparenza, equità, tracciabilità – criteri chiari invece dell'istinto.",
       framework: "Framework",
-      frameworkText: "Criteri – Ponderazione – Valutazione – Sensibilità – documentato & comparabile.",
+      frameworkText: "Criteri – Ponderazione – Valutazione – Sensibilità – documentato e comparabile.",
       legal: "Legale",
       imprint: "Impronta",
       privacy: "Privacy",
       terms: "Termini",
     },
   },
-  
-  // Presets
   presets: {
-    supplier: {
-      label: "Selezione fornitore",
-      hint: "Confronta i partner oggettivamente",
-    },
-    software: {
-      label: "Confronto software",
-      hint: "Valuta gli strumenti sistematicamente",
-    },
-    investment: {
-      label: "Decisione di investimento",
-      hint: "Valuta rendimenti & rischi",
-    },
-    machines: {
-      label: "Acquisto macchinari",
-      hint: "Prestazioni & efficienza",
-    },
-    vehicle: {
-      label: "Acquisto veicolo",
-      hint: "Ottimizza costi & benefici",
-    },
-    employee: {
-      label: "Selezione dipendente",
-      hint: "Confronta i candidati equamente",
-    },
+    supplier: { label: "Selezione fornitore", hint: "Confronta oggettivamente" },
+    software: { label: "Confronto software", hint: "Valuta sistematicamente" },
+    investment: { label: "Decisione di investimento", hint: "Valuta rendimenti e rischi" },
+    machines: { label: "Acquisto macchinari", hint: "Prestazioni ed efficienza" },
+    vehicle: { label: "Acquisto veicolo", hint: "Ottimizza costi e benefici" },
+    employee: { label: "Selezione dipendente", hint: "Confronta equamente" },
   },
-  
-  // Common
   common: {
-    back: "Indietro",
-    next: "Avanti",
-    cancel: "Annulla",
-    save: "Salva",
-    delete: "Elimina",
-    edit: "Modifica",
-    close: "Chiudi",
-    loading: "Caricamento...",
-    error: "Errore",
-    success: "Successo",
-    yes: "Sì",
-    no: "No",
-    or: "o",
-    and: "e",
+    back: "Indietro", next: "Avanti", cancel: "Annulla", save: "Salva",
+    delete: "Elimina", edit: "Modifica", close: "Chiudi", loading: "Caricamento...",
+    error: "Errore", success: "Successo", yes: "Sì", no: "No", or: "o", and: "e",
+    add: "Aggiungi", remove: "Rimuovi", ignore: "Ignora", useTemplate: "Usa modello",
+    examples: "Esempi", optional: "facoltativo",
   },
-  
-  // Analysis Wizard
+  steps: {
+    step: "Passo", result: "Risultato", decision: "Decisione", alternatives: "Alternative",
+    criteria: "Criteri", weighting: "Ponderazione", evaluation: "Valutazione", results: "Risultati",
+  },
   wizard: {
-    step1: "Passo 1",
-    step2: "Passo 2",
-    step3: "Passo 3",
-    step4: "Passo 4",
-    step5: "Passo 5",
-    step6: "Passo 6",
-    result: "Risultato",
-    defineDecision: "Definire la decisione",
-    strategicQuestion: "Domanda di decisione strategica",
-    defineAlternatives: "Definire le alternative",
-    defineCriteria: "Definire i criteri",
-    weightCriteria: "Ponderare i criteri",
-    rateAlternatives: "Valutare le alternative",
-    analysisResult: "Risultato dell'analisi & Raccomandazione",
     resetAnalysis: "Reimpostare l'analisi?",
-    resetConfirm: "Sei sicuro di voler reimpostare l'analisi? Tutti i dati inseriti verranno eliminati.",
-    reset: "Reimposta",
-    draftFound: "È stata trovata una bozza salvata. Vuoi ripristinarla?",
-    restore: "Ripristina",
-    discard: "Abbandona",
+    resetConfirm: "Sei sicuro? Tutti i dati verranno eliminati.",
+    reset: "Reimposta", draftFound: "Trovata una bozza. Vuoi ripristinarla?",
+    restore: "Ripristina", discard: "Abbandona",
   },
-  
-  // Decision Suggestion
+  decisionSetup: {
+    title: "Definire la decisione", titleBusiness: "Domanda strategica",
+    description: "Cosa vuoi decidere?",
+    descriptionAdvanced: "Definisci la decisione e i vincoli.",
+    descriptionBusiness: "Formula la domanda per documentazione conforme.",
+    decisionTitle: "Titolo della decisione", strategicQuestion: "Domanda strategica",
+    placeholderBasic: "es. Quale fornitore scegliere?",
+    placeholderBusiness: "es. Quale partner per l'espansione?",
+    descriptionLabel: "Descrizione / Contesto", constraintsLabel: "Vincoli",
+    documentationStandard: "Standard di documentazione",
+    documentationInfo: "Tutti gli input sono documentati per revisioni e conformità.",
+    validationError: "Inserisci un titolo.",
+  },
+  alternativesSetup: {
+    title: "Definire le alternative", description: "Quali opzioni sono disponibili?",
+    descriptionAdvanced: "Puoi anche documentare le ipotesi.",
+    placeholder: "Nome dell'alternativa...", shortDescription: "Descrizione breve (facoltativo)...",
+    assumptions: "Ipotesi", assumptionsPlaceholder: "Un'ipotesi per riga...",
+    maxReached: "Massimo raggiunto",
+  },
+  criteriaSetup: {
+    title: "Definire i criteri",
+    description: "Definisci i criteri di valutazione delle alternative.",
+    descriptionAdvanced: "Definisci i criteri e assegnali a categorie.",
+    placeholder: "Nome del criterio...", selectCategory: "Scegli categoria...",
+    noCategory: "Senza categoria", templateAvailable: "Modello disponibile",
+    templateCriteria: "criteri predefiniti", knockout: "Criterio eliminatorio",
+    knockoutThreshold: "Soglia min.", description_label: "Descrizione",
+    descriptionPlaceholder: "Descrizione (facoltativo)...", uncategorized: "Non categorizzato",
+  },
+  weightingSetup: {
+    title: "Ponderare i criteri", description: "Determina l'importanza relativa.",
+    methods: {
+      simple: "Ponderazione semplice", simpleDesc: "1-5 punti per criterio",
+      percentage: "Ponderazione %", percentageDesc: "Distribuzione al 100%",
+      ahpLight: "AHP semplice", ahpLightDesc: "Confronti a coppie",
+      ahpFull: "AHP completo", ahpFullDesc: "Con verifica coerenza",
+    },
+    validation: { percentage: "La somma deve essere 100%.", general: "Pondera tutti i criteri." },
+    total: "Totale", remaining: "Rimanente", consistency: "Coerenza",
+    consistencyOk: "Coerenza OK", consistencyWarning: "Incoerenze rilevate",
+    compare: "Confronta", vs: "vs.", equalImportance: "Ugualmente importante",
+    moreImportant: "più importante", lessImportant: "meno importante",
+  },
+  evaluationSetup: {
+    title: "Valutare le alternative", description: "Valuta ogni alternativa da 1 a 10.",
+    evaluator: "Valutatore", progress: "Progresso", weight: "Peso", min: "Min", knockout: "K.O.",
+    scale: {
+      1: "Molto scarso", 2: "Scarso", 3: "Sotto la media",
+      4: "Leggermente sotto", 5: "Medio", 6: "Leggermente sopra",
+      7: "Sopra la media", 8: "Buono", 9: "Molto buono", 10: "Eccellente",
+    },
+  },
+  resultsView: {
+    title: "Risultati e raccomandazione", recommendation: "Raccomandazione",
+    noRecommendation: "Nessuna raccomandazione chiara", confidence: "Fiducia",
+    confidenceHigh: "Alta", confidenceMedium: "Media", confidenceLow: "Bassa",
+    ranking: "Classifica", score: "Punteggio", normalized: "Normalizzato",
+    knockoutExcluded: "Escluso (K.O.)", sensitivity: "Analisi di sensibilità",
+    sensitivityDesc: "Mostra la sensibilità ai cambiamenti di ponderazione.",
+    impact: "Impatto", impactHigh: "Alto", impactMedium: "Medio", impactLow: "Basso",
+    detailedAnalysis: "Analisi dettagliata", perCriterion: "Per criterio",
+  },
   suggestion: {
-    aiAnalysis: "Analisi IA",
-    interpretedAs: "Abbiamo interpretato il tuo input come:",
-    editTitle: "Modifica titolo",
-    alternatives: "Alternative",
-    criteria: "Criteri",
-    lookingGood: "Sembra buono",
-    startAnalysis: "Inizia l'analisi",
-    customize: "Personalizza",
+    aiAnalysis: "Analisi IA", interpretedAs: "Abbiamo interpretato il tuo input come:",
+    editTitle: "Modifica titolo", alternatives: "Alternative", criteria: "Criteri",
+    lookingGood: "Sembra buono", startAnalysis: "Inizia", customize: "Personalizza",
   },
-  
-  // Packages
   packages: {
-    basic: "Basic",
-    advanced: "Avanzato",
-    business: "Business",
+    basic: "Basic", advanced: "Advanced", business: "Business",
     choosePackage: "Scegli il pacchetto",
     basicDesc: "Analisi semplice per decisioni rapide",
-    advancedDesc: "Analisi estesa con categorie e sensibilità",
-    businessDesc: "Analisi professionale per aziende con conformità",
+    advancedDesc: "Analisi estesa con categorie",
+    businessDesc: "Analisi professionale con conformità",
   },
-  
-  // Report
   report: {
-    exportPDF: "Esporta PDF",
-    generating: "Generazione...",
-    recommendation: "Raccomandazione",
-    ranking: "Classifica",
-    sensitivity: "Sensibilità",
-    confidence: "Fiducia",
-    high: "Alta",
-    medium: "Media",
-    low: "Bassa",
+    exportPDF: "Esporta PDF", generating: "Generazione...", title: "Analisi dell'utilità",
+    recommendation: "Raccomandazione", recommendedAlternative: "Alternativa raccomandata",
+    ranking: "Classifica", rank: "Rango", alternative: "Alternativa", score: "Punteggio",
+    normalized: "Normalizzato", sensitivity: "Sensibilità", sensitivityAnalysis: "Analisi di sensibilità",
+    criterion: "Criterio", weight: "Peso", impact: "Impatto", confidence: "Fiducia",
+    high: "Alto", medium: "Medio", low: "Basso", detailedAnalysis: "Analisi dettagliata",
+    methodology: "Metodologia", methodologyNotes: "Analisi condotta con il metodo dell'analisi dell'utilità.",
+    auditTrail: "Traccia di audit", riskAssessment: "Valutazione dei rischi",
+    knockoutCriteria: "Criteri K.O.", excluded: "Escluso", consistencyCheck: "Verifica coerenza",
+    consistencyPassed: "Coerenza OK", consistencyFailed: "Incoerenze rilevate",
+    generatedBy: "Generato con lo strumento di analisi", generatedOn: "Generato il",
+    options: {
+      title: "Opzioni del report", executiveSummary: "Riepilogo", detailedAnalysis: "Analisi dettagliata",
+      sensitivityAnalysis: "Sensibilità", riskAssessment: "Rischi",
+      auditTrail: "Traccia di audit", methodologyNotes: "Metodologia",
+    },
   },
-  
-  // Info Buttons
-  info: {
-    close: "Chiudi",
+  info: { close: "Chiudi", learnMore: "Scopri di più", tip: "Suggerimento", example: "Esempio", why: "Perché?" },
+  language: { switchLanguage: "Cambia lingua", currentLanguage: "Lingua attuale" },
+  categories: { economic: "Economico", quality: "Qualità", strategic: "Strategico", risk: "Rischio", other: "Altro" },
+  errors: {
+    required: "Campo obbligatorio.", minLength: "Almeno {min} caratteri.", maxLength: "Massimo {max} caratteri.",
+    invalidEmail: "Email non valida.", loadingFailed: "Caricamento fallito.", saveFailed: "Salvataggio fallito.",
+    exportFailed: "Esportazione fallita.",
   },
-  
-  // Language
-  language: {
-    switchLanguage: "Cambia lingua",
-    currentLanguage: "Lingua attuale",
-  },
-};
+} as const;

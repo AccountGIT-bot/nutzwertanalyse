@@ -4,10 +4,12 @@ import { useAnalysis } from "@/app/lib/nwa/analysis-context";
 import { getPresetContext } from "@/app/lib/nwa/preset-context";
 import { getPresetIcon, getDomainIcon, getDomainLabel } from "@/app/lib/nwa/preset-icons";
 import { StepInfoButton } from "./StepInfoButton";
+import { useTranslations } from "@/app/lib/i18n";
 
 export function DecisionSetup() {
   const { state, setDecision, canProceedToNext } = useAnalysis();
   const { decision } = state;
+  const t = useTranslations();
   const packageLevel = decision.packageLevel;
   
   // Get context-specific content based on preset or AI interpretation
@@ -51,10 +53,10 @@ export function DecisionSetup() {
           </div>
           <div className="flex-1 min-w-0">
             <div className="text-xs text-white/50 flex items-center gap-1.5">
-              Anwendungsbereich
+              {t.categories.other}
               {hasAIContext && (
                 <span className="px-1.5 py-0.5 rounded text-[10px] bg-white/10 text-white/60">
-                  KI-erkannt
+                  {t.suggestion.aiAnalysis}
                 </span>
               )}
             </div>
@@ -67,27 +69,27 @@ export function DecisionSetup() {
 
       <div>
         <div className="text-sm text-white/60 flex items-center gap-2">
-          Schritt 1
+          {t.steps.step} 1
           <StepInfoButton stepId="setup" />
         </div>
         <h2 className="mt-1 text-xl font-semibold text-white">
           {packageLevel === "business"
-            ? "Strategische Entscheidungsfrage"
-            : "Entscheidung definieren"}
+            ? t.decisionSetup.titleBusiness
+            : t.decisionSetup.title}
         </h2>
         <p className="mt-2 text-sm text-white/50">
           {packageLevel === "basic"
-            ? presetContext.titleHelperText
+            ? t.decisionSetup.description
             : packageLevel === "advanced"
-            ? "Definieren Sie die Entscheidung und relevante Randbedingungen."
-            : "Formulieren Sie die strategische Fragestellung für eine auditfähige Dokumentation."}
+            ? t.decisionSetup.descriptionAdvanced
+            : t.decisionSetup.descriptionBusiness}
         </p>
       </div>
 
       <div className="space-y-4">
         <div>
           <label className="block text-sm font-medium text-white/70 mb-2">
-            {packageLevel === "business" ? "Strategische Fragestellung" : "Entscheidungstitel"}
+            {packageLevel === "business" ? t.decisionSetup.strategicQuestion : t.decisionSetup.decisionTitle}
           </label>
           <input
             type="text"
@@ -95,7 +97,7 @@ export function DecisionSetup() {
             onChange={(e) => setDecision({ title: e.target.value })}
             placeholder={
               packageLevel === "business"
-                ? "z.B. Welcher strategische Partner für die Marktexpansion?"
+                ? t.decisionSetup.placeholderBusiness
                 : titlePlaceholder
             }
             className="w-full h-12 px-4 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/30 outline-none focus:border-[rgb(var(--accent))] focus:ring-2 focus:ring-[rgb(var(--accent))]/20 transition"
@@ -103,7 +105,7 @@ export function DecisionSetup() {
           {/* Example hints based on preset */}
           {presetContext.titleExamples.length > 0 && !decision.title && (
             <div className="mt-2 text-xs text-white/40">
-              <span className="text-white/50">Beispiele: </span>
+              <span className="text-white/50">{t.common.examples}: </span>
               {presetContext.titleExamples.slice(0, 2).join(" | ")}
             </div>
           )}
@@ -111,7 +113,7 @@ export function DecisionSetup() {
 
         <div>
           <label className="block text-sm font-medium text-white/70 mb-2">
-            Beschreibung / Kontext
+            {t.decisionSetup.descriptionLabel}
           </label>
           <textarea
             value={decision.description}
@@ -125,7 +127,7 @@ export function DecisionSetup() {
         {(packageLevel === "advanced" || packageLevel === "business") && (
           <div>
             <label className="block text-sm font-medium text-white/70 mb-2">
-              Randbedingungen & Einschränkungen
+              {t.decisionSetup.constraintsLabel}
             </label>
             <textarea
               value={decision.constraints || ""}
@@ -137,7 +139,7 @@ export function DecisionSetup() {
             {/* Constraint examples */}
             {presetContext.constraintsExamples.length > 0 && !decision.constraints && (
               <div className="mt-2 text-xs text-white/40">
-                <span className="text-white/50">Beispiele: </span>
+                <span className="text-white/50">{t.common.examples}: </span>
                 {presetContext.constraintsExamples.slice(0, 2).join(" | ")}
               </div>
             )}
@@ -148,12 +150,10 @@ export function DecisionSetup() {
           <div className="rounded-xl border border-white/10 bg-white/5 p-4">
             <div className="flex items-center gap-2 text-sm font-medium text-white/70 mb-3">
               <span className="h-2 w-2 rounded-full bg-[rgb(var(--accent))]" />
-              Dokumentationsstandard
+              {t.decisionSetup.documentationStandard}
             </div>
             <p className="text-sm text-white/50">
-              Alle Eingaben werden vollständig dokumentiert und können später für 
-              Revisionen, Gremienentscheide oder Compliance-Nachweise verwendet werden.
-              Formulieren Sie sachlich und nachvollziehbar.
+              {t.decisionSetup.documentationInfo}
             </p>
           </div>
         )}
@@ -162,7 +162,7 @@ export function DecisionSetup() {
       {/* Validation feedback */}
       {!canProceedToNext && decision.title.trim().length === 0 && (
         <div className="text-sm text-[rgb(var(--accent))]/80">
-          Bitte geben Sie einen Titel für die Entscheidung ein.
+          {t.decisionSetup.validationError}
         </div>
       )}
     </div>
