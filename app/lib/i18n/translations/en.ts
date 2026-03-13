@@ -1,6 +1,4 @@
-import type { Translations } from "./de";
-
-export const en: Translations = {
+export const en = {
   // Meta
   meta: {
     title: "Utility Analysis Tool",

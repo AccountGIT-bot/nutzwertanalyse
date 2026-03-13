@@ -1,6 +1,4 @@
-import type { Translations } from "./de";
-
-export const es: Translations = {
+export const es = {
   meta: {
     title: "Herramienta de Análisis de Utilidad",
     description: "Toma decisiones estructuradas – con análisis de utilidad. Definir, ponderar, evaluar y documentar criterios.",
