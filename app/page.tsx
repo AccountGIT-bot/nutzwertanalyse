@@ -293,7 +293,7 @@ export default function LandingWithIntro() {
   }, [text, goToApp]);
 
   return (
-    <main className="relative min-h-[100svh] text-slate-900 overflow-x-hidden pt-10">
+    <main className="relative min-h-[100svh] text-slate-900 overflow-x-hidden pt-11">
       {/* Construction Banner */}
       <div className="fixed top-0 left-0 right-0 z-50 bg-gradient-to-r from-amber-500 via-orange-500 to-amber-500 text-white py-2 px-4 text-center text-sm font-medium shadow-lg">
         <div className="flex items-center justify-center gap-2">
