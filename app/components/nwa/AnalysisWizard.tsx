@@ -268,23 +268,13 @@ export function AnalysisWizard() {
                   </div>
                 </div>
               </div>
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={handleHomeClick}
-                  className="p-2 rounded-lg text-white/50 hover:text-white/70 hover:bg-white/10 transition"
-                  title={t.wizard.goHome || "Zur Startseite"}
-                  aria-label={t.wizard.goHome || "Zur Startseite"}
-                >
-                  <Home size={18} />
-                </button>
-                <button
-                  onClick={handleResetClick}
-                  className="px-3 py-1.5 rounded-lg text-xs font-medium text-white/50 hover:text-white/70 hover:bg-white/10 transition"
-                  title={t.wizard.resetAnalysis}
-                >
-                  {t.wizard.reset}
-                </button>
-              </div>
+              <button
+                onClick={handleResetClick}
+                className="px-3 py-1.5 rounded-lg text-xs font-medium text-white/50 hover:text-white/70 hover:bg-white/10 transition"
+                title={t.wizard.resetAnalysis}
+              >
+                {t.wizard.reset}
+              </button>
             </div>
 
             <div className="mb-3">

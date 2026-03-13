@@ -150,14 +150,14 @@ export default function AppPage() {
   if (phase === "select") {
     return (
       <main className="min-h-[100svh] text-white">
-        {/* Header - Light theme */}
+        {/* Header - Light theme with smooth transition to dark content */}
         <header className="sticky top-0 z-30">
           <div
             className={[
-              "transition-all duration-300",
+              "transition-all duration-300 relative",
               scrolled
-                ? "bg-white/95 backdrop-blur-xl shadow-[0_4px_20px_rgba(0,0,0,0.08)]"
-                : "bg-white/90 backdrop-blur-sm",
+                ? "bg-white shadow-[0_4px_30px_rgba(0,0,0,0.15)]"
+                : "bg-white",
             ].join(" ")}
           >
             <div className="mx-auto max-w-6xl px-5 sm:px-6 h-[68px] sm:h-[76px] flex items-center justify-between">
@@ -197,7 +197,8 @@ export default function AppPage() {
                 </button>
               </div>
             </div>
-            <div className="h-px bg-slate-200/60" />
+            {/* Gradient fade from white to transparent for smooth transition */}
+            <div className="absolute left-0 right-0 top-full h-8 bg-gradient-to-b from-white/80 via-white/40 to-transparent pointer-events-none" />
           </div>
         </header>
 
@@ -366,21 +367,25 @@ export default function AppPage() {
           </div>
         </section>
 
-        <footer className="pb-6">
-          <div className="mx-auto max-w-6xl px-5 sm:px-6">
-            <div className="h-px bg-white/10" />
-            <div className="pt-3 text-[10px] sm:text-[11px] text-white/40 flex flex-col sm:flex-row gap-2 sm:items-center sm:justify-between">
-              <div>© {new Date().getFullYear()} Nutzwertanalyse.com</div>
-              <div className="flex flex-wrap gap-x-3 gap-y-1">
-                <a href="/impressum" className="underline underline-offset-2 decoration-white/20">
-                  {t.landing.footer.imprint}
-                </a>
-                <a href="/agb" className="underline underline-offset-2 decoration-white/20">
-                  {t.landing.footer.terms}
-                </a>
-                <a href="/datenschutz" className="underline underline-offset-2 decoration-white/20">
-                  {t.landing.footer.privacy}
-                </a>
+        <footer className="relative pb-6">
+          {/* Gradient fade from content to footer */}
+          <div className="absolute -top-12 left-0 right-0 h-12 bg-gradient-to-b from-transparent via-white/20 to-white/60 pointer-events-none" />
+          <div className="relative bg-white/60 backdrop-blur-sm pt-4 rounded-t-3xl mx-4 sm:mx-6">
+            <div className="mx-auto max-w-6xl px-5 sm:px-6">
+              <div className="h-px bg-slate-200/60" />
+              <div className="pt-3 pb-2 text-[10px] sm:text-[11px] text-slate-500 flex flex-col sm:flex-row gap-2 sm:items-center sm:justify-between">
+                <div>© {new Date().getFullYear()} Nutzwertanalyse.com</div>
+                <div className="flex flex-wrap gap-x-3 gap-y-1">
+                  <a href="/impressum" className="underline underline-offset-2 decoration-slate-300 hover:text-slate-700 transition">
+                    {t.landing.footer.imprint}
+                  </a>
+                  <a href="/agb" className="underline underline-offset-2 decoration-slate-300 hover:text-slate-700 transition">
+                    {t.landing.footer.terms}
+                  </a>
+                  <a href="/datenschutz" className="underline underline-offset-2 decoration-slate-300 hover:text-slate-700 transition">
+                    {t.landing.footer.privacy}
+                  </a>
+                </div>
               </div>
             </div>
           </div>
@@ -398,14 +403,14 @@ export default function AppPage() {
       initialAIInterpretation={initialAIInterpretation}
     >
       <main className="min-h-[100svh] text-white">
-        {/* Header - Light theme */}
+        {/* Header - Light theme with smooth transition */}
         <header className="sticky top-0 z-30">
           <div
             className={[
-              "transition-all duration-300",
+              "transition-all duration-300 relative",
               scrolled
-                ? "bg-white/95 backdrop-blur-xl shadow-[0_4px_20px_rgba(0,0,0,0.08)]"
-                : "bg-white/90 backdrop-blur-sm",
+                ? "bg-white shadow-[0_4px_30px_rgba(0,0,0,0.15)]"
+                : "bg-white",
             ].join(" ")}
           >
             <div className="mx-auto max-w-6xl px-5 sm:px-6 h-[68px] sm:h-[76px] flex items-center justify-between">
@@ -452,7 +457,8 @@ export default function AppPage() {
                 </button>
               </div>
             </div>
-            <div className="h-px bg-slate-200/60" />
+            {/* Gradient fade from white to transparent for smooth transition */}
+            <div className="absolute left-0 right-0 top-full h-8 bg-gradient-to-b from-white/80 via-white/40 to-transparent pointer-events-none" />
           </div>
         </header>
 
