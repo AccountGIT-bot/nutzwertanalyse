@@ -1,11 +1,11 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, type ReactNode } from "react";
 import { useI18n, locales, localeNames, localeCodes, type Locale } from "@/app/lib/i18n";
 
 // SVG flag icons for a cleaner look than emoji flags
 const FlagIcon = ({ locale, className = "w-5 h-4" }: { locale: Locale; className?: string }) => {
-  const flags: Record<Locale, JSX.Element> = {
+  const flags: Record<Locale, ReactNode> = {
     de: (
       <svg className={className} viewBox="0 0 640 480" aria-hidden="true">
         <path fill="#ffce00" d="M0 320h640v160H0z" />
