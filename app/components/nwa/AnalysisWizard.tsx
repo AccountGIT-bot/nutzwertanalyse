@@ -305,19 +305,7 @@ export function AnalysisWizard() {
               <div className="text-sm text-white/40">
                 Schritt {currentStepIndex + 1} von {STEPS.length}
               </div>
-              {currentStep === "results" ? (
-                <button
-                  onClick={() => {
-                    // Trigger the export in ReportGenerator via DOM event
-                    const exportBtn = document.querySelector('[data-export-pdf]') as HTMLButtonElement;
-                    if (exportBtn) exportBtn.click();
-                  }}
-                  className="px-6 py-2.5 rounded-xl text-sm font-semibold transition hover:brightness-110"
-                  style={{ background: "rgb(var(--accent))", color: "white" }}
-                >
-                  Export PDF
-                </button>
-              ) : (
+              {currentStep !== "results" && (
                 <button
                   onClick={goNext}
                   disabled={!canProceedToNext}
