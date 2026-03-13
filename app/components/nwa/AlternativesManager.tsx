@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useAnalysis } from "@/app/lib/nwa/analysis-context";
 import type { Alternative } from "@/app/lib/nwa/types";
 import { getPresetContext } from "@/app/lib/nwa/preset-context";
+import { StepInfoButton } from "./StepInfoButton";
 
 export function AlternativesManager() {
   const { state, addAlternative, updateAlternative, removeAlternative, duplicateAlternative, canProceedToNext } = useAnalysis();
@@ -47,7 +48,10 @@ export function AlternativesManager() {
   return (
     <div className="space-y-6">
       <div>
-        <div className="text-sm text-white/60">Schritt 2</div>
+        <div className="text-sm text-white/60 flex items-center gap-2">
+          Schritt 2
+          <StepInfoButton stepId="alternatives" />
+        </div>
         <h2 className="mt-1 text-xl font-semibold text-white">Alternativen definieren</h2>
         <p className="mt-2 text-sm text-white/50">
           {presetContext.alternativeHelperText}

@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import { useAnalysis } from "@/app/lib/nwa/analysis-context";
 import { getRecommendation } from "@/app/lib/nwa/calculate";
 import { ReportGenerator } from "./ReportGenerator";
+import { StepInfoButton } from "./StepInfoButton";
 
 export function ResultsDashboard() {
   const { state, knockoutFailures } = useAnalysis();
@@ -39,7 +40,10 @@ export function ResultsDashboard() {
   return (
     <div className="space-y-6">
       <div>
-        <div className="text-sm text-white/60">Ergebnis</div>
+        <div className="text-sm text-white/60 flex items-center gap-2">
+          Schritt 6 – Ergebnis
+          <StepInfoButton stepId="results" />
+        </div>
         <h2 className="mt-1 text-xl font-semibold text-white">
           Analyse-Ergebnis & Entscheidungsempfehlung
         </h2>

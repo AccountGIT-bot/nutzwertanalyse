@@ -3,6 +3,7 @@
 import { useAnalysis } from "@/app/lib/nwa/analysis-context";
 import { getPresetContext } from "@/app/lib/nwa/preset-context";
 import { getPresetIcon, getDomainIcon, getDomainLabel } from "@/app/lib/nwa/preset-icons";
+import { StepInfoButton } from "./StepInfoButton";
 
 export function DecisionSetup() {
   const { state, setDecision, canProceedToNext } = useAnalysis();
@@ -65,7 +66,10 @@ export function DecisionSetup() {
       )}
 
       <div>
-        <div className="text-sm text-white/60">Schritt 1</div>
+        <div className="text-sm text-white/60 flex items-center gap-2">
+          Schritt 1
+          <StepInfoButton stepId="setup" />
+        </div>
         <h2 className="mt-1 text-xl font-semibold text-white">
           {packageLevel === "business"
             ? "Strategische Entscheidungsfrage"

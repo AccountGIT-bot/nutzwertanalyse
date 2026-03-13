@@ -2,6 +2,7 @@
 
 import { useState, useMemo, useCallback, useEffect } from "react";
 import { useAnalysis } from "@/app/lib/nwa/analysis-context";
+import { StepInfoButton } from "./StepInfoButton";
 
 export function EvaluationMatrix() {
   const { state, setRating, canProceedToNext, knockoutFailures } = useAnalysis();
@@ -72,7 +73,10 @@ export function EvaluationMatrix() {
   return (
     <div className="space-y-6">
       <div>
-        <div className="text-sm text-white/60">Schritt 5</div>
+        <div className="text-sm text-white/60 flex items-center gap-2">
+          Schritt 5
+          <StepInfoButton stepId="rating" />
+        </div>
         <h2 className="mt-1 text-xl font-semibold text-white">
           Alternativen bewerten
         </h2>

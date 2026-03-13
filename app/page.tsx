@@ -294,19 +294,28 @@ export default function LandingWithIntro() {
 
   return (
     <main className="relative min-h-[100svh] text-slate-900 overflow-x-hidden">
-      {/* Premium Background */}
+      {/* Premium Background - Lebendig mit subtilen Farbakzenten */}
       <div className="absolute inset-0 -z-10">
-        <div className="absolute inset-0 bg-gradient-to-b from-[#fbfbfb] via-[#f3f6f6] to-[#eef2f2]" />
+        {/* Base gradient - warm to cool */}
+        <div className="absolute inset-0 bg-gradient-to-br from-[#faf9f7] via-[#f5f3f0] to-[#eff2f4]" />
+        
+        {/* Animated subtle color orbs */}
+        <div className="absolute top-[10%] left-[10%] w-[600px] h-[600px] rounded-full bg-blue-400/[0.06] blur-[100px] animate-float-slow" />
+        <div className="absolute top-[20%] right-[5%] w-[500px] h-[500px] rounded-full bg-purple-400/[0.05] blur-[80px] animate-float-slower" />
+        <div className="absolute bottom-[0%] left-[30%] w-[700px] h-[500px] rounded-full bg-emerald-400/[0.04] blur-[100px] animate-float-slow" />
+        
+        {/* Depth gradients */}
         <div
           className="absolute inset-0"
           style={{
             background:
-              "radial-gradient(900px 650px at 18% 18%, rgba(0,0,0,0.05), transparent 62%), radial-gradient(850px 600px at 85% 40%, rgba(0,0,0,0.035), transparent 62%), radial-gradient(900px 700px at 50% 115%, rgba(0,0,0,0.07), transparent 72%)",
+              "radial-gradient(900px 650px at 18% 18%, rgba(0,0,0,0.04), transparent 62%), radial-gradient(850px 600px at 85% 40%, rgba(0,0,0,0.025), transparent 62%)",
           }}
         />
-        <div className="absolute inset-0 landing-grain opacity-[0.18]" />
-        <div className="absolute inset-0 landing-sheen2 opacity-[0.60]" />
-        <div className="absolute inset-0 bg-[radial-gradient(1200px_700px_at_50%_30%,transparent_55%,rgba(0,0,0,0.10)_100%)]" />
+        
+        <div className="absolute inset-0 landing-grain opacity-[0.12]" />
+        <div className="absolute inset-0 landing-sheen2 opacity-[0.55]" />
+        <div className="absolute inset-0 bg-[radial-gradient(1200px_700px_at_50%_30%,transparent_55%,rgba(0,0,0,0.08)_100%)]" />
       </div>
 
       {/* Fog Overlay only when intro is active/just ended */}
@@ -734,6 +743,20 @@ export default function LandingWithIntro() {
         .animation-delay-200 {
           animation-delay: 0.2s;
           opacity: 0;
+        }
+        @keyframes float-slow {
+          0%, 100% { transform: translate(0, 0) scale(1); }
+          50% { transform: translate(20px, -20px) scale(1.05); }
+        }
+        @keyframes float-slower {
+          0%, 100% { transform: translate(0, 0) scale(1); }
+          50% { transform: translate(-15px, 15px) scale(0.95); }
+        }
+        .animate-float-slow {
+          animation: float-slow 20s ease-in-out infinite;
+        }
+        .animate-float-slower {
+          animation: float-slower 25s ease-in-out infinite;
         }
         .landing-sheen2 {
           background: radial-gradient(

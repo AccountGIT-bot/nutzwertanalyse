@@ -3,6 +3,7 @@
 import { useState, useMemo } from "react";
 import { useAnalysis } from "@/app/lib/nwa/analysis-context";
 import type { WeightingMethod } from "@/app/lib/nwa/types";
+import { StepInfoButton } from "./StepInfoButton";
 
 const AHP_SCALE = [
   { value: 1 / 9, label: "1/9", desc: "Extrem weniger wichtig" },
@@ -315,7 +316,10 @@ export function WeightingModule() {
   return (
     <div className="space-y-6">
       <div>
-        <div className="text-sm text-white/60">Schritt 4</div>
+        <div className="text-sm text-white/60 flex items-center gap-2">
+          Schritt 4
+          <StepInfoButton stepId="weighting" />
+        </div>
         <h2 className="mt-1 text-xl font-semibold text-white">Kriterien gewichten</h2>
         <p className="mt-2 text-sm text-white/50">
           Bestimmen Sie die relative Wichtigkeit der Kriterien.
