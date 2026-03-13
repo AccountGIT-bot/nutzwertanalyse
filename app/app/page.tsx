@@ -150,14 +150,14 @@ export default function AppPage() {
   if (phase === "select") {
     return (
       <main className="min-h-[100svh] text-white">
-        {/* Header */}
+        {/* Header - Light theme */}
         <header className="sticky top-0 z-30">
           <div
             className={[
               "transition-all duration-300",
               scrolled
-                ? "bg-black/70 backdrop-blur-xl shadow-[0_12px_30px_rgba(0,0,0,0.3)]"
-                : "bg-transparent",
+                ? "bg-white/95 backdrop-blur-xl shadow-[0_4px_20px_rgba(0,0,0,0.08)]"
+                : "bg-white/90 backdrop-blur-sm",
             ].join(" ")}
           >
             <div className="mx-auto max-w-6xl px-5 sm:px-6 h-[68px] sm:h-[76px] flex items-center justify-between">
@@ -167,20 +167,14 @@ export default function AppPage() {
                 aria-label="Zur Startseite"
                 title="Startseite"
               >
-                <div
-                  className="h-10 w-10 rounded-2xl border grid place-items-center"
-                  style={{
-                    background: `rgb(var(--accent) / 0.1)`,
-                    borderColor: `rgb(var(--accent) / 0.3)`,
-                  }}
-                >
-                  <span className="text-[rgb(var(--accent))] text-lg">⌁</span>
+                <div className="h-10 w-10 rounded-2xl overflow-hidden">
+                  <img src="/images/logo.webp" alt="Logo" className="h-full w-full object-contain" />
                 </div>
                 <div className="leading-tight">
-                  <div className="text-sm sm:text-base font-semibold tracking-tight text-white">
-                    {t.brand.name}<span className="opacity-60">{t.brand.domain}</span>
+                  <div className="text-sm sm:text-base font-semibold tracking-tight text-slate-800">
+                    {t.brand.name}<span className="text-slate-400">{t.brand.domain}</span>
                   </div>
-                  <div className="text-[11px] sm:text-xs text-white/45">
+                  <div className="text-[11px] sm:text-xs text-slate-500">
                     {t.packageSelect.headerSubtitle} • {t.packageSelect.headerSubtitle2}
                   </div>
                 </div>
@@ -189,7 +183,7 @@ export default function AppPage() {
               <div className="flex items-center gap-2">
                 <button
                   onClick={() => router.push("/")}
-                  className="p-2 rounded-lg text-white/50 hover:text-white/70 hover:bg-white/10 transition"
+                  className="p-2 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition"
                   title={t.wizard?.goHome || "Zur Startseite"}
                   aria-label={t.wizard?.goHome || "Zur Startseite"}
                 >
@@ -197,13 +191,13 @@ export default function AppPage() {
                 </button>
                 <button
                   onClick={() => router.push("/login")}
-                  className="rounded-full px-4 py-2 text-sm font-semibold border border-white/10 bg-white/5 hover:bg-white/10 transition"
+                  className="rounded-full px-4 py-2 text-sm font-semibold border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 transition shadow-sm"
                 >
                   {t.packageSelect.login}
                 </button>
               </div>
             </div>
-            <div className="h-px bg-white/10" />
+            <div className="h-px bg-slate-200/60" />
           </div>
         </header>
 
@@ -404,14 +398,14 @@ export default function AppPage() {
       initialAIInterpretation={initialAIInterpretation}
     >
       <main className="min-h-[100svh] text-white">
-        {/* Header */}
+        {/* Header - Light theme */}
         <header className="sticky top-0 z-30">
           <div
             className={[
               "transition-all duration-300",
               scrolled
-                ? "bg-black/70 backdrop-blur-xl shadow-[0_12px_30px_rgba(0,0,0,0.3)]"
-                : "bg-transparent",
+                ? "bg-white/95 backdrop-blur-xl shadow-[0_4px_20px_rgba(0,0,0,0.08)]"
+                : "bg-white/90 backdrop-blur-sm",
             ].join(" ")}
           >
             <div className="mx-auto max-w-6xl px-5 sm:px-6 h-[68px] sm:h-[76px] flex items-center justify-between">
@@ -428,29 +422,23 @@ export default function AppPage() {
                 aria-label={t.packageSelect.backToSelection}
                 title={t.packageSelect.backToSelection}
               >
-                <div
-                  className="h-10 w-10 rounded-2xl border grid place-items-center"
-                  style={{
-                    background: `rgb(var(--accent) / 0.1)`,
-                    borderColor: `rgb(var(--accent) / 0.3)`,
-                  }}
-                >
-                  <span className="text-[rgb(var(--accent))] text-lg">⌁</span>
+                <div className="h-10 w-10 rounded-2xl overflow-hidden">
+                  <img src="/images/logo.webp" alt="Logo" className="h-full w-full object-contain" />
                 </div>
                 <div className="leading-tight">
-                  <div className="text-sm sm:text-base font-semibold tracking-tight text-white">
-                    {t.brand.name}<span className="opacity-60">{t.brand.domain}</span>
+                  <div className="text-sm sm:text-base font-semibold tracking-tight text-slate-800">
+                    {t.brand.name}<span className="text-slate-400">{t.brand.domain}</span>
                   </div>
-                  <div className="text-[11px] sm:text-xs text-white/45">
+                  <div className="text-[11px] sm:text-xs text-slate-500">
                     {t.packageSelect.backToSelection}
                   </div>
                 </div>
               </button>
 
-<div className="flex items-center gap-2">
+              <div className="flex items-center gap-2">
                 <button
                   onClick={() => router.push("/")}
-                  className="p-2 rounded-lg text-white/50 hover:text-white/70 hover:bg-white/10 transition"
+                  className="p-2 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition"
                   title={t.wizard?.goHome || "Zur Startseite"}
                   aria-label={t.wizard?.goHome || "Zur Startseite"}
                 >
@@ -458,13 +446,13 @@ export default function AppPage() {
                 </button>
                 <button
                   onClick={() => router.push("/login")}
-                  className="rounded-full px-4 py-2 text-sm font-semibold border border-white/10 bg-white/5 hover:bg-white/10 transition"
+                  className="rounded-full px-4 py-2 text-sm font-semibold border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 transition shadow-sm"
                 >
                   {t.packageSelect.login}
                 </button>
               </div>
             </div>
-            <div className="h-px bg-white/10" />
+            <div className="h-px bg-slate-200/60" />
           </div>
         </header>
 

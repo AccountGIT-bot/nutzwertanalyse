@@ -157,8 +157,8 @@ export default function RegisterPage() {
               aria-label="Zurück zum Login"
               title="Login"
             >
-              <div className="h-10 w-10 rounded-2xl bg-black/5 border border-black/10 grid place-items-center">
-                <span className="text-black/70 text-lg">⌁</span>
+              <div className="h-10 w-10 rounded-2xl overflow-hidden">
+                <img src="/images/logo.webp" alt="Logo" className="h-full w-full object-contain" />
               </div>
               <div className="leading-tight">
                 <div className="text-sm sm:text-base font-semibold tracking-tight text-slate-900">

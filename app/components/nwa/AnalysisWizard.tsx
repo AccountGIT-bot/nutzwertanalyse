@@ -317,8 +317,8 @@ export function AnalysisWizard() {
                           isActive
                             ? "bg-[rgb(var(--accent))] text-white"
                             : isCompleted
-                            ? "bg-[rgb(var(--accent))]/30 text-[rgb(var(--accent))]"
-                            : "bg-white/10 text-white/40"
+                              ? "bg-[rgb(var(--accent))]/30 text-[rgb(var(--accent))]"
+                              : "bg-white/10 text-white/40"
                         }`}
                       >
                         {isCompleted ? "\u2713" : index + 1}
