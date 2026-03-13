@@ -197,6 +197,12 @@ export const en = {
     assumptions: "Assumptions & Prerequisites",
     assumptionsPlaceholder: "One assumption per line...",
     maxReached: "Maximum reached",
+    duplicateAlt: "Duplicate alternative",
+    removeAlt: "Remove alternative",
+    noAlternatives: "No alternatives added yet",
+    addMinimum: "Add at least {min} alternatives",
+    countStatus: "{current} of {max} alternatives",
+    minRequired: "At least {min} alternatives required",
   },
   
   // Criteria (Step 3)
@@ -214,6 +220,12 @@ export const en = {
     description_label: "Description",
     descriptionPlaceholder: "Description (optional)...",
     uncategorized: "Uncategorized",
+    duplicateCrit: "Duplicate criterion",
+    removeCrit: "Remove criterion",
+    noCriteria: "No criteria defined yet",
+    addMinimum: "Add at least 2 criteria",
+    countStatus: "{count} criteria",
+    minRequired: "At least 2 criteria required",
   },
   
   // Weighting (Step 4)

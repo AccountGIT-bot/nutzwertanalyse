@@ -137,6 +137,9 @@ export const it = {
     placeholder: "Nome dell'alternativa...", shortDescription: "Descrizione breve (facoltativo)...",
     assumptions: "Ipotesi", assumptionsPlaceholder: "Un'ipotesi per riga...",
     maxReached: "Massimo raggiunto",
+    duplicateAlt: "Duplica alternativa", removeAlt: "Rimuovi alternativa",
+    noAlternatives: "Nessuna alternativa aggiunta", addMinimum: "Aggiungi almeno {min} alternative",
+    countStatus: "{current} di {max} alternative", minRequired: "Almeno {min} alternative richieste",
   },
   criteriaSetup: {
     title: "Definire i criteri",
@@ -147,6 +150,9 @@ export const it = {
     templateCriteria: "criteri predefiniti", knockout: "Criterio eliminatorio",
     knockoutThreshold: "Soglia min.", description_label: "Descrizione",
     descriptionPlaceholder: "Descrizione (facoltativo)...", uncategorized: "Non categorizzato",
+    duplicateCrit: "Duplica criterio", removeCrit: "Rimuovi criterio",
+    noCriteria: "Nessun criterio definito", addMinimum: "Aggiungi almeno 2 criteri",
+    countStatus: "{count} criteri", minRequired: "Almeno 2 criteri richiesti",
   },
   weightingSetup: {
     title: "Ponderare i criteri", description: "Determina l'importanza relativa.",

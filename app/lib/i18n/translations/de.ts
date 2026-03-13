@@ -197,6 +197,12 @@ export const de = {
     assumptions: "Annahmen & Voraussetzungen",
     assumptionsPlaceholder: "Eine Annahme pro Zeile...",
     maxReached: "Maximum erreicht",
+    duplicateAlt: "Alternative duplizieren",
+    removeAlt: "Alternative entfernen",
+    noAlternatives: "Noch keine Alternativen hinzugefügt",
+    addMinimum: "Fügen Sie mindestens {min} Alternativen hinzu",
+    countStatus: "{current} von {max} Alternativen",
+    minRequired: "Mindestens {min} Alternativen erforderlich",
   },
   
   // Criteria (Step 3)
@@ -214,6 +220,12 @@ export const de = {
     description_label: "Beschreibung",
     descriptionPlaceholder: "Beschreibung (optional)...",
     uncategorized: "Nicht kategorisiert",
+    duplicateCrit: "Kriterium duplizieren",
+    removeCrit: "Kriterium entfernen",
+    noCriteria: "Noch keine Kriterien definiert",
+    addMinimum: "Fügen Sie mindestens 2 Kriterien hinzu",
+    countStatus: "{count} Kriterien",
+    minRequired: "Mindestens 2 Kriterien erforderlich",
   },
   
   // Weighting (Step 4)

@@ -159,7 +159,7 @@ export function AlternativesManager() {
                   onClick={() => duplicateAlternative(alt.id)}
                   disabled={alternatives.length >= maxAlts}
                   className="flex-shrink-0 h-8 w-8 rounded-lg bg-white/5 text-white/50 hover:bg-white/10 hover:text-white/70 transition flex items-center justify-center disabled:opacity-30 disabled:cursor-not-allowed"
-                  title="Alternative duplizieren"
+                  title={t.alternativesSetup.duplicateAlt}
                 >
                   <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
@@ -170,7 +170,7 @@ export function AlternativesManager() {
                 <button
                   onClick={() => removeAlternative(alt.id)}
                   className="flex-shrink-0 h-8 w-8 rounded-lg bg-red-500/10 text-red-400 hover:bg-red-500/20 transition flex items-center justify-center"
-                  title="Alternative entfernen"
+                  title={t.alternativesSetup.removeAlt}
                 >
                   <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -183,9 +183,9 @@ export function AlternativesManager() {
 
         {alternatives.length === 0 && (
           <div className="rounded-xl border border-dashed border-white/20 p-8 text-center">
-            <div className="text-white/40">Noch keine Alternativen hinzugefügt</div>
+            <div className="text-white/40">{t.alternativesSetup.noAlternatives}</div>
             <div className="text-sm text-white/30 mt-1">
-              Fügen Sie mindestens {minAlts} Alternativen hinzu
+              {t.alternativesSetup.addMinimum.replace("{min}", String(minAlts))}
             </div>
           </div>
         )}
@@ -194,11 +194,11 @@ export function AlternativesManager() {
       {/* Status indicator */}
       <div className="flex items-center justify-between text-sm">
         <div className="text-white/50">
-          {alternatives.length} von {maxAlts} Alternativen
+          {t.alternativesSetup.countStatus.replace("{current}", String(alternatives.length)).replace("{max}", String(maxAlts))}
         </div>
         {!canProceedToNext && (
           <div className="text-[rgb(var(--accent))]/80">
-            Mindestens {minAlts} Alternativen erforderlich
+            {t.alternativesSetup.minRequired.replace("{min}", String(minAlts))}
           </div>
         )}
       </div>
