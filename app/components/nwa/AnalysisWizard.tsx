@@ -9,16 +9,10 @@ import { CriteriaManager } from "./CriteriaManager";
 import { WeightingModule } from "./WeightingModule";
 import { EvaluationMatrix } from "./EvaluationMatrix";
 import { ResultsDashboard } from "./ResultsDashboard";
+import { useTranslations } from "@/app/lib/i18n";
 import type { AnalysisStep } from "@/app/lib/nwa/types";
 
-const STEPS: { id: AnalysisStep; label: string; shortLabel: string }[] = [
-  { id: "decision", label: "Entscheidung", shortLabel: "1. Entscheidung" },
-  { id: "alternatives", label: "Alternativen", shortLabel: "2. Alternativen" },
-  { id: "criteria", label: "Kriterien", shortLabel: "3. Kriterien" },
-  { id: "weighting", label: "Gewichtung", shortLabel: "4. Gewichtung" },
-  { id: "evaluation", label: "Bewertung", shortLabel: "5. Bewertung" },
-  { id: "results", label: "Ergebnis", shortLabel: "6. Ergebnis" },
-];
+const STEP_IDS: AnalysisStep[] = ["decision", "alternatives", "criteria", "weighting", "evaluation", "results"];
 
 export function AnalysisWizard() {
   const { state, setStep, calculateResults, canProceedToNext, reset, saveDraft, hasDraft, loadDraft } = useAnalysis();
@@ -26,9 +20,20 @@ export function AnalysisWizard() {
   const [showResetConfirm, setShowResetConfirm] = useState(false);
   const [showDraftPrompt, setShowDraftPrompt] = useState(false);
   const [draftChecked, setDraftChecked] = useState(false);
+  const t = useTranslations();
+
+  // Dynamic steps with translations
+  const STEPS = useMemo(() => [
+    { id: "decision" as AnalysisStep, label: t.steps.decision },
+    { id: "alternatives" as AnalysisStep, label: t.steps.alternatives },
+    { id: "criteria" as AnalysisStep, label: t.steps.criteria },
+    { id: "weighting" as AnalysisStep, label: t.steps.weighting },
+    { id: "evaluation" as AnalysisStep, label: t.steps.evaluation },
+    { id: "results" as AnalysisStep, label: t.steps.results },
+  ], [t]);
 
   const currentStepIndex = useMemo(
-    () => STEPS.findIndex((s) => s.id === currentStep),
+    () => STEP_IDS.indexOf(currentStep),
     [currentStep]
   );
 
@@ -140,23 +145,23 @@ export function AnalysisWizard() {
       {showDraftPrompt && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
           <div className="bg-[#1a1a1a] border border-white/10 rounded-2xl p-6 max-w-md mx-4 shadow-2xl">
-            <h3 className="text-lg font-semibold text-white">Entwurf gefunden</h3>
+            <h3 className="text-lg font-semibold text-white">{t.wizard.draftFound.split(".")[0]}</h3>
             <p className="mt-2 text-sm text-white/60">
-              Es wurde ein gespeicherter Entwurf gefunden. Möchten Sie diesen wiederherstellen?
+              {t.wizard.draftFound}
             </p>
             <div className="mt-4 flex gap-3">
               <button
                 onClick={handleDiscardDraft}
                 className="flex-1 px-4 py-2.5 rounded-xl text-sm font-medium text-white/70 bg-white/10 hover:bg-white/15 transition"
               >
-                Verwerfen
+                {t.wizard.discard}
               </button>
               <button
                 onClick={handleLoadDraft}
                 className="flex-1 px-4 py-2.5 rounded-xl text-sm font-semibold text-white transition"
                 style={{ background: "rgb(var(--accent))" }}
               >
-                Wiederherstellen
+                {t.wizard.restore}
               </button>
             </div>
           </div>
@@ -166,22 +171,22 @@ export function AnalysisWizard() {
       {showResetConfirm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
           <div className="bg-[#1a1a1a] border border-white/10 rounded-2xl p-6 max-w-md mx-4 shadow-2xl">
-            <h3 className="text-lg font-semibold text-white">Analyse zurücksetzen?</h3>
+            <h3 className="text-lg font-semibold text-white">{t.wizard.resetAnalysis}</h3>
             <p className="mt-2 text-sm text-white/60">
-              Sind Sie sicher, dass Sie die Analyse zurücksetzen möchten? Alle eingegebenen Daten werden gelöscht.
+              {t.wizard.resetConfirm}
             </p>
             <div className="mt-4 flex gap-3">
               <button
                 onClick={handleCancelReset}
                 className="flex-1 px-4 py-2.5 rounded-xl text-sm font-medium text-white/70 bg-white/10 hover:bg-white/15 transition"
               >
-                Abbrechen
+                {t.common.cancel}
               </button>
               <button
                 onClick={handleConfirmReset}
                 className="flex-1 px-4 py-2.5 rounded-xl text-sm font-semibold text-white bg-red-600 hover:bg-red-500 transition"
               >
-                Zurücksetzen
+                {t.wizard.reset}
               </button>
             </div>
           </div>
@@ -210,7 +215,7 @@ export function AnalysisWizard() {
                 )}
                 <div>
                   <div className="text-sm font-medium text-white truncate max-w-[200px] sm:max-w-none">
-                    {decision.title || "Neue Analyse"}
+                    {decision.title || t.decisionSetup.title}
                   </div>
                   <div className="text-xs text-white/50 flex items-center gap-1.5">
                     <span>{packageLevelLabel}</span>
@@ -222,9 +227,9 @@ export function AnalysisWizard() {
               <button
                 onClick={handleResetClick}
                 className="px-3 py-1.5 rounded-lg text-xs font-medium text-white/50 hover:text-white/70 hover:bg-white/10 transition"
-                title="Analyse zurücksetzen"
+                title={t.wizard.resetAnalysis}
               >
-                Neustart
+                {t.wizard.reset}
               </button>
             </div>
 
@@ -300,10 +305,10 @@ export function AnalysisWizard() {
                   currentStepIndex === 0 ? "text-white/30 cursor-not-allowed" : "text-white/70 hover:text-white hover:bg-white/10"
                 }`}
               >
-                Zurück
+                {t.common.back}
               </button>
               <div className="text-sm text-white/40">
-                Schritt {currentStepIndex + 1} von {STEPS.length}
+                {t.steps.step} {currentStepIndex + 1} / {STEPS.length}
               </div>
               {currentStep !== "results" && (
                 <button
@@ -317,7 +322,7 @@ export function AnalysisWizard() {
                     color: "white",
                   }}
                 >
-                  Weiter
+                  {t.common.next}
                 </button>
               )}
             </div>

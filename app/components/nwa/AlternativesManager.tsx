@@ -5,10 +5,12 @@ import { useAnalysis } from "@/app/lib/nwa/analysis-context";
 import type { Alternative } from "@/app/lib/nwa/types";
 import { getPresetContext } from "@/app/lib/nwa/preset-context";
 import { StepInfoButton } from "./StepInfoButton";
+import { useTranslations } from "@/app/lib/i18n";
 
 export function AlternativesManager() {
   const { state, addAlternative, updateAlternative, removeAlternative, duplicateAlternative, canProceedToNext } = useAnalysis();
   const { alternatives, decision } = state;
+  const t = useTranslations();
   const packageLevel = decision.packageLevel;
   
   // Get context-specific content
@@ -49,13 +51,13 @@ export function AlternativesManager() {
     <div className="space-y-6">
       <div>
         <div className="text-sm text-white/60 flex items-center gap-2">
-          Schritt 2
+          {t.steps.step} 2
           <StepInfoButton stepId="alternatives" />
         </div>
-        <h2 className="mt-1 text-xl font-semibold text-white">Alternativen definieren</h2>
+        <h2 className="mt-1 text-xl font-semibold text-white">{t.alternativesSetup.title}</h2>
         <p className="mt-2 text-sm text-white/50">
-          {presetContext.alternativeHelperText}
-          {packageLevel !== "basic" && " Sie können auch Annahmen zu jeder Alternative dokumentieren."}
+          {t.alternativesSetup.description}
+          {packageLevel !== "basic" && ` ${t.alternativesSetup.descriptionAdvanced}`}
         </p>
       </div>
 
@@ -80,7 +82,7 @@ export function AlternativesManager() {
             border: `1px solid rgb(var(--accent) / 0.3)`,
           }}
         >
-          Hinzufügen
+          {t.common.add}
         </button>
       </div>
 
@@ -122,7 +124,7 @@ export function AlternativesManager() {
                 <textarea
                   value={alt.description || ""}
                   onChange={(e) => handleUpdate(alt, { description: e.target.value })}
-                  placeholder="Kurze Beschreibung (optional)..."
+                  placeholder={t.alternativesSetup.shortDescription}
                   rows={1}
                   className="mt-2 w-full px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-sm text-white/70 placeholder:text-white/30 outline-none focus:border-[rgb(var(--accent))]/50 transition resize-none"
                 />
@@ -131,7 +133,7 @@ export function AlternativesManager() {
                 {packageLevel !== "basic" && (
                   <div className="mt-3">
                     <div className="text-xs font-medium text-white/50 mb-2">
-                      Annahmen & Voraussetzungen
+                      {t.alternativesSetup.assumptions}
                     </div>
                     <textarea
                       value={alt.assumptions?.join("\n") || ""}
@@ -140,7 +142,7 @@ export function AlternativesManager() {
                           assumptions: e.target.value.split("\n").filter(Boolean),
                         })
                       }
-                      placeholder="Eine Annahme pro Zeile..."
+                      placeholder={t.alternativesSetup.assumptionsPlaceholder}
                       rows={2}
                       className="w-full px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-sm text-white/70 placeholder:text-white/30 outline-none focus:border-[rgb(var(--accent))]/50 transition resize-none"
                     />
