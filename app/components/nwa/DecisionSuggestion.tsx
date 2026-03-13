@@ -71,7 +71,7 @@ export function DecisionSuggestion({
 
   const addCriterion = () => {
     if (editedCriteria.length < 10) {
-      setEditedCriteria([...editedCriteria, { name: "", weight: 1, description: null }]);
+      setEditedCriteria([...editedCriteria, { name: "", description: "", categoryId: "other" as const }]);
     }
   };
 
