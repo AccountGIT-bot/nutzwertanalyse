@@ -238,7 +238,7 @@ export function AnalysisWizard() {
       )}
 
       <div className="min-h-[calc(100vh-76px)] flex flex-col">
-        <div className="border-b border-white/10 bg-black/20 backdrop-blur-md sticky top-[76px] z-20">
+        <div className="border-b border-slate-200/60 bg-white/80 backdrop-blur-md sticky top-[76px] z-20 shadow-sm">
           <div className="mx-auto max-w-5xl px-5 sm:px-6 py-4">
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-3">
@@ -258,12 +258,12 @@ export function AnalysisWizard() {
                   </div>
                 )}
                 <div>
-                  <div className="text-sm font-medium text-white truncate max-w-[200px] sm:max-w-none">
+                  <div className="text-sm font-medium text-slate-800 truncate max-w-[200px] sm:max-w-none">
                     {decision.title || t.decisionSetup.title}
                   </div>
-                  <div className="text-xs text-white/50 flex items-center gap-1.5">
+                  <div className="text-xs text-slate-500 flex items-center gap-1.5">
                     <span>{packageLevelLabel}</span>
-                    {contextLabel ? <span className="text-white/30">-</span> : null}
+                    {contextLabel ? <span className="text-slate-300">-</span> : null}
                     {contextLabel ? <span>{contextLabel}</span> : null}
                   </div>
                 </div>
@@ -271,7 +271,7 @@ export function AnalysisWizard() {
               <div className="flex items-center gap-2">
                 <button
                   onClick={handleHomeClick}
-                  className="p-2 rounded-lg text-white/50 hover:text-white/70 hover:bg-white/10 transition"
+                  className="p-2 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition"
                   title={t.wizard.goHome || "Zur Startseite"}
                   aria-label={t.wizard.goHome || "Zur Startseite"}
                 >
@@ -279,7 +279,7 @@ export function AnalysisWizard() {
                 </button>
                 <button
                   onClick={handleResetClick}
-                  className="px-3 py-1.5 rounded-lg text-xs font-medium text-white/50 hover:text-white/70 hover:bg-white/10 transition"
+                  className="px-3 py-1.5 rounded-lg text-xs font-medium text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition"
                   title={t.wizard.resetAnalysis}
                 >
                   {t.wizard.reset}
@@ -288,7 +288,7 @@ export function AnalysisWizard() {
             </div>
 
             <div className="mb-3">
-              <div className="h-1.5 rounded-full bg-white/10 overflow-hidden">
+              <div className="h-1.5 rounded-full bg-slate-200 overflow-hidden">
                 <div
                   className="h-full rounded-full transition-all duration-500"
                   style={{
@@ -306,27 +306,27 @@ export function AnalysisWizard() {
                 const isAccessible = index <= currentStepIndex;
 
                 return (
-                  <div key={step.id} className="flex-1 min-w-0 flex items-center">
+                  <div key={step.id} className="flex-1 min-w-0 flex items-center text-slate-600">
                     <button
                       onClick={() => goToStep(step.id)}
                       disabled={!isAccessible}
                       className={`flex items-center gap-2 transition ${isAccessible ? "cursor-pointer" : "cursor-not-allowed"}`}
                     >
                       <div
-                        className={`h-8 w-8 rounded-lg flex items-center justify-center text-sm font-medium flex-shrink-0 transition ${
-                          isActive
-                            ? "bg-[rgb(var(--accent))] text-white"
-                            : isCompleted
+className={`h-8 w-8 rounded-lg flex items-center justify-center text-sm font-medium flex-shrink-0 transition ${
+                        isActive
+                          ? "bg-[rgb(var(--accent))] text-white"
+                          : isCompleted
                             ? "bg-[rgb(var(--accent))]/30 text-[rgb(var(--accent))]"
-                            : "bg-white/10 text-white/40"
-                        }`}
+                            : "bg-slate-200 text-slate-400"
+                      }`}
                       >
                         {isCompleted ? "\u2713" : index + 1}
                       </div>
                       <span
-                        className={`text-sm truncate hidden sm:block ${
-                          isActive ? "text-white font-medium" : isCompleted ? "text-white/60" : "text-white/40"
-                        }`}
+className={`text-sm truncate hidden sm:block ${
+                        isActive ? "text-slate-800 font-medium" : isCompleted ? "text-slate-600" : "text-slate-400"
+                      }`}
                       >
                         {step.label}
                       </span>
@@ -356,14 +356,14 @@ export function AnalysisWizard() {
                 onClick={goBack}
                 disabled={currentStepIndex === 0}
                 className={`px-5 py-2.5 rounded-xl text-sm font-medium transition ${
-                  currentStepIndex === 0 ? "text-white/30 cursor-not-allowed" : "text-white/70 hover:text-white hover:bg-white/10"
+                  currentStepIndex === 0 ? "text-slate-300 cursor-not-allowed" : "text-slate-600 hover:text-slate-800 hover:bg-slate-100"
                 }`}
               >
                 {t.common.back}
               </button>
-              <div className="text-sm text-white/40">
-                {t.steps.step} {currentStepIndex + 1} / {STEPS.length}
-              </div>
+<div className="text-sm text-slate-400">
+                  {t.steps.step} {currentStepIndex + 1} / {STEPS.length}
+                </div>
               {currentStep !== "results" && (
                 <button
                   onClick={goNext}
