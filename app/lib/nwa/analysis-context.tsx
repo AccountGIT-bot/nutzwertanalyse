@@ -34,7 +34,7 @@ import {
   calculateRiskAdjustedScores,
   checkKnockoutCriteria,
 } from "./calculate";
-import { getTemplateByPreset, DEFAULT_CATEGORIES, getDefaultTemplate } from "./templates";
+import { getTemplateByPreset, DEFAULT_CATEGORIES, getDefaultTemplate, DEFAULT_ALTERNATIVES } from "./templates";
 
 // Initial state factory
 function createInitialState(packageLevel: PackageLevel = "basic"): AnalysisState {
@@ -526,6 +526,30 @@ export function AnalysisProvider({
       }
       if (initialPreset) {
         initialState.decision.preset = initialPreset;
+        
+        // Add default alternatives for the preset if available
+        const presetAlternatives = DEFAULT_ALTERNATIVES[initialPreset];
+        if (presetAlternatives && presetAlternatives.length > 0) {
+          initialState.alternatives = presetAlternatives.map((alt, index) => ({
+            id: `preset-alt-${index}`,
+            name: alt.name,
+            description: alt.description,
+          }));
+        }
+        
+        // Also auto-load criteria from template
+        const template = getTemplateByPreset(initialPreset);
+        if (template) {
+          const defaultWeight = initialPackageLevel === "basic" ? 3 : 10;
+          initialState.criteria = template.criteria.map((crit, index) => ({
+            id: `preset-crit-${index}`,
+            name: crit.name,
+            description: crit.description,
+            categoryId: crit.categoryId,
+            weight: 0,
+            rawWeight: defaultWeight,
+          }));
+        }
       }
     }
     

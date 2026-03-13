@@ -8,6 +8,40 @@ export const DEFAULT_CATEGORIES: CriteriaCategory[] = [
   { id: "other", name: "Sonstige", description: "Weitere Kriterien", order: 5 },
 ];
 
+// Default alternatives for each preset
+export const DEFAULT_ALTERNATIVES: Record<string, { name: string; description?: string }[]> = {
+  supplier: [
+    { name: "Lieferant A", description: "Aktueller Hauptlieferant" },
+    { name: "Lieferant B", description: "Neuer Anbieter" },
+    { name: "Lieferant C", description: "Alternativer Anbieter" },
+  ],
+  software: [
+    { name: "Software A", description: "Marktführer-Lösung" },
+    { name: "Software B", description: "Alternative Lösung" },
+    { name: "Eigenentwicklung", description: "Inhouse-Entwicklung" },
+  ],
+  investment: [
+    { name: "Investition A", description: "Hauptoption" },
+    { name: "Investition B", description: "Alternative" },
+    { name: "Status Quo", description: "Keine Investition" },
+  ],
+  machines: [
+    { name: "Maschine A", description: "Premiummodell" },
+    { name: "Maschine B", description: "Standardmodell" },
+    { name: "Gebrauchtmaschine", description: "Gebraucht kaufen" },
+  ],
+  vehicle: [
+    { name: "Fahrzeug A", description: "Option 1" },
+    { name: "Fahrzeug B", description: "Option 2" },
+    { name: "Leasing", description: "Leasing statt Kauf" },
+  ],
+  employee: [
+    { name: "Kandidat A", description: "Erster Bewerber" },
+    { name: "Kandidat B", description: "Zweiter Bewerber" },
+    { name: "Kandidat C", description: "Dritter Bewerber" },
+  ],
+};
+
 export const CRITERIA_TEMPLATES: CriteriaTemplate[] = [
   {
     id: "supplier",
