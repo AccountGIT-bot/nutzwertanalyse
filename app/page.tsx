@@ -295,14 +295,21 @@ export default function LandingWithIntro() {
   return (
     <main className="relative min-h-[100svh] text-slate-900 overflow-x-hidden">
       {/* Premium Background - Lebendig mit subtilen Farbakzenten */}
-      <div className="absolute inset-0 -z-10">
+      <div className="absolute inset-0 -z-10 overflow-hidden">
         {/* Base gradient - warm to cool */}
         <div className="absolute inset-0 bg-gradient-to-br from-[#faf9f7] via-[#f5f3f0] to-[#eff2f4]" />
         
-        {/* Animated subtle color orbs */}
-        <div className="absolute top-[10%] left-[10%] w-[600px] h-[600px] rounded-full bg-blue-400/[0.06] blur-[100px] animate-float-slow" />
-        <div className="absolute top-[20%] right-[5%] w-[500px] h-[500px] rounded-full bg-purple-400/[0.05] blur-[80px] animate-float-slower" />
-        <div className="absolute bottom-[0%] left-[30%] w-[700px] h-[500px] rounded-full bg-emerald-400/[0.04] blur-[100px] animate-float-slow" />
+        {/* Static subtle color accents - no animations to avoid hydration issues */}
+        <div 
+          className="absolute inset-0"
+          style={{
+            background: `
+              radial-gradient(800px 600px at 12% 15%, rgba(59, 130, 246, 0.07), transparent 55%),
+              radial-gradient(600px 500px at 88% 25%, rgba(168, 85, 247, 0.05), transparent 50%),
+              radial-gradient(900px 600px at 45% 105%, rgba(16, 185, 129, 0.06), transparent 60%)
+            `,
+          }}
+        />
         
         {/* Depth gradients */}
         <div
@@ -743,20 +750,6 @@ export default function LandingWithIntro() {
         .animation-delay-200 {
           animation-delay: 0.2s;
           opacity: 0;
-        }
-        @keyframes float-slow {
-          0%, 100% { transform: translate(0, 0) scale(1); }
-          50% { transform: translate(20px, -20px) scale(1.05); }
-        }
-        @keyframes float-slower {
-          0%, 100% { transform: translate(0, 0) scale(1); }
-          50% { transform: translate(-15px, 15px) scale(0.95); }
-        }
-        .animate-float-slow {
-          animation: float-slow 20s ease-in-out infinite;
-        }
-        .animate-float-slower {
-          animation: float-slower 25s ease-in-out infinite;
         }
         .landing-sheen2 {
           background: radial-gradient(
