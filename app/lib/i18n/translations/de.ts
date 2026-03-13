@@ -1,7 +1,7 @@
 export const de = {
   // Meta
   meta: {
-    title: "Nutzwertanalyse.tool",
+    title: "Nutzwertanalyse.com",
     description: "Entscheidungen strukturiert treffen – mit Nutzwertanalyse. Kriterien definieren, gewichten, bewerten und dokumentieren.",
   },
   
@@ -407,7 +407,7 @@ export const de = {
     consistencyCheck: "Konsistenzprüfung",
     consistencyPassed: "Konsistenz OK",
     consistencyFailed: "Inkonsistenzen erkannt",
-    generatedBy: "Erstellt mit Nutzwertanalyse.tool",
+    generatedBy: "Erstellt mit Nutzwertanalyse.com",
     generatedOn: "Erstellt am",
     options: {
       title: "Report-Optionen",

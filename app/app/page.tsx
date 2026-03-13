@@ -367,7 +367,7 @@ export default function AppPage() {
           <div className="mx-auto max-w-6xl px-5 sm:px-6">
             <div className="h-px bg-white/10" />
             <div className="pt-3 text-[10px] sm:text-[11px] text-white/40 flex flex-col sm:flex-row gap-2 sm:items-center sm:justify-between">
-              <div>© {new Date().getFullYear()} Nutzwertanalyse.tool</div>
+              <div>© {new Date().getFullYear()} Nutzwertanalyse.com</div>
               <div className="flex flex-wrap gap-x-3 gap-y-1">
                 <a href="/impressum" className="underline underline-offset-2 decoration-white/20">
                   {t.landing.footer.imprint}

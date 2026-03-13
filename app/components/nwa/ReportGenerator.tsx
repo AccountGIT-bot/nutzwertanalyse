@@ -427,7 +427,7 @@ function generateReportHTML(state: AnalysisState, config: ReportConfig): string 
   // Footer
   html += `
   <div class="footer">
-    <p>Erstellt mit Nutzwertanalyse.tool | ${date}</p>
+    <p>Erstellt mit Nutzwertanalyse.com | ${date}</p>
     <p>Diese Analyse dient als Entscheidungsunterstützung. Die finale Entscheidung liegt beim Anwender.</p>
   </div>
 </body>
