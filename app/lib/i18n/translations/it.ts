@@ -115,6 +115,8 @@ export const it = {
     resetConfirm: "Sei sicuro? Tutti i dati verranno eliminati.",
     reset: "Reimposta", draftFound: "Trovata una bozza. Vuoi ripristinarla?",
     restore: "Ripristina", discard: "Abbandona",
+    goHome: "Home", goHomeConfirm: "Il tuo progresso verrà salvato automaticamente. Puoi continuare più tardi.",
+    goHomeButton: "Torna alla Home",
   },
   decisionSetup: {
     title: "Definire la decisione", titleBusiness: "Domanda strategica",

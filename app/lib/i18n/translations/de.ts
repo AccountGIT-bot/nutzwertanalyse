@@ -164,6 +164,9 @@ export const de = {
     draftFound: "Es wurde ein gespeicherter Entwurf gefunden. Möchten Sie diesen wiederherstellen?",
     restore: "Wiederherstellen",
     discard: "Verwerfen",
+    goHome: "Zur Startseite",
+    goHomeConfirm: "Ihr Fortschritt wird automatisch gespeichert. Sie können später fortfahren.",
+    goHomeButton: "Zur Startseite",
   },
   
   // Decision Setup (Step 1)

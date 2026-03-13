@@ -164,6 +164,9 @@ export const en = {
     draftFound: "A saved draft was found. Would you like to restore it?",
     restore: "Restore",
     discard: "Discard",
+    goHome: "Go to Home",
+    goHomeConfirm: "Your progress will be saved automatically. You can continue later.",
+    goHomeButton: "Go to Home",
   },
   
   // Decision Setup (Step 1)

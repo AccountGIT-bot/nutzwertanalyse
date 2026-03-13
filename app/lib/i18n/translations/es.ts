@@ -102,7 +102,7 @@ export const es = {
   common: {
     back: "Atrás", next: "Siguiente", cancel: "Cancelar", save: "Guardar",
     delete: "Eliminar", edit: "Editar", close: "Cerrar", loading: "Cargando...",
-    error: "Error", success: "Éxito", yes: "Sí", no: "No", or: "o", and: "y",
+    error: "Error", success: "Éxito", yes: "S��", no: "No", or: "o", and: "y",
     add: "Añadir", remove: "Eliminar", ignore: "Ignorar", useTemplate: "Usar plantilla",
     examples: "Ejemplos", optional: "opcional",
   },
@@ -115,6 +115,8 @@ export const es = {
     resetConfirm: "¿Estás seguro? Todos los datos se eliminarán.",
     reset: "Reiniciar", draftFound: "Borrador encontrado. ¿Deseas restaurarlo?",
     restore: "Restaurar", discard: "Descartar",
+    goHome: "Inicio", goHomeConfirm: "Tu progreso se guardará automáticamente. Puedes continuar más tarde.",
+    goHomeButton: "Ir al Inicio",
   },
   decisionSetup: {
     title: "Definir decisión", titleBusiness: "Pregunta estratégica",

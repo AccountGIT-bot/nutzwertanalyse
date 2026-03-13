@@ -115,6 +115,8 @@ export const fr = {
     resetConfirm: "Êtes-vous sûr de vouloir réinitialiser ? Toutes les données seront supprimées.",
     reset: "Réinitialiser", draftFound: "Un brouillon a été trouvé. Voulez-vous le restaurer ?",
     restore: "Restaurer", discard: "Supprimer",
+    goHome: "Accueil", goHomeConfirm: "Votre progression sera sauvegardée automatiquement. Vous pourrez continuer plus tard.",
+    goHomeButton: "Retour à l'accueil",
   },
   decisionSetup: {
     title: "Définir la décision", titleBusiness: "Question stratégique",

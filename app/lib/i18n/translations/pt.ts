@@ -115,6 +115,8 @@ export const pt = {
     resetConfirm: "Tem certeza? Todos os dados serão excluídos.",
     reset: "Redefinir", draftFound: "Rascunho encontrado. Deseja restaurar?",
     restore: "Restaurar", discard: "Descartar",
+    goHome: "Início", goHomeConfirm: "Seu progresso será salvo automaticamente. Você pode continuar mais tarde.",
+    goHomeButton: "Ir para Início",
   },
   decisionSetup: {
     title: "Definir decisão", titleBusiness: "Questão estratégica",

@@ -58,7 +58,7 @@ const PRESET_CONFIG: Array<{
   },
 ];
 
-const INTRO_COOLDOWN_MS = 3 * 60 * 1000; // 3 Minuten
+const INTRO_COOLDOWN_MS = 10 * 60 * 1000; // 10 Minuten
 const INTRO_KEY = "nwa_intro_lastShownAt";
 
 // Safe localStorage access - only call on client side
@@ -296,12 +296,20 @@ export default function LandingWithIntro() {
         </div>
       </div>
       
-      {/* Premium Background */}
+      {/* Premium Dynamic Background */}
       <div className="absolute inset-0 -z-10 overflow-hidden">
         {/* Base gradient - warm to cool */}
         <div className="absolute inset-0 bg-gradient-to-br from-[#faf9f7] via-[#f5f3f0] to-[#eff2f4]" />
         
-        {/* Static subtle color accents - no animations to avoid hydration issues */}
+        {/* Animated floating orbs */}
+        <div className="landing-orb landing-orb-1" />
+        <div className="landing-orb landing-orb-2" />
+        <div className="landing-orb landing-orb-3" />
+        
+        {/* Animated gradient mesh */}
+        <div className="landing-mesh" />
+        
+        {/* Static subtle color accents */}
         <div 
           className="absolute inset-0"
           style={{
@@ -321,6 +329,15 @@ export default function LandingWithIntro() {
               "radial-gradient(900px 650px at 18% 18%, rgba(0,0,0,0.04), transparent 62%), radial-gradient(850px 600px at 85% 40%, rgba(0,0,0,0.025), transparent 62%)",
           }}
         />
+        
+        {/* Animated particles */}
+        <div className="landing-particles">
+          <div className="landing-particle landing-particle-1" />
+          <div className="landing-particle landing-particle-2" />
+          <div className="landing-particle landing-particle-3" />
+          <div className="landing-particle landing-particle-4" />
+          <div className="landing-particle landing-particle-5" />
+        </div>
         
         <div className="absolute inset-0 landing-grain opacity-[0.12]" />
         <div className="absolute inset-0 landing-sheen2 opacity-[0.55]" />
