@@ -22,7 +22,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="de" suppressHydrationWarning>
+    <html lang="de" suppressHydrationWarning data-scroll-behavior="smooth">
       <body className="min-h-screen">
         <I18nProvider>{children}</I18nProvider>
       </body>
