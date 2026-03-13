@@ -17,6 +17,10 @@ export const it = {
     headline: { part1: "Decisioni.", part2: "Strutturate.", part3: "Giustificate." },
     description: "Descrivi la tua decisione con parole tue. La nostra IA analizza il tuo testo e crea automaticamente alternative e criteri di valutazione adatti.",
     searchPlaceholder: "Descrivi la tua decisione...",
+    searchInputPlaceholder: "QUALE DECISIONE DEVE ESSERE STRUTTURATA OGGI?",
+    searchInputAriaLabel: "Inserisci decisione",
+    startButton: "Avvia",
+    startButtonLoading: "...",
     searchHint: "Inizia subito – l'IA analizza e struttura il tuo input automaticamente",
     orChooseTemplate: "Oppure scegli un modello",
     footer: {
