@@ -526,22 +526,22 @@ export default function LandingWithIntro() {
                 {/* Search */}
                 <div className="mt-5 sm:mt-6">
                   <div className="w-full max-w-4xl">
-                    <div className="relative rounded-[999px] bg-white/74 border border-black/10 shadow-[0_26px_72px_rgba(0,0,0,0.10)] backdrop-blur-md px-3 sm:px-4 py-3">
-                      <div className="flex items-center gap-3 sm:gap-4">
+                    <div className="relative rounded-2xl sm:rounded-[999px] bg-white/74 border border-black/10 shadow-[0_12px_36px_rgba(0,0,0,0.08)] sm:shadow-[0_26px_72px_rgba(0,0,0,0.10)] backdrop-blur-md px-3 sm:px-4 py-2.5 sm:py-3">
+                      <div className="flex items-center gap-2 sm:gap-4">
                         <div
-                          className="h-11 w-11 sm:h-12 sm:w-12 shrink-0 rounded-full flex items-center justify-center"
+                          className="h-9 w-9 sm:h-12 sm:w-12 shrink-0 rounded-full flex items-center justify-center"
                           style={{
                             background: "rgba(0,0,0,0.04)",
                             border: "1px solid rgba(0,0,0,0.10)",
                           }}
                           aria-hidden="true"
                         >
-                          <span className="text-black/60" style={{ fontSize: 18 }}>
+                          <span className="text-black/60 text-sm sm:text-lg">
                             ⌁
                           </span>
                         </div>
 
-                        <div className="relative w-full">
+                        <div className="relative w-full min-w-0">
                           <input
                             value={text}
                             onChange={(e) => setText(e.target.value)}
@@ -552,9 +552,9 @@ export default function LandingWithIntro() {
                             onBlur={() => setIsFocused(false)}
                             className={[
                               "w-full bg-transparent outline-none font-medium tracking-wide",
-                              "text-sm sm:text-base",
+                              "text-xs sm:text-base",
                               "placeholder:text-transparent",
-                              "pr-2",
+                              "pr-1 sm:pr-2",
                             ].join(" ")}
                             placeholder={placeholderText}
                             aria-label="Entscheidung eingeben"
@@ -571,7 +571,7 @@ export default function LandingWithIntro() {
                           {!text && !isFocused && (
                             <div className="pointer-events-none absolute inset-y-0 left-0 flex sm:hidden items-center w-full overflow-hidden">
                               <div className="w-full landing-marquee-mask">
-                                <div className="landing-marquee text-black/55 text-sm font-semibold tracking-[0.12em] uppercase whitespace-nowrap">
+                                <div className="landing-marquee text-black/55 text-xs font-semibold tracking-[0.08em] uppercase whitespace-nowrap">
                                   {placeholderText}&nbsp;&nbsp;&nbsp;•&nbsp;&nbsp;&nbsp;
                                   {placeholderText}
                                 </div>
@@ -584,10 +584,10 @@ export default function LandingWithIntro() {
                           onClick={startFromInput}
                           disabled={!canStart || isAnalyzing}
                           className={[
-                            "shrink-0 rounded-full px-6 sm:px-8 py-2.5",
-                            "text-sm sm:text-base font-semibold",
+                            "shrink-0 rounded-full px-4 sm:px-8 py-2 sm:py-2.5",
+                            "text-xs sm:text-base font-semibold",
                             "transition-all duration-200",
-                            "shadow-[0_16px_34px_rgba(0,0,0,0.10)]",
+                            "shadow-[0_8px_20px_rgba(0,0,0,0.08)] sm:shadow-[0_16px_34px_rgba(0,0,0,0.10)]",
                             "active:scale-[0.99]",
                             canStart && !isAnalyzing
                               ? "hover:brightness-[1.04]"
@@ -612,7 +612,7 @@ export default function LandingWithIntro() {
                 {/* Presets */}
                 <div className="mt-5 sm:mt-6 flex-1 min-h-0">
                   <div className="h-full flex flex-col">
-                    <div className="grid gap-3 sm:gap-4 grid-cols-2 md:grid-cols-3">
+                    <div className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-3">
                       {PRESET_CONFIG.map((p) => {
                         const presetTranslations = t.presets[p.id as keyof typeof t.presets];
                         return (
