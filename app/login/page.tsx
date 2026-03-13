@@ -397,7 +397,7 @@ export default function LoginPage() {
         </div>
 
         <div className="mt-8 text-[11px] text-black/40">
-          © {new Date().getFullYear()} Nutzwertanalyse.tool
+          © {new Date().getFullYear()} Nutzwertanalyse.com
         </div>
       </section>
     </main>

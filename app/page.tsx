@@ -715,7 +715,7 @@ export default function LandingWithIntro() {
               <footer className="mt-4 pb-4 sm:pb-5">
                 <div className="h-px bg-black/10" />
                 <div className="pt-3 text-[10px] sm:text-[11px] text-black/40 flex flex-col sm:flex-row gap-2 sm:items-center sm:justify-between">
-                  <div>© {new Date().getFullYear()} Nutzwertanalyse.tool • Draft-first</div>
+                  <div>© {new Date().getFullYear()} Nutzwertanalyse.com • Decision Studio</div>
                   <div className="flex flex-wrap gap-x-3 gap-y-1">
                     <a href="/impressum" className="underline underline-offset-2 decoration-black/20">
                       {t.landing.footer.imprint}

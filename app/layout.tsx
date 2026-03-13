@@ -4,8 +4,8 @@ import { I18nProvider } from "@/app/lib/i18n";
 
 export const metadata: Metadata = {
   title: {
-    default: "Nutzwertanalyse.tool",
-    template: "%s | Nutzwertanalyse.tool",
+    default: "Nutzwertanalyse.com",
+    template: "%s | Nutzwertanalyse.com",
   },
   description: "Entscheidungen strukturiert treffen – mit Nutzwertanalyse. Kriterien definieren, gewichten, bewerten und dokumentieren.",
 };

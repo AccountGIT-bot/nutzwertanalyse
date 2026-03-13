@@ -53,7 +53,7 @@ export default function AgbPage() {
               <div className="font-semibold text-black/80">1. Geltungsbereich</div>
               <div className="mt-2">
                 Diese AGB regeln die Nutzung der SaaS-Plattform{" "}
-                <span className="font-medium">Nutzwertanalyse.tool</span> (nachfolgend „Tool“) durch
+                <span className="font-medium">Nutzwertanalyse.com</span> (nachfolgend „Tool“) durch
                 Kundinnen und Kunden („Nutzer“). Abweichende Bedingungen finden nur Anwendung, wenn
                 sie schriftlich bestätigt wurden.
               </div>
@@ -183,7 +183,7 @@ export default function AgbPage() {
         <div className="mx-auto max-w-4xl px-5 sm:px-6">
           <div className="h-px bg-black/10" />
           <div className="pt-3 text-[10px] sm:text-[11px] text-black/40 flex flex-col sm:flex-row gap-2 sm:items-center sm:justify-between">
-            <div>© {new Date().getFullYear()} Nutzwertanalyse.tool</div>
+            <div>© {new Date().getFullYear()} Nutzwertanalyse.com</div>
             <div className="flex flex-wrap gap-x-3 gap-y-1">
               <a href="/impressum" className="underline underline-offset-2 decoration-black/20">
                 Impressum

@@ -425,7 +425,7 @@ export default function GlobalError({
         <div className="mx-auto max-w-6xl px-5 sm:px-6">
           <div className="h-px bg-black/10" />
           <div className="pt-3 text-[10px] sm:text-[11px] text-black/40 flex flex-col sm:flex-row gap-2 sm:items-center sm:justify-between">
-            <div>© {new Date().getFullYear()} Nutzwertanalyse.tool</div>
+            <div>© {new Date().getFullYear()} Nutzwertanalyse.com</div>
             <div className="text-black/35">Stabilität • Transparenz • Governance</div>
           </div>
         </div>

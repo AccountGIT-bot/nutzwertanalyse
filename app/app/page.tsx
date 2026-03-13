@@ -1,61 +1,20 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { AnalysisProvider } from "@/app/lib/nwa/analysis-context";
 import { AnalysisWizard } from "@/app/components/nwa/AnalysisWizard";
 import type { PackageLevel, AIDecisionInterpretation } from "@/app/lib/nwa/types";
 import { getPresetIcon, getPresetLabel, getDomainIcon, getDomainLabel } from "@/app/lib/nwa/preset-icons";
+import { useTranslations } from "@/app/lib/i18n";
 
 type Theme = "basic" | "advanced" | "business";
 
-const MODELS = [
-  {
-    id: "basic" as Theme,
-    title: "BASIC",
-    subtitle: "Schnell & übersichtlich",
-    accent: "37 99 235",
-    accent2: "59 130 246",
-    features: [
-      "Klare Entscheidungsformulierung",
-      "2-5 Alternativen vergleichen",
-      "Bewährte Kriterien-Vorlagen",
-      "Einfache Gewichtung (1-5 Skala)",
-      "Übersichtliche Bewertungsmatrix",
-      "Kompakter Entscheidungsreport",
-    ],
-  },
-  {
-    id: "advanced" as Theme,
-    title: "ADVANCED",
-    subtitle: "Detailliert & flexibel",
-    accent: "16 185 129",
-    accent2: "45 212 191",
-    features: [
-      "Ziel inkl. Randbedingungen",
-      "Mehr Alternativen, mit Annahmen",
-      "Kriterien nach Kategorien gruppiert",
-      "Prozentuale oder paarweise Gewichtung",
-      "Sensitivitätsanalyse inklusive",
-      "Vollständiger Analysebericht",
-    ],
-  },
-  {
-    id: "business" as Theme,
-    title: "BUSINESS",
-    subtitle: "Nachvollziehbar & revisionssicher",
-    accent: "245 158 11",
-    accent2: "168 85 247",
-    features: [
-      "Strategische Fragestellung",
-      "Szenarien und Varianten möglich",
-      "Strukturierte Kriterienhierarchie",
-      "AHP-Gewichtung mit Konsistenzprüfung",
-      "Team-Bewertung (mehrere Bewerter)",
-      "Vollständige Dokumentation für Gremien",
-    ],
-  },
-];
+const MODEL_ACCENTS = {
+  basic: { accent: "37 99 235", accent2: "59 130 246" },
+  advanced: { accent: "16 185 129", accent2: "45 212 191" },
+  business: { accent: "245 158 11", accent2: "168 85 247" },
+};
 
 // Safe localStorage access with SSR guards
 const safeLocalStorage = {
@@ -110,12 +69,38 @@ function getSavedAIInterpretation(): AIDecisionInterpretation | undefined {
 
 export default function AppPage() {
   const router = useRouter();
+  const t = useTranslations();
   const [scrolled, setScrolled] = useState(false);
   const [phase, setPhase] = useState<"select" | "analysis">("select");
   const [selectedTheme, setSelectedTheme] = useState<Theme>("basic");
   const [initialDecision, setInitialDecision] = useState("");
   const [initialPreset, setInitialPreset] = useState<string | undefined>();
   const [initialAIInterpretation, setInitialAIInterpretation] = useState<AIDecisionInterpretation | undefined>();
+
+  // Dynamic models with translations
+  const MODELS = useMemo(() => [
+    {
+      id: "basic" as Theme,
+      title: t.packageSelect.basic.title,
+      subtitle: t.packageSelect.basic.subtitle,
+      ...MODEL_ACCENTS.basic,
+      features: t.packageSelect.basic.features,
+    },
+    {
+      id: "advanced" as Theme,
+      title: t.packageSelect.advanced.title,
+      subtitle: t.packageSelect.advanced.subtitle,
+      ...MODEL_ACCENTS.advanced,
+      features: t.packageSelect.advanced.features,
+    },
+    {
+      id: "business" as Theme,
+      title: t.packageSelect.business.title,
+      subtitle: t.packageSelect.business.subtitle,
+      ...MODEL_ACCENTS.business,
+      features: t.packageSelect.business.features,
+    },
+  ], [t]);
 
   useEffect(() => {
     const saved = getSavedTheme();
@@ -195,7 +180,7 @@ export default function AppPage() {
                     Nutzwertanalyse<span className="opacity-60">.tool</span>
                   </div>
                   <div className="text-[11px] sm:text-xs text-white/45">
-                    Modell wählen • gleiche Logik, andere Tiefe
+                    {t.packageSelect.headerSubtitle} • {t.packageSelect.headerSubtitle2}
                   </div>
                 </div>
               </button>
@@ -205,7 +190,7 @@ export default function AppPage() {
                   onClick={() => router.push("/login")}
                   className="rounded-full px-4 py-2 text-sm font-semibold border border-white/10 bg-white/5 hover:bg-white/10 transition"
                 >
-                  Login
+                  {t.packageSelect.login}
                 </button>
               </div>
             </div>
@@ -216,17 +201,16 @@ export default function AppPage() {
         <section className="mx-auto max-w-6xl px-5 sm:px-6 py-10 sm:py-12">
           <div className="mb-8 sm:mb-10">
             <div className="text-[11px] sm:text-xs tracking-[0.28em] uppercase text-white/45">
-              Pakete • B2C • B2B • Beratung
+              {t.packageSelect.breadcrumb} • B2C • B2B
             </div>
 
             <h1 className="mt-2 text-3xl sm:text-4xl font-semibold tracking-tight">
-              Wähle die passende Tiefe für deine Analyse
+              {t.packageSelect.title}
               <span style={{ color: `rgb(var(--accent))` }}>.</span>
             </h1>
 
             <p className="mt-3 max-w-3xl text-sm sm:text-base text-white/55 leading-relaxed">
-              Der Ablauf bleibt gleich: Kriterien definieren, gewichten, bewerten, dokumentieren.
-              Die Pakete unterscheiden sich in Tiefe, Methodik und Reportumfang.
+              {t.packageSelect.subtitle}
             </p>
             
             {/* Show context: AI interpretation domain takes priority over static preset */}
@@ -254,10 +238,10 @@ export default function AppPage() {
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="text-xs text-white/50 flex items-center gap-1.5">
-                      Anwendungsbereich
+                      {t.packageSelect.applicationArea}
                       {isAIGenerated && (
                         <span className="px-1.5 py-0.5 rounded text-[10px] bg-white/10 text-white/60">
-                          KI-erkannt
+                          {t.packageSelect.aiDetected}
                         </span>
                       )}
                     </div>
@@ -351,7 +335,7 @@ export default function AppPage() {
                           border: `1px solid rgb(${m.accent} / 0.24)`,
                         }}
                       >
-                        Analyse starten
+                        {t.packageSelect.startAnalysis}
                         <span
                           className="h-2 w-2 rounded-full"
                           style={{
@@ -375,7 +359,7 @@ export default function AppPage() {
           </div>
 
           <div className="mt-8 text-[11px] text-white/45">
-            Hinweis: Theme-Vorschau wechselt beim Hover/Fokus — Auswahl bleibt gespeichert.
+            {t.packageSelect.hint}
           </div>
         </section>
 
@@ -383,16 +367,16 @@ export default function AppPage() {
           <div className="mx-auto max-w-6xl px-5 sm:px-6">
             <div className="h-px bg-white/10" />
             <div className="pt-3 text-[10px] sm:text-[11px] text-white/40 flex flex-col sm:flex-row gap-2 sm:items-center sm:justify-between">
-              <div>© {new Date().getFullYear()} Nutzwertanalyse.tool</div>
+              <div>© {new Date().getFullYear()} Nutzwertanalyse.com</div>
               <div className="flex flex-wrap gap-x-3 gap-y-1">
                 <a href="/impressum" className="underline underline-offset-2 decoration-white/20">
-                  Impressum
+                  {t.landing.footer.imprint}
                 </a>
                 <a href="/agb" className="underline underline-offset-2 decoration-white/20">
-                  AGB
+                  {t.landing.footer.terms}
                 </a>
                 <a href="/datenschutz" className="underline underline-offset-2 decoration-white/20">
-                  Datenschutz
+                  {t.landing.footer.privacy}
                 </a>
               </div>
             </div>
@@ -432,8 +416,8 @@ export default function AppPage() {
                   setPhase("select");
                 }}
                 className="flex items-center gap-3 text-left"
-                aria-label="Zur Paketauswahl"
-                title="Zurück zur Paketauswahl"
+                aria-label={t.packageSelect.backToSelection}
+                title={t.packageSelect.backToSelection}
               >
                 <div
                   className="h-10 w-10 rounded-2xl border grid place-items-center"
@@ -449,7 +433,7 @@ export default function AppPage() {
                     Nutzwertanalyse<span className="opacity-60">.tool</span>
                   </div>
                   <div className="text-[11px] sm:text-xs text-white/45">
-                    Analyse durchführen • Schritt für Schritt
+                    {t.packageSelect.backToSelection}
                   </div>
                 </div>
               </button>
@@ -459,7 +443,7 @@ export default function AppPage() {
                   onClick={() => router.push("/login")}
                   className="rounded-full px-4 py-2 text-sm font-semibold border border-white/10 bg-white/5 hover:bg-white/10 transition"
                 >
-                  Login
+                  {t.packageSelect.login}
                 </button>
               </div>
             </div>

@@ -2,7 +2,7 @@
 
 import { useAnalysis } from "@/app/lib/nwa/analysis-context";
 import { getPresetContext } from "@/app/lib/nwa/preset-context";
-import { getPresetIcon, getDomainIcon, getDomainLabel } from "@/app/lib/nwa/preset-icons";
+import { getPresetIcon, getDomainIcon, getDomainLabel, type PresetId } from "@/app/lib/nwa/preset-icons";
 import { StepInfoButton } from "./StepInfoButton";
 import { useTranslations } from "@/app/lib/i18n";
 
@@ -15,6 +15,10 @@ export function DecisionSetup() {
   // Get context-specific content based on preset or AI interpretation
   const hasAIContext = decision.aiInterpretation?.domain;
   const presetContext = getPresetContext(decision.preset);
+  const presetKey = (decision.preset || "custom") as PresetId;
+  
+  // Get translations for this preset (with fallback to custom)
+  const presetTranslations = t.presets[presetKey] || t.presets.custom;
   
   // Determine the appropriate icon and label
   const ContextIcon = hasAIContext 
@@ -24,18 +28,20 @@ export function DecisionSetup() {
       : null;
   const contextLabel = hasAIContext
     ? getDomainLabel(decision.aiInterpretation?.domain)
-    : presetContext.label;
+    : presetTranslations.label;
   
-  // Get context-aware placeholders
+  // Get context-aware placeholders - prefer translations, fallback to presetContext
   const titlePlaceholder = hasAIContext
-    ? `z.B. ${decision.aiInterpretation?.title || presetContext.titlePlaceholder}`
-    : presetContext.titlePlaceholder;
+    ? decision.aiInterpretation?.title || presetTranslations.titlePlaceholder || presetContext.titlePlaceholder
+    : presetTranslations.titlePlaceholder || presetContext.titlePlaceholder;
   
   const descriptionPlaceholder = hasAIContext
-    ? decision.aiInterpretation?.description || presetContext.descriptionPlaceholder
-    : presetContext.descriptionPlaceholder;
+    ? decision.aiInterpretation?.description || presetTranslations.descriptionPlaceholder || presetContext.descriptionPlaceholder
+    : presetTranslations.descriptionPlaceholder || presetContext.descriptionPlaceholder;
   
-  const constraintsPlaceholder = presetContext.constraintsPlaceholder;
+  const constraintsPlaceholder = presetTranslations.constraintsPlaceholder || presetContext.constraintsPlaceholder;
+  const titleExamples = presetTranslations.titleExamples || presetContext.titleExamples;
+  const constraintsExamples = presetTranslations.constraintsExamples || presetContext.constraintsExamples;
 
   return (
     <div className="space-y-6">
@@ -103,10 +109,10 @@ export function DecisionSetup() {
             className="w-full h-12 px-4 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/30 outline-none focus:border-[rgb(var(--accent))] focus:ring-2 focus:ring-[rgb(var(--accent))]/20 transition"
           />
           {/* Example hints based on preset */}
-          {presetContext.titleExamples.length > 0 && !decision.title && (
+          {titleExamples && titleExamples.length > 0 && !decision.title && (
             <div className="mt-2 text-xs text-white/40">
               <span className="text-white/50">{t.common.examples}: </span>
-              {presetContext.titleExamples.slice(0, 2).join(" | ")}
+              {titleExamples.slice(0, 2).join(" | ")}
             </div>
           )}
         </div>
@@ -137,10 +143,10 @@ export function DecisionSetup() {
               className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/30 outline-none focus:border-[rgb(var(--accent))] focus:ring-2 focus:ring-[rgb(var(--accent))]/20 transition resize-none"
             />
             {/* Constraint examples */}
-            {presetContext.constraintsExamples.length > 0 && !decision.constraints && (
+            {constraintsExamples && constraintsExamples.length > 0 && !decision.constraints && (
               <div className="mt-2 text-xs text-white/40">
                 <span className="text-white/50">{t.common.examples}: </span>
-                {presetContext.constraintsExamples.slice(0, 2).join(" | ")}
+                {constraintsExamples.slice(0, 2).join(" | ")}
               </div>
             )}
           </div>

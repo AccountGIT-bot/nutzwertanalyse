@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useAnalysis } from "@/app/lib/nwa/analysis-context";
 import type { Alternative } from "@/app/lib/nwa/types";
 import { getPresetContext } from "@/app/lib/nwa/preset-context";
+import { type PresetId } from "@/app/lib/nwa/preset-icons";
 import { StepInfoButton } from "./StepInfoButton";
 import { useTranslations } from "@/app/lib/i18n";
 
@@ -15,6 +16,8 @@ export function AlternativesManager() {
   
   // Get context-specific content
   const presetContext = getPresetContext(decision.preset);
+  const presetKey = (decision.preset || "custom") as PresetId;
+  const presetTranslations = t.presets[presetKey] || t.presets.custom;
 
   const [newName, setNewName] = useState("");
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -22,11 +25,11 @@ export function AlternativesManager() {
   const minAlts = 2;
   const maxAlts = packageLevel === "basic" ? 5 : 10;
   
-  // Dynamic placeholder based on preset and current count
+  // Dynamic placeholder based on preset and current count - use translations
   const getPlaceholder = () => {
-    const placeholders = presetContext.alternativePlaceholders;
+    const placeholders = presetTranslations.alternativePlaceholders || presetContext.alternativePlaceholders;
     const index = alternatives.length % placeholders.length;
-    return placeholders[index] || "Name der Alternative...";
+    return placeholders[index] || t.alternativesSetup.placeholder;
   };
 
   const handleAdd = () => {
