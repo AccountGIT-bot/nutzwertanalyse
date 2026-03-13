@@ -3,17 +3,29 @@
 import { useState } from "react";
 import { useAnalysis } from "@/app/lib/nwa/analysis-context";
 import type { Alternative } from "@/app/lib/nwa/types";
+import { getPresetContext } from "@/app/lib/nwa/preset-context";
+import { StepInfoButton } from "./StepInfoButton";
 
 export function AlternativesManager() {
   const { state, addAlternative, updateAlternative, removeAlternative, duplicateAlternative, canProceedToNext } = useAnalysis();
   const { alternatives, decision } = state;
   const packageLevel = decision.packageLevel;
+  
+  // Get context-specific content
+  const presetContext = getPresetContext(decision.preset);
 
   const [newName, setNewName] = useState("");
   const [editingId, setEditingId] = useState<string | null>(null);
 
   const minAlts = 2;
   const maxAlts = packageLevel === "basic" ? 5 : 10;
+  
+  // Dynamic placeholder based on preset and current count
+  const getPlaceholder = () => {
+    const placeholders = presetContext.alternativePlaceholders;
+    const index = alternatives.length % placeholders.length;
+    return placeholders[index] || "Name der Alternative...";
+  };
 
   const handleAdd = () => {
     if (newName.trim() && alternatives.length < maxAlts) {
@@ -36,10 +48,13 @@ export function AlternativesManager() {
   return (
     <div className="space-y-6">
       <div>
-        <div className="text-sm text-white/60">Schritt 2</div>
+        <div className="text-sm text-white/60 flex items-center gap-2">
+          Schritt 2
+          <StepInfoButton stepId="alternatives" />
+        </div>
         <h2 className="mt-1 text-xl font-semibold text-white">Alternativen definieren</h2>
         <p className="mt-2 text-sm text-white/50">
-          Fügen Sie {minAlts} bis {maxAlts} Alternativen hinzu, die Sie vergleichen möchten.
+          {presetContext.alternativeHelperText}
           {packageLevel !== "basic" && " Sie können auch Annahmen zu jeder Alternative dokumentieren."}
         </p>
       </div>
@@ -51,7 +66,7 @@ export function AlternativesManager() {
           value={newName}
           onChange={(e) => setNewName(e.target.value)}
           onKeyDown={handleKeyDown}
-          placeholder="Name der Alternative..."
+          placeholder={getPlaceholder()}
           className="flex-1 h-12 px-4 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/30 outline-none focus:border-[rgb(var(--accent))] focus:ring-2 focus:ring-[rgb(var(--accent))]/20 transition"
           disabled={alternatives.length >= maxAlts}
         />

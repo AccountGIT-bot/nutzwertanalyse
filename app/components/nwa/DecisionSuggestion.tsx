@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState } from "react";
 import type { AIDecisionInterpretation } from "@/app/lib/nwa/types";
 import { getDomainIcon, getDomainLabel } from "@/app/lib/nwa/preset-icons";
 
@@ -12,21 +12,10 @@ interface DecisionSuggestionProps {
   onReject: () => void;
 }
 
-
-
-const CATEGORY_LABELS: Record<string, string> = {
-  economic: "Wirtschaftlichkeit",
-  quality: "Qualitat",
-  strategic: "Strategie",
-  risk: "Risiko",
-  other: "Sonstige",
-};
-
-const CONFIDENCE_LABELS: Record<string, { label: string; color: string }> = {
-  high: { label: "Hohe Konfidenz", color: "rgb(16, 185, 129)" },
-  medium: { label: "Mittlere Konfidenz", color: "rgb(245, 158, 11)" },
-  low: { label: "Niedrige Konfidenz", color: "rgb(239, 68, 68)" },
-};
+// Helper to capitalize first letter of each word
+function capitalizeFirst(str: string): string {
+  return str.charAt(0).toUpperCase() + str.slice(1);
+}
 
 export function DecisionSuggestion({
   interpretation,
@@ -35,264 +24,207 @@ export function DecisionSuggestion({
   onEdit,
   onReject,
 }: DecisionSuggestionProps) {
-  const [expandedSection, setExpandedSection] = useState<string | null>("title");
+  const [editedTitle, setEditedTitle] = useState(interpretation.title);
+  const [editedAlternatives, setEditedAlternatives] = useState(
+    interpretation.alternatives.map(a => ({ ...a, name: capitalizeFirst(a.name) }))
+  );
+  const [isEditing, setIsEditing] = useState(false);
   
   const DomainIcon = getDomainIcon(interpretation.domain);
   const domainLabel = getDomainLabel(interpretation.domain);
-  const confidenceInfo = CONFIDENCE_LABELS[interpretation.confidence];
 
-  const toggleSection = useCallback((section: string) => {
-    setExpandedSection((prev) => (prev === section ? null : section));
-  }, []);
+  const updateAlternative = (index: number, name: string) => {
+    const updated = [...editedAlternatives];
+    updated[index] = { ...updated[index], name: capitalizeFirst(name) };
+    setEditedAlternatives(updated);
+  };
+
+  const addAlternative = () => {
+    if (editedAlternatives.length < 6) {
+      setEditedAlternatives([...editedAlternatives, { name: `Option ${editedAlternatives.length + 1}`, description: null }]);
+    }
+  };
+
+  const removeAlternative = (index: number) => {
+    if (editedAlternatives.length > 2) {
+      setEditedAlternatives(editedAlternatives.filter((_, i) => i !== index));
+    }
+  };
+
+  const handleAccept = () => {
+    const updated: AIDecisionInterpretation = {
+      ...interpretation,
+      title: editedTitle,
+      alternatives: editedAlternatives,
+    };
+    onAccept(updated);
+  };
+
+  const handleEdit = () => {
+    const updated: AIDecisionInterpretation = {
+      ...interpretation,
+      title: editedTitle,
+      alternatives: editedAlternatives,
+    };
+    onEdit(updated);
+  };
 
   return (
-    <div className="w-full max-w-4xl mx-auto">
-      {/* Header with confidence indicator */}
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-3">
-          <div
-            className="h-10 w-10 rounded-xl flex items-center justify-center"
-            style={{ background: "rgba(0,0,0,0.08)" }}
-          >
-            <DomainIcon size={22} className="text-black/60" />
-          </div>
-          <div>
-            <div className="text-xs text-black/50">KI-Interpretation - {domainLabel}</div>
-            <div className="text-sm font-medium text-black/80">
-              Ihre Entscheidung wurde analysiert
-            </div>
-          </div>
-        </div>
+    <div className="w-full max-w-2xl mx-auto">
+      {/* Compact Header */}
+      <div className="flex items-center gap-3 mb-6">
         <div
-          className="flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium"
-          style={{
-            background: `${confidenceInfo.color}15`,
-            color: confidenceInfo.color,
-          }}
+          className="h-11 w-11 rounded-xl flex items-center justify-center"
+          style={{ background: "rgba(0,0,0,0.06)" }}
         >
-          <span
-            className="h-2 w-2 rounded-full"
-            style={{ background: confidenceInfo.color }}
-          />
-          {confidenceInfo.label}
+          <DomainIcon size={22} className="text-black/60" />
+        </div>
+        <div>
+          <div className="text-base font-semibold text-black/85">{domainLabel}</div>
+          <div className="text-xs text-black/45">basierend auf Ihrer Eingabe</div>
         </div>
       </div>
 
-      {/* Original input reference */}
-      <div className="mb-4 px-4 py-3 rounded-xl bg-black/5 border border-black/10">
-        <div className="text-[11px] text-black/50 mb-1">Ihre Eingabe</div>
-        <div className="text-sm text-black/70 italic">{`"${originalInput}"`}</div>
+      {/* Original Input - minimal */}
+      <div className="mb-5 px-3 py-2.5 rounded-lg bg-black/[0.03] border border-black/[0.06]">
+        <div className="text-sm text-black/60 italic truncate">{`„${originalInput}"`}</div>
       </div>
 
-      {/* Suggestion sections */}
-      <div className="space-y-3">
-        {/* Title & Description */}
-        <div className="rounded-2xl border border-black/10 bg-white/80 overflow-hidden">
-          <button
-            onClick={() => toggleSection("title")}
-            className="w-full px-4 py-3 flex items-center justify-between text-left hover:bg-black/5 transition"
-          >
-            <div className="flex items-center gap-3">
-              <div className="h-8 w-8 rounded-lg bg-blue-500/10 flex items-center justify-center">
-                <svg className="h-4 w-4 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                </svg>
-              </div>
-              <div>
-                <div className="text-sm font-medium text-black/80">Entscheidungstitel</div>
-                <div className="text-xs text-black/50">Verbesserte Formulierung</div>
-              </div>
-            </div>
-            <svg
-              className={`h-5 w-5 text-black/40 transition-transform ${
-                expandedSection === "title" ? "rotate-180" : ""
-              }`}
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
+      {/* Main Editable Card */}
+      <div className="rounded-2xl border border-black/10 bg-white shadow-sm overflow-hidden">
+        {/* Title Section */}
+        <div className="p-4 border-b border-black/[0.06]">
+          <label className="block text-xs font-medium text-black/50 mb-1.5">
+            Titel der Entscheidung
+          </label>
+          {isEditing ? (
+            <input
+              type="text"
+              value={editedTitle}
+              onChange={(e) => setEditedTitle(e.target.value)}
+              className="w-full text-lg font-semibold text-black/90 bg-transparent border-b border-black/20 focus:border-black/40 outline-none pb-1"
+              placeholder="Titel eingeben..."
+            />
+          ) : (
+            <div 
+              className="text-lg font-semibold text-black/90 cursor-pointer hover:text-black transition"
+              onClick={() => setIsEditing(true)}
             >
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-            </svg>
-          </button>
-          {expandedSection === "title" && (
-            <div className="px-4 pb-4 border-t border-black/10">
-              <div className="pt-3 space-y-3">
-                <div>
-                  <div className="text-xs text-black/50 mb-1">Titel</div>
-                  <div className="text-base font-semibold text-black/90">{interpretation.title}</div>
+              {editedTitle}
+            </div>
+          )}
+        </div>
+
+        {/* Alternatives Section */}
+        <div className="p-4">
+          <div className="flex items-center justify-between mb-3">
+            <label className="text-xs font-medium text-black/50">
+              Alternativen zum Vergleich
+            </label>
+            {!isEditing && (
+              <button
+                onClick={() => setIsEditing(true)}
+                className="text-xs text-black/40 hover:text-black/60 transition"
+              >
+                Bearbeiten
+              </button>
+            )}
+          </div>
+          
+          <div className="space-y-2">
+            {editedAlternatives.map((alt, index) => (
+              <div key={index} className="flex items-center gap-2">
+                <div className="h-7 w-7 rounded-full bg-black/[0.04] flex items-center justify-center flex-shrink-0">
+                  <span className="text-xs font-semibold text-black/50">{index + 1}</span>
                 </div>
-                <div>
-                  <div className="text-xs text-black/50 mb-1">Beschreibung</div>
-                  <div className="text-sm text-black/70">{interpretation.description}</div>
-                </div>
-                {interpretation.constraints && (
-                  <div>
-                    <div className="text-xs text-black/50 mb-1">Erkannte Randbedingungen</div>
-                    <div className="text-sm text-black/60 italic">{interpretation.constraints}</div>
+                {isEditing ? (
+                  <div className="flex-1 flex items-center gap-2">
+                    <input
+                      type="text"
+                      value={alt.name}
+                      onChange={(e) => updateAlternative(index, e.target.value)}
+                      className="flex-1 px-3 py-2 text-sm text-black/80 bg-black/[0.03] rounded-lg border border-transparent focus:border-black/20 outline-none"
+                      placeholder={`Alternative ${index + 1}...`}
+                    />
+                    {editedAlternatives.length > 2 && (
+                      <button
+                        onClick={() => removeAlternative(index)}
+                        className="p-1.5 text-black/30 hover:text-red-500 transition"
+                        title="Entfernen"
+                      >
+                        <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                      </button>
+                    )}
+                  </div>
+                ) : (
+                  <div className="flex-1 px-3 py-2 text-sm font-medium text-black/75 bg-black/[0.03] rounded-lg">
+                    {alt.name}
                   </div>
                 )}
               </div>
-            </div>
+            ))}
+          </div>
+
+          {isEditing && editedAlternatives.length < 6 && (
+            <button
+              onClick={addAlternative}
+              className="mt-3 w-full py-2 text-sm text-black/40 hover:text-black/60 border border-dashed border-black/15 hover:border-black/25 rounded-lg transition"
+            >
+              + Alternative hinzufügen
+            </button>
           )}
         </div>
 
-        {/* Alternatives */}
-        <div className="rounded-2xl border border-black/10 bg-white/80 overflow-hidden">
-          <button
-            onClick={() => toggleSection("alternatives")}
-            className="w-full px-4 py-3 flex items-center justify-between text-left hover:bg-black/5 transition"
-          >
-            <div className="flex items-center gap-3">
-              <div className="h-8 w-8 rounded-lg bg-green-500/10 flex items-center justify-center">
-                <svg className="h-4 w-4 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-                </svg>
+        {/* Criteria Preview - collapsed by default */}
+        <details className="border-t border-black/[0.06]">
+          <summary className="px-4 py-3 text-xs font-medium text-black/50 cursor-pointer hover:bg-black/[0.02] transition select-none">
+            {interpretation.criteria.length} Kriterien vorgeschlagen
+          </summary>
+          <div className="px-4 pb-4 space-y-1.5">
+            {interpretation.criteria.map((crit, index) => (
+              <div key={index} className="flex items-center gap-2 text-sm text-black/60">
+                <span className="w-1.5 h-1.5 rounded-full bg-black/20" />
+                {crit.name}
               </div>
-              <div>
-                <div className="text-sm font-medium text-black/80">
-                  {interpretation.alternatives.length} Alternativen vorgeschlagen
-                </div>
-                <div className="text-xs text-black/50">Entscheidungsoptionen</div>
-              </div>
+            ))}
+            <div className="text-xs text-black/40 mt-2 pt-2 border-t border-black/[0.06]">
+              Kriterien können im nächsten Schritt angepasst werden
             </div>
-            <svg
-              className={`h-5 w-5 text-black/40 transition-transform ${
-                expandedSection === "alternatives" ? "rotate-180" : ""
-              }`}
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-            </svg>
-          </button>
-          {expandedSection === "alternatives" && (
-            <div className="px-4 pb-4 border-t border-black/10">
-              <div className="pt-3 space-y-2">
-                {interpretation.alternatives.map((alt, index) => (
-                  <div
-                    key={index}
-                    className="flex items-start gap-3 p-3 rounded-xl bg-black/5"
-                  >
-                    <div className="h-6 w-6 rounded-full bg-green-500/20 flex items-center justify-center flex-shrink-0 mt-0.5">
-                      <span className="text-xs font-semibold text-green-700">{index + 1}</span>
-                    </div>
-                    <div>
-                      <div className="text-sm font-medium text-black/80">{alt.name}</div>
-                      {alt.description && (
-                        <div className="text-xs text-black/50 mt-0.5">{alt.description}</div>
-                      )}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* Criteria */}
-        <div className="rounded-2xl border border-black/10 bg-white/80 overflow-hidden">
-          <button
-            onClick={() => toggleSection("criteria")}
-            className="w-full px-4 py-3 flex items-center justify-between text-left hover:bg-black/5 transition"
-          >
-            <div className="flex items-center gap-3">
-              <div className="h-8 w-8 rounded-lg bg-purple-500/10 flex items-center justify-center">
-                <svg className="h-4 w-4 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
-                </svg>
-              </div>
-              <div>
-                <div className="text-sm font-medium text-black/80">
-                  {interpretation.criteria.length} Kriterien vorgeschlagen
-                </div>
-                <div className="text-xs text-black/50">Bewertungsmerkmale</div>
-              </div>
-            </div>
-            <svg
-              className={`h-5 w-5 text-black/40 transition-transform ${
-                expandedSection === "criteria" ? "rotate-180" : ""
-              }`}
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-            </svg>
-          </button>
-          {expandedSection === "criteria" && (
-            <div className="px-4 pb-4 border-t border-black/10">
-              <div className="pt-3 space-y-2">
-                {interpretation.criteria.map((crit, index) => (
-                  <div
-                    key={index}
-                    className="flex items-start gap-3 p-3 rounded-xl bg-black/5"
-                  >
-                    <div
-                      className="h-6 px-2 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5 text-xs font-medium"
-                      style={{
-                        background:
-                          crit.categoryId === "economic"
-                            ? "rgba(59, 130, 246, 0.15)"
-                            : crit.categoryId === "quality"
-                            ? "rgba(16, 185, 129, 0.15)"
-                            : crit.categoryId === "strategic"
-                            ? "rgba(168, 85, 247, 0.15)"
-                            : crit.categoryId === "risk"
-                            ? "rgba(239, 68, 68, 0.15)"
-                            : "rgba(107, 114, 128, 0.15)",
-                        color:
-                          crit.categoryId === "economic"
-                            ? "rgb(59, 130, 246)"
-                            : crit.categoryId === "quality"
-                            ? "rgb(16, 185, 129)"
-                            : crit.categoryId === "strategic"
-                            ? "rgb(168, 85, 247)"
-                            : crit.categoryId === "risk"
-                            ? "rgb(239, 68, 68)"
-                            : "rgb(107, 114, 128)",
-                      }}
-                    >
-                      {CATEGORY_LABELS[crit.categoryId]}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="text-sm font-medium text-black/80">{crit.name}</div>
-                      <div className="text-xs text-black/50 mt-0.5">{crit.description}</div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-        </div>
+          </div>
+        </details>
       </div>
 
-      {/* Action buttons */}
-      <div className="mt-6 flex flex-col sm:flex-row gap-3">
+      {/* Action Buttons */}
+      <div className="mt-6 flex flex-col gap-3">
         <button
-          onClick={() => onAccept(interpretation)}
-          className="flex-1 px-6 py-3 rounded-full text-sm font-semibold text-white transition shadow-lg hover:shadow-xl active:scale-[0.99]"
+          onClick={handleAccept}
+          className="w-full px-6 py-3.5 rounded-full text-sm font-semibold text-white transition shadow-lg hover:shadow-xl active:scale-[0.99]"
           style={{ background: "#0b0f14" }}
         >
-          Vorschlage ubernehmen
+          Weiter zur Analyse
         </button>
-        <button
-          onClick={() => onEdit(interpretation)}
-          className="flex-1 px-6 py-3 rounded-full text-sm font-semibold text-black/70 bg-black/5 border border-black/10 hover:bg-black/10 transition"
-        >
-          Anpassen & Starten
-        </button>
-        <button
-          onClick={onReject}
-          className="px-4 py-3 rounded-full text-sm font-medium text-black/50 hover:text-black/70 hover:bg-black/5 transition"
-        >
-          Neu eingeben
-        </button>
+        
+        <div className="flex gap-3">
+          <button
+            onClick={handleEdit}
+            className="flex-1 px-4 py-2.5 rounded-full text-sm font-medium text-black/60 bg-black/[0.04] hover:bg-black/[0.08] transition"
+          >
+            Detailliert anpassen
+          </button>
+          <button
+            onClick={onReject}
+            className="px-4 py-2.5 rounded-full text-sm font-medium text-black/40 hover:text-black/60 hover:bg-black/[0.04] transition"
+          >
+            Neu eingeben
+          </button>
+        </div>
       </div>
 
       {/* Hint */}
-      <div className="mt-4 text-center text-xs text-black/45">
-        Sie konnen alle Vorschlage im nachsten Schritt anpassen oder erweitern.
+      <div className="mt-4 text-center text-xs text-black/40">
+        Alle Angaben können jederzeit angepasst werden
       </div>
     </div>
   );

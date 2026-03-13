@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useAnalysis } from "@/app/lib/nwa/analysis-context";
 import { getTemplateByPreset } from "@/app/lib/nwa/templates";
 import type { Criterion } from "@/app/lib/nwa/types";
+import { StepInfoButton } from "./StepInfoButton";
 
 export function CriteriaManager() {
 const {
@@ -77,7 +78,10 @@ const {
   return (
     <div className="space-y-6">
       <div>
-        <div className="text-sm text-white/60">Schritt 3</div>
+        <div className="text-sm text-white/60 flex items-center gap-2">
+          Schritt 3
+          <StepInfoButton stepId="criteria" />
+        </div>
         <h2 className="mt-1 text-xl font-semibold text-white">Kriterien festlegen</h2>
         <p className="mt-2 text-sm text-white/50">
           {packageLevel === "basic"

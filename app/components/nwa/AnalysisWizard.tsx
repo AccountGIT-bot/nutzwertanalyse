@@ -142,7 +142,7 @@ export function AnalysisWizard() {
           <div className="bg-[#1a1a1a] border border-white/10 rounded-2xl p-6 max-w-md mx-4 shadow-2xl">
             <h3 className="text-lg font-semibold text-white">Entwurf gefunden</h3>
             <p className="mt-2 text-sm text-white/60">
-              Es wurde ein gespeicherter Entwurf gefunden. Moechten Sie diesen wiederherstellen?
+              Es wurde ein gespeicherter Entwurf gefunden. Möchten Sie diesen wiederherstellen?
             </p>
             <div className="mt-4 flex gap-3">
               <button
@@ -166,9 +166,9 @@ export function AnalysisWizard() {
       {showResetConfirm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
           <div className="bg-[#1a1a1a] border border-white/10 rounded-2xl p-6 max-w-md mx-4 shadow-2xl">
-            <h3 className="text-lg font-semibold text-white">Analyse zuruecksetzen?</h3>
+            <h3 className="text-lg font-semibold text-white">Analyse zurücksetzen?</h3>
             <p className="mt-2 text-sm text-white/60">
-              Sind Sie sicher, dass Sie die Analyse zuruecksetzen moechten? Alle eingegebenen Daten werden geloescht.
+              Sind Sie sicher, dass Sie die Analyse zurücksetzen möchten? Alle eingegebenen Daten werden gelöscht.
             </p>
             <div className="mt-4 flex gap-3">
               <button
@@ -181,7 +181,7 @@ export function AnalysisWizard() {
                 onClick={handleConfirmReset}
                 className="flex-1 px-4 py-2.5 rounded-xl text-sm font-semibold text-white bg-red-600 hover:bg-red-500 transition"
               >
-                Zuruecksetzen
+                Zurücksetzen
               </button>
             </div>
           </div>
@@ -222,7 +222,7 @@ export function AnalysisWizard() {
               <button
                 onClick={handleResetClick}
                 className="px-3 py-1.5 rounded-lg text-xs font-medium text-white/50 hover:text-white/70 hover:bg-white/10 transition"
-                title="Analyse zuruecksetzen"
+                title="Analyse zurücksetzen"
               >
                 Neustart
               </button>
@@ -300,14 +300,19 @@ export function AnalysisWizard() {
                   currentStepIndex === 0 ? "text-white/30 cursor-not-allowed" : "text-white/70 hover:text-white hover:bg-white/10"
                 }`}
               >
-                Zurueck
+                Zurück
               </button>
               <div className="text-sm text-white/40">
                 Schritt {currentStepIndex + 1} von {STEPS.length}
               </div>
               {currentStep === "results" ? (
                 <button
-                  className="px-6 py-2.5 rounded-xl text-sm font-semibold transition"
+                  onClick={() => {
+                    // Trigger the export in ReportGenerator via DOM event
+                    const exportBtn = document.querySelector('[data-export-pdf]') as HTMLButtonElement;
+                    if (exportBtn) exportBtn.click();
+                  }}
+                  className="px-6 py-2.5 rounded-xl text-sm font-semibold transition hover:brightness-110"
                   style={{ background: "rgb(var(--accent))", color: "white" }}
                 >
                   Export PDF

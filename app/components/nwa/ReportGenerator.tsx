@@ -54,137 +54,146 @@ function generateReportHTML(state: AnalysisState, config: ReportConfig): string 
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Nutzwertanalyse Report - ${decision.title}</title>
+  <title>Nutzwertanalyse - ${decision.title}</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { 
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-      line-height: 1.6;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      line-height: 1.5;
       color: #1a1a1a;
       background: #fff;
-      padding: 40px;
-      max-width: 900px;
+      padding: 28px 32px;
+      max-width: 850px;
       margin: 0 auto;
+      font-size: 12px;
     }
     .header { 
-      border-bottom: 3px solid #0066cc; 
-      padding-bottom: 24px; 
-      margin-bottom: 32px;
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      border-bottom: 2px solid #1a1a1a; 
+      padding-bottom: 16px; 
+      margin-bottom: 20px;
     }
-    .header h1 { font-size: 28px; font-weight: 700; margin-bottom: 8px; }
-    .header .subtitle { color: #666; font-size: 14px; }
-    .meta { display: flex; gap: 24px; margin-top: 16px; font-size: 12px; color: #666; }
-    .meta-item { display: flex; align-items: center; gap: 6px; }
-    .badge { 
+    .header-left h1 { font-size: 20px; font-weight: 700; margin-bottom: 4px; }
+    .header-left .subtitle { color: #666; font-size: 11px; max-width: 400px; }
+    .header-right { text-align: right; font-size: 10px; color: #888; }
+    .header-right .badge { 
       display: inline-block; 
-      padding: 4px 12px; 
-      border-radius: 4px; 
-      font-size: 11px; 
-      font-weight: 600; 
+      padding: 3px 10px; 
+      border-radius: 3px; 
+      font-size: 9px; 
+      font-weight: 700; 
       text-transform: uppercase;
-      background: #0066cc;
+      background: #1a1a1a;
       color: white;
+      margin-bottom: 6px;
     }
-    .section { margin-bottom: 32px; page-break-inside: avoid; }
+    .section { margin-bottom: 20px; page-break-inside: avoid; }
     .section-title { 
-      font-size: 18px; 
-      font-weight: 600; 
-      margin-bottom: 16px;
-      padding-bottom: 8px;
-      border-bottom: 1px solid #e0e0e0;
+      font-size: 13px; 
+      font-weight: 700; 
+      margin-bottom: 10px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #ddd;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
     }
     .recommendation-card {
-      background: linear-gradient(135deg, #f0f7ff, #e8f4ff);
-      border: 1px solid #0066cc;
-      border-radius: 12px;
-      padding: 24px;
-      margin-bottom: 24px;
+      background: #f8f9fa;
+      border-left: 4px solid #0066cc;
+      padding: 14px 16px;
+      margin-bottom: 16px;
     }
-    .recommendation-card h3 { font-size: 14px; color: #666; margin-bottom: 8px; }
-    .recommendation-card .winner { font-size: 24px; font-weight: 700; color: #0066cc; }
-    .recommendation-card .reasoning { margin-top: 12px; font-size: 14px; color: #444; }
+    .recommendation-card .label { font-size: 9px; color: #888; text-transform: uppercase; letter-spacing: 0.5px; }
+    .recommendation-card .winner { font-size: 18px; font-weight: 700; color: #0066cc; margin: 4px 0; }
+    .recommendation-card .reasoning { font-size: 11px; color: #555; }
     .confidence { 
-      display: flex; 
+      display: inline-flex; 
       align-items: center; 
-      gap: 8px; 
-      margin-top: 12px;
-      font-size: 12px;
-      color: #666;
+      gap: 6px; 
+      margin-top: 8px;
+      font-size: 10px;
+      color: #888;
+      background: #fff;
+      padding: 4px 8px;
+      border-radius: 3px;
     }
-    .confidence-bar { display: flex; gap: 4px; }
-    .confidence-bar span { width: 24px; height: 8px; border-radius: 4px; background: #e0e0e0; }
-    .confidence-bar span.filled { background: #0066cc; }
-    table { width: 100%; border-collapse: collapse; font-size: 13px; }
-    th, td { padding: 12px; text-align: left; border-bottom: 1px solid #e0e0e0; }
-    th { background: #f8f9fa; font-weight: 600; color: #444; }
+    .confidence-dots { display: flex; gap: 3px; }
+    .confidence-dots span { width: 8px; height: 8px; border-radius: 50%; background: #ddd; }
+    .confidence-dots span.filled { background: #0066cc; }
+    table { width: 100%; border-collapse: collapse; font-size: 11px; }
+    th, td { padding: 8px 10px; text-align: left; border-bottom: 1px solid #eee; }
+    th { background: #f5f5f5; font-weight: 600; color: #555; font-size: 10px; text-transform: uppercase; }
     .rank { 
       display: inline-flex; 
       align-items: center; 
       justify-content: center;
-      width: 28px; 
-      height: 28px; 
-      border-radius: 8px; 
+      width: 22px; 
+      height: 22px; 
+      border-radius: 4px; 
       font-weight: 700;
-      font-size: 14px;
+      font-size: 11px;
     }
     .rank-1 { background: #ffd700; color: #1a1a1a; }
     .rank-2 { background: #c0c0c0; color: #1a1a1a; }
     .rank-3 { background: #cd7f32; color: white; }
-    .rank-other { background: #e0e0e0; color: #666; }
-    .score { font-weight: 600; color: #0066cc; }
-    .progress-bar { 
-      height: 8px; 
-      background: #e0e0e0; 
-      border-radius: 4px; 
+    .rank-other { background: #eee; color: #888; }
+    .score { font-weight: 700; color: #0066cc; font-size: 13px; }
+    .score-bar { 
+      height: 4px; 
+      background: #eee; 
+      border-radius: 2px; 
       overflow: hidden;
-      margin-top: 4px;
+      margin-top: 3px;
+      width: 80px;
     }
-    .progress-bar-fill { height: 100%; background: #0066cc; border-radius: 4px; }
-    .knockout { color: #dc3545; font-weight: 500; }
-    .sensitivity-badge {
+    .score-bar-fill { height: 100%; background: #0066cc; }
+    .knockout { color: #dc3545; }
+    .sens-badge {
       display: inline-block;
-      padding: 2px 8px;
-      border-radius: 4px;
-      font-size: 11px;
+      padding: 2px 6px;
+      border-radius: 3px;
+      font-size: 9px;
       font-weight: 600;
     }
-    .sensitivity-high { background: #ffebee; color: #c62828; }
-    .sensitivity-medium { background: #fff8e1; color: #f57f17; }
-    .sensitivity-low { background: #e8f5e9; color: #2e7d32; }
+    .sens-high { background: #ffebee; color: #c62828; }
+    .sens-medium { background: #fff8e1; color: #f57f17; }
+    .sens-low { background: #e8f5e9; color: #2e7d32; }
     .consistency-box {
-      padding: 16px;
-      border-radius: 8px;
-      margin-top: 16px;
+      padding: 12px;
+      border-radius: 4px;
+      font-size: 11px;
     }
     .consistency-pass { background: #e8f5e9; border: 1px solid #4caf50; }
     .consistency-fail { background: #fff8e1; border: 1px solid #ff9800; }
     .footer {
-      margin-top: 48px;
-      padding-top: 24px;
-      border-top: 1px solid #e0e0e0;
-      font-size: 11px;
-      color: #999;
+      margin-top: 24px;
+      padding-top: 12px;
+      border-top: 1px solid #eee;
+      font-size: 9px;
+      color: #aaa;
       text-align: center;
     }
-    .text-muted { color: #666; }
-    .text-small { font-size: 12px; }
+    .text-muted { color: #888; }
+    .text-small { font-size: 10px; }
+    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
     @media print {
-      body { padding: 20px; }
+      body { padding: 16px; font-size: 11px; }
       .section { page-break-inside: avoid; }
     }
   </style>
 </head>
 <body>
   <div class="header">
-    <h1>${decision.title || "Nutzwertanalyse"}</h1>
-    <p class="subtitle">${decision.description || "Entscheidungsanalyse"}</p>
-    <div class="meta">
-      <div class="meta-item">
-        <span class="badge">${packageLabel}</span>
-      </div>
-      <div class="meta-item">Erstellt: ${date}</div>
-      <div class="meta-item">${alternatives.length} Alternativen</div>
-      <div class="meta-item">${criteria.length} Kriterien</div>
+    <div class="header-left">
+      <h1>${decision.title || "Nutzwertanalyse"}</h1>
+      <p class="subtitle">${decision.description || ""}</p>
+    </div>
+    <div class="header-right">
+      <div class="badge">${packageLabel}</div>
+      <div>${date}</div>
+      <div>${alternatives.length} Alternativen · ${criteria.length} Kriterien</div>
     </div>
   </div>
 `;
@@ -194,17 +203,16 @@ function generateReportHTML(state: AnalysisState, config: ReportConfig): string 
     const confidenceFilled = recommendation.confidence === "high" ? 3 : recommendation.confidence === "medium" ? 2 : 1;
     html += `
   <div class="section">
-    <h2 class="section-title">Zusammenfassung & Empfehlung</h2>
+    <h2 class="section-title">Empfehlung</h2>
     <div class="recommendation-card">
-      <h3>Empfohlene Alternative</h3>
+      <div class="label">Empfohlene Alternative</div>
       <div class="winner">${recommendation.recommended?.name || "Keine klare Empfehlung"}</div>
       <div class="reasoning">${recommendation.reasoning}</div>
       <div class="confidence">
-        <span>Konfidenz:</span>
-        <div class="confidence-bar">
+        <div class="confidence-dots">
           ${[1, 2, 3].map((i) => `<span class="${i <= confidenceFilled ? "filled" : ""}"></span>`).join("")}
         </div>
-        <span>${recommendation.confidence === "high" ? "Hoch" : recommendation.confidence === "medium" ? "Mittel" : "Niedrig"}</span>
+        <span>Konfidenz: ${recommendation.confidence === "high" ? "Hoch" : recommendation.confidence === "medium" ? "Mittel" : "Niedrig"}</span>
       </div>
     </div>
   </div>
@@ -214,14 +222,14 @@ function generateReportHTML(state: AnalysisState, config: ReportConfig): string 
   // Ranking Results
   html += `
   <div class="section">
-    <h2 class="section-title">Ranking der Alternativen</h2>
+    <h2 class="section-title">Ranking</h2>
     <table>
       <thead>
         <tr>
-          <th>Rang</th>
+          <th style="width:50px">Rang</th>
           <th>Alternative</th>
-          <th>Gesamtscore</th>
-          <th>Normalisiert</th>
+          <th style="width:120px">Score</th>
+          <th style="width:60px">%</th>
         </tr>
       </thead>
       <tbody>
@@ -236,14 +244,11 @@ function generateReportHTML(state: AnalysisState, config: ReportConfig): string 
     html += `
         <tr>
           <td><span class="rank ${rankClass}">${result.rank}</span></td>
-          <td>
-            <strong>${alt?.name}</strong>
-            ${alt?.description ? `<br><span class="text-small text-muted">${alt.description}</span>` : ""}
-          </td>
+          <td><strong>${alt?.name}</strong></td>
           <td>
             <span class="score">${result.totalScore.toFixed(2)}</span>
-            <div class="progress-bar">
-              <div class="progress-bar-fill" style="width: ${barWidth}%"></div>
+            <div class="score-bar">
+              <div class="score-bar-fill" style="width: ${barWidth}%"></div>
             </div>
           </td>
           <td>${result.normalizedScore.toFixed(0)}%</td>
@@ -332,17 +337,14 @@ function generateReportHTML(state: AnalysisState, config: ReportConfig): string 
   if (config.includeSensitivityAnalysis && sensitivityResults.length > 0) {
     html += `
   <div class="section">
-    <h2 class="section-title">Sensitivitätsanalyse</h2>
-    <p class="text-muted text-small" style="margin-bottom: 16px;">
-      Zeigt, wie empfindlich das Ranking auf Änderungen der Gewichtung reagiert.
-    </p>
+    <h2 class="section-title">Sensitivität</h2>
     <table>
       <thead>
         <tr>
           <th>Kriterium</th>
-          <th>Aktuelles Gewicht</th>
-          <th>Sensitivität</th>
-          <th>Einfluss auf Ranking</th>
+          <th style="width:80px">Gewicht</th>
+          <th style="width:80px">Sensitivität</th>
+          <th style="width:80px">Einfluss</th>
         </tr>
       </thead>
       <tbody>
@@ -350,7 +352,7 @@ function generateReportHTML(state: AnalysisState, config: ReportConfig): string 
 
     sensitivityResults.forEach((sens) => {
       const criterion = criteria.find((c) => c.id === sens.criterionId);
-      const badgeClass = sens.impactOnRanking === "high" ? "sensitivity-high" : sens.impactOnRanking === "medium" ? "sensitivity-medium" : "sensitivity-low";
+      const badgeClass = sens.impactOnRanking === "high" ? "sens-high" : sens.impactOnRanking === "medium" ? "sens-medium" : "sens-low";
       const label = sens.impactOnRanking === "high" ? "Hoch" : sens.impactOnRanking === "medium" ? "Mittel" : "Niedrig";
       
       html += `
@@ -358,7 +360,7 @@ function generateReportHTML(state: AnalysisState, config: ReportConfig): string 
           <td>${criterion?.name}</td>
           <td>${(sens.originalWeight * 100).toFixed(0)}%</td>
           <td>${(sens.sensitivity * 100).toFixed(0)}%</td>
-          <td><span class="sensitivity-badge ${badgeClass}">${label}</span></td>
+          <td><span class="sens-badge ${badgeClass}">${label}</span></td>
         </tr>
 `;
     });
@@ -540,9 +542,10 @@ export function ReportGenerator() {
 
       {/* Export button */}
       <button
+        data-export-pdf
         onClick={handleExportPDF}
         disabled={isGenerating}
-        className="w-full h-12 rounded-xl font-semibold transition disabled:opacity-50 flex items-center justify-center gap-2"
+        className="w-full h-12 rounded-xl font-semibold transition disabled:opacity-50 flex items-center justify-center gap-2 hover:brightness-110"
         style={{
           background: `rgb(var(--accent))`,
           color: "white",

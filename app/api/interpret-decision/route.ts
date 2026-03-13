@@ -45,50 +45,87 @@ const decisionInterpretationSchema = z.object({
 
 export type DecisionInterpretation = z.infer<typeof decisionInterpretationSchema>;
 
-const SYSTEM_PROMPT = `You are a professional decision analysis assistant for a Nutzwertanalyse (utility analysis) tool. 
-Your task is to interpret user decision descriptions and generate structured analysis frameworks.
+const SYSTEM_PROMPT = `Du bist ein professioneller Entscheidungsanalyse-Assistent für ein Nutzwertanalyse-Tool.
+Deine Aufgabe: Interpretiere Benutzereingaben und erstelle strukturierte Analyserahmen.
 
-Guidelines:
-1. TITLE: Create a clear, professional decision title in German. Keep it concise but descriptive.
+WICHTIG: Die Eingabe muss NICHT in eine der 6 Standardkategorien passen. 
+Analysiere den genauen Text des Benutzers und erstelle passende Alternativen und Kriterien dafür.
 
-2. DESCRIPTION: Improve the user's wording into a professional, clear description. 
-   - Fix grammar and spelling
-   - Make it more formal and structured
-   - Keep the original meaning intact
-   - Write in German
+Richtlinien:
+1. TITEL: Erstelle einen klaren, professionellen Entscheidungstitel auf Deutsch.
+   - Wenn der Benutzer "X oder Y" fragt, nutze genau diese Begriffe
+   - Halte es kurz aber aussagekräftig
 
-3. DOMAIN: Detect the most appropriate decision domain from the options.
+2. BESCHREIBUNG: Verbessere die Formulierung zu einer professionellen Beschreibung.
+   - Korrigiere Grammatik und Rechtschreibung
+   - Behalte die ursprüngliche Bedeutung bei
+   - Auf Deutsch schreiben
 
-4. ALTERNATIVES: Generate 2-6 realistic decision alternatives.
-   - Include at least one "status quo" or "do nothing" option when appropriate
-   - Make alternatives mutually exclusive but collectively exhaustive
-   - Use German names
+3. DOMAIN: Wähle die passendste Kategorie. Bei unklaren Eingaben wähle "other".
 
-5. CRITERIA: Suggest 4-10 relevant evaluation criteria.
-   - Criteria should be measurable or at least comparable
-   - Mix of economic, quality, strategic, and risk criteria
-   - Appropriate for the specific decision context
-   - Use German names and descriptions
+4. ALTERNATIVEN: Generiere 2-6 realistische Entscheidungsalternativen.
+   - Wenn der Benutzer "A oder B" fragt, nutze A und B als Alternativen (kapitalisiert)
+   - Füge ggf. eine "Status quo" Option hinzu
+   - Alternativen sollten sich gegenseitig ausschließen
+   - WICHTIG: Erster Buchstabe jeder Alternative groß schreiben
 
-6. CONSTRAINTS: Extract any constraints or assumptions mentioned or implied.
+5. KRITERIEN: Schlage 4-10 relevante Bewertungskriterien vor.
+   - Kriterien sollten messbar oder vergleichbar sein
+   - Mix aus wirtschaftlichen, qualitativen, strategischen und Risiko-Kriterien
+   - Passend zum spezifischen Entscheidungskontext
 
-7. CONFIDENCE: Rate your interpretation confidence based on input clarity.
+6. EINSCHRÄNKUNGEN: Extrahiere erkannte Rahmenbedingungen.
 
-Always respond in German. Be practical and realistic in your suggestions.`;
+7. KONFIDENZ: Bewerte deine Interpretationssicherheit.
+
+Antworte IMMER auf Deutsch. Sei praktisch und realistisch.`;
+
+// Additional security: sanitize and validate input
+function sanitizeUserInput(input: unknown): string | null {
+  if (typeof input !== "string") return null;
+  
+  return input
+    .trim()
+    // Remove potential script tags and HTML
+    .replace(/<[^>]*>/g, "")
+    // Remove control characters except newlines
+    .replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, "")
+    // Normalize whitespace
+    .replace(/\s+/g, " ")
+    // Limit length
+    .slice(0, 1000);
+}
+
+// Validate package level
+function validatePackageLevel(level: unknown): "basic" | "advanced" | "business" {
+  if (level === "advanced") return "advanced";
+  if (level === "business") return "business";
+  return "basic";
+}
 
 export async function POST(req: Request) {
   try {
-    const { userInput, packageLevel = "basic" } = await req.json();
+    // Parse request body with error handling
+    let body: Record<string, unknown>;
+    try {
+      body = await req.json();
+    } catch {
+      return Response.json(
+        { error: "Invalid JSON body" },
+        { status: 400 }
+      );
+    }
 
-    if (!userInput || typeof userInput !== "string") {
+    const { userInput, packageLevel } = body;
+    const sanitizedInput = sanitizeUserInput(userInput);
+    const validPackageLevel = validatePackageLevel(packageLevel);
+
+    if (!sanitizedInput) {
       return Response.json(
         { error: "Missing or invalid user input" },
         { status: 400 }
       );
     }
-
-    // Sanitize input
-    const sanitizedInput = userInput.trim().slice(0, 1000);
 
     if (sanitizedInput.length < 3) {
       return Response.json(
@@ -98,8 +135,8 @@ export async function POST(req: Request) {
     }
 
     // Adjust criteria count based on package level
-    const maxCriteria = packageLevel === "basic" ? 6 : packageLevel === "advanced" ? 8 : 10;
-    const maxAlternatives = packageLevel === "basic" ? 5 : 8;
+    const maxCriteria = validPackageLevel === "basic" ? 6 : validPackageLevel === "advanced" ? 8 : 10;
+    const maxAlternatives = validPackageLevel === "basic" ? 5 : 8;
 
     const { output } = await generateText({
       model: "openai/gpt-4o-mini",
@@ -111,7 +148,7 @@ export async function POST(req: Request) {
 
 User Input: "${sanitizedInput}"
 
-Package Level: ${packageLevel} (${packageLevel === "basic" ? "simpler, max 6 criteria" : packageLevel === "advanced" ? "detailed, max 8 criteria" : "comprehensive, max 10 criteria"})
+Package Level: ${validPackageLevel} (${validPackageLevel === "basic" ? "simpler, max 6 criteria" : validPackageLevel === "advanced" ? "detailed, max 8 criteria" : "comprehensive, max 10 criteria"})
 
 Requirements:
 - Maximum ${maxAlternatives} alternatives

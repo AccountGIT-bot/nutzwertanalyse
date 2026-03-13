@@ -15,146 +15,9 @@ import {
 } from "@/app/lib/nwa/preset-icons";
 import { DecisionSuggestion } from "@/app/components/nwa/DecisionSuggestion";
 import type { AIDecisionInterpretation } from "@/app/lib/nwa/types";
+import { interpretDecisionInput, sanitizeInput } from "@/app/lib/nwa/interpretation-engine";
 
 type Phase = "intro" | "landing" | "analyzing" | "suggestion";
-
-// Client-side fallback interpretation for simple inputs
-type CategoryId = "economic" | "quality" | "strategic" | "risk" | "other";
-
-function createFallbackInterpretation(input: string): AIDecisionInterpretation {
-  const trimmed = input.trim();
-  
-  // Detect various comparison patterns:
-  // "X oder Y", "X vs Y", "X oder Y?", etc.
-  const orPattern = /^(.+?)\s+(?:oder|vs\.?|versus|oder\s+doch|oder\s+lieber)\s+(.+?)[\?\.\!]?$/i;
-  const match = trimmed.match(orPattern);
-  
-  // Also detect "Soll ich X oder Y" patterns
-  const sollIchPattern = /^(?:soll\s+ich|sollte\s+ich|welche[rns]?|was\s+soll|ich\s+(?:moechte|will|wuerde))\s+.*?(.+?)\s+(?:oder|vs\.?)\s+(.+?)[\?\.\!]?$/i;
-  const sollIchMatch = trimmed.match(sollIchPattern);
-  
-  let alternatives: { name: string; description: string | null }[] = [];
-  let title = trimmed;
-  let domain: AIDecisionInterpretation["domain"] = "other";
-  
-  // Use either match
-  const actualMatch = match || sollIchMatch;
-  
-  if (actualMatch) {
-    const alt1 = actualMatch[1].trim();
-    const alt2 = actualMatch[2].trim();
-    alternatives = [
-      { name: alt1, description: null },
-      { name: alt2, description: null },
-    ];
-    title = `Vergleich: ${alt1} vs. ${alt2}`;
-    
-    // Try to detect domain from keywords
-    const combined = (alt1 + " " + alt2).toLowerCase();
-    if (/bmw|audi|mercedes|vw|volkswagen|ford|toyota|auto|fahrzeug|wagen|pkw/.test(combined)) {
-      domain = "vehicle";
-      title = `Fahrzeugvergleich: ${alt1} vs. ${alt2}`;
-    } else if (/software|app|tool|crm|erp|system|programm/.test(combined)) {
-      domain = "software";
-      title = `Softwarevergleich: ${alt1} vs. ${alt2}`;
-    } else if (/lieferant|anbieter|supplier|partner|firma|unternehmen/.test(combined)) {
-      domain = "supplier";
-      title = `Lieferantenvergleich: ${alt1} vs. ${alt2}`;
-    } else if (/maschine|anlage|geraet|equipment/.test(combined)) {
-      domain = "machines";
-      title = `Maschinenvergleich: ${alt1} vs. ${alt2}`;
-    } else if (/mitarbeiter|bewerber|kandidat|personal/.test(combined)) {
-      domain = "employee";
-      title = `Kandidatenvergleich: ${alt1} vs. ${alt2}`;
-    } else if (/invest|aktie|fonds|anlage|rendite|kaufen|mieten/.test(combined)) {
-      domain = "investment";
-      title = `Investitionsentscheidung: ${alt1} vs. ${alt2}`;
-    } else if (/katze|hund|haustier|tier|pet/.test(combined)) {
-      domain = "personal";
-      title = `Persoenliche Entscheidung: ${alt1} vs. ${alt2}`;
-    } else {
-      domain = "personal";
-    }
-  } else {
-    // No pattern match - use input as title, create generic alternatives
-    alternatives = [
-      { name: "Option A", description: null },
-      { name: "Option B", description: null },
-    ];
-  }
-  
-  // Generate domain-appropriate default criteria
-  const criteriaMap: Record<string, { name: string; description: string; categoryId: CategoryId }[]> = {
-    vehicle: [
-      { name: "Anschaffungskosten", description: "Kaufpreis inkl. Nebenkosten", categoryId: "economic" },
-      { name: "Unterhaltskosten", description: "Laufende Kosten pro Jahr", categoryId: "economic" },
-      { name: "Zuverlaessigkeit", description: "Erwartete Pannenhaeufigkeit", categoryId: "quality" },
-      { name: "Komfort", description: "Fahrkomfort und Ausstattung", categoryId: "quality" },
-      { name: "Verbrauch", description: "Kraftstoff- oder Energieverbrauch", categoryId: "economic" },
-    ],
-    software: [
-      { name: "Lizenzkosten", description: "Einmalige oder laufende Kosten", categoryId: "economic" },
-      { name: "Funktionsumfang", description: "Abdeckung der Anforderungen", categoryId: "quality" },
-      { name: "Benutzerfreundlichkeit", description: "Intuitive Bedienung", categoryId: "quality" },
-      { name: "Integration", description: "Anbindung an bestehende Systeme", categoryId: "strategic" },
-      { name: "Support", description: "Qualitaet des Kundenservice", categoryId: "quality" },
-    ],
-    supplier: [
-      { name: "Preis", description: "Gesamtkosten des Angebots", categoryId: "economic" },
-      { name: "Qualitaet", description: "Produkt- oder Servicequalitaet", categoryId: "quality" },
-      { name: "Lieferzeit", description: "Schnelligkeit der Lieferung", categoryId: "quality" },
-      { name: "Zuverlaessigkeit", description: "Termintreue und Konstanz", categoryId: "risk" },
-      { name: "Flexibilitaet", description: "Anpassungsfaehigkeit an Aenderungen", categoryId: "strategic" },
-    ],
-    machines: [
-      { name: "Anschaffungspreis", description: "Kaufpreis der Maschine", categoryId: "economic" },
-      { name: "Leistung", description: "Technische Leistungsfaehigkeit", categoryId: "quality" },
-      { name: "Wartungskosten", description: "Laufende Wartungsaufwendungen", categoryId: "economic" },
-      { name: "Zuverlaessigkeit", description: "Ausfallsicherheit und Langlebigkeit", categoryId: "risk" },
-      { name: "Produktivitaet", description: "Output pro Zeiteinheit", categoryId: "quality" },
-    ],
-    investment: [
-      { name: "Kapitalaufwand", description: "Benoetigte Investitionssumme", categoryId: "economic" },
-      { name: "Renditeerwartung", description: "Erwartete Rendite", categoryId: "economic" },
-      { name: "Risiko", description: "Verlustrisiko der Investition", categoryId: "risk" },
-      { name: "Liquiditaet", description: "Verfuegbarkeit des Kapitals", categoryId: "strategic" },
-      { name: "Zeithorizont", description: "Anlagedauer", categoryId: "strategic" },
-    ],
-    employee: [
-      { name: "Qualifikation", description: "Fachliche Eignung", categoryId: "quality" },
-      { name: "Erfahrung", description: "Relevante Berufserfahrung", categoryId: "quality" },
-      { name: "Gehaltsvorstellung", description: "Erwartetes Gehalt", categoryId: "economic" },
-      { name: "Teamfit", description: "Passung ins Team", categoryId: "strategic" },
-      { name: "Entwicklungspotenzial", description: "Weiterentwicklungsmoeglichkeiten", categoryId: "strategic" },
-    ],
-    personal: [
-      { name: "Kosten", description: "Finanzielle Aufwendungen", categoryId: "economic" },
-      { name: "Nutzen", description: "Erwarteter persoenlicher Nutzen", categoryId: "quality" },
-      { name: "Zeitaufwand", description: "Benoetigte Zeit", categoryId: "economic" },
-      { name: "Freude", description: "Emotionaler Wert", categoryId: "quality" },
-      { name: "Risiko", description: "Moegliche negative Folgen", categoryId: "risk" },
-    ],
-    other: [
-      { name: "Kosten", description: "Gesamtkosten der Option", categoryId: "economic" },
-      { name: "Nutzen", description: "Erwarteter Mehrwert", categoryId: "quality" },
-      { name: "Aufwand", description: "Benoetigte Ressourcen", categoryId: "economic" },
-      { name: "Risiko", description: "Potenzielle Nachteile", categoryId: "risk" },
-      { name: "Strategischer Fit", description: "Passung zu langfristigen Zielen", categoryId: "strategic" },
-    ],
-  };
-  
-  const criteria = criteriaMap[domain] || criteriaMap.other;
-  
-  return {
-    title,
-    description: `Strukturierte Entscheidungsfindung: ${trimmed}`,
-    domain,
-    alternatives,
-    criteria,
-    constraints: null,
-    confidence: "medium",
-  };
-}
 
 const PRESETS: Array<{
   id: PresetId;
@@ -341,10 +204,10 @@ export default function LandingWithIntro() {
     router.push("/app");
   }, [router]);
 
-  // Analyze user input with AI - with robust fallback
+  // Analyze user input with AI - with robust fallback using interpretation engine
   const analyzeInput = useCallback(async () => {
-    const draft = text.trim();
-    if (!draft || draft.length < 5) return;
+    const draft = sanitizeInput(text);
+    if (!draft || draft.length < 3) return;
 
     setIsAnalyzing(true);
     setAiError(null);
@@ -369,32 +232,33 @@ export default function LandingWithIntro() {
         throw new Error("No interpretation returned");
       }
     } catch (err) {
-      console.error("[v0] AI interpretation error, using fallback:", err);
-      // Instead of showing error and going back, use client-side fallback
-      const fallback = createFallbackInterpretation(draft);
+      // Use robust client-side interpretation engine as fallback
+      const fallback = interpretDecisionInput(draft);
       setAiInterpretation(fallback);
       setPhase("suggestion");
-      // Show a subtle warning that we used fallback
-      setAiError("KI-Analyse nicht verfuegbar - automatische Interpretation wurde verwendet.");
+      // Show subtle notice that local interpretation was used
+      if (fallback.confidence === "low") {
+        setAiError("Automatische Interpretation wurde verwendet. Sie können alle Felder anpassen.");
+      }
     } finally {
       setIsAnalyzing(false);
     }
   }, [text]);
 
-  // Start from input - triggers AI analysis or uses fallback for simple inputs
+  // Start from input - triggers AI analysis or uses local interpretation for simple inputs
   const startFromInput = useCallback(() => {
-    const draft = text.trim();
+    const draft = sanitizeInput(text);
     if (!draft) return;
     
-    // For very short inputs (< 8 chars), use fallback immediately without API call
-    if (draft.length < 8) {
-      const fallback = createFallbackInterpretation(draft);
-      setAiInterpretation(fallback);
+    // For very short inputs (< 6 chars), use local interpretation immediately
+    if (draft.length < 6) {
+      const interpretation = interpretDecisionInput(draft);
+      setAiInterpretation(interpretation);
       setPhase("suggestion");
       return;
     }
     
-    // Trigger AI analysis (which has its own fallback on error)
+    // Trigger AI analysis (which has robust fallback on error)
     analyzeInput();
   }, [text, analyzeInput]);
 
@@ -430,19 +294,28 @@ export default function LandingWithIntro() {
 
   return (
     <main className="relative min-h-[100svh] text-slate-900 overflow-x-hidden">
-      {/* Premium Background */}
+      {/* Premium Background - Lebendig mit subtilen Farbakzenten */}
       <div className="absolute inset-0 -z-10">
-        <div className="absolute inset-0 bg-gradient-to-b from-[#fbfbfb] via-[#f3f6f6] to-[#eef2f2]" />
+        {/* Base gradient - warm to cool */}
+        <div className="absolute inset-0 bg-gradient-to-br from-[#faf9f7] via-[#f5f3f0] to-[#eff2f4]" />
+        
+        {/* Animated subtle color orbs */}
+        <div className="absolute top-[10%] left-[10%] w-[600px] h-[600px] rounded-full bg-blue-400/[0.06] blur-[100px] animate-float-slow" />
+        <div className="absolute top-[20%] right-[5%] w-[500px] h-[500px] rounded-full bg-purple-400/[0.05] blur-[80px] animate-float-slower" />
+        <div className="absolute bottom-[0%] left-[30%] w-[700px] h-[500px] rounded-full bg-emerald-400/[0.04] blur-[100px] animate-float-slow" />
+        
+        {/* Depth gradients */}
         <div
           className="absolute inset-0"
           style={{
             background:
-              "radial-gradient(900px 650px at 18% 18%, rgba(0,0,0,0.05), transparent 62%), radial-gradient(850px 600px at 85% 40%, rgba(0,0,0,0.035), transparent 62%), radial-gradient(900px 700px at 50% 115%, rgba(0,0,0,0.07), transparent 72%)",
+              "radial-gradient(900px 650px at 18% 18%, rgba(0,0,0,0.04), transparent 62%), radial-gradient(850px 600px at 85% 40%, rgba(0,0,0,0.025), transparent 62%)",
           }}
         />
-        <div className="absolute inset-0 landing-grain opacity-[0.18]" />
-        <div className="absolute inset-0 landing-sheen2 opacity-[0.60]" />
-        <div className="absolute inset-0 bg-[radial-gradient(1200px_700px_at_50%_30%,transparent_55%,rgba(0,0,0,0.10)_100%)]" />
+        
+        <div className="absolute inset-0 landing-grain opacity-[0.12]" />
+        <div className="absolute inset-0 landing-sheen2 opacity-[0.55]" />
+        <div className="absolute inset-0 bg-[radial-gradient(1200px_700px_at_50%_30%,transparent_55%,rgba(0,0,0,0.08)_100%)]" />
       </div>
 
       {/* Fog Overlay only when intro is active/just ended */}
@@ -613,16 +486,16 @@ export default function LandingWithIntro() {
                       Nutzwertanalyse • Dokumentation • Vergleichbarkeit
                     </div>
 
-                    <h1 className="mt-2 text-3xl sm:text-4xl font-semibold tracking-tight text-slate-900">
-                      Entscheidungen dokumentieren.{" "}
-                      <span className="opacity-70">Sauber begründet.</span>
+                    <h1 className="mt-2 text-3xl sm:text-4xl lg:text-5xl font-semibold tracking-tight text-slate-900">
+                      <span className="inline-block animate-fade-in-up">Entscheidungen.</span>{" "}
+                      <span className="inline-block animate-fade-in-up animation-delay-100 bg-gradient-to-r from-slate-900 via-slate-700 to-slate-900 bg-clip-text text-transparent">Strukturiert.</span>{" "}
+                      <span className="inline-block animate-fade-in-up animation-delay-200 opacity-60">Begründet.</span>
                     </h1>
 
-                    <p className="mt-3 text-sm sm:text-base text-black/55 leading-relaxed">
-                      Starte mit einer Entscheidung oder einer Vorlage. Du erhaltst
-                      einen strukturierten Bewertungsprozess (Kriterien, Gewichtung,
-                      Bewertung) und eine nachvollziehbare Dokumentation - fur Team,
-                      Management und Compliance.
+                    <p className="mt-4 text-sm sm:text-base text-black/55 leading-relaxed max-w-2xl">
+                      Beschreibe deine Entscheidung in eigenen Worten. Unsere KI analysiert 
+                      deinen Text und erstellt automatisch passende Alternativen und Bewertungskriterien 
+                      – keine Vorlage nötig, funktioniert mit jedem Thema.
                     </p>
                   </div>
                 </div>
@@ -719,8 +592,9 @@ export default function LandingWithIntro() {
                       </div>
                     </div>
 
-                    <div className="mt-2 text-xs sm:text-sm text-black/45">
-                      Ohne Login starten - KI analysiert und strukturiert deine Entscheidung.
+                    <div className="mt-2 text-xs sm:text-sm text-black/45 flex items-center gap-2">
+                      <span className="inline-flex h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                      Sofort starten – KI analysiert und strukturiert deine Eingabe automatisch
                     </div>
                   </div>
                 </div>
@@ -790,7 +664,7 @@ export default function LandingWithIntro() {
                       >
                         <div className="font-semibold text-black/70">Prinzipien</div>
                         <div className="mt-1">
-                          Transparenz, Fairness, Nachvollziehbarkeit - klare Kriterien statt Bauchgefuhl.
+                          Transparenz, Fairness, Nachvollziehbarkeit – klare Kriterien statt Bauchgefühl.
                         </div>
                       </div>
 
@@ -800,7 +674,7 @@ export default function LandingWithIntro() {
                       >
                         <div className="font-semibold text-black/70">Framework</div>
                         <div className="mt-1">
-                          Kriterien - Gewichtung - Bewertung - Sensitivitat - dokumentiert & vergleichbar.
+                          Kriterien – Gewichtung – Bewertung – Sensitivität – dokumentiert & vergleichbar.
                         </div>
                       </div>
 
@@ -849,6 +723,41 @@ export default function LandingWithIntro() {
       </div>
 
       <style jsx global>{`
+        @keyframes fade-in-up {
+          from {
+            opacity: 0;
+            transform: translateY(12px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        .animate-fade-in-up {
+          animation: fade-in-up 0.6s ease-out forwards;
+        }
+        .animation-delay-100 {
+          animation-delay: 0.1s;
+          opacity: 0;
+        }
+        .animation-delay-200 {
+          animation-delay: 0.2s;
+          opacity: 0;
+        }
+        @keyframes float-slow {
+          0%, 100% { transform: translate(0, 0) scale(1); }
+          50% { transform: translate(20px, -20px) scale(1.05); }
+        }
+        @keyframes float-slower {
+          0%, 100% { transform: translate(0, 0) scale(1); }
+          50% { transform: translate(-15px, 15px) scale(0.95); }
+        }
+        .animate-float-slow {
+          animation: float-slow 20s ease-in-out infinite;
+        }
+        .animate-float-slower {
+          animation: float-slower 25s ease-in-out infinite;
+        }
         .landing-sheen2 {
           background: radial-gradient(
             800px 420px at 22% 18%,
