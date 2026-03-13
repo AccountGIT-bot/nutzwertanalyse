@@ -293,7 +293,20 @@ export default function LandingWithIntro() {
   }, [text, goToApp]);
 
   return (
-    <main className="relative min-h-[100svh] text-slate-900 overflow-x-hidden">
+    <main className="relative min-h-[100svh] text-slate-900 overflow-x-hidden pt-10">
+      {/* Construction Banner */}
+      <div className="fixed top-0 left-0 right-0 z-50 bg-gradient-to-r from-amber-500 via-orange-500 to-amber-500 text-white py-2 px-4 text-center text-sm font-medium shadow-lg">
+        <div className="flex items-center justify-center gap-2">
+          <svg className="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+          </svg>
+          <span>Diese Website befindet sich noch im Aufbau – einige Funktionen sind in Entwicklung</span>
+          <svg className="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
+          </svg>
+        </div>
+      </div>
+      
       {/* Premium Background - Lebendig mit subtilen Farbakzenten */}
       <div className="absolute inset-0 -z-10 overflow-hidden">
         {/* Base gradient - warm to cool */}
@@ -772,6 +785,10 @@ export default function LandingWithIntro() {
             transform: translate3d(-2%, 0, 0);
             opacity: 0.55;
           }
+        }
+        .landing-sheen2 {
+          will-change: transform, opacity;
+          backface-visibility: hidden;
         }
         .landing-grain {
           background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)' opacity='.28'/%3E%3C/svg%3E");
