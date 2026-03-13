@@ -5,6 +5,15 @@ export const en = {
     description: "Make structured decisions – with utility analysis. Define criteria, weight, evaluate, and document.",
   },
   
+  // Brand
+  brand: {
+    name: "Nutzwertanalyse",
+    domain: ".com",
+    tagline: "A Decision Studio Tool",
+    headerSubtitle: "Structured decision documentation",
+    swissQuality: "Swiss Quality",
+  },
+  
   // Construction Banner
   constructionBanner: {
     text: "This website is under construction – some features are still in development",

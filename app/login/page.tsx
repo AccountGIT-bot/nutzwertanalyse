@@ -106,7 +106,7 @@ export default function LoginPage() {
               </div>
               <div className="leading-tight">
                 <div className="text-sm sm:text-base font-semibold tracking-tight text-slate-900">
-                  Nutzwertanalyse<span className="opacity-60">.tool</span>
+                  Nutzwertanalyse<span className="opacity-60">.com</span>
                 </div>
                 <div className="text-[11px] sm:text-xs text-black/45">
                   Login • Speichern • Export • Governance-ready

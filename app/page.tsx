@@ -392,10 +392,10 @@ export default function LandingWithIntro() {
                 </div>
                 <div className="leading-tight">
                   <div className="text-sm sm:text-base font-semibold tracking-tight text-slate-900">
-                    Nutzwertanalyse<span className="opacity-60">.tool</span>
+                    {t.brand.name}<span className="opacity-60">{t.brand.domain}</span>
                   </div>
                   <div className="text-[11px] sm:text-xs text-black/45">
-                    Decision documentation • Governance-ready
+                    {t.brand.tagline} • {t.brand.swissQuality}
                   </div>
                 </div>
               </button>

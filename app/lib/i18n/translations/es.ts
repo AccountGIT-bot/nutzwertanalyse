@@ -3,6 +3,13 @@ export const es = {
     title: "Herramienta de Análisis de Utilidad",
     description: "Toma decisiones estructuradas – con análisis de utilidad. Definir, ponderar, evaluar y documentar criterios.",
   },
+  brand: {
+    name: "Nutzwertanalyse",
+    domain: ".com",
+    tagline: "Una herramienta de Decision Studio",
+    headerSubtitle: "Documentacion estructurada de decisiones",
+    swissQuality: "Calidad Suiza",
+  },
   constructionBanner: {
     text: "Este sitio está en construcción – algunas funciones están en desarrollo",
   },
