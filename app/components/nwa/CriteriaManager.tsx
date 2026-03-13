@@ -140,7 +140,7 @@ const {
           <select
             value={newCategory}
             onChange={(e) => setNewCategory(e.target.value)}
-            className="h-12 px-4 rounded-xl bg-white/5 border border-white/10 text-white outline-none focus:border-[rgb(var(--accent))] transition"
+            className="h-12 px-4 rounded-xl bg-slate-800 border border-white/10 text-white outline-none focus:border-[rgb(var(--accent))] transition [&>option]:bg-slate-800 [&>option]:text-white"
           >
             <option value="">Kategorie wählen...</option>
             {categories.map((cat) => (
@@ -226,7 +226,7 @@ const {
                                     categoryId: e.target.value || undefined,
                                   })
                                 }
-                                className="h-9 px-3 rounded-lg bg-white/5 border border-white/10 text-sm text-white/70 outline-none"
+                                className="h-9 px-3 rounded-lg bg-slate-800 border border-white/10 text-sm text-white/70 outline-none [&>option]:bg-slate-800 [&>option]:text-white"
                               >
                                 <option value="">Keine Kategorie</option>
                                 {categories.map((cat) => (
