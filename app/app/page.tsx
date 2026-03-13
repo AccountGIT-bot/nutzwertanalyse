@@ -177,7 +177,7 @@ export default function AppPage() {
                 </div>
                 <div className="leading-tight">
                   <div className="text-sm sm:text-base font-semibold tracking-tight text-white">
-                    Nutzwertanalyse<span className="opacity-60">.tool</span>
+                    {t.brand.name}<span className="opacity-60">{t.brand.domain}</span>
                   </div>
                   <div className="text-[11px] sm:text-xs text-white/45">
                     {t.packageSelect.headerSubtitle} • {t.packageSelect.headerSubtitle2}
@@ -430,7 +430,7 @@ export default function AppPage() {
                 </div>
                 <div className="leading-tight">
                   <div className="text-sm sm:text-base font-semibold tracking-tight text-white">
-                    Nutzwertanalyse<span className="opacity-60">.tool</span>
+                    {t.brand.name}<span className="opacity-60">{t.brand.domain}</span>
                   </div>
                   <div className="text-[11px] sm:text-xs text-white/45">
                     {t.packageSelect.backToSelection}

@@ -5,6 +5,15 @@ export const de = {
     description: "Entscheidungen strukturiert treffen – mit Nutzwertanalyse. Kriterien definieren, gewichten, bewerten und dokumentieren.",
   },
   
+  // Brand
+  brand: {
+    name: "Nutzwertanalyse",
+    domain: ".com",
+    tagline: "Ein Tool von Decision Studio",
+    headerSubtitle: "Entscheidungen strukturiert dokumentieren",
+    swissQuality: "Swiss Quality",
+  },
+  
   // Construction Banner
   constructionBanner: {
     text: "Diese Website befindet sich noch im Aufbau – einige Funktionen sind in Entwicklung",

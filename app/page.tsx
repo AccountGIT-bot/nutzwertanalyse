@@ -392,10 +392,10 @@ export default function LandingWithIntro() {
                 </div>
                 <div className="leading-tight">
                   <div className="text-sm sm:text-base font-semibold tracking-tight text-slate-900">
-                    Nutzwertanalyse<span className="opacity-60">.tool</span>
+                    {t.brand.name}<span className="opacity-60">{t.brand.domain}</span>
                   </div>
                   <div className="text-[11px] sm:text-xs text-black/45">
-                    Decision documentation • Governance-ready
+                    {t.brand.tagline} • {t.brand.swissQuality}
                   </div>
                 </div>
               </button>
@@ -735,96 +735,7 @@ export default function LandingWithIntro() {
         </section>
       </div>
 
-      <style jsx global>{`
-        @keyframes fade-in-up {
-          from {
-            opacity: 0;
-            transform: translateY(12px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-        .animate-fade-in-up {
-          animation: fade-in-up 0.6s ease-out forwards;
-        }
-        .animation-delay-100 {
-          animation-delay: 0.1s;
-          opacity: 0;
-        }
-        .animation-delay-200 {
-          animation-delay: 0.2s;
-          opacity: 0;
-        }
-        .landing-sheen2 {
-          background: radial-gradient(
-            800px 420px at 22% 18%,
-            rgba(255, 255, 255, 0.55),
-            transparent 62%
-          );
-          animation: sheenMove2 12s ease-in-out infinite;
-        }
-        @keyframes sheenMove2 {
-          0% {
-            transform: translate3d(-2%, 0, 0);
-            opacity: 0.55;
-          }
-          50% {
-            transform: translate3d(2%, -1%, 0);
-            opacity: 0.75;
-          }
-          100% {
-            transform: translate3d(-2%, 0, 0);
-            opacity: 0.55;
-          }
-        }
-        .landing-sheen2 {
-          will-change: transform, opacity;
-          backface-visibility: hidden;
-        }
-        .landing-grain {
-          background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)' opacity='.28'/%3E%3C/svg%3E");
-          mix-blend-mode: soft-light;
-        }
-        .landing-card-sheen {
-          background: linear-gradient(
-            120deg,
-            rgba(255, 255, 255, 0.04),
-            rgba(255, 255, 255, 0.14),
-            rgba(255, 255, 255, 0.04)
-          );
-          mix-blend-mode: overlay;
-        }
-        .landing-marquee-mask {
-          mask-image: linear-gradient(
-            to right,
-            transparent,
-            black 12%,
-            black 88%,
-            transparent
-          );
-          -webkit-mask-image: linear-gradient(
-            to right,
-            transparent,
-            black 12%,
-            black 88%,
-            transparent
-          );
-        }
-        .landing-marquee {
-          display: inline-block;
-          animation: marquee 8s linear infinite;
-        }
-        @keyframes marquee {
-          0% {
-            transform: translateX(0%);
-          }
-          100% {
-            transform: translateX(-50%);
-          }
-        }
-      `}</style>
+      
     </main>
   );
 }
