@@ -167,14 +167,8 @@ export default function AppPage() {
                 aria-label="Zur Startseite"
                 title="Startseite"
               >
-                <div
-                  className="h-10 w-10 rounded-2xl border grid place-items-center"
-                  style={{
-                    background: `rgb(var(--accent) / 0.1)`,
-                    borderColor: `rgb(var(--accent) / 0.3)`,
-                  }}
-                >
-                  <span className="text-[rgb(var(--accent))] text-lg">⌁</span>
+                <div className="h-10 w-10 rounded-2xl overflow-hidden">
+                  <img src="/images/logo.webp" alt="Logo" className="h-full w-full object-contain" />
                 </div>
                 <div className="leading-tight">
                   <div className="text-sm sm:text-base font-semibold tracking-tight text-white">
@@ -428,14 +422,8 @@ export default function AppPage() {
                 aria-label={t.packageSelect.backToSelection}
                 title={t.packageSelect.backToSelection}
               >
-                <div
-                  className="h-10 w-10 rounded-2xl border grid place-items-center"
-                  style={{
-                    background: `rgb(var(--accent) / 0.1)`,
-                    borderColor: `rgb(var(--accent) / 0.3)`,
-                  }}
-                >
-                  <span className="text-[rgb(var(--accent))] text-lg">⌁</span>
+                <div className="h-10 w-10 rounded-2xl overflow-hidden">
+                  <img src="/images/logo.webp" alt="Logo" className="h-full w-full object-contain" />
                 </div>
                 <div className="leading-tight">
                   <div className="text-sm sm:text-base font-semibold tracking-tight text-white">

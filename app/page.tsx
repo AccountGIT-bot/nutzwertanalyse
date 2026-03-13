@@ -404,8 +404,8 @@ export default function LandingWithIntro() {
                 aria-label="Zur Startseite"
                 title="Startseite"
               >
-                <div className="h-10 w-10 rounded-2xl bg-black/5 border border-black/10 grid place-items-center">
-                  <span className="text-black/70 text-lg">⌁</span>
+                <div className="h-10 w-10 rounded-2xl overflow-hidden">
+                  <img src="/images/logo.webp" alt="Logo" className="h-full w-full object-contain" />
                 </div>
                 <div className="leading-tight">
                   <div className="text-sm sm:text-base font-semibold tracking-tight text-slate-900">
@@ -461,9 +461,9 @@ export default function LandingWithIntro() {
                       className="absolute inset-0 rounded-full border-2 border-transparent border-t-black/60 animate-spin"
                       style={{ animationDuration: "1s" }}
                     />
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <span className="text-black/60 text-xl">⌁</span>
-                    </div>
+<div className="absolute inset-0 flex items-center justify-center p-3">
+                    <img src="/images/logo.webp" alt="Logo" className="h-full w-full object-contain" />
+                  </div>
                   </div>
                   <h2 className="text-xl font-semibold text-slate-900 mb-2">
                     Analysiere Ihre Entscheidung...
@@ -553,9 +553,7 @@ export default function LandingWithIntro() {
                           }}
                           aria-hidden="true"
                         >
-                          <span className="text-black/60 text-sm sm:text-lg">
-                            ⌁
-                          </span>
+                          <img src="/images/logo.webp" alt="" className="h-5 w-5 sm:h-6 sm:w-6 object-contain" />
                         </div>
 
                         <div className="relative w-full min-w-0">
