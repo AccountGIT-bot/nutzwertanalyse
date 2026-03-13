@@ -404,3 +404,193 @@ html {
     transform: translateX(-50%);
   }
 }
+
+/* =========================================================
+   Dynamic Background Elements
+   ========================================================= */
+
+/* Floating orbs */
+.landing-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: 0.6;
+  will-change: transform;
+  pointer-events: none;
+}
+
+.landing-orb-1 {
+  width: 500px;
+  height: 500px;
+  top: 5%;
+  left: 10%;
+  background: radial-gradient(circle, rgba(59, 130, 246, 0.15), transparent 70%);
+  animation: orbFloat1 20s ease-in-out infinite;
+}
+
+.landing-orb-2 {
+  width: 400px;
+  height: 400px;
+  top: 50%;
+  right: 5%;
+  background: radial-gradient(circle, rgba(168, 85, 247, 0.12), transparent 70%);
+  animation: orbFloat2 25s ease-in-out infinite;
+}
+
+.landing-orb-3 {
+  width: 600px;
+  height: 600px;
+  bottom: -10%;
+  left: 30%;
+  background: radial-gradient(circle, rgba(16, 185, 129, 0.1), transparent 70%);
+  animation: orbFloat3 30s ease-in-out infinite;
+}
+
+@keyframes orbFloat1 {
+  0%, 100% {
+    transform: translate(0, 0) scale(1);
+  }
+  25% {
+    transform: translate(30px, -20px) scale(1.05);
+  }
+  50% {
+    transform: translate(-20px, 30px) scale(0.95);
+  }
+  75% {
+    transform: translate(20px, 10px) scale(1.02);
+  }
+}
+
+@keyframes orbFloat2 {
+  0%, 100% {
+    transform: translate(0, 0) scale(1);
+  }
+  33% {
+    transform: translate(-40px, 20px) scale(1.08);
+  }
+  66% {
+    transform: translate(25px, -30px) scale(0.92);
+  }
+}
+
+@keyframes orbFloat3 {
+  0%, 100% {
+    transform: translate(0, 0) scale(1);
+  }
+  20% {
+    transform: translate(40px, -15px) scale(1.03);
+  }
+  40% {
+    transform: translate(-15px, 25px) scale(0.97);
+  }
+  60% {
+    transform: translate(25px, 20px) scale(1.05);
+  }
+  80% {
+    transform: translate(-30px, -10px) scale(0.98);
+  }
+}
+
+/* Animated mesh gradient */
+.landing-mesh {
+  position: absolute;
+  inset: 0;
+  opacity: 0.4;
+  background: 
+    radial-gradient(at 40% 20%, rgba(59, 130, 246, 0.08) 0px, transparent 50%),
+    radial-gradient(at 80% 0%, rgba(168, 85, 247, 0.06) 0px, transparent 50%),
+    radial-gradient(at 0% 50%, rgba(16, 185, 129, 0.06) 0px, transparent 50%),
+    radial-gradient(at 80% 50%, rgba(245, 158, 11, 0.05) 0px, transparent 50%),
+    radial-gradient(at 0% 100%, rgba(59, 130, 246, 0.06) 0px, transparent 50%),
+    radial-gradient(at 80% 100%, rgba(168, 85, 247, 0.05) 0px, transparent 50%);
+  animation: meshMove 35s ease-in-out infinite;
+  will-change: background-position;
+  pointer-events: none;
+}
+
+@keyframes meshMove {
+  0%, 100% {
+    background-position: 0% 0%, 100% 0%, 0% 50%, 100% 50%, 0% 100%, 100% 100%;
+  }
+  25% {
+    background-position: 10% 5%, 90% 10%, 5% 55%, 95% 45%, 10% 95%, 90% 105%;
+  }
+  50% {
+    background-position: 5% 10%, 95% 5%, 10% 45%, 90% 55%, 5% 105%, 95% 95%;
+  }
+  75% {
+    background-position: 15% 0%, 85% 15%, 0% 60%, 100% 40%, 15% 100%, 85% 100%;
+  }
+}
+
+/* Floating particles */
+.landing-particles {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.landing-particle {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.08);
+  will-change: transform, opacity;
+}
+
+.landing-particle-1 {
+  top: 15%;
+  left: 20%;
+  animation: particleFloat 15s ease-in-out infinite;
+}
+
+.landing-particle-2 {
+  top: 35%;
+  right: 25%;
+  width: 6px;
+  height: 6px;
+  animation: particleFloat 18s ease-in-out infinite 2s;
+}
+
+.landing-particle-3 {
+  bottom: 30%;
+  left: 40%;
+  width: 3px;
+  height: 3px;
+  animation: particleFloat 12s ease-in-out infinite 4s;
+}
+
+.landing-particle-4 {
+  top: 60%;
+  right: 15%;
+  animation: particleFloat 20s ease-in-out infinite 1s;
+}
+
+.landing-particle-5 {
+  bottom: 20%;
+  left: 15%;
+  width: 5px;
+  height: 5px;
+  animation: particleFloat 16s ease-in-out infinite 3s;
+}
+
+@keyframes particleFloat {
+  0%, 100% {
+    transform: translate(0, 0);
+    opacity: 0.3;
+  }
+  25% {
+    transform: translate(20px, -30px);
+    opacity: 0.6;
+  }
+  50% {
+    transform: translate(-15px, -60px);
+    opacity: 0.4;
+  }
+  75% {
+    transform: translate(25px, -40px);
+    opacity: 0.5;
+  }
+}

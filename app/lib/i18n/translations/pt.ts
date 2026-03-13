@@ -115,6 +115,8 @@ export const pt = {
     resetConfirm: "Tem certeza? Todos os dados serão excluídos.",
     reset: "Redefinir", draftFound: "Rascunho encontrado. Deseja restaurar?",
     restore: "Restaurar", discard: "Descartar",
+    goHome: "Início", goHomeConfirm: "Seu progresso será salvo automaticamente. Você pode continuar mais tarde.",
+    goHomeButton: "Ir para Início",
   },
   decisionSetup: {
     title: "Definir decisão", titleBusiness: "Questão estratégica",
@@ -135,6 +137,9 @@ export const pt = {
     placeholder: "Nome da alternativa...", shortDescription: "Descrição curta (opcional)...",
     assumptions: "Suposições", assumptionsPlaceholder: "Uma suposição por linha...",
     maxReached: "Máximo atingido",
+    duplicateAlt: "Duplicar alternativa", removeAlt: "Remover alternativa",
+    noAlternatives: "Nenhuma alternativa adicionada", addMinimum: "Adicione pelo menos {min} alternativas",
+    countStatus: "{current} de {max} alternativas", minRequired: "Pelo menos {min} alternativas necessárias",
   },
   criteriaSetup: {
     title: "Definir critérios",
@@ -145,6 +150,9 @@ export const pt = {
     templateCriteria: "critérios predefinidos", knockout: "Critério eliminatório",
     knockoutThreshold: "Limite mín.", description_label: "Descrição",
     descriptionPlaceholder: "Descrição (opcional)...", uncategorized: "Não categorizado",
+    duplicateCrit: "Duplicar critério", removeCrit: "Remover critério",
+    noCriteria: "Nenhum critério definido", addMinimum: "Adicione pelo menos 2 critérios",
+    countStatus: "{count} critérios", minRequired: "Pelo menos 2 critérios necessários",
   },
   weightingSetup: {
     title: "Ponderar critérios", description: "Determine a importância relativa.",

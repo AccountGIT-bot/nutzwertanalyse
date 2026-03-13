@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useCallback, useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
 import { useAnalysis } from "@/app/lib/nwa/analysis-context";
 import { getPresetIcon, getDomainIcon, getDomainLabel } from "@/app/lib/nwa/preset-icons";
 import { DecisionSetup } from "./DecisionSetup";
@@ -11,14 +12,17 @@ import { EvaluationMatrix } from "./EvaluationMatrix";
 import { ResultsDashboard } from "./ResultsDashboard";
 import { useTranslations } from "@/app/lib/i18n";
 import type { AnalysisStep } from "@/app/lib/nwa/types";
+import { Home } from "lucide-react";
 
 const STEP_IDS: AnalysisStep[] = ["decision", "alternatives", "criteria", "weighting", "evaluation", "results"];
 
 export function AnalysisWizard() {
+  const router = useRouter();
   const { state, setStep, calculateResults, canProceedToNext, reset, saveDraft, hasDraft, loadDraft } = useAnalysis();
   const { currentStep, decision } = state;
   const [showResetConfirm, setShowResetConfirm] = useState(false);
   const [showDraftPrompt, setShowDraftPrompt] = useState(false);
+  const [showHomeConfirm, setShowHomeConfirm] = useState(false);
   const [draftChecked, setDraftChecked] = useState(false);
   const t = useTranslations();
 
@@ -84,6 +88,20 @@ export function AnalysisWizard() {
 
   const handleCancelReset = useCallback(() => {
     setShowResetConfirm(false);
+  }, []);
+
+  const handleHomeClick = useCallback(() => {
+    setShowHomeConfirm(true);
+  }, []);
+
+  const handleConfirmHome = useCallback(() => {
+    saveDraft();
+    setShowHomeConfirm(false);
+    router.push("/");
+  }, [saveDraft, router]);
+
+  const handleCancelHome = useCallback(() => {
+    setShowHomeConfirm(false);
   }, []);
 
   const goToStep = useCallback((step: AnalysisStep) => {
@@ -193,6 +211,32 @@ export function AnalysisWizard() {
         </div>
       )}
 
+      {showHomeConfirm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+          <div className="bg-[#1a1a1a] border border-white/10 rounded-2xl p-6 max-w-md mx-4 shadow-2xl">
+            <h3 className="text-lg font-semibold text-white">{t.wizard.goHome || "Zur Startseite"}</h3>
+            <p className="mt-2 text-sm text-white/60">
+              {t.wizard.goHomeConfirm || "Ihr Fortschritt wird automatisch gespeichert. Sie können später fortfahren."}
+            </p>
+            <div className="mt-4 flex gap-3">
+              <button
+                onClick={handleCancelHome}
+                className="flex-1 px-4 py-2.5 rounded-xl text-sm font-medium text-white/70 bg-white/10 hover:bg-white/15 transition"
+              >
+                {t.common.cancel}
+              </button>
+              <button
+                onClick={handleConfirmHome}
+                className="flex-1 px-4 py-2.5 rounded-xl text-sm font-semibold text-white transition"
+                style={{ background: "rgb(var(--accent))" }}
+              >
+                {t.wizard.goHomeButton || "Zur Startseite"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="min-h-[calc(100vh-76px)] flex flex-col">
         <div className="border-b border-white/10 bg-black/20 backdrop-blur-md sticky top-[76px] z-20">
           <div className="mx-auto max-w-5xl px-5 sm:px-6 py-4">
@@ -224,13 +268,23 @@ export function AnalysisWizard() {
                   </div>
                 </div>
               </div>
-              <button
-                onClick={handleResetClick}
-                className="px-3 py-1.5 rounded-lg text-xs font-medium text-white/50 hover:text-white/70 hover:bg-white/10 transition"
-                title={t.wizard.resetAnalysis}
-              >
-                {t.wizard.reset}
-              </button>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={handleHomeClick}
+                  className="p-2 rounded-lg text-white/50 hover:text-white/70 hover:bg-white/10 transition"
+                  title={t.wizard.goHome || "Zur Startseite"}
+                  aria-label={t.wizard.goHome || "Zur Startseite"}
+                >
+                  <Home size={18} />
+                </button>
+                <button
+                  onClick={handleResetClick}
+                  className="px-3 py-1.5 rounded-lg text-xs font-medium text-white/50 hover:text-white/70 hover:bg-white/10 transition"
+                  title={t.wizard.resetAnalysis}
+                >
+                  {t.wizard.reset}
+                </button>
+              </div>
             </div>
 
             <div className="mb-3">

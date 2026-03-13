@@ -102,7 +102,7 @@ export const es = {
   common: {
     back: "Atrás", next: "Siguiente", cancel: "Cancelar", save: "Guardar",
     delete: "Eliminar", edit: "Editar", close: "Cerrar", loading: "Cargando...",
-    error: "Error", success: "Éxito", yes: "Sí", no: "No", or: "o", and: "y",
+    error: "Error", success: "Éxito", yes: "S��", no: "No", or: "o", and: "y",
     add: "Añadir", remove: "Eliminar", ignore: "Ignorar", useTemplate: "Usar plantilla",
     examples: "Ejemplos", optional: "opcional",
   },
@@ -115,6 +115,8 @@ export const es = {
     resetConfirm: "¿Estás seguro? Todos los datos se eliminarán.",
     reset: "Reiniciar", draftFound: "Borrador encontrado. ¿Deseas restaurarlo?",
     restore: "Restaurar", discard: "Descartar",
+    goHome: "Inicio", goHomeConfirm: "Tu progreso se guardará automáticamente. Puedes continuar más tarde.",
+    goHomeButton: "Ir al Inicio",
   },
   decisionSetup: {
     title: "Definir decisión", titleBusiness: "Pregunta estratégica",
@@ -135,6 +137,9 @@ export const es = {
     placeholder: "Nombre de la alternativa...", shortDescription: "Descripción corta (opcional)...",
     assumptions: "Suposiciones", assumptionsPlaceholder: "Una suposición por línea...",
     maxReached: "Máximo alcanzado",
+    duplicateAlt: "Duplicar alternativa", removeAlt: "Eliminar alternativa",
+    noAlternatives: "No hay alternativas añadidas", addMinimum: "Añade al menos {min} alternativas",
+    countStatus: "{current} de {max} alternativas", minRequired: "Se requieren al menos {min} alternativas",
   },
   criteriaSetup: {
     title: "Definir criterios",
@@ -145,6 +150,9 @@ export const es = {
     templateCriteria: "criterios predefinidos", knockout: "Criterio eliminatorio",
     knockoutThreshold: "Umbral mín.", description_label: "Descripción",
     descriptionPlaceholder: "Descripción (opcional)...", uncategorized: "Sin categorizar",
+    duplicateCrit: "Duplicar criterio", removeCrit: "Eliminar criterio",
+    noCriteria: "No hay criterios definidos", addMinimum: "Añade al menos 2 criterios",
+    countStatus: "{count} criterios", minRequired: "Se requieren al menos 2 criterios",
   },
   weightingSetup: {
     title: "Ponderar criterios", description: "Determina la importancia relativa.",

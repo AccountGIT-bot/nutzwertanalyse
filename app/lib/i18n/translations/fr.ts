@@ -115,6 +115,8 @@ export const fr = {
     resetConfirm: "Êtes-vous sûr de vouloir réinitialiser ? Toutes les données seront supprimées.",
     reset: "Réinitialiser", draftFound: "Un brouillon a été trouvé. Voulez-vous le restaurer ?",
     restore: "Restaurer", discard: "Supprimer",
+    goHome: "Accueil", goHomeConfirm: "Votre progression sera sauvegardée automatiquement. Vous pourrez continuer plus tard.",
+    goHomeButton: "Retour à l'accueil",
   },
   decisionSetup: {
     title: "Définir la décision", titleBusiness: "Question stratégique",
@@ -135,6 +137,9 @@ export const fr = {
     placeholder: "Nom de l'alternative...", shortDescription: "Description courte (facultatif)...",
     assumptions: "Hypothèses", assumptionsPlaceholder: "Une hypothèse par ligne...",
     maxReached: "Maximum atteint",
+    duplicateAlt: "Dupliquer l'alternative", removeAlt: "Supprimer l'alternative",
+    noAlternatives: "Aucune alternative ajoutée", addMinimum: "Ajoutez au moins {min} alternatives",
+    countStatus: "{current} sur {max} alternatives", minRequired: "Au moins {min} alternatives requises",
   },
   criteriaSetup: {
     title: "Définir les critères",
@@ -145,6 +150,9 @@ export const fr = {
     templateCriteria: "critères prédéfinis", knockout: "Critère éliminatoire",
     knockoutThreshold: "Seuil min.", description_label: "Description",
     descriptionPlaceholder: "Description (facultatif)...", uncategorized: "Non catégorisé",
+    duplicateCrit: "Dupliquer le critère", removeCrit: "Supprimer le critère",
+    noCriteria: "Aucun critère défini", addMinimum: "Ajoutez au moins 2 critères",
+    countStatus: "{count} critères", minRequired: "Au moins 2 critères requis",
   },
   weightingSetup: {
     title: "Pondérer les critères", description: "Déterminez l'importance relative.",

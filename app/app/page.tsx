@@ -7,6 +7,7 @@ import { AnalysisWizard } from "@/app/components/nwa/AnalysisWizard";
 import type { PackageLevel, AIDecisionInterpretation } from "@/app/lib/nwa/types";
 import { getPresetIcon, getPresetLabel, getDomainIcon, getDomainLabel } from "@/app/lib/nwa/preset-icons";
 import { useTranslations } from "@/app/lib/i18n";
+import { Home } from "lucide-react";
 
 type Theme = "basic" | "advanced" | "business";
 
@@ -186,6 +187,14 @@ export default function AppPage() {
               </button>
 
               <div className="flex items-center gap-2">
+                <button
+                  onClick={() => router.push("/")}
+                  className="p-2 rounded-lg text-white/50 hover:text-white/70 hover:bg-white/10 transition"
+                  title={t.wizard?.goHome || "Zur Startseite"}
+                  aria-label={t.wizard?.goHome || "Zur Startseite"}
+                >
+                  <Home size={18} />
+                </button>
                 <button
                   onClick={() => router.push("/login")}
                   className="rounded-full px-4 py-2 text-sm font-semibold border border-white/10 bg-white/5 hover:bg-white/10 transition"
@@ -438,7 +447,15 @@ export default function AppPage() {
                 </div>
               </button>
 
-              <div className="flex items-center gap-2">
+<div className="flex items-center gap-2">
+                <button
+                  onClick={() => router.push("/")}
+                  className="p-2 rounded-lg text-white/50 hover:text-white/70 hover:bg-white/10 transition"
+                  title={t.wizard?.goHome || "Zur Startseite"}
+                  aria-label={t.wizard?.goHome || "Zur Startseite"}
+                >
+                  <Home size={18} />
+                </button>
                 <button
                   onClick={() => router.push("/login")}
                   className="rounded-full px-4 py-2 text-sm font-semibold border border-white/10 bg-white/5 hover:bg-white/10 transition"
