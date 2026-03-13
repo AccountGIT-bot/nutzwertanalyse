@@ -296,7 +296,7 @@ export default function LandingWithIntro() {
         </div>
       </div>
       
-      {/* Premium Background - Lebendig mit subtilen Farbakzenten */}
+      {/* Premium Background */}
       <div className="absolute inset-0 -z-10 overflow-hidden">
         {/* Base gradient - warm to cool */}
         <div className="absolute inset-0 bg-gradient-to-br from-[#faf9f7] via-[#f5f3f0] to-[#eff2f4]" />
