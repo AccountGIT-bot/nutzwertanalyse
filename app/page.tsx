@@ -195,8 +195,9 @@ export default function LandingWithIntro() {
       employee: t.presets?.employee?.label || "Mitarbeiterwahl",
       realEstate: t.presets?.realEstate?.label || "Immobilienbewertung",
       product: t.presets?.product?.label || "Produktvergleich",
+      custom: t.presets?.custom?.label || "Eigene Analyse",
     };
-    return labels[id] || id;
+    return labels[id] || String(id);
   };
 
   const handleSubmit = useCallback((e?: React.FormEvent) => {
@@ -242,7 +243,7 @@ export default function LandingWithIntro() {
             <span className="text-white/40">.com</span>
           </div>
           <div className="text-white/50 text-lg">
-                {typeof t.landing?.headline === 'object' 
+                {t.landing?.headline?.part1 && t.landing?.headline?.part2 && t.landing?.headline?.part3
                   ? `${t.landing.headline.part1} ${t.landing.headline.part2} ${t.landing.headline.part3}`
                   : "Entscheidungen leicht gemacht"}
               </div>
@@ -371,7 +372,7 @@ export default function LandingWithIntro() {
         {/* Headline */}
         <div className="text-center mb-8 animate-premium-fade-in-up">
           <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white tracking-tight mb-3">
-            {typeof t.landing?.headline === 'object' 
+            {t.landing?.headline?.part1 && t.landing?.headline?.part2 && t.landing?.headline?.part3
               ? `${t.landing.headline.part1} ${t.landing.headline.part2} ${t.landing.headline.part3}`
               : "Entscheidungen leicht gemacht"}
           </h1>
