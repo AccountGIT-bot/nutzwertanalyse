@@ -600,7 +600,7 @@ export default function LandingWithIntro() {
                     opacity,
                     transitionDuration: '700ms',
                     boxShadow: isCenter 
-                      ? `0 30px 100px -15px rgb(${item.color} / 0.6), 0 0 80px rgb(${item.color} / 0.4), 0 0 0 1px rgb(${item.color} / 0.3)`
+                      ? `0 0 0 3px rgb(${item.color} / 0.4), 0 40px 120px -20px rgb(${item.color} / 0.7), 0 0 100px rgb(${item.color} / 0.5), 0 0 150px rgb(${item.color} / 0.3)`
                       : `0 20px 50px -15px rgba(0,0,0,0.5)`,
                   }}
                 >
@@ -614,34 +614,68 @@ export default function LandingWithIntro() {
                     }}
                   />
 
-                  {/* Gradient Overlay - More vibrant for center */}
+                  {/* Gradient Overlay - Vibrant category color for center, muted for others */}
                   <div 
                     className="absolute inset-0 transition-all duration-700"
                     style={{
                       background: isCenter
-                        ? `linear-gradient(to top, rgb(${item.color}) 0%, rgb(${item.color} / 0.6) 40%, rgb(${item.color} / 0.2) 70%, transparent 100%)`
-                        : 'linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.4) 60%, transparent 100%)',
+                        ? `linear-gradient(to top, rgb(${item.color}) 0%, rgb(${item.color} / 0.7) 35%, rgb(${item.color} / 0.3) 60%, transparent 100%)`
+                        : `linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgb(${item.color} / 0.15) 50%, transparent 100%)`,
+                    }}
+                  />
+                  
+                  {/* Color tint overlay for image */}
+                  <div 
+                    className="absolute inset-0 mix-blend-overlay transition-opacity duration-700"
+                    style={{
+                      background: `rgb(${item.color} / ${isCenter ? 0.3 : 0.15})`,
                     }}
                   />
 
-                  {/* Animated glow border for center */}
+                  {/* ===== PREMIUM LASER GLOW EFFECT FOR CENTER ===== */}
                   {isCenter && (
-                    <div 
-                      className="absolute inset-0 rounded-[28px] pointer-events-none animate-pulse"
-                      style={{
-                        boxShadow: `inset 0 0 0 2px rgb(${item.color} / 0.6), inset 0 0 60px rgb(${item.color} / 0.3)`,
-                        animationDuration: '2s',
-                      }}
-                    />
+                    <>
+                      {/* Outer glow layer */}
+                      <div 
+                        className="laser-glow-outer"
+                        style={{
+                          background: `linear-gradient(135deg, rgb(${item.color} / 0.4), transparent, rgb(${item.color} / 0.4))`,
+                          boxShadow: `0 0 40px rgb(${item.color} / 0.5), 0 0 80px rgb(${item.color} / 0.3), 0 0 120px rgb(${item.color} / 0.2)`,
+                        }}
+                      />
+                      
+                      {/* Inner intense glow */}
+                      <div 
+                        className="laser-glow-inner"
+                        style={{
+                          boxShadow: `inset 0 0 30px rgb(${item.color} / 0.4), 0 0 20px rgb(${item.color} / 0.6)`,
+                          border: `2px solid rgb(${item.color} / 0.5)`,
+                        }}
+                      />
+                      
+                      {/* Animated corner accents */}
+                      <div className="laser-corner laser-corner-tl" style={{ '--laser-color': `rgb(${item.color})` } as React.CSSProperties} />
+                      <div className="laser-corner laser-corner-tr" style={{ '--laser-color': `rgb(${item.color})` } as React.CSSProperties} />
+                      <div className="laser-corner laser-corner-bl" style={{ '--laser-color': `rgb(${item.color})` } as React.CSSProperties} />
+                      <div className="laser-corner laser-corner-br" style={{ '--laser-color': `rgb(${item.color})` } as React.CSSProperties} />
+                      
+                      {/* Sweeping laser beam */}
+                      <div className="absolute inset-0 overflow-hidden rounded-[28px] pointer-events-none">
+                        <div 
+                          className="laser-beam"
+                          style={{ '--laser-color': `rgb(${item.color})` } as React.CSSProperties}
+                        />
+                      </div>
+                    </>
                   )}
 
                   {/* Content - Better readability */}
-                  <div className="absolute inset-0 flex flex-col items-center justify-end p-5 sm:p-7">
+                  <div className="absolute inset-0 flex flex-col items-center justify-end p-4 sm:p-6 z-10">
                     {/* Icon with glow */}
                     <div 
                       className={[
-                        "rounded-2xl flex items-center justify-center mb-4 transition-all duration-700",
-                        isCenter ? "w-16 h-16 sm:w-18 sm:h-18" : "w-12 h-12 opacity-60",
+                        "rounded-2xl flex items-center justify-center mb-3 sm:mb-4 transition-all duration-700",
+                        isCenter ? "w-14 h-14 sm:w-16 sm:h-16" : "w-10 h-10 sm:w-12 sm:h-12 opacity-60",
                       ].join(" ")}
                       style={{ 
                         background: isCenter 
@@ -652,17 +686,20 @@ export default function LandingWithIntro() {
                           : 'none',
                       }}
                     >
-                      <item.Icon className={isCenter ? "w-8 h-8 sm:w-9 sm:h-9 text-white" : "w-6 h-6 text-white/80"} />
+                      <item.Icon className={isCenter ? "w-7 h-7 sm:w-8 sm:h-8 text-white" : "w-5 h-5 sm:w-6 sm:h-6 text-white/80"} />
                     </div>
                     
-                    {/* Label with better contrast */}
+                    {/* Label with maximum contrast and readability */}
                     <div 
                       className={[
-                        "font-bold text-center transition-all duration-700 text-white drop-shadow-lg",
-                        isCenter ? "text-xl sm:text-2xl" : "text-sm opacity-60",
+                        "font-extrabold text-center transition-all duration-700 text-white",
+                        isCenter ? "text-lg sm:text-xl lg:text-2xl" : "text-xs sm:text-sm opacity-60",
                       ].join(" ")}
                       style={{
-                        textShadow: isCenter ? `0 2px 20px rgb(${item.color} / 0.8)` : 'none',
+                        textShadow: isCenter 
+                          ? `0 0 20px rgb(${item.color}), 0 0 40px rgb(${item.color} / 0.8), 0 2px 4px rgba(0,0,0,0.8)`
+                          : '0 1px 2px rgba(0,0,0,0.5)',
+                        WebkitTextStroke: isCenter ? '0.5px rgba(255,255,255,0.3)' : 'none',
                       }}
                     >
                       {getPresetLabel(item.id)}
@@ -671,10 +708,11 @@ export default function LandingWithIntro() {
                     {/* Call to action for center */}
                     {isCenter && (
                       <div 
-                        className="mt-3 px-4 py-1.5 rounded-full text-white/90 text-xs sm:text-sm font-medium backdrop-blur-sm border transition-all duration-300 hover:scale-105"
+                        className="mt-2 sm:mt-3 px-3 sm:px-4 py-1 sm:py-1.5 rounded-full text-white text-[10px] sm:text-xs font-semibold backdrop-blur-md border transition-all duration-300 hover:scale-105"
                         style={{
-                          background: `rgb(${item.color} / 0.3)`,
-                          borderColor: `rgb(${item.color} / 0.5)`,
+                          background: `linear-gradient(135deg, rgb(${item.color} / 0.4), rgb(${item.color} / 0.2))`,
+                          borderColor: `rgb(${item.color} / 0.6)`,
+                          boxShadow: `0 4px 20px rgb(${item.color} / 0.3), inset 0 0 10px rgb(${item.color} / 0.2)`,
                         }}
                       >
                         Jetzt starten
