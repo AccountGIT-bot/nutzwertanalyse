@@ -437,11 +437,8 @@ export default function LandingWithIntro() {
       </div>
 
       {/* ===== HEADER ===== */}
-      <header className="relative z-20 px-5 sm:px-8 py-5">
-        <div className="mx-auto max-w-7xl flex items-center justify-between">
-          <div className="text-xl font-bold text-white tracking-tight">
-            {t.brand?.name || "Nutzwertanalyse"}<span className="text-white/30">.com</span>
-          </div>
+      <header className="relative z-20 px-5 sm:px-8 py-4">
+        <div className="mx-auto max-w-7xl flex items-center justify-end">
           <div className="flex items-center gap-3">
             <LanguageSwitcher />
             <button
@@ -455,18 +452,13 @@ export default function LandingWithIntro() {
       </header>
 
       {/* ===== MAIN CONTENT ===== */}
-      <main className="relative z-10 flex flex-col items-center justify-center min-h-[calc(100svh-120px)] px-5 pt-4 pb-8">
+      <main className="relative z-10 flex flex-col items-center justify-center min-h-[calc(100svh-100px)] px-5 pt-0 pb-8">
         
-        {/* Headline */}
-        <div className="text-center mb-6 animate-premium-fade-in-up">
-          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white tracking-tight mb-3">
-            {t.landing?.headline?.part1 && t.landing?.headline?.part2 && t.landing?.headline?.part3
-              ? `${t.landing.headline.part1} ${t.landing.headline.part2} ${t.landing.headline.part3}`
-              : "Entscheidungen leicht gemacht"}
+        {/* Centered Brand Title */}
+        <div className="text-center mb-8 animate-premium-fade-in-up">
+          <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-white tracking-tight">
+            Nutzwertanalyse<span className="text-white/40">.com</span>
           </h1>
-          <p className="text-white/40 text-base sm:text-lg max-w-xl mx-auto">
-            {t.landing?.subheadline || "Systematisch vergleichen, fundiert entscheiden"}
-          </p>
         </div>
 
         {/* Search Input */}
