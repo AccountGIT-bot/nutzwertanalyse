@@ -1145,3 +1145,23 @@ html {
 .color-transition {
   transition: background-color 1s ease-out, box-shadow 1s ease-out;
 }
+
+/* 3D Carousel transitions */
+.duration-600 {
+  transition-duration: 600ms;
+}
+
+/* Perspective utility */
+.perspective-\[1200px\] {
+  perspective: 1200px;
+}
+
+/* Carousel item hover effect */
+@keyframes carouselPulse {
+  0%, 100% {
+    box-shadow: 0 25px 80px -10px var(--glow-color, rgba(255,255,255,0.3));
+  }
+  50% {
+    box-shadow: 0 30px 100px -10px var(--glow-color, rgba(255,255,255,0.4));
+  }
+}

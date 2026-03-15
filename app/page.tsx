@@ -20,59 +20,75 @@ import { LanguageSwitcher } from "@/app/components/LanguageSwitcher";
 
 type Phase = "intro" | "landing" | "analyzing" | "suggestion";
 
+// Preset configuration with custom images
 const PRESET_CONFIG: Array<{
   id: PresetId;
   image: string;
   Icon: typeof SupplierIcon;
   color: string;
-  gradient: string;
+  bgColor: string;
 }> = [
   {
     id: "supplier",
-    image: "/presets/Startseite_Lieferantenauswahl_komprimiert.jpg",
+    image: "/images/presets/lieferant.jpg",
     Icon: SupplierIcon,
     color: "59, 130, 246",
-    gradient: "from-blue-600 via-blue-500 to-cyan-400",
+    bgColor: "#1e3a5f",
   },
   {
     id: "software",
-    image: "/presets/Startseite_Softwarevergleich_komprimiert.jpg",
+    image: "/images/presets/software.jpg",
     Icon: SoftwareIcon,
     color: "168, 85, 247",
-    gradient: "from-purple-600 via-violet-500 to-fuchsia-400",
+    bgColor: "#2d1b4e",
   },
   {
     id: "investment",
-    image: "/presets/Startseite_Investitionsentscheid_komprimiert.jpg",
+    image: "/images/presets/investition.jpg",
     Icon: InvestmentIcon,
     color: "245, 158, 11",
-    gradient: "from-amber-500 via-orange-500 to-yellow-400",
+    bgColor: "#3d2a0a",
   },
   {
     id: "machines",
-    image: "/presets/Startseite_Maschinenkauf_komprimiert.jpg",
+    image: "/images/presets/standort.jpg",
     Icon: MachinesIcon,
     color: "16, 185, 129",
-    gradient: "from-emerald-600 via-green-500 to-teal-400",
+    bgColor: "#0d3325",
   },
   {
     id: "vehicle",
-    image: "/presets/Startseite_Fahrzeugauswahl_komprimiert.jpg",
+    image: "/images/presets/auto.jpg",
     Icon: VehicleIcon,
     color: "239, 68, 68",
-    gradient: "from-red-600 via-rose-500 to-pink-400",
+    bgColor: "#3d1515",
   },
   {
     id: "employee",
-    image: "/presets/Startseite_Mitarbeiterwahl_komprimiert.jpg",
+    image: "/images/presets/mitarbeiter.jpg",
     Icon: EmployeeIcon,
     color: "6, 182, 212",
-    gradient: "from-cyan-500 via-sky-500 to-blue-400",
+    bgColor: "#0c3544",
+  },
+  {
+    id: "realEstate",
+    image: "/images/presets/immobilien.jpg",
+    Icon: SupplierIcon,
+    color: "234, 179, 8",
+    bgColor: "#3a2f0c",
+  },
+  {
+    id: "product",
+    image: "/images/presets/produkt.jpg",
+    Icon: SoftwareIcon,
+    color: "236, 72, 153",
+    bgColor: "#3d1530",
   },
 ];
 
 const INTRO_COOLDOWN_MS = 10 * 60 * 1000;
 const INTRO_KEY = "nwa_intro_lastShownAt";
+const AUTO_ROTATE_INTERVAL = 4000;
 
 function shouldShowIntroNow(): boolean {
   if (typeof window === "undefined") return false;
@@ -98,721 +114,478 @@ export default function LandingWithIntro() {
   const [phase, setPhase] = useState<Phase>("landing");
   const [shouldIntro, setShouldIntro] = useState(false);
   const [text, setText] = useState("");
-  const [isFocused, setIsFocused] = useState(false);
-  const [fogVisible, setFogVisible] = useState(false);
-  const [fogSoftHide, setFogSoftHide] = useState(false);
-  const fogTimer = useRef<number | null>(null);
-  const [isAnalyzing, setIsAnalyzing] = useState(false);
-  const [aiInterpretation, setAiInterpretation] = useState<AIDecisionInterpretation | null>(null);
-  const [aiError, setAiError] = useState<string | null>(null);
-  
-  // Carousel state
-  const [activeIndex, setActiveIndex] = useState(Math.floor(PRESET_CONFIG.length / 2));
-  const [isDragging, setIsDragging] = useState(false);
-  const [startX, setStartX] = useState(0);
-  const [translateX, setTranslateX] = useState(0);
+  const [interpretation, setInterpretation] = useState<AIDecisionInterpretation | null>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const [isClient, setIsClient] = useState(false);
+
+  // Infinite carousel state
+  const [activeIndex, setActiveIndex] = useState(0);
+  const [isTransitioning, setIsTransitioning] = useState(false);
+  const [isPaused, setIsPaused] = useState(false);
   const carouselRef = useRef<HTMLDivElement>(null);
+  const autoRotateRef = useRef<NodeJS.Timeout | null>(null);
 
-  const canStart = useMemo(() => text.trim().length > 0, [text]);
-  const placeholderText = t.landing.searchInputPlaceholder;
-
-  // Get active preset color
-  const activePreset = PRESET_CONFIG[activeIndex];
-  const activeColor = activePreset?.color || "59, 130, 246";
-  const activeGradient = activePreset?.gradient || "from-blue-600 to-cyan-400";
+  // Get current preset
+  const currentPreset = PRESET_CONFIG[activeIndex];
 
   useEffect(() => {
-    const show = shouldShowIntroNow();
-    setShouldIntro(show);
-
-    if (show) {
+    setIsClient(true);
+    const intro = shouldShowIntroNow();
+    setShouldIntro(intro);
+    if (intro) {
       setPhase("intro");
-      setFogVisible(true);
-      setFogSoftHide(false);
-      const t = window.setTimeout(() => {
-        setPhase("landing");
-        markIntroShownNow();
-      }, 3000);
-      return () => window.clearTimeout(t);
-    } else {
-      setPhase("landing");
-      setFogVisible(false);
-      setFogSoftHide(false);
+      markIntroShownNow();
     }
   }, []);
 
+  // Auto-rotate carousel
   useEffect(() => {
-    if (!shouldIntro) return;
-    if (fogTimer.current) window.clearTimeout(fogTimer.current);
+    if (phase !== "landing" || isPaused) return;
 
-    if (phase === "intro") {
-      setFogVisible(true);
-      setFogSoftHide(false);
-      return;
-    }
-
-    setFogVisible(true);
-    setFogSoftHide(false);
-    fogTimer.current = window.setTimeout(() => {
-      setFogSoftHide(true);
-      window.setTimeout(() => setFogVisible(false), 650);
-    }, 550);
+    autoRotateRef.current = setInterval(() => {
+      setIsTransitioning(true);
+      setActiveIndex((prev) => (prev + 1) % PRESET_CONFIG.length);
+      setTimeout(() => setIsTransitioning(false), 600);
+    }, AUTO_ROTATE_INTERVAL);
 
     return () => {
-      if (fogTimer.current) window.clearTimeout(fogTimer.current);
+      if (autoRotateRef.current) {
+        clearInterval(autoRotateRef.current);
+      }
     };
-  }, [phase, shouldIntro]);
+  }, [phase, isPaused]);
 
-  const goToApp = useCallback((payload: { 
-    draft: string; 
-    preset?: PresetId;
-    interpretation?: AIDecisionInterpretation;
-  }) => {
-    if (typeof window !== "undefined") {
-      try {
-        localStorage.removeItem("nwa_decisionDraft");
-        localStorage.removeItem("nwa_preset");
-        localStorage.removeItem("nwa_aiInterpretation");
-        localStorage.setItem("nwa_decisionDraft", payload.draft);
-        if (payload.preset) localStorage.setItem("nwa_preset", payload.preset);
-        if (payload.interpretation) localStorage.setItem("nwa_aiInterpretation", JSON.stringify(payload.interpretation));
-      } catch {}
-    }
-    router.push("/app");
-  }, [router]);
+  // Navigate carousel
+  const goToSlide = useCallback((index: number) => {
+    if (isTransitioning) return;
+    setIsTransitioning(true);
+    setActiveIndex(index);
+    setTimeout(() => setIsTransitioning(false), 600);
+  }, [isTransitioning]);
 
-  const analyzeInput = useCallback(async () => {
-    const draft = sanitizeInput(text);
-    if (!draft || draft.length < 3) return;
+  const goNext = useCallback(() => {
+    goToSlide((activeIndex + 1) % PRESET_CONFIG.length);
+  }, [activeIndex, goToSlide]);
 
-    setIsAnalyzing(true);
-    setAiError(null);
-    setPhase("analyzing");
+  const goPrev = useCallback(() => {
+    goToSlide((activeIndex - 1 + PRESET_CONFIG.length) % PRESET_CONFIG.length);
+  }, [activeIndex, goToSlide]);
 
-    try {
-      const response = await fetch("/api/interpret-decision", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userInput: draft }),
+  // Get visible items for carousel (5 items: -2, -1, center, +1, +2)
+  const getVisibleItems = useMemo(() => {
+    const items = [];
+    for (let i = -2; i <= 2; i++) {
+      const index = (activeIndex + i + PRESET_CONFIG.length) % PRESET_CONFIG.length;
+      items.push({
+        ...PRESET_CONFIG[index],
+        offset: i,
+        realIndex: index,
       });
-
-      if (!response.ok) throw new Error("Failed to analyze decision");
-
-      const data = await response.json();
-      if (data.interpretation) {
-        setAiInterpretation(data.interpretation);
-        setPhase("suggestion");
-      } else {
-        throw new Error("No interpretation returned");
-      }
-    } catch {
-      const fallback = interpretDecisionInput(draft);
-      setAiInterpretation(fallback);
-      setPhase("suggestion");
-      if (fallback.confidence === "low") {
-        setAiError("Automatische Interpretation wurde verwendet. Sie können alle Felder anpassen.");
-      }
-    } finally {
-      setIsAnalyzing(false);
     }
-  }, [text]);
+    return items;
+  }, [activeIndex]);
 
-  const startFromInput = useCallback(() => {
-    const draft = sanitizeInput(text);
-    if (!draft) return;
-    
-    if (draft.length < 6) {
-      const interpretation = interpretDecisionInput(draft);
-      setAiInterpretation(interpretation);
-      setPhase("suggestion");
+  const getPresetLabel = (id: PresetId) => {
+    const labels: Record<PresetId, string> = {
+      supplier: t.presets?.supplier || "Lieferantenauswahl",
+      software: t.presets?.software || "Softwarevergleich",
+      investment: t.presets?.investment || "Investitionsentscheidung",
+      machines: t.presets?.machines || "Maschinenkauf",
+      vehicle: t.presets?.vehicle || "Fahrzeugauswahl",
+      employee: t.presets?.employee || "Mitarbeiterwahl",
+      realEstate: t.presets?.realEstate || "Immobilienbewertung",
+      product: t.presets?.product || "Produktvergleich",
+    };
+    return labels[id] || id;
+  };
+
+  const handleSubmit = useCallback((e?: React.FormEvent) => {
+    e?.preventDefault();
+    const trimmed = text.trim();
+    if (!trimmed) {
+      inputRef.current?.focus();
       return;
     }
-    
-    analyzeInput();
-  }, [text, analyzeInput]);
+    const safe = sanitizeInput(trimmed);
+    setPhase("analyzing");
+    requestAnimationFrame(() => {
+      const result = interpretDecisionInput(safe);
+      setInterpretation(result);
+      setPhase("suggestion");
+    });
+  }, [text]);
 
-  const handleAcceptSuggestion = useCallback((interpretation: AIDecisionInterpretation) => {
-    goToApp({ draft: interpretation.title, interpretation });
-  }, [goToApp]);
-
-  const handleEditSuggestion = useCallback((interpretation: AIDecisionInterpretation) => {
-    goToApp({ draft: text.trim(), interpretation });
-  }, [goToApp, text]);
-
-  const handleRejectSuggestion = useCallback(() => {
-    setAiInterpretation(null);
-    setPhase("landing");
-  }, []);
-
-  const startFromPreset = useCallback((p: PresetId) => {
-    const draft = text.trim();
-    goToApp({ draft, preset: p });
-  }, [text, goToApp]);
-
-  // Carousel navigation
-  const goToSlide = (index: number) => {
-    if (index < 0) index = PRESET_CONFIG.length - 1;
-    if (index >= PRESET_CONFIG.length) index = 0;
-    setActiveIndex(index);
-  };
-
-  const handleDragStart = (e: React.MouseEvent | React.TouchEvent) => {
-    setIsDragging(true);
-    const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
-    setStartX(clientX);
-  };
-
-  const handleDragMove = (e: React.MouseEvent | React.TouchEvent) => {
-    if (!isDragging) return;
-    const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
-    const diff = clientX - startX;
-    setTranslateX(diff);
-  };
-
-  const handleDragEnd = () => {
-    if (!isDragging) return;
-    setIsDragging(false);
-    
-    if (Math.abs(translateX) > 50) {
-      if (translateX > 0) {
-        goToSlide(activeIndex - 1);
-      } else {
-        goToSlide(activeIndex + 1);
-      }
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      handleSubmit();
     }
-    setTranslateX(0);
   };
 
-  // Keyboard navigation
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (phase !== "landing") return;
-      if (e.key === "ArrowLeft") goToSlide(activeIndex - 1);
-      if (e.key === "ArrowRight") goToSlide(activeIndex + 1);
-    };
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [activeIndex, phase]);
+  const handleBack = () => {
+    setPhase("landing");
+    setInterpretation(null);
+    setText("");
+  };
 
-  return (
-    <main className="relative min-h-[100svh] overflow-hidden">
-      {/* Construction Banner */}
-      <div className="fixed top-0 left-0 right-0 z-50 bg-gradient-to-r from-amber-500 via-orange-500 to-amber-500 text-white py-2 px-4 text-center text-sm font-medium shadow-lg">
-        <div className="flex items-center justify-center gap-2">
-          <svg className="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-          </svg>
-          <span>{t.constructionBanner.text}</span>
+  const handlePresetClick = (presetId: PresetId) => {
+    router.push(`/app?preset=${presetId}`);
+  };
+
+  // Intro Animation Phase
+  if (phase === "intro") {
+    return (
+      <div className="min-h-[100svh] relative overflow-hidden bg-black flex items-center justify-center">
+        <div className="text-center animate-premium-fade-in-up">
+          <div className="text-4xl sm:text-6xl font-bold text-white mb-4">
+            {t.brand?.name || "Nutzwertanalyse"}
+            <span className="text-white/40">.com</span>
+          </div>
+          <div className="text-white/50 text-lg">{t.landing?.headline || "Entscheidungen leicht gemacht"}</div>
         </div>
-      </div>
-      
-      {/* ===== DYNAMIC FULLSCREEN BACKGROUND ===== */}
-      <div className="fixed inset-0 -z-10 overflow-hidden transition-all duration-1000">
-        {/* Base - Deep dark */}
-        <div className="absolute inset-0 bg-[#050508]" />
-        
-        {/* Active preset background image with blur */}
-        <div 
-          className="absolute inset-0 transition-opacity duration-1000"
-          style={{ opacity: 0.15 }}
+        <button
+          onClick={() => setPhase("landing")}
+          className="absolute bottom-10 text-white/30 text-sm hover:text-white/60 transition"
         >
-          <img 
-            src={activePreset?.image} 
-            alt="" 
-            className="w-full h-full object-cover scale-110 blur-xl"
+          Weiter
+        </button>
+      </div>
+    );
+  }
+
+  // Suggestion Phase
+  if (phase === "suggestion" && interpretation) {
+    return (
+      <div className="min-h-[100svh] bg-[#0a0a0b]">
+        <DecisionSuggestion
+          interpretation={interpretation}
+          onBack={handleBack}
+          onProceed={(level) => {
+            const params = new URLSearchParams();
+            params.set("title", text.trim());
+            params.set("package", level);
+            if (interpretation?.domain) params.set("domain", interpretation.domain);
+            params.set("ai", encodeURIComponent(JSON.stringify(interpretation)));
+            router.push(`/app?${params.toString()}`);
+          }}
+        />
+      </div>
+    );
+  }
+
+  // Main Landing Page
+  return (
+    <div className="min-h-[100svh] relative overflow-hidden">
+      {/* ===== DYNAMIC BACKGROUND WITH IMAGE ===== */}
+      <div 
+        className="fixed inset-0 -z-10 transition-all duration-1000 ease-out"
+        style={{ backgroundColor: currentPreset.bgColor }}
+      >
+        {/* Background Image */}
+        {PRESET_CONFIG.map((preset, idx) => (
+          <div
+            key={preset.id}
+            className="absolute inset-0 transition-opacity duration-1000"
+            style={{ 
+              opacity: idx === activeIndex ? 0.4 : 0,
+              backgroundImage: `url(${preset.image})`,
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
+            }}
           />
-        </div>
+        ))}
+
+        {/* Gradient overlays */}
+        <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black/80" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent" />
         
-        {/* Intense color layers - Layer 1 (Slowest, largest) */}
-        <div className="parallax-layer-1 absolute inset-0">
+        {/* Animated color orbs */}
+        <div className="parallax-layer-1 absolute inset-0 pointer-events-none">
           <div 
-            className="absolute w-[1000px] h-[1000px] rounded-full blur-[150px] transition-all duration-1000"
+            className="absolute w-[800px] h-[800px] rounded-full blur-[150px] transition-all duration-1000"
             style={{
               top: '-20%',
               left: '-10%',
-              background: `radial-gradient(circle, rgb(${activeColor}), transparent 60%)`,
-              opacity: 0.4,
+              background: `radial-gradient(circle, rgb(${currentPreset.color} / 0.6), transparent 60%)`,
             }}
           />
+        </div>
+        <div className="parallax-layer-2 absolute inset-0 pointer-events-none">
           <div 
-            className="absolute w-[800px] h-[800px] rounded-full blur-[120px] transition-all duration-1000"
+            className="absolute w-[600px] h-[600px] rounded-full blur-[120px] transition-all duration-1000"
             style={{
-              bottom: '-30%',
-              right: '-15%',
-              background: `radial-gradient(circle, rgb(${activeColor} / 0.8), transparent 50%)`,
-              opacity: 0.3,
-              animation: 'parallaxFloat1 35s ease-in-out infinite',
+              bottom: '-15%',
+              right: '-5%',
+              background: `radial-gradient(circle, rgb(${currentPreset.color} / 0.4), transparent 50%)`,
+            }}
+          />
+        </div>
+        <div className="parallax-layer-3 absolute inset-0 pointer-events-none">
+          <div 
+            className="absolute w-[400px] h-[400px] rounded-full blur-[80px] transition-all duration-1000"
+            style={{
+              top: '50%',
+              left: '50%',
+              transform: 'translate(-50%, -50%)',
+              background: `radial-gradient(circle, rgb(${currentPreset.color} / 0.3), transparent 40%)`,
             }}
           />
         </div>
 
-        {/* Layer 2 (Medium) */}
-        <div className="parallax-layer-2 absolute inset-0">
-          <div 
-            className="absolute w-[600px] h-[600px] rounded-full blur-[100px] transition-all duration-700"
-            style={{
-              top: '20%',
-              right: '10%',
-              background: `radial-gradient(circle, rgb(${activeColor}), transparent 50%)`,
-              opacity: 0.5,
-              animation: 'parallaxFloat2 25s ease-in-out infinite',
-            }}
-          />
-          <div 
-            className="absolute w-[500px] h-[500px] rounded-full blur-[80px] transition-all duration-700"
-            style={{
-              bottom: '10%',
-              left: '20%',
-              background: `radial-gradient(circle, rgb(${activeColor} / 0.9), transparent 50%)`,
-              opacity: 0.35,
-              animation: 'parallaxFloat3 20s ease-in-out infinite',
-            }}
-          />
-        </div>
-
-        {/* Layer 3 (Fastest, closest) */}
-        <div className="parallax-layer-3 absolute inset-0">
-          <div 
-            className="absolute w-[400px] h-[400px] rounded-full blur-[60px] transition-all duration-500"
-            style={{
-              top: '40%',
-              left: '35%',
-              background: `radial-gradient(circle, rgb(${activeColor}), transparent 40%)`,
-              opacity: 0.6,
-              animation: 'parallaxPulse 6s ease-in-out infinite',
-            }}
-          />
-        </div>
-
-        {/* Light streaks */}
-        <div className="absolute inset-0 overflow-hidden">
-          <div 
-            className="absolute w-[2px] h-[300px] blur-[2px] transition-all duration-1000"
-            style={{
-              top: '10%',
-              left: '25%',
-              background: `linear-gradient(to bottom, transparent, rgb(${activeColor}), transparent)`,
-              opacity: 0.3,
-              transform: 'rotate(15deg)',
-              animation: 'parallaxDrift1 20s ease-in-out infinite',
-            }}
-          />
-          <div 
-            className="absolute w-[2px] h-[400px] blur-[3px] transition-all duration-1000"
-            style={{
-              top: '5%',
-              right: '30%',
-              background: `linear-gradient(to bottom, transparent, rgb(${activeColor}), transparent)`,
-              opacity: 0.25,
-              transform: 'rotate(-10deg)',
-              animation: 'parallaxDrift2 25s ease-in-out infinite',
-            }}
-          />
-        </div>
-
-        {/* Floating particles */}
-        <div className="absolute inset-0 pointer-events-none">
-          {[...Array(12)].map((_, i) => (
-            <div
-              key={i}
-              className="absolute rounded-full transition-all duration-1000"
-              style={{
-                width: `${3 + Math.random() * 4}px`,
-                height: `${3 + Math.random() * 4}px`,
-                top: `${Math.random() * 100}%`,
-                left: `${Math.random() * 100}%`,
-                background: `rgb(${activeColor})`,
-                opacity: 0.3 + Math.random() * 0.3,
-                animation: `floatShape${(i % 4) + 1} ${15 + Math.random() * 10}s ease-in-out infinite`,
-                animationDelay: `${Math.random() * 5}s`,
-              }}
-            />
-          ))}
-        </div>
-
-        {/* Grid */}
-        <div 
-          className="absolute inset-0 opacity-[0.04]"
-          style={{
-            backgroundImage: `
-              linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px),
-              linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)
-            `,
-            backgroundSize: '80px 80px',
-          }}
-        />
-
-        {/* Noise */}
-        <div className="absolute inset-0 landing-grain opacity-[0.06]" />
-        
-        {/* Vignette */}
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_0%,rgba(0,0,0,0.5)_100%)]" />
+        {/* Noise texture */}
+        <div className="absolute inset-0 landing-grain opacity-[0.04]" />
       </div>
 
-      {/* Fog Overlay for intro */}
-      {shouldIntro && fogVisible && (
-        <div
-          className={[
-            "fixed inset-0 z-40 pointer-events-none transition-opacity duration-700 ease-out",
-            fogSoftHide ? "opacity-0" : "opacity-100",
-          ].join(" ")}
-          style={{ backdropFilter: "blur(12px)", background: "rgba(0,0,0,0.7)" }}
-        />
-      )}
-
-      {/* INTRO OVERLAY */}
-      {shouldIntro && (
-        <div
-          className={[
-            "fixed inset-0 z-50 grid place-items-center transition-all duration-700 ease-out",
-            phase === "intro" ? "opacity-100" : "opacity-0 pointer-events-none",
-          ].join(" ")}
-        >
-          <div
-            className={[
-              "text-center transition-all duration-700 ease-out",
-              phase === "intro" ? "translate-y-0 scale-100 opacity-100" : "-translate-y-3 scale-[0.98] opacity-0",
-            ].join(" ")}
-          >
-            <div className="text-5xl md:text-7xl font-bold tracking-tight text-white">
-              Nutzwertanalyse<span className="opacity-40">.</span>
+      {/* ===== HEADER ===== */}
+      <header className="relative z-20 px-5 sm:px-8 py-5">
+        <div className="mx-auto max-w-7xl flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="h-10 w-10 rounded-2xl overflow-hidden ring-2 ring-white/10">
+              <img src="/images/logo.webp" alt="Logo" className="h-full w-full object-contain" />
             </div>
-            <div className="mt-4 text-base text-white/50">
-              Entscheidungen nachvollziehbar begründen
+            <div className="leading-tight">
+              <div className="text-base font-semibold text-white">
+                {t.brand?.name || "Nutzwertanalyse"}<span className="text-white/30">.com</span>
+              </div>
             </div>
           </div>
+          <div className="flex items-center gap-3">
+            <LanguageSwitcher />
+            <button
+              onClick={() => router.push("/login")}
+              className="rounded-full px-5 py-2.5 text-sm font-semibold bg-white/10 backdrop-blur-xl text-white border border-white/10 hover:bg-white/20 transition-all duration-300"
+            >
+              {t.packageSelect?.login || "Anmelden"}
+            </button>
+          </div>
         </div>
-      )}
+      </header>
 
       {/* ===== MAIN CONTENT ===== */}
-      <div className="relative min-h-[100svh] flex flex-col pt-[52px]">
-        {/* Header */}
-        <header className="fixed top-[40px] left-0 right-0 z-30 px-5">
-          <div className="mx-auto max-w-6xl flex items-center justify-between py-4">
-            <button
-              onClick={() => router.push("/")}
-              className="group flex items-center gap-3"
-            >
-              <div className="h-10 w-10 rounded-2xl overflow-hidden ring-2 ring-white/10 transition-all duration-300 group-hover:ring-white/20">
-                <img src="/images/logo.webp" alt="Logo" className="h-full w-full object-contain" />
-              </div>
-              <div className="hidden sm:block">
-                <div className="text-sm font-semibold text-white">
-                  {t.brand.name}<span className="text-white/40">{t.brand.domain}</span>
-                </div>
-              </div>
-            </button>
+      <main className="relative z-10 flex flex-col items-center justify-center min-h-[calc(100svh-160px)] px-5">
+        
+        {/* Headline */}
+        <div className="text-center mb-8 animate-premium-fade-in-up">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white tracking-tight mb-3">
+            {t.landing?.headline || "Entscheidungen leicht gemacht"}
+          </h1>
+          <p className="text-white/40 text-base sm:text-lg max-w-xl mx-auto">
+            {t.landing?.subheadline || "Systematisch vergleichen, fundiert entscheiden"}
+          </p>
+        </div>
 
-            <div className="flex items-center gap-3">
-              <LanguageSwitcher />
+        {/* Search Input */}
+        <form onSubmit={handleSubmit} className="w-full max-w-2xl mb-12 animate-premium-fade-in-up stagger-1">
+          <div 
+            className="relative group"
+            style={{
+              boxShadow: `0 0 80px rgb(${currentPreset.color} / 0.2), 0 25px 50px -12px rgba(0, 0, 0, 0.5)`,
+            }}
+          >
+            <div 
+              className="absolute -inset-1 rounded-3xl opacity-50 blur-xl transition-all duration-500"
+              style={{ background: `rgb(${currentPreset.color} / 0.3)` }}
+            />
+            <div className="relative bg-white/[0.08] backdrop-blur-2xl rounded-2xl border border-white/[0.12] overflow-hidden">
+              <input
+                ref={inputRef}
+                type="text"
+                value={text}
+                onChange={(e) => setText(e.target.value)}
+                onKeyDown={handleKeyDown}
+                placeholder={t.landing?.inputPlaceholder || "Was möchten Sie vergleichen?"}
+                className="w-full px-6 py-5 bg-transparent text-white text-lg placeholder:text-white/30 focus:outline-none"
+              />
               <button
-                onClick={() => router.push("/login")}
-                className="px-5 py-2.5 rounded-full text-sm font-semibold bg-white/10 backdrop-blur-xl border border-white/10 text-white hover:bg-white/20 transition-all duration-300"
+                type="submit"
+                disabled={!text.trim()}
+                className="absolute right-3 top-1/2 -translate-y-1/2 p-3 rounded-xl transition-all duration-300 disabled:opacity-30"
+                style={{ 
+                  background: text.trim() ? `rgb(${currentPreset.color})` : 'rgb(255 255 255 / 0.1)',
+                }}
               >
-                Login
+                <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                </svg>
               </button>
             </div>
           </div>
-        </header>
+        </form>
 
-        {/* Main Content */}
-        <div className="flex-1 flex flex-col items-center justify-center px-5 py-8">
-          
-          {/* Analyzing Phase */}
-          {phase === "analyzing" && (
-            <div className="text-center animate-premium-fade-in-up">
-              <div className="relative mx-auto w-20 h-20 mb-8">
-                <div className="absolute inset-0 rounded-full border-2 border-white/10" />
-                <div 
-                  className="absolute inset-0 rounded-full border-2 border-transparent animate-spin"
-                  style={{ 
-                    borderTopColor: `rgb(${activeColor})`,
-                    animationDuration: "1s" 
+        {/* ===== INFINITE 3D CAROUSEL ===== */}
+        <div 
+          className="relative w-full max-w-6xl h-[280px] sm:h-[320px] animate-premium-fade-in-up stagger-2"
+          onMouseEnter={() => setIsPaused(true)}
+          onMouseLeave={() => setIsPaused(false)}
+          ref={carouselRef}
+        >
+          {/* Navigation Arrows */}
+          <button
+            onClick={goPrev}
+            className="absolute left-0 sm:left-4 top-1/2 -translate-y-1/2 z-20 p-3 rounded-full bg-black/40 backdrop-blur-xl border border-white/10 text-white/60 hover:text-white hover:bg-black/60 transition-all duration-300"
+          >
+            <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
+          </button>
+          <button
+            onClick={goNext}
+            className="absolute right-0 sm:right-4 top-1/2 -translate-y-1/2 z-20 p-3 rounded-full bg-black/40 backdrop-blur-xl border border-white/10 text-white/60 hover:text-white hover:bg-black/60 transition-all duration-300"
+          >
+            <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+            </svg>
+          </button>
+
+          {/* Carousel Items */}
+          <div className="relative h-full flex items-center justify-center perspective-[1200px]">
+            {getVisibleItems.map((item) => {
+              const isCenter = item.offset === 0;
+              const isAdjacent = Math.abs(item.offset) === 1;
+              const isEdge = Math.abs(item.offset) === 2;
+
+              // Calculate transform based on position
+              let translateX = item.offset * 180;
+              let translateZ = isCenter ? 100 : isAdjacent ? 0 : -100;
+              let scale = isCenter ? 1.15 : isAdjacent ? 0.85 : 0.65;
+              let opacity = isCenter ? 1 : isAdjacent ? 0.7 : 0.4;
+              let rotateY = item.offset * -8;
+
+              return (
+                <button
+                  key={`${item.id}-${item.offset}`}
+                  onClick={() => {
+                    if (isCenter) {
+                      handlePresetClick(item.id);
+                    } else {
+                      goToSlide(item.realIndex);
+                    }
                   }}
-                />
-                <div className="absolute inset-0 flex items-center justify-center p-4">
-                  <img src="/images/logo.webp" alt="Logo" className="h-full w-full object-contain" />
-                </div>
-              </div>
-              <h2 className="text-2xl font-semibold text-white mb-3">
-                Analysiere Ihre Entscheidung...
-              </h2>
-              <p className="text-sm text-white/40 max-w-md mx-auto">
-                Wir interpretieren Ihre Eingabe und generieren passende Alternativen und Kriterien.
-              </p>
-            </div>
-          )}
-
-          {/* Suggestion Phase */}
-          {phase === "suggestion" && aiInterpretation && (
-            <div className="w-full max-w-4xl animate-premium-fade-in-up">
-              {aiError && (
-                <div className="mb-6 px-5 py-4 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-sm text-amber-200 flex items-center gap-3">
-                  <svg className="h-5 w-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                  <span>{aiError}</span>
-                  <button onClick={() => setAiError(null)} className="ml-auto text-amber-300 hover:text-amber-100 font-medium">OK</button>
-                </div>
-              )}
-              <DecisionSuggestion
-                interpretation={aiInterpretation}
-                originalInput={text}
-                onAccept={handleAcceptSuggestion}
-                onEdit={handleEditSuggestion}
-                onReject={handleRejectSuggestion}
-              />
-            </div>
-          )}
-
-          {/* Normal Landing Phase */}
-          {(phase === "landing" || phase === "intro") && (
-            <div className="w-full flex flex-col items-center">
-              {/* Minimal Hero */}
-              <div className="text-center mb-8 animate-premium-fade-in-up">
-                <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white tracking-tight leading-[1.1]">
-                  {t.landing.headline.part1}
-                  <br />
-                  <span className="text-white/30">{t.landing.headline.part2}</span>
-                </h1>
-                <p className="mt-4 text-sm sm:text-base text-white/40 max-w-md mx-auto">
-                  {t.landing.description}
-                </p>
-              </div>
-
-              {/* Centered Search */}
-              <div className="w-full max-w-xl mb-12 animate-premium-fade-in-up stagger-1">
-                <div 
                   className={[
-                    "relative rounded-2xl",
-                    "bg-white/[0.06] backdrop-blur-2xl",
-                    "border transition-all duration-500",
-                    isFocused 
-                      ? "border-white/20 shadow-[0_0_80px_rgba(255,255,255,0.1)]" 
-                      : "border-white/[0.08]",
-                    "p-2",
+                    "absolute w-[200px] sm:w-[240px] h-[240px] sm:h-[280px] rounded-3xl overflow-hidden",
+                    "transition-all duration-600 ease-out",
+                    isCenter ? "z-30 cursor-pointer" : "z-10 cursor-pointer",
                   ].join(" ")}
-                  style={isFocused ? {
-                    boxShadow: `0 0 60px rgb(${activeColor} / 0.2)`
-                  } : {}}
+                  style={{
+                    transform: `translateX(${translateX}px) translateZ(${translateZ}px) scale(${scale}) rotateY(${rotateY}deg)`,
+                    opacity,
+                    boxShadow: isCenter 
+                      ? `0 25px 80px -10px rgb(${item.color} / 0.5), 0 0 60px rgb(${item.color} / 0.3), inset 0 0 80px rgb(${item.color} / 0.1)`
+                      : `0 15px 40px -10px rgba(0,0,0,0.4)`,
+                  }}
                 >
-                  <div className="flex items-center gap-3">
+                  {/* Background Image */}
+                  <div 
+                    className="absolute inset-0 bg-cover bg-center transition-transform duration-500"
+                    style={{ 
+                      backgroundImage: `url(${item.image})`,
+                      transform: isCenter ? 'scale(1.05)' : 'scale(1)',
+                    }}
+                  />
+
+                  {/* Gradient Overlay */}
+                  <div 
+                    className="absolute inset-0 transition-opacity duration-500"
+                    style={{
+                      background: isCenter
+                        ? `linear-gradient(to top, rgb(${item.color} / 0.9) 0%, rgb(${item.color} / 0.4) 50%, transparent 100%)`
+                        : 'linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.3) 100%)',
+                    }}
+                  />
+
+                  {/* Glow border for center */}
+                  {isCenter && (
                     <div 
-                      className="h-12 w-12 shrink-0 rounded-xl flex items-center justify-center transition-all duration-500"
+                      className="absolute inset-0 rounded-3xl pointer-events-none"
                       style={{
-                        background: `rgba(${activeColor}, 0.15)`,
+                        boxShadow: `inset 0 0 0 2px rgb(${item.color} / 0.5), inset 0 0 40px rgb(${item.color} / 0.2)`,
+                      }}
+                    />
+                  )}
+
+                  {/* Content */}
+                  <div className="absolute inset-0 flex flex-col items-center justify-end p-6">
+                    <div 
+                      className={[
+                        "w-14 h-14 rounded-2xl flex items-center justify-center mb-3 transition-all duration-500",
+                        isCenter ? "scale-110" : "scale-90 opacity-70",
+                      ].join(" ")}
+                      style={{ 
+                        background: isCenter ? `rgb(${item.color})` : 'rgba(255,255,255,0.1)',
+                        boxShadow: isCenter ? `0 8px 30px rgb(${item.color} / 0.5)` : 'none',
                       }}
                     >
-                      <img src="/images/logo.webp" alt="" className="h-6 w-6 object-contain" />
+                      <item.Icon className="w-7 h-7 text-white" />
                     </div>
-
-                    <input
-                      value={text}
-                      onChange={(e) => setText(e.target.value)}
-                      onKeyDown={(e) => { if (e.key === "Enter") startFromInput(); }}
-                      onFocus={() => setIsFocused(true)}
-                      onBlur={() => setIsFocused(false)}
-                      className="flex-1 bg-transparent outline-none text-white text-base placeholder:text-white/30 py-3"
-                      placeholder={placeholderText}
-                      aria-label={t.landing.searchInputAriaLabel}
-                    />
-
-                    <button
-                      onClick={startFromInput}
-                      disabled={!canStart || isAnalyzing}
-                      className={[
-                        "shrink-0 rounded-xl px-6 py-3",
-                        "text-sm font-semibold",
-                        "transition-all duration-300",
-                        canStart && !isAnalyzing
-                          ? "bg-white text-black hover:scale-[1.02] active:scale-[0.98]"
-                          : "bg-white/10 text-white/30 cursor-not-allowed",
-                      ].join(" ")}
-                    >
-                      {isAnalyzing ? (
-                        <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
-                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-                        </svg>
-                      ) : t.landing.startButton}
-                    </button>
+                    <div className={[
+                      "text-white font-semibold text-center transition-all duration-500",
+                      isCenter ? "text-lg" : "text-sm opacity-70",
+                    ].join(" ")}>
+                      {getPresetLabel(item.id)}
+                    </div>
+                    {isCenter && (
+                      <div className="mt-2 text-white/50 text-xs">
+                        Klicken zum Starten
+                      </div>
+                    )}
                   </div>
-                </div>
-              </div>
+                </button>
+              );
+            })}
+          </div>
 
-              {/* ===== 3D CAROUSEL ===== */}
-              <div className="w-full max-w-5xl animate-premium-fade-in-up stagger-2">
-                <div className="text-center mb-6">
-                  <div className="text-xs uppercase tracking-[0.2em] text-white/30 font-medium">
-                    {t.landing.quickTemplates || "Schnellstart-Vorlagen"}
-                  </div>
-                </div>
-
-                <div 
-                  ref={carouselRef}
-                  className="relative h-[220px] sm:h-[260px] perspective-[1200px] select-none"
-                  onMouseDown={handleDragStart}
-                  onMouseMove={handleDragMove}
-                  onMouseUp={handleDragEnd}
-                  onMouseLeave={handleDragEnd}
-                  onTouchStart={handleDragStart}
-                  onTouchMove={handleDragMove}
-                  onTouchEnd={handleDragEnd}
-                >
-                  {/* Navigation Arrows */}
-                  <button
-                    onClick={() => goToSlide(activeIndex - 1)}
-                    className="absolute left-0 top-1/2 -translate-y-1/2 z-20 h-12 w-12 rounded-full bg-white/10 backdrop-blur-xl border border-white/10 flex items-center justify-center text-white/60 hover:text-white hover:bg-white/20 transition-all duration-300"
-                  >
-                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                    </svg>
-                  </button>
-                  <button
-                    onClick={() => goToSlide(activeIndex + 1)}
-                    className="absolute right-0 top-1/2 -translate-y-1/2 z-20 h-12 w-12 rounded-full bg-white/10 backdrop-blur-xl border border-white/10 flex items-center justify-center text-white/60 hover:text-white hover:bg-white/20 transition-all duration-300"
-                  >
-                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                    </svg>
-                  </button>
-
-                  {/* Carousel Items */}
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    {PRESET_CONFIG.map((preset, index) => {
-                      const presetTranslations = t.presets[preset.id as keyof typeof t.presets];
-                      const offset = index - activeIndex;
-                      const absOffset = Math.abs(offset);
-                      
-                      // Calculate 3D transforms
-                      const translateXVal = offset * 180 + translateX * 0.3;
-                      const scale = absOffset === 0 ? 1 : absOffset === 1 ? 0.75 : 0.55;
-                      const opacity = absOffset > 2 ? 0 : absOffset === 0 ? 1 : absOffset === 1 ? 0.6 : 0.3;
-                      const zIndex = 10 - absOffset;
-                      const rotateY = offset * -15;
-                      
-                      return (
-                        <button
-                          key={preset.id}
-                          onClick={() => {
-                            if (absOffset === 0) {
-                              startFromPreset(preset.id);
-                            } else {
-                              goToSlide(index);
-                            }
-                          }}
-                          className={[
-                            "absolute transition-all duration-500 ease-out",
-                            "rounded-2xl overflow-hidden",
-                            absOffset === 0 ? "cursor-pointer" : "cursor-pointer",
-                          ].join(" ")}
-                          style={{
-                            width: absOffset === 0 ? '280px' : '200px',
-                            height: absOffset === 0 ? '180px' : '140px',
-                            transform: `translateX(${translateXVal}px) scale(${scale}) rotateY(${rotateY}deg)`,
-                            opacity,
-                            zIndex,
-                            transformStyle: 'preserve-3d',
-                          }}
-                        >
-                          {/* Card background image */}
-                          <div className="absolute inset-0">
-                            <img 
-                              src={preset.image} 
-                              alt="" 
-                              className="w-full h-full object-cover"
-                            />
-                            <div 
-                              className="absolute inset-0 transition-all duration-500"
-                              style={{
-                                background: absOffset === 0 
-                                  ? `linear-gradient(135deg, rgb(${preset.color} / 0.7), rgb(${preset.color} / 0.3))`
-                                  : `linear-gradient(135deg, rgb(${preset.color} / 0.85), rgb(${preset.color} / 0.6))`,
-                              }}
-                            />
-                          </div>
-                          
-                          {/* Card content */}
-                          <div className="relative h-full flex flex-col items-center justify-center p-5 text-white">
-                            <div 
-                              className={[
-                                "rounded-2xl flex items-center justify-center mb-3 transition-all duration-300",
-                                absOffset === 0 ? "h-14 w-14" : "h-10 w-10",
-                              ].join(" ")}
-                              style={{
-                                background: 'rgba(255,255,255,0.2)',
-                                backdropFilter: 'blur(8px)',
-                              }}
-                            >
-                              <preset.Icon size={absOffset === 0 ? 28 : 20} />
-                            </div>
-                            <div className={[
-                              "font-bold text-center transition-all duration-300",
-                              absOffset === 0 ? "text-lg" : "text-sm",
-                            ].join(" ")}>
-                              {presetTranslations.label}
-                            </div>
-                            {absOffset === 0 && (
-                              <div className="text-xs text-white/70 mt-1 text-center max-w-[200px]">
-                                {presetTranslations.hint}
-                              </div>
-                            )}
-                          </div>
-
-                          {/* Glow for active */}
-                          {absOffset === 0 && (
-                            <div 
-                              className="absolute -inset-1 rounded-2xl opacity-50 -z-10 blur-xl"
-                              style={{
-                                background: `rgb(${preset.color})`,
-                              }}
-                            />
-                          )}
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-
-                {/* Dots indicator */}
-                <div className="flex justify-center gap-2 mt-6">
-                  {PRESET_CONFIG.map((_, index) => (
-                    <button
-                      key={index}
-                      onClick={() => goToSlide(index)}
-                      className={[
-                        "rounded-full transition-all duration-300",
-                        index === activeIndex 
-                          ? "w-8 h-2" 
-                          : "w-2 h-2 hover:bg-white/40",
-                      ].join(" ")}
-                      style={{
-                        background: index === activeIndex 
-                          ? `rgb(${activeColor})` 
-                          : 'rgba(255,255,255,0.2)',
-                      }}
-                    />
-                  ))}
-                </div>
-              </div>
-
-              {/* Footer */}
-              <div className="mt-16 text-xs text-white/20 text-center animate-premium-fade-in-up stagger-3">
-                <div className="flex flex-wrap justify-center gap-4">
-                  <a href="/datenschutz" className="hover:text-white/40 transition-colors">{t.landing.footer.privacy}</a>
-                  <span>·</span>
-                  <a href="/agb" className="hover:text-white/40 transition-colors">{t.landing.footer.terms}</a>
-                  <span>·</span>
-                  <a href="/impressum" className="hover:text-white/40 transition-colors">{t.landing.footer.imprint}</a>
-                </div>
-                <div className="mt-3">
-                  © {new Date().getFullYear()} Nutzwertanalyse.com
-                </div>
-              </div>
-            </div>
-          )}
+          {/* Dots Indicator */}
+          <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 flex items-center gap-2">
+            {PRESET_CONFIG.map((_, idx) => (
+              <button
+                key={idx}
+                onClick={() => goToSlide(idx)}
+                className={[
+                  "rounded-full transition-all duration-300",
+                  idx === activeIndex 
+                    ? "w-8 h-2" 
+                    : "w-2 h-2 hover:bg-white/40",
+                ].join(" ")}
+                style={{
+                  background: idx === activeIndex 
+                    ? `rgb(${currentPreset.color})` 
+                    : 'rgb(255 255 255 / 0.2)',
+                }}
+              />
+            ))}
+          </div>
         </div>
-      </div>
-    </main>
+
+        {/* Quick start text */}
+        <div className="mt-10 text-center text-white/30 text-sm animate-premium-fade-in-up stagger-3">
+          {t.landing?.quickStart || "Oder wählen Sie eine Vorlage oben"}
+        </div>
+      </main>
+
+      {/* ===== FOOTER ===== */}
+      <footer className="relative z-10 py-6 px-5">
+        <div className="mx-auto max-w-7xl flex flex-col sm:flex-row items-center justify-between gap-3 text-[11px] text-white/25">
+          <div>© {new Date().getFullYear()} Nutzwertanalyse.com</div>
+          <div className="flex gap-4">
+            <a href="/impressum" className="hover:text-white/50 transition">{t.landing?.footer?.imprint || "Impressum"}</a>
+            <a href="/agb" className="hover:text-white/50 transition">{t.landing?.footer?.terms || "AGB"}</a>
+            <a href="/datenschutz" className="hover:text-white/50 transition">{t.landing?.footer?.privacy || "Datenschutz"}</a>
+          </div>
+        </div>
+      </footer>
+
+      {/* Analyzing Overlay */}
+      {phase === "analyzing" && (
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-xl flex items-center justify-center">
+          <div className="text-center">
+            <div 
+              className="w-16 h-16 rounded-full border-4 border-t-transparent animate-spin mx-auto mb-4"
+              style={{ borderColor: `rgb(${currentPreset.color})`, borderTopColor: 'transparent' }}
+            />
+            <div className="text-white text-lg font-medium">{t.landing?.analyzing || "Analysiere..."}</div>
+          </div>
+        </div>
+      )}
+    </div>
   );
 }
