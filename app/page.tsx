@@ -187,14 +187,14 @@ export default function LandingWithIntro() {
 
   const getPresetLabel = (id: PresetId) => {
     const labels: Record<PresetId, string> = {
-      supplier: t.presets?.supplier || "Lieferantenauswahl",
-      software: t.presets?.software || "Softwarevergleich",
-      investment: t.presets?.investment || "Investitionsentscheidung",
-      machines: t.presets?.machines || "Maschinenkauf",
-      vehicle: t.presets?.vehicle || "Fahrzeugauswahl",
-      employee: t.presets?.employee || "Mitarbeiterwahl",
-      realEstate: t.presets?.realEstate || "Immobilienbewertung",
-      product: t.presets?.product || "Produktvergleich",
+      supplier: t.presets?.supplier?.label || "Lieferantenauswahl",
+      software: t.presets?.software?.label || "Softwarevergleich",
+      investment: t.presets?.investment?.label || "Investitionsentscheidung",
+      machines: t.presets?.machines?.label || "Maschinenkauf",
+      vehicle: t.presets?.vehicle?.label || "Fahrzeugauswahl",
+      employee: t.presets?.employee?.label || "Mitarbeiterwahl",
+      realEstate: t.presets?.realEstate?.label || "Immobilienbewertung",
+      product: t.presets?.product?.label || "Produktvergleich",
     };
     return labels[id] || id;
   };
