@@ -689,20 +689,34 @@ export default function LandingWithIntro() {
                       <item.Icon className={isCenter ? "w-7 h-7 sm:w-8 sm:h-8 text-white" : "w-5 h-5 sm:w-6 sm:h-6 text-white/80"} />
                     </div>
                     
-                    {/* Label with maximum contrast and readability */}
+                    {/* Label with solid background for maximum readability */}
                     <div 
                       className={[
-                        "font-extrabold text-center transition-all duration-700 text-white",
-                        isCenter ? "text-lg sm:text-xl lg:text-2xl" : "text-xs sm:text-sm opacity-60",
+                        "text-center transition-all duration-700",
+                        isCenter 
+                          ? "px-4 sm:px-5 py-2 sm:py-2.5 rounded-xl backdrop-blur-md" 
+                          : "px-2 py-1 rounded-lg opacity-70",
                       ].join(" ")}
                       style={{
-                        textShadow: isCenter 
-                          ? `0 0 20px rgb(${item.color}), 0 0 40px rgb(${item.color} / 0.8), 0 2px 4px rgba(0,0,0,0.8)`
-                          : '0 1px 2px rgba(0,0,0,0.5)',
-                        WebkitTextStroke: isCenter ? '0.5px rgba(255,255,255,0.3)' : 'none',
+                        background: isCenter 
+                          ? `linear-gradient(135deg, rgba(0,0,0,0.7), rgba(0,0,0,0.5))`
+                          : 'rgba(0,0,0,0.4)',
+                        boxShadow: isCenter 
+                          ? `0 4px 20px rgba(0,0,0,0.3), inset 0 0 0 1px rgb(${item.color} / 0.3)`
+                          : 'none',
                       }}
                     >
-                      {getPresetLabel(item.id)}
+                      <span 
+                        className={[
+                          "font-bold text-white block",
+                          isCenter ? "text-base sm:text-lg lg:text-xl" : "text-[10px] sm:text-xs",
+                        ].join(" ")}
+                        style={{
+                          textShadow: `0 1px 2px rgba(0,0,0,0.5)`,
+                        }}
+                      >
+                        {getPresetLabel(item.id)}
+                      </span>
                     </div>
                     
                     {/* Call to action for center */}
