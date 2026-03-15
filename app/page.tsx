@@ -17,6 +17,7 @@ import type { AIDecisionInterpretation } from "@/app/lib/nwa/types";
 import { interpretDecisionInput, sanitizeInput } from "@/app/lib/nwa/interpretation-engine";
 import { useTranslations } from "@/app/lib/i18n";
 import { LanguageSwitcher } from "@/app/components/LanguageSwitcher";
+import { CategoryBackground } from "@/app/components/CategoryBackgrounds";
 
 type Phase = "intro" | "landing" | "analyzing" | "suggestion";
 
@@ -404,6 +405,21 @@ export default function LandingWithIntro() {
           ))}
         </div>
 
+        {/* ===== CATEGORY-SPECIFIC ANIMATED BACKGROUNDS ===== */}
+        {PRESET_CONFIG.map((preset, idx) => (
+          <div
+            key={`cat-bg-${preset.id}`}
+            className="absolute inset-0 transition-opacity duration-1000"
+            style={{ opacity: idx === activeIndex ? 1 : 0 }}
+          >
+            <CategoryBackground
+              categoryId={preset.id}
+              color={preset.color}
+              isActive={idx === activeIndex}
+            />
+          </div>
+        ))}
+
         {/* Grid pattern overlay */}
         <div 
           className="absolute inset-0 opacity-[0.015]"
@@ -430,19 +446,19 @@ export default function LandingWithIntro() {
             <LanguageSwitcher />
             <button
               onClick={() => router.push("/login")}
-              className="rounded-full px-5 py-2.5 text-sm font-semibold bg-white/10 backdrop-blur-xl text-white border border-white/10 hover:bg-white/20 transition-all duration-300"
+              className="rounded-full px-6 py-2.5 text-sm font-bold tracking-wide uppercase bg-white/10 backdrop-blur-xl text-white border border-white/10 hover:bg-white/20 transition-all duration-300"
             >
-              {t.packageSelect?.login || "Anmelden"}
+              {t.packageSelect?.login || "LOGIN"}
             </button>
           </div>
         </div>
       </header>
 
       {/* ===== MAIN CONTENT ===== */}
-      <main className="relative z-10 flex flex-col items-center justify-center min-h-[calc(100svh-160px)] px-5">
+      <main className="relative z-10 flex flex-col items-center justify-center min-h-[calc(100svh-120px)] px-5 pt-4 pb-8">
         
         {/* Headline */}
-        <div className="text-center mb-8 animate-premium-fade-in-up">
+        <div className="text-center mb-6 animate-premium-fade-in-up">
           <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white tracking-tight mb-3">
             {t.landing?.headline?.part1 && t.landing?.headline?.part2 && t.landing?.headline?.part3
               ? `${t.landing.headline.part1} ${t.landing.headline.part2} ${t.landing.headline.part3}`
@@ -454,7 +470,7 @@ export default function LandingWithIntro() {
         </div>
 
         {/* Search Input */}
-        <form onSubmit={handleSubmit} className="w-full max-w-2xl mb-12 animate-premium-fade-in-up stagger-1">
+        <form onSubmit={handleSubmit} className="w-full max-w-2xl mb-8 sm:mb-10 animate-premium-fade-in-up stagger-1">
           <div 
             className="relative group"
             style={{
@@ -493,7 +509,7 @@ export default function LandingWithIntro() {
 
         {/* ===== INFINITE 3D CAROUSEL ===== */}
         <div 
-          className="relative w-full max-w-6xl h-[300px] sm:h-[360px] animate-premium-fade-in-up stagger-2"
+          className="relative w-full max-w-6xl h-[260px] sm:h-[320px] lg:h-[360px] animate-premium-fade-in-up stagger-2"
           onMouseEnter={() => setIsPaused(true)}
           onMouseLeave={() => setIsPaused(false)}
           ref={carouselRef}
@@ -554,12 +570,13 @@ export default function LandingWithIntro() {
               const isCenter = item.offset === 0;
               const isAdjacent = Math.abs(item.offset) === 1;
 
-              // Improved transform calculations for better 3D effect
-              const translateX = item.offset * 200;
-              const translateZ = isCenter ? 120 : isAdjacent ? -20 : -120;
-              const scale = isCenter ? 1.2 : isAdjacent ? 0.8 : 0.55;
-              const opacity = isCenter ? 1 : isAdjacent ? 0.75 : 0.35;
-              const rotateY = item.offset * -12;
+              // Improved transform calculations for better 3D effect - responsive
+              const isMobile = typeof window !== 'undefined' && window.innerWidth < 640;
+              const translateX = item.offset * (isMobile ? 140 : 200);
+              const translateZ = isCenter ? 100 : isAdjacent ? -20 : -100;
+              const scale = isCenter ? 1.15 : isAdjacent ? 0.75 : 0.5;
+              const opacity = isCenter ? 1 : isAdjacent ? 0.7 : 0.3;
+              const rotateY = item.offset * -10;
 
               return (
                 <button
@@ -572,9 +589,11 @@ export default function LandingWithIntro() {
                     }
                   }}
                   className={[
-                    "absolute rounded-[28px] overflow-hidden",
+                    "absolute rounded-[24px] sm:rounded-[28px] overflow-hidden",
                     "transition-all ease-out",
-                    isCenter ? "z-30 cursor-pointer w-[220px] sm:w-[280px] h-[280px] sm:h-[340px]" : "z-10 cursor-pointer w-[180px] sm:w-[220px] h-[220px] sm:h-[280px]",
+                    isCenter 
+                      ? "z-30 cursor-pointer w-[180px] sm:w-[240px] lg:w-[280px] h-[220px] sm:h-[280px] lg:h-[320px]" 
+                      : "z-10 cursor-pointer w-[140px] sm:w-[180px] lg:w-[220px] h-[180px] sm:h-[220px] lg:h-[260px]",
                   ].join(" ")}
                   style={{
                     transform: `translateX(${translateX}px) translateZ(${translateZ}px) scale(${scale}) rotateY(${rotateY}deg)`,

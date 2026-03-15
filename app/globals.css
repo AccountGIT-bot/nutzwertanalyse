@@ -1165,3 +1165,152 @@ html {
     box-shadow: 0 30px 100px -10px var(--glow-color, rgba(255,255,255,0.4));
   }
 }
+
+/* =========================================================
+   Category-Specific Background Animations
+   ========================================================= */
+
+/* Code scroll animation for Software */
+@keyframes codeScroll {
+  0% {
+    transform: translateY(0);
+  }
+  100% {
+    transform: translateY(-50%);
+  }
+}
+
+.code-scroll {
+  animation: codeScroll 20s linear infinite;
+}
+
+/* Stock chart animation for Investment */
+@keyframes stockLine {
+  0% {
+    stroke-dashoffset: 2000;
+  }
+  100% {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes stockPulse {
+  0%, 100% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+.stock-line {
+  stroke-dasharray: 2000;
+  animation: stockLine 10s ease-in-out infinite;
+}
+
+.stock-pulse {
+  animation: stockPulse 2s ease-in-out infinite;
+}
+
+/* Car motion animation for Vehicle */
+@keyframes roadMove {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.road-move {
+  animation: roadMove 3s linear infinite;
+}
+
+/* Building rise animation for Real Estate */
+@keyframes buildingRise {
+  0% {
+    transform: translateY(100%) scaleY(0);
+    opacity: 0;
+  }
+  50% {
+    opacity: 0.4;
+  }
+  100% {
+    transform: translateY(0) scaleY(1);
+    opacity: 0.3;
+  }
+}
+
+.building-rise {
+  animation: buildingRise 8s ease-out forwards;
+}
+
+/* Network pulse animation for Supplier/Employee */
+@keyframes networkPulse {
+  0%, 100% {
+    r: 3;
+    opacity: 0.6;
+  }
+  50% {
+    r: 6;
+    opacity: 1;
+  }
+}
+
+@keyframes networkLine {
+  0% {
+    stroke-dashoffset: 100;
+    opacity: 0.2;
+  }
+  50% {
+    opacity: 0.6;
+  }
+  100% {
+    stroke-dashoffset: 0;
+    opacity: 0.2;
+  }
+}
+
+.network-node {
+  animation: networkPulse 3s ease-in-out infinite;
+}
+
+.network-line {
+  stroke-dasharray: 100;
+  animation: networkLine 4s ease-in-out infinite;
+}
+
+/* Product showcase animation */
+@keyframes productFloat {
+  0%, 100% {
+    transform: translateY(0) rotateY(0deg);
+  }
+  25% {
+    transform: translateY(-10px) rotateY(5deg);
+  }
+  75% {
+    transform: translateY(-5px) rotateY(-5deg);
+  }
+}
+
+.product-float {
+  animation: productFloat 6s ease-in-out infinite;
+}
+
+/* Machine/gear rotation */
+@keyframes gearRotate {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.gear-rotate {
+  animation: gearRotate 10s linear infinite;
+}
+
+.gear-rotate-reverse {
+  animation: gearRotate 10s linear infinite reverse;
+}
