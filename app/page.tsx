@@ -446,9 +446,9 @@ export default function LandingWithIntro() {
             <LanguageSwitcher />
             <button
               onClick={() => router.push("/login")}
-              className="rounded-full px-6 py-2.5 text-sm font-bold tracking-wide uppercase bg-white/10 backdrop-blur-xl text-white border border-white/10 hover:bg-white/20 transition-all duration-300"
+              className="rounded-full px-6 py-2.5 text-sm font-black tracking-widest uppercase bg-white/10 backdrop-blur-xl text-white border border-white/10 hover:bg-white/20 transition-all duration-300"
             >
-              {t.packageSelect?.login || "LOGIN"}
+              LOGIN
             </button>
           </div>
         </div>
