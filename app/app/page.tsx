@@ -366,12 +366,12 @@ export default function AppPage() {
                     "hover:border-white/[0.12]",
                     "active:translate-y-0 active:scale-[0.99]",
                     "focus:outline-none focus-visible:ring-2 focus-visible:ring-white/20 focus-visible:ring-offset-2 focus-visible:ring-offset-transparent",
-                    active ? "ring-2 ring-offset-2 ring-offset-transparent" : "",
+                    active ? `ring-2 ring-offset-2 ring-offset-transparent` : "",
                   ].join(" ")}
                   style={active ? { 
-                    ringColor: `rgb(${m.accent})`,
+                    '--tw-ring-color': `rgb(${m.accent})`,
                     boxShadow: `0 0 40px rgb(${m.accent} / 0.15), 0 8px 32px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.05)` 
-                  } : {}}
+                  } as React.CSSProperties : {}}
                 >
                   {/* Premium accent glow on hover */}
                   <div
