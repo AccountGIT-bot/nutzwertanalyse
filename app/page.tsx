@@ -281,7 +281,7 @@ export default function LandingWithIntro() {
   // Main Landing Page
   return (
     <div className="min-h-[100svh] relative overflow-hidden">
-      {/* ===== DYNAMIC BACKGROUND WITH IMAGE ===== */}
+      {/* ===== DYNAMIC BACKGROUND WITH IMAGE & PARTICLES ===== */}
       <div 
         className="fixed inset-0 -z-10 transition-all duration-1000 ease-out"
         style={{ backgroundColor: currentPreset.bgColor }}
@@ -292,7 +292,7 @@ export default function LandingWithIntro() {
             key={preset.id}
             className="absolute inset-0 transition-opacity duration-1000"
             style={{ 
-              opacity: idx === activeIndex ? 0.4 : 0,
+              opacity: idx === activeIndex ? 0.35 : 0,
               backgroundImage: `url(${preset.image})`,
               backgroundSize: 'cover',
               backgroundPosition: 'center',
@@ -301,30 +301,42 @@ export default function LandingWithIntro() {
         ))}
 
         {/* Gradient overlays */}
-        <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black/80" />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/50 to-black/90" />
         <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent" />
         
-        {/* Animated color orbs */}
+        {/* Animated color orbs - Layer 1 (slowest) */}
         <div className="parallax-layer-1 absolute inset-0 pointer-events-none">
           <div 
-            className="absolute w-[800px] h-[800px] rounded-full blur-[150px] transition-all duration-1000"
+            className="absolute w-[900px] h-[900px] rounded-full blur-[180px] transition-all duration-1000"
             style={{
-              top: '-20%',
-              left: '-10%',
-              background: `radial-gradient(circle, rgb(${currentPreset.color} / 0.6), transparent 60%)`,
+              top: '-25%',
+              left: '-15%',
+              background: `radial-gradient(circle, rgb(${currentPreset.color} / 0.5), transparent 60%)`,
+            }}
+          />
+          <div 
+            className="absolute w-[500px] h-[500px] rounded-full blur-[100px] transition-all duration-1000"
+            style={{
+              bottom: '10%',
+              right: '5%',
+              background: `radial-gradient(circle, rgb(${currentPreset.color} / 0.3), transparent 50%)`,
             }}
           />
         </div>
+        
+        {/* Layer 2 (medium speed) */}
         <div className="parallax-layer-2 absolute inset-0 pointer-events-none">
           <div 
             className="absolute w-[600px] h-[600px] rounded-full blur-[120px] transition-all duration-1000"
             style={{
-              bottom: '-15%',
-              right: '-5%',
+              bottom: '-20%',
+              right: '-10%',
               background: `radial-gradient(circle, rgb(${currentPreset.color} / 0.4), transparent 50%)`,
             }}
           />
         </div>
+        
+        {/* Layer 3 (fastest) */}
         <div className="parallax-layer-3 absolute inset-0 pointer-events-none">
           <div 
             className="absolute w-[400px] h-[400px] rounded-full blur-[80px] transition-all duration-1000"
@@ -337,22 +349,82 @@ export default function LandingWithIntro() {
           />
         </div>
 
+        {/* ===== FLOATING PARTICLES ===== */}
+        <div className="absolute inset-0 pointer-events-none overflow-hidden">
+          {/* Particle Group 1 - Large slow particles */}
+          {[...Array(8)].map((_, i) => (
+            <div
+              key={`particle-lg-${i}`}
+              className="absolute rounded-full transition-all duration-1000"
+              style={{
+                width: `${4 + Math.random() * 4}px`,
+                height: `${4 + Math.random() * 4}px`,
+                left: `${10 + i * 12}%`,
+                top: `${15 + (i % 3) * 25}%`,
+                background: `rgb(${currentPreset.color})`,
+                opacity: 0.3 + Math.random() * 0.3,
+                animation: `particleFloat ${15 + i * 3}s ease-in-out infinite`,
+                animationDelay: `${i * -2}s`,
+              }}
+            />
+          ))}
+          
+          {/* Particle Group 2 - Medium particles */}
+          {[...Array(12)].map((_, i) => (
+            <div
+              key={`particle-md-${i}`}
+              className="absolute rounded-full transition-all duration-1000"
+              style={{
+                width: `${2 + Math.random() * 3}px`,
+                height: `${2 + Math.random() * 3}px`,
+                left: `${5 + i * 8}%`,
+                top: `${20 + (i % 4) * 20}%`,
+                background: `rgba(255, 255, 255, ${0.2 + Math.random() * 0.3})`,
+                animation: `particleFloat ${10 + i * 2}s ease-in-out infinite`,
+                animationDelay: `${i * -1.5}s`,
+              }}
+            />
+          ))}
+          
+          {/* Particle Group 3 - Small fast particles */}
+          {[...Array(20)].map((_, i) => (
+            <div
+              key={`particle-sm-${i}`}
+              className="absolute rounded-full transition-all duration-1000"
+              style={{
+                width: `${1 + Math.random() * 2}px`,
+                height: `${1 + Math.random() * 2}px`,
+                left: `${Math.random() * 100}%`,
+                top: `${Math.random() * 100}%`,
+                background: `rgba(255, 255, 255, ${0.1 + Math.random() * 0.2})`,
+                animation: `particleFloat ${8 + Math.random() * 8}s ease-in-out infinite`,
+                animationDelay: `${Math.random() * -10}s`,
+              }}
+            />
+          ))}
+        </div>
+
+        {/* Grid pattern overlay */}
+        <div 
+          className="absolute inset-0 opacity-[0.015]"
+          style={{
+            backgroundImage: `linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)`,
+            backgroundSize: '80px 80px',
+          }}
+        />
+
         {/* Noise texture */}
         <div className="absolute inset-0 landing-grain opacity-[0.04]" />
+        
+        {/* Vignette */}
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_0%,rgba(0,0,0,0.4)_100%)]" />
       </div>
 
       {/* ===== HEADER ===== */}
       <header className="relative z-20 px-5 sm:px-8 py-5">
         <div className="mx-auto max-w-7xl flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-2xl overflow-hidden ring-2 ring-white/10">
-              <img src="/images/logo.webp" alt="Logo" className="h-full w-full object-contain" />
-            </div>
-            <div className="leading-tight">
-              <div className="text-base font-semibold text-white">
-                {t.brand?.name || "Nutzwertanalyse"}<span className="text-white/30">.com</span>
-              </div>
-            </div>
+          <div className="text-xl font-bold text-white tracking-tight">
+            {t.brand?.name || "Nutzwertanalyse"}<span className="text-white/30">.com</span>
           </div>
           <div className="flex items-center gap-3">
             <LanguageSwitcher />
@@ -421,42 +493,73 @@ export default function LandingWithIntro() {
 
         {/* ===== INFINITE 3D CAROUSEL ===== */}
         <div 
-          className="relative w-full max-w-6xl h-[280px] sm:h-[320px] animate-premium-fade-in-up stagger-2"
+          className="relative w-full max-w-6xl h-[300px] sm:h-[360px] animate-premium-fade-in-up stagger-2"
           onMouseEnter={() => setIsPaused(true)}
           onMouseLeave={() => setIsPaused(false)}
           ref={carouselRef}
         >
-          {/* Navigation Arrows */}
+          {/* Navigation Arrows - Dynamic color based on current preset */}
           <button
             onClick={goPrev}
-            className="absolute left-0 sm:left-4 top-1/2 -translate-y-1/2 z-20 p-3 rounded-full bg-black/40 backdrop-blur-xl border border-white/10 text-white/60 hover:text-white hover:bg-black/60 transition-all duration-300"
+            className="absolute left-0 sm:left-2 top-1/2 -translate-y-1/2 z-20 group"
+            aria-label="Vorheriges Preset"
           >
-            <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-            </svg>
+            <div 
+              className="p-3.5 sm:p-4 rounded-2xl backdrop-blur-2xl border transition-all duration-500 hover:scale-110 active:scale-95"
+              style={{
+                background: `linear-gradient(135deg, rgb(${currentPreset.color} / 0.2), rgb(${currentPreset.color} / 0.05))`,
+                borderColor: `rgb(${currentPreset.color} / 0.3)`,
+                boxShadow: `0 8px 32px rgb(${currentPreset.color} / 0.2), inset 0 0 20px rgb(${currentPreset.color} / 0.1)`,
+              }}
+            >
+              <svg 
+                className="w-5 h-5 sm:w-6 sm:h-6 transition-all duration-300 group-hover:-translate-x-0.5" 
+                fill="none" 
+                viewBox="0 0 24 24" 
+                stroke="currentColor"
+                style={{ color: `rgb(${currentPreset.color})` }}
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" />
+              </svg>
+            </div>
           </button>
           <button
             onClick={goNext}
-            className="absolute right-0 sm:right-4 top-1/2 -translate-y-1/2 z-20 p-3 rounded-full bg-black/40 backdrop-blur-xl border border-white/10 text-white/60 hover:text-white hover:bg-black/60 transition-all duration-300"
+            className="absolute right-0 sm:right-2 top-1/2 -translate-y-1/2 z-20 group"
+            aria-label="Naechstes Preset"
           >
-            <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-            </svg>
+            <div 
+              className="p-3.5 sm:p-4 rounded-2xl backdrop-blur-2xl border transition-all duration-500 hover:scale-110 active:scale-95"
+              style={{
+                background: `linear-gradient(135deg, rgb(${currentPreset.color} / 0.2), rgb(${currentPreset.color} / 0.05))`,
+                borderColor: `rgb(${currentPreset.color} / 0.3)`,
+                boxShadow: `0 8px 32px rgb(${currentPreset.color} / 0.2), inset 0 0 20px rgb(${currentPreset.color} / 0.1)`,
+              }}
+            >
+              <svg 
+                className="w-5 h-5 sm:w-6 sm:h-6 transition-all duration-300 group-hover:translate-x-0.5" 
+                fill="none" 
+                viewBox="0 0 24 24" 
+                stroke="currentColor"
+                style={{ color: `rgb(${currentPreset.color})` }}
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
+              </svg>
+            </div>
           </button>
 
           {/* Carousel Items */}
-          <div className="relative h-full flex items-center justify-center perspective-[1200px]">
+          <div className="relative h-full flex items-center justify-center" style={{ perspective: '1400px' }}>
             {getVisibleItems.map((item) => {
               const isCenter = item.offset === 0;
               const isAdjacent = Math.abs(item.offset) === 1;
-              const isEdge = Math.abs(item.offset) === 2;
 
-              // Calculate transform based on position
-              let translateX = item.offset * 180;
-              let translateZ = isCenter ? 100 : isAdjacent ? 0 : -100;
-              let scale = isCenter ? 1.15 : isAdjacent ? 0.85 : 0.65;
-              let opacity = isCenter ? 1 : isAdjacent ? 0.7 : 0.4;
-              let rotateY = item.offset * -8;
+              // Improved transform calculations for better 3D effect
+              const translateX = item.offset * 200;
+              const translateZ = isCenter ? 120 : isAdjacent ? -20 : -120;
+              const scale = isCenter ? 1.2 : isAdjacent ? 0.8 : 0.55;
+              const opacity = isCenter ? 1 : isAdjacent ? 0.75 : 0.35;
+              const rotateY = item.offset * -12;
 
               return (
                 <button
@@ -469,70 +572,93 @@ export default function LandingWithIntro() {
                     }
                   }}
                   className={[
-                    "absolute w-[200px] sm:w-[240px] h-[240px] sm:h-[280px] rounded-3xl overflow-hidden",
-                    "transition-all duration-600 ease-out",
-                    isCenter ? "z-30 cursor-pointer" : "z-10 cursor-pointer",
+                    "absolute rounded-[28px] overflow-hidden",
+                    "transition-all ease-out",
+                    isCenter ? "z-30 cursor-pointer w-[220px] sm:w-[280px] h-[280px] sm:h-[340px]" : "z-10 cursor-pointer w-[180px] sm:w-[220px] h-[220px] sm:h-[280px]",
                   ].join(" ")}
                   style={{
                     transform: `translateX(${translateX}px) translateZ(${translateZ}px) scale(${scale}) rotateY(${rotateY}deg)`,
                     opacity,
+                    transitionDuration: '700ms',
                     boxShadow: isCenter 
-                      ? `0 25px 80px -10px rgb(${item.color} / 0.5), 0 0 60px rgb(${item.color} / 0.3), inset 0 0 80px rgb(${item.color} / 0.1)`
-                      : `0 15px 40px -10px rgba(0,0,0,0.4)`,
+                      ? `0 30px 100px -15px rgb(${item.color} / 0.6), 0 0 80px rgb(${item.color} / 0.4), 0 0 0 1px rgb(${item.color} / 0.3)`
+                      : `0 20px 50px -15px rgba(0,0,0,0.5)`,
                   }}
                 >
-                  {/* Background Image */}
+                  {/* Background Image with Ken Burns effect */}
                   <div 
-                    className="absolute inset-0 bg-cover bg-center transition-transform duration-500"
+                    className="absolute inset-0 bg-cover bg-center"
                     style={{ 
                       backgroundImage: `url(${item.image})`,
-                      transform: isCenter ? 'scale(1.05)' : 'scale(1)',
+                      transform: isCenter ? 'scale(1.1)' : 'scale(1)',
+                      transition: 'transform 8s ease-out',
                     }}
                   />
 
-                  {/* Gradient Overlay */}
+                  {/* Gradient Overlay - More vibrant for center */}
                   <div 
-                    className="absolute inset-0 transition-opacity duration-500"
+                    className="absolute inset-0 transition-all duration-700"
                     style={{
                       background: isCenter
-                        ? `linear-gradient(to top, rgb(${item.color} / 0.9) 0%, rgb(${item.color} / 0.4) 50%, transparent 100%)`
-                        : 'linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.3) 100%)',
+                        ? `linear-gradient(to top, rgb(${item.color}) 0%, rgb(${item.color} / 0.6) 40%, rgb(${item.color} / 0.2) 70%, transparent 100%)`
+                        : 'linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.4) 60%, transparent 100%)',
                     }}
                   />
 
-                  {/* Glow border for center */}
+                  {/* Animated glow border for center */}
                   {isCenter && (
                     <div 
-                      className="absolute inset-0 rounded-3xl pointer-events-none"
+                      className="absolute inset-0 rounded-[28px] pointer-events-none animate-pulse"
                       style={{
-                        boxShadow: `inset 0 0 0 2px rgb(${item.color} / 0.5), inset 0 0 40px rgb(${item.color} / 0.2)`,
+                        boxShadow: `inset 0 0 0 2px rgb(${item.color} / 0.6), inset 0 0 60px rgb(${item.color} / 0.3)`,
+                        animationDuration: '2s',
                       }}
                     />
                   )}
 
-                  {/* Content */}
-                  <div className="absolute inset-0 flex flex-col items-center justify-end p-6">
+                  {/* Content - Better readability */}
+                  <div className="absolute inset-0 flex flex-col items-center justify-end p-5 sm:p-7">
+                    {/* Icon with glow */}
                     <div 
                       className={[
-                        "w-14 h-14 rounded-2xl flex items-center justify-center mb-3 transition-all duration-500",
-                        isCenter ? "scale-110" : "scale-90 opacity-70",
+                        "rounded-2xl flex items-center justify-center mb-4 transition-all duration-700",
+                        isCenter ? "w-16 h-16 sm:w-18 sm:h-18" : "w-12 h-12 opacity-60",
                       ].join(" ")}
                       style={{ 
-                        background: isCenter ? `rgb(${item.color})` : 'rgba(255,255,255,0.1)',
-                        boxShadow: isCenter ? `0 8px 30px rgb(${item.color} / 0.5)` : 'none',
+                        background: isCenter 
+                          ? `linear-gradient(135deg, rgb(${item.color}), rgb(${item.color} / 0.8))`
+                          : 'rgba(255,255,255,0.15)',
+                        boxShadow: isCenter 
+                          ? `0 12px 40px rgb(${item.color} / 0.6), 0 0 20px rgb(${item.color} / 0.4)`
+                          : 'none',
                       }}
                     >
-                      <item.Icon className="w-7 h-7 text-white" />
+                      <item.Icon className={isCenter ? "w-8 h-8 sm:w-9 sm:h-9 text-white" : "w-6 h-6 text-white/80"} />
                     </div>
-                    <div className={[
-                      "text-white font-semibold text-center transition-all duration-500",
-                      isCenter ? "text-lg" : "text-sm opacity-70",
-                    ].join(" ")}>
+                    
+                    {/* Label with better contrast */}
+                    <div 
+                      className={[
+                        "font-bold text-center transition-all duration-700 text-white drop-shadow-lg",
+                        isCenter ? "text-xl sm:text-2xl" : "text-sm opacity-60",
+                      ].join(" ")}
+                      style={{
+                        textShadow: isCenter ? `0 2px 20px rgb(${item.color} / 0.8)` : 'none',
+                      }}
+                    >
                       {getPresetLabel(item.id)}
                     </div>
+                    
+                    {/* Call to action for center */}
                     {isCenter && (
-                      <div className="mt-2 text-white/50 text-xs">
-                        Klicken zum Starten
+                      <div 
+                        className="mt-3 px-4 py-1.5 rounded-full text-white/90 text-xs sm:text-sm font-medium backdrop-blur-sm border transition-all duration-300 hover:scale-105"
+                        style={{
+                          background: `rgb(${item.color} / 0.3)`,
+                          borderColor: `rgb(${item.color} / 0.5)`,
+                        }}
+                      >
+                        Jetzt starten
                       </div>
                     )}
                   </div>
@@ -541,30 +667,31 @@ export default function LandingWithIntro() {
             })}
           </div>
 
-          {/* Dots Indicator */}
-          <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 flex items-center gap-2">
-            {PRESET_CONFIG.map((_, idx) => (
+          {/* Dots Indicator - with glow effect */}
+          <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-2.5 p-2 rounded-full bg-black/20 backdrop-blur-xl">
+            {PRESET_CONFIG.map((preset, idx) => (
               <button
                 key={idx}
                 onClick={() => goToSlide(idx)}
-                className={[
-                  "rounded-full transition-all duration-300",
-                  idx === activeIndex 
-                    ? "w-8 h-2" 
-                    : "w-2 h-2 hover:bg-white/40",
-                ].join(" ")}
+                className="relative rounded-full transition-all duration-500"
                 style={{
+                  width: idx === activeIndex ? '32px' : '10px',
+                  height: '10px',
                   background: idx === activeIndex 
-                    ? `rgb(${currentPreset.color})` 
-                    : 'rgb(255 255 255 / 0.2)',
+                    ? `rgb(${preset.color})` 
+                    : 'rgb(255 255 255 / 0.15)',
+                  boxShadow: idx === activeIndex 
+                    ? `0 0 20px rgb(${preset.color} / 0.6)` 
+                    : 'none',
                 }}
+                aria-label={`Gehe zu ${getPresetLabel(preset.id)}`}
               />
             ))}
           </div>
         </div>
 
         {/* Quick start text */}
-        <div className="mt-10 text-center text-white/30 text-sm animate-premium-fade-in-up stagger-3">
+        <div className="mt-12 text-center text-white/30 text-sm animate-premium-fade-in-up stagger-3">
           {t.landing?.quickStart || "Oder wählen Sie eine Vorlage oben"}
         </div>
       </main>
