@@ -241,7 +241,11 @@ export default function LandingWithIntro() {
             {t.brand?.name || "Nutzwertanalyse"}
             <span className="text-white/40">.com</span>
           </div>
-          <div className="text-white/50 text-lg">{t.landing?.headline || "Entscheidungen leicht gemacht"}</div>
+          <div className="text-white/50 text-lg">
+                {typeof t.landing?.headline === 'object' 
+                  ? `${t.landing.headline.part1} ${t.landing.headline.part2} ${t.landing.headline.part3}`
+                  : "Entscheidungen leicht gemacht"}
+              </div>
         </div>
         <button
           onClick={() => setPhase("landing")}
@@ -367,7 +371,9 @@ export default function LandingWithIntro() {
         {/* Headline */}
         <div className="text-center mb-8 animate-premium-fade-in-up">
           <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white tracking-tight mb-3">
-            {t.landing?.headline || "Entscheidungen leicht gemacht"}
+            {typeof t.landing?.headline === 'object' 
+              ? `${t.landing.headline.part1} ${t.landing.headline.part2} ${t.landing.headline.part3}`
+              : "Entscheidungen leicht gemacht"}
           </h1>
           <p className="text-white/40 text-base sm:text-lg max-w-xl mx-auto">
             {t.landing?.subheadline || "Systematisch vergleichen, fundiert entscheiden"}
