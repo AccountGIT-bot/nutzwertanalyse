@@ -387,64 +387,69 @@ export default function LandingWithIntro() {
       )}
 
       <div className="relative min-h-[100svh] flex flex-col">
-        {/* Header */}
+        {/* Premium Header */}
         <header className="sticky top-0 z-30">
           <div
             className={[
-              "transition-all duration-300",
+              "transition-all duration-500",
               scrolled
-                ? "bg-white/70 backdrop-blur-xl shadow-[0_12px_30px_rgba(0,0,0,0.08)]"
-                : "bg-white/0",
+                ? "bg-white/80 backdrop-blur-2xl shadow-[0_4px_30px_rgba(0,0,0,0.06)]"
+                : "bg-transparent",
             ].join(" ")}
           >
-            <div className="mx-auto max-w-6xl px-5 sm:px-6 h-[68px] sm:h-[76px] flex items-center justify-between">
+            <div className="mx-auto max-w-6xl px-5 sm:px-6 h-[64px] sm:h-[72px] flex items-center justify-between">
               <button
                 onClick={() => router.push("/")}
-                className="flex items-center gap-3 text-left"
+                className="group flex items-center gap-3 text-left"
                 aria-label="Zur Startseite"
                 title="Startseite"
               >
-                <div className="h-10 w-10 rounded-2xl overflow-hidden">
+                <div className="h-10 w-10 rounded-2xl overflow-hidden shadow-sm ring-1 ring-black/[0.04] transition-transform duration-300 group-hover:scale-105">
                   <img src="/images/logo.webp" alt="Logo" className="h-full w-full object-contain" />
                 </div>
                 <div className="leading-tight">
                   <div className="text-sm sm:text-base font-semibold tracking-tight text-slate-900">
-                    {t.brand.name}<span className="opacity-60">{t.brand.domain}</span>
+                    {t.brand.name}<span className="text-slate-400">{t.brand.domain}</span>
                   </div>
-                  <div className="text-[11px] sm:text-xs text-black/45">
+                  <div className="text-[10px] sm:text-xs text-slate-400 font-medium">
                     {t.brand.tagline} • {t.brand.swissQuality}
                   </div>
                 </div>
               </button>
 
-              <nav className="hidden lg:flex items-center gap-6 text-sm text-black/55">
-                <a className="hover:text-black/80 transition" href="#principles">
+              <nav className="hidden lg:flex items-center gap-1">
+                <a className="px-4 py-2 rounded-full text-sm text-slate-500 hover:text-slate-800 hover:bg-black/[0.03] transition-all duration-200" href="#principles">
                   {t.landing.footer.principles}
                 </a>
-                <a className="hover:text-black/80 transition" href="#framework">
+                <a className="px-4 py-2 rounded-full text-sm text-slate-500 hover:text-slate-800 hover:bg-black/[0.03] transition-all duration-200" href="#framework">
                   {t.landing.footer.framework}
                 </a>
-                <a className="hover:text-black/80 transition" href="/datenschutz">
+                <a className="px-4 py-2 rounded-full text-sm text-slate-500 hover:text-slate-800 hover:bg-black/[0.03] transition-all duration-200" href="/datenschutz">
                   {t.landing.footer.privacy}
                 </a>
               </nav>
 
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2 sm:gap-3">
                 <LanguageSwitcher />
                 <button
                   onClick={() => router.push("/login")}
                   className={[
-                    "rounded-full px-4 py-2 text-sm font-semibold",
-                    "border border-black/10",
-                    "bg-white/70 backdrop-blur-md",
-                    "hover:bg-white/85 transition",
+                    "rounded-full px-4 sm:px-5 py-2 sm:py-2.5 text-sm font-semibold",
+                    "bg-slate-900 text-white",
+                    "shadow-[0_2px_8px_rgba(0,0,0,0.12),inset_0_1px_0_rgba(255,255,255,0.1)]",
+                    "hover:bg-slate-800 hover:shadow-[0_4px_12px_rgba(0,0,0,0.15)]",
+                    "active:scale-[0.98]",
+                    "transition-all duration-200",
                   ].join(" ")}
                 >
                   Login
                 </button>
               </div>
             </div>
-            <div className="h-px bg-black/10" />
+            <div className={[
+              "h-px transition-opacity duration-300",
+              scrolled ? "bg-black/[0.06]" : "bg-transparent",
+            ].join(" ")} />
           </div>
         </header>
 
@@ -509,19 +514,23 @@ export default function LandingWithIntro() {
             {/* Normal Landing Phase */}
             {(phase === "landing" || phase === "intro") && (
               <>
-                <div className="pt-5 sm:pt-7">
+                <div className="pt-6 sm:pt-10">
                   <div className="max-w-3xl">
-                    <div className="text-[11px] sm:text-xs tracking-[0.28em] uppercase text-black/45">
-                      Nutzwertanalyse • Dokumentation • Vergleichbarkeit
+                    {/* Premium badge */}
+                    <div className="animate-premium-fade-in-up inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-gradient-to-r from-black/[0.03] to-black/[0.06] border border-black/[0.08] backdrop-blur-sm mb-4">
+                      <span className="flex h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+                      <span className="text-[11px] sm:text-xs tracking-[0.2em] uppercase text-black/60 font-medium">
+                        Nutzwertanalyse • Dokumentation • Vergleichbarkeit
+                      </span>
                     </div>
 
-                    <h1 className="mt-2 text-3xl sm:text-4xl lg:text-5xl font-semibold tracking-tight text-slate-900">
-                      <span className="inline-block animate-fade-in-up">{t.landing.headline.part1}</span>{" "}
-                      <span className="inline-block animate-fade-in-up animation-delay-100 bg-gradient-to-r from-slate-900 via-slate-700 to-slate-900 bg-clip-text text-transparent">{t.landing.headline.part2}</span>{" "}
-                      <span className="inline-block animate-fade-in-up animation-delay-200 opacity-60">{t.landing.headline.part3}</span>
+                    <h1 className="text-4xl sm:text-5xl lg:text-6xl font-semibold tracking-tight text-slate-900 leading-[1.1]">
+                      <span className="inline-block animate-premium-fade-in-up">{t.landing.headline.part1}</span>{" "}
+                      <span className="inline-block animate-premium-fade-in-up stagger-2 bg-gradient-to-r from-slate-900 via-slate-600 to-slate-900 bg-clip-text text-transparent">{t.landing.headline.part2}</span>{" "}
+                      <span className="inline-block animate-premium-fade-in-up stagger-3 text-slate-400">{t.landing.headline.part3}</span>
                     </h1>
 
-                    <p className="mt-4 text-sm sm:text-base text-black/55 leading-relaxed max-w-2xl">
+                    <p className="mt-5 text-base sm:text-lg text-black/50 leading-relaxed max-w-2xl animate-premium-fade-in-up stagger-4">
                       {t.landing.description}
                     </p>
                   </div>
@@ -540,17 +549,26 @@ export default function LandingWithIntro() {
                   </div>
                 )}
 
-                {/* Search */}
-                <div className="mt-5 sm:mt-6">
+                {/* Premium Search Input */}
+                <div className="mt-6 sm:mt-8 animate-premium-fade-in-up stagger-5">
                   <div className="w-full max-w-4xl">
-                    <div className="relative rounded-2xl sm:rounded-[999px] bg-white/74 border border-black/10 shadow-[0_12px_36px_rgba(0,0,0,0.08)] sm:shadow-[0_26px_72px_rgba(0,0,0,0.10)] backdrop-blur-md px-3 sm:px-4 py-2.5 sm:py-3">
-                      <div className="flex items-center gap-2 sm:gap-4">
+                    <div 
+                      className={[
+                        "relative rounded-2xl sm:rounded-[999px]",
+                        "bg-white/80 backdrop-blur-xl",
+                        "border border-black/[0.08]",
+                        "shadow-[0_20px_60px_rgba(0,0,0,0.08),0_8px_24px_rgba(0,0,0,0.04)]",
+                        "px-3 sm:px-5 py-3 sm:py-4",
+                        "transition-all duration-300",
+                        isFocused ? "shadow-[0_24px_70px_rgba(0,0,0,0.12),0_0_0_2px_rgba(0,0,0,0.05)]" : "",
+                      ].join(" ")}
+                    >
+                      {/* Subtle inner glow */}
+                      <div className="absolute inset-0 rounded-2xl sm:rounded-[999px] bg-gradient-to-b from-white/60 to-transparent pointer-events-none" />
+                      
+                      <div className="relative flex items-center gap-3 sm:gap-4">
                         <div
-                          className="h-9 w-9 sm:h-12 sm:w-12 shrink-0 rounded-full flex items-center justify-center"
-                          style={{
-                            background: "rgba(0,0,0,0.04)",
-                            border: "1px solid rgba(0,0,0,0.10)",
-                          }}
+                          className="h-10 w-10 sm:h-12 sm:w-12 shrink-0 rounded-full flex items-center justify-center bg-gradient-to-br from-slate-50 to-slate-100 border border-black/[0.06] shadow-sm"
                           aria-hidden="true"
                         >
                           <img src="/images/logo.webp" alt="" className="h-5 w-5 sm:h-6 sm:w-6 object-contain" />
@@ -566,8 +584,8 @@ export default function LandingWithIntro() {
                             onFocus={() => setIsFocused(true)}
                             onBlur={() => setIsFocused(false)}
                             className={[
-                              "w-full bg-transparent outline-none font-medium tracking-wide",
-                              "text-xs sm:text-base",
+                              "w-full bg-transparent outline-none font-medium tracking-wide text-slate-800",
+                              "text-sm sm:text-base",
                               "placeholder:text-transparent",
                               "pr-1 sm:pr-2",
                             ].join(" ")}
@@ -577,7 +595,7 @@ export default function LandingWithIntro() {
 
                           {!text && !isFocused && (
                             <div className="pointer-events-none absolute inset-y-0 left-0 hidden sm:flex items-center">
-                              <span className="text-black/55 text-sm sm:text-base font-semibold tracking-[0.12em] uppercase">
+                              <span className="text-slate-400 text-sm sm:text-base font-medium tracking-[0.08em] uppercase">
                                 {placeholderText}
                               </span>
                             </div>
@@ -586,7 +604,7 @@ export default function LandingWithIntro() {
                           {!text && !isFocused && (
                             <div className="pointer-events-none absolute inset-y-0 left-0 flex sm:hidden items-center w-full overflow-hidden">
                               <div className="w-full landing-marquee-mask">
-                                <div className="landing-marquee text-black/55 text-xs font-semibold tracking-[0.08em] uppercase whitespace-nowrap">
+                                <div className="landing-marquee text-slate-400 text-xs font-medium tracking-[0.06em] uppercase whitespace-nowrap">
                                   {placeholderText}&nbsp;&nbsp;&nbsp;•&nbsp;&nbsp;&nbsp;
                                   {placeholderText}
                                 </div>
@@ -599,125 +617,172 @@ export default function LandingWithIntro() {
                           onClick={startFromInput}
                           disabled={!canStart || isAnalyzing}
                           className={[
-                            "shrink-0 rounded-full px-4 sm:px-8 py-2 sm:py-2.5",
-                            "text-xs sm:text-base font-semibold",
+                            "shrink-0 rounded-full px-5 sm:px-8 py-2.5 sm:py-3",
+                            "text-xs sm:text-sm font-semibold",
+                            "bg-gradient-to-b from-slate-800 to-slate-900 text-white",
+                            "shadow-[0_4px_12px_rgba(0,0,0,0.15),inset_0_1px_0_rgba(255,255,255,0.1)]",
                             "transition-all duration-200",
-                            "shadow-[0_8px_20px_rgba(0,0,0,0.08)] sm:shadow-[0_16px_34px_rgba(0,0,0,0.10)]",
-                            "active:scale-[0.99]",
+                            "active:scale-[0.98]",
                             canStart && !isAnalyzing
-                              ? "hover:brightness-[1.04]"
-                              : "opacity-65 cursor-not-allowed",
+                              ? "hover:shadow-[0_8px_20px_rgba(0,0,0,0.2)] hover:from-slate-700 hover:to-slate-800"
+                              : "opacity-50 cursor-not-allowed",
                           ].join(" ")}
-                          style={{ background: "#0b0f14", color: "white" }}
                           aria-label={t.landing.startButton}
                           title={t.landing.startButton}
                         >
-                          {isAnalyzing ? t.landing.startButtonLoading : t.landing.startButton}
+                          {isAnalyzing ? (
+                            <span className="flex items-center gap-2">
+                              <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
+                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                              </svg>
+                              <span className="hidden sm:inline">{t.landing.startButtonLoading}</span>
+                            </span>
+                          ) : t.landing.startButton}
                         </button>
                       </div>
                     </div>
 
-                    <div className="mt-2 text-xs sm:text-sm text-black/45 flex items-center gap-2">
-                      <span className="inline-flex h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                    <div className="mt-3 text-xs sm:text-sm text-slate-400 flex items-center gap-2 pl-1">
+                      <span className="relative flex h-2 w-2">
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+                        <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
+                      </span>
                       {t.landing.searchHint}
                     </div>
                   </div>
                 </div>
 
-                {/* Presets */}
-                <div className="mt-5 sm:mt-6 flex-1 min-h-0">
+                {/* Premium Preset Cards */}
+                <div className="mt-6 sm:mt-8 flex-1 min-h-0 animate-premium-fade-in-up stagger-6">
                   <div className="h-full flex flex-col">
-                    <div className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-3">
-                      {PRESET_CONFIG.map((p) => {
+                    <div className="grid gap-4 sm:gap-5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+                      {PRESET_CONFIG.map((p, index) => {
                         const presetTranslations = t.presets[p.id as keyof typeof t.presets];
                         return (
                           <button
                             key={p.id}
                             onClick={() => startFromPreset(p.id)}
                             className={[
-                              "group relative overflow-hidden rounded-3xl text-left",
-                              "border border-black/10",
-                              "shadow-[0_16px_42px_rgba(0,0,0,0.12)]",
-                              "transition duration-300 ease-out",
-                              "hover:-translate-y-0.5 hover:shadow-[0_22px_55px_rgba(0,0,0,0.16)]",
-                              "active:translate-y-0",
-                              "focus:outline-none focus-visible:ring-2 focus-visible:ring-black/20",
-                              "h-[clamp(132px,18.5vh,182px)]",
+                              "group relative overflow-hidden rounded-3xl text-left card-shine",
+                              "border border-black/[0.06]",
+                              "shadow-[0_8px_30px_rgba(0,0,0,0.08),0_4px_12px_rgba(0,0,0,0.04)]",
+                              "transition-all duration-500 ease-out",
+                              "hover:-translate-y-1 hover:shadow-[0_20px_50px_rgba(0,0,0,0.15)]",
+                              "active:translate-y-0 active:scale-[0.99]",
+                              "focus:outline-none focus-visible:ring-2 focus-visible:ring-black/20 focus-visible:ring-offset-2",
+                              "h-[clamp(140px,20vh,190px)]",
                             ].join(" ")}
+                            style={{ animationDelay: `${index * 0.05}s` }}
                           >
+                            {/* Image with premium overlays */}
                             <div className="absolute inset-0">
                               <Image
                                 src={p.image}
                                 alt=""
                                 fill
-                                sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 33vw"
-                                className="object-cover object-[74%_50%] scale-[1.10] transition-transform duration-500 ease-out group-hover:scale-[1.14]"
+                                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                                className="object-cover object-[74%_50%] scale-[1.05] transition-transform duration-700 ease-out group-hover:scale-[1.12]"
                                 priority={p.id === "supplier"}
                               />
-                              <div className="absolute inset-0 bg-gradient-to-t from-black/72 via-black/16 to-black/0" />
-                              <div className="absolute inset-0 bg-[radial-gradient(900px_280px_at_20%_100%,rgba(0,0,0,0.35),transparent_65%)]" />
-                              <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition duration-300 landing-card-sheen" />
+                              {/* Premium gradient overlays */}
+                              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+                              <div className="absolute inset-0 bg-gradient-to-br from-black/30 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                              <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition duration-500">
+                                <div className="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-transparent to-transparent" />
+                              </div>
                             </div>
 
-                            <div className="relative z-10 p-3 sm:p-4">
+                            {/* Content */}
+                            <div className="absolute inset-0 flex flex-col justify-end p-4 sm:p-5">
                               <div
-                                className="inline-flex items-start gap-3 rounded-2xl px-3.5 py-2.5 backdrop-blur-md"
+                                className="inline-flex items-start gap-3 rounded-2xl px-4 py-3 backdrop-blur-xl transition-all duration-300 group-hover:scale-[1.02]"
                                 style={{
-                                  background: "rgba(0,0,0,0.34)",
-                                  border: "1px solid rgba(255,255,255,0.14)",
+                                  background: "rgba(255,255,255,0.12)",
+                                  border: "1px solid rgba(255,255,255,0.15)",
+                                  boxShadow: "0 8px 32px rgba(0,0,0,0.12), inset 0 1px 0 rgba(255,255,255,0.1)",
                                 }}
                               >
-                                <div className="h-8 w-8 rounded-lg flex items-center justify-center bg-white/10 flex-shrink-0 mt-0.5">
-                                  <p.Icon size={18} className="text-white/90" />
+                                <div className="h-9 w-9 rounded-xl flex items-center justify-center bg-white/15 backdrop-blur-sm flex-shrink-0 transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3">
+                                  <p.Icon size={20} className="text-white" />
                                 </div>
                                 <div className="flex flex-col gap-0.5">
-                                  <div className="text-sm sm:text-base font-semibold text-white leading-tight">
+                                  <div className="text-sm sm:text-base font-semibold text-white leading-tight tracking-tight">
                                     {presetTranslations.label}
                                   </div>
-                                  <div className="text-[11px] sm:text-xs text-white/80">
+                                  <div className="text-[11px] sm:text-xs text-white/70 font-medium">
                                     {presetTranslations.hint}
                                   </div>
                                 </div>
                               </div>
+                            </div>
+                            
+                            {/* Hover arrow indicator */}
+                            <div className="absolute top-4 right-4 h-8 w-8 rounded-full bg-white/10 backdrop-blur-sm flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 translate-x-2 group-hover:translate-x-0">
+                              <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                              </svg>
                             </div>
                           </button>
                         );
                       })}
                     </div>
 
-                    <div className="mt-3 hidden sm:grid grid-cols-3 gap-3 text-[11px] text-black/45">
+                    {/* Premium Info Cards */}
+                    <div className="mt-5 hidden sm:grid grid-cols-3 gap-4 text-xs text-slate-500">
                       <div
                         id="principles"
-                        className="rounded-2xl border border-black/10 bg-white/55 backdrop-blur-md px-4 py-3"
+                        className="group rounded-2xl border border-black/[0.06] bg-white/60 backdrop-blur-xl px-5 py-4 transition-all duration-300 hover:bg-white/80 hover:shadow-[0_8px_30px_rgba(0,0,0,0.06)]"
                       >
-                        <div className="font-semibold text-black/70">{t.landing.footer.principles}</div>
-                        <div className="mt-1">
+                        <div className="font-semibold text-slate-700 flex items-center gap-2">
+                          <div className="h-6 w-6 rounded-lg bg-gradient-to-br from-slate-100 to-slate-200 flex items-center justify-center">
+                            <svg className="w-3.5 h-3.5 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                          </div>
+                          {t.landing.footer.principles}
+                        </div>
+                        <div className="mt-2 leading-relaxed">
                           {t.landing.footer.principlesText}
                         </div>
                       </div>
 
                       <div
                         id="framework"
-                        className="rounded-2xl border border-black/10 bg-white/55 backdrop-blur-md px-4 py-3"
+                        className="group rounded-2xl border border-black/[0.06] bg-white/60 backdrop-blur-xl px-5 py-4 transition-all duration-300 hover:bg-white/80 hover:shadow-[0_8px_30px_rgba(0,0,0,0.06)]"
                       >
-                        <div className="font-semibold text-black/70">{t.landing.footer.framework}</div>
-                        <div className="mt-1">
+                        <div className="font-semibold text-slate-700 flex items-center gap-2">
+                          <div className="h-6 w-6 rounded-lg bg-gradient-to-br from-slate-100 to-slate-200 flex items-center justify-center">
+                            <svg className="w-3.5 h-3.5 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z" />
+                            </svg>
+                          </div>
+                          {t.landing.footer.framework}
+                        </div>
+                        <div className="mt-2 leading-relaxed">
                           {t.landing.footer.frameworkText}
                         </div>
                       </div>
 
-                      <div className="rounded-2xl border border-black/10 bg-white/55 backdrop-blur-md px-4 py-3">
-                        <div className="font-semibold text-black/70">{t.landing.footer.legal}</div>
-                        <div className="mt-1">
-                          <a className="underline underline-offset-2 decoration-black/20" href="/datenschutz">
+                      <div className="group rounded-2xl border border-black/[0.06] bg-white/60 backdrop-blur-xl px-5 py-4 transition-all duration-300 hover:bg-white/80 hover:shadow-[0_8px_30px_rgba(0,0,0,0.06)]">
+                        <div className="font-semibold text-slate-700 flex items-center gap-2">
+                          <div className="h-6 w-6 rounded-lg bg-gradient-to-br from-slate-100 to-slate-200 flex items-center justify-center">
+                            <svg className="w-3.5 h-3.5 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                            </svg>
+                          </div>
+                          {t.landing.footer.legal}
+                        </div>
+                        <div className="mt-2 leading-relaxed flex flex-wrap gap-x-2 gap-y-1">
+                          <a className="hover:text-slate-700 underline underline-offset-2 decoration-slate-300 transition-colors" href="/datenschutz">
                             {t.landing.footer.privacy}
-                          </a>{" "}
-                          -{" "}
-                          <a className="underline underline-offset-2 decoration-black/20" href="/agb">
+                          </a>
+                          <span className="text-slate-300">•</span>
+                          <a className="hover:text-slate-700 underline underline-offset-2 decoration-slate-300 transition-colors" href="/agb">
                             {t.landing.footer.terms}
-                          </a>{" "}
-                          -{" "}
-                          <a className="underline underline-offset-2 decoration-black/20" href="/impressum">
+                          </a>
+                          <span className="text-slate-300">•</span>
+                          <a className="hover:text-slate-700 underline underline-offset-2 decoration-slate-300 transition-colors" href="/impressum">
                             {t.landing.footer.imprint}
                           </a>
                         </div>
@@ -726,19 +791,27 @@ export default function LandingWithIntro() {
                   </div>
                 </div>
 
-              {/* Footer */}
-              <footer className="mt-4 pb-4 sm:pb-5">
-                <div className="h-px bg-black/10" />
-                <div className="pt-3 text-[10px] sm:text-[11px] text-black/40 flex flex-col sm:flex-row gap-2 sm:items-center sm:justify-between">
-                  <div>© {new Date().getFullYear()} Nutzwertanalyse.com • Decision Studio</div>
-                  <div className="flex flex-wrap gap-x-3 gap-y-1">
-                    <a href="/impressum" className="underline underline-offset-2 decoration-black/20">
+              {/* Premium Footer */}
+              <footer className="mt-6 pb-6 sm:pb-8">
+                <div className="h-px bg-gradient-to-r from-transparent via-black/10 to-transparent" />
+                <div className="pt-4 flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="h-8 w-8 rounded-xl overflow-hidden opacity-60">
+                      <img src="/images/logo.webp" alt="" className="h-full w-full object-contain" />
+                    </div>
+                    <div className="text-[11px] sm:text-xs text-slate-400">
+                      © {new Date().getFullYear()} Nutzwertanalyse.com
+                      <span className="hidden sm:inline"> • Decision Studio</span>
+                    </div>
+                  </div>
+                  <div className="flex flex-wrap gap-x-4 gap-y-1 text-[11px] sm:text-xs text-slate-400">
+                    <a href="/impressum" className="hover:text-slate-600 transition-colors">
                       {t.landing.footer.imprint}
                     </a>
-                    <a href="/agb" className="underline underline-offset-2 decoration-black/20">
+                    <a href="/agb" className="hover:text-slate-600 transition-colors">
                       {t.landing.footer.terms}
                     </a>
-                    <a href="/datenschutz" className="underline underline-offset-2 decoration-black/20">
+                    <a href="/datenschutz" className="hover:text-slate-600 transition-colors">
                       {t.landing.footer.privacy}
                     </a>
                   </div>

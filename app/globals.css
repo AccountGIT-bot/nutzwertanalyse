@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 /* =========================================================
-   Base Theme Tokens (App Themes)
+   Premium Design System - Base Theme Tokens
    ========================================================= */
 
 /* Default (falls noch kein Theme gesetzt ist) */
@@ -15,9 +15,25 @@
 
   /* Landing Accent */
   --landing-accent: 0 115 106; /* #00736a */
+  
+  /* Premium shadows */
+  --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -2px rgba(0,0,0,0.1);
+  --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.1);
+  --shadow-xl: 0 20px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.1);
+  --shadow-2xl: 0 25px 50px -12px rgba(0,0,0,0.25);
+  --shadow-glow: 0 0 40px rgba(var(--accent), 0.15);
+  
+  /* Premium timing functions */
+  --ease-premium: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+  
+  /* Premium spacing rhythm */
+  --space-unit: 4px;
 }
 
-/* BASIC */
+/* BASIC - Professional Blue */
 [data-theme="basic"] {
   --accent: 37 99 235;
   --accent-2: 59 130 246;
@@ -26,7 +42,7 @@
   --bg-2: 15 23 42;
 }
 
-/* ADVANCED */
+/* ADVANCED - Elegant Emerald */
 [data-theme="advanced"] {
   --accent: 16 185 129;
   --accent-2: 45 212 191;
@@ -35,22 +51,27 @@
   --bg-2: 12 24 30;
 }
 
-/* BUSINESS (Gold dominiert, Violett nur als Akzent) */
+/* BUSINESS - Luxurious Gold */
 [data-theme="business"] {
-  --accent: 245 158 11;   /* Gold */
-  --accent-2: 168 85 247; /* Violett */
-  --glow: 251 191 36;     /* warmes Gold-Glow */
+  --accent: 245 158 11;
+  --accent-2: 168 85 247;
+  --glow: 251 191 36;
   --bg-1: 7 6 18;
   --bg-2: 14 14 28;
 }
 
+/* =========================================================
+   Premium Typography & Base Styles
+   ========================================================= */
+
 body {
   min-height: 100vh;
-  font-family: Arial, Helvetica, sans-serif;
-  /* Enable hardware acceleration for smoother animations */
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
+  font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+  letter-spacing: -0.011em;
 }
 
 /* Optimize rendering for interactive elements */
@@ -95,6 +116,256 @@ html {
 .fixed {
   backface-visibility: hidden;
   transform: translateZ(0);
+}
+
+/* =========================================================
+   Premium Animation Classes
+   ========================================================= */
+
+/* Stagger animation delays */
+.stagger-1 { animation-delay: 0.05s; }
+.stagger-2 { animation-delay: 0.1s; }
+.stagger-3 { animation-delay: 0.15s; }
+.stagger-4 { animation-delay: 0.2s; }
+.stagger-5 { animation-delay: 0.25s; }
+.stagger-6 { animation-delay: 0.3s; }
+
+/* Premium fade in up */
+@keyframes premium-fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.98);
+    filter: blur(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0);
+  }
+}
+
+.animate-premium-fade-in-up {
+  animation: premium-fade-in-up 0.7s var(--ease-premium) forwards;
+  opacity: 0;
+}
+
+/* Premium scale in */
+@keyframes premium-scale-in {
+  from {
+    opacity: 0;
+    transform: scale(0.92);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.animate-premium-scale-in {
+  animation: premium-scale-in 0.5s var(--ease-premium) forwards;
+  opacity: 0;
+}
+
+/* Premium slide in from left */
+@keyframes premium-slide-in-left {
+  from {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.animate-premium-slide-in-left {
+  animation: premium-slide-in-left 0.6s var(--ease-premium) forwards;
+  opacity: 0;
+}
+
+/* Premium slide in from right */
+@keyframes premium-slide-in-right {
+  from {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.animate-premium-slide-in-right {
+  animation: premium-slide-in-right 0.6s var(--ease-premium) forwards;
+  opacity: 0;
+}
+
+/* Premium blur reveal */
+@keyframes premium-blur-reveal {
+  from {
+    opacity: 0;
+    filter: blur(10px);
+  }
+  to {
+    opacity: 1;
+    filter: blur(0);
+  }
+}
+
+.animate-premium-blur-reveal {
+  animation: premium-blur-reveal 0.8s var(--ease-premium) forwards;
+  opacity: 0;
+}
+
+/* Premium pulse glow */
+@keyframes premium-pulse-glow {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgb(var(--accent) / 0.4);
+  }
+  50% {
+    box-shadow: 0 0 20px 4px rgb(var(--accent) / 0.2);
+  }
+}
+
+.animate-premium-pulse-glow {
+  animation: premium-pulse-glow 2s ease-in-out infinite;
+}
+
+/* Premium shimmer effect */
+@keyframes premium-shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.animate-premium-shimmer {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255,255,255,0.1) 50%,
+    transparent 100%
+  );
+  background-size: 200% 100%;
+  animation: premium-shimmer 2s linear infinite;
+}
+
+/* Premium hover lift */
+.hover-lift {
+  transition: transform 0.3s var(--ease-premium), box-shadow 0.3s var(--ease-premium);
+}
+
+.hover-lift:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-xl);
+}
+
+/* Premium hover scale */
+.hover-scale {
+  transition: transform 0.2s var(--ease-premium);
+}
+
+.hover-scale:hover {
+  transform: scale(1.02);
+}
+
+/* Premium glass effect */
+.glass {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.glass-dark {
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Premium gradient text */
+.gradient-text {
+  background: linear-gradient(135deg, rgb(var(--accent)), rgb(var(--accent-2)));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Premium glow border */
+.glow-border {
+  position: relative;
+}
+
+.glow-border::before {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  background: linear-gradient(135deg, rgb(var(--accent) / 0.5), rgb(var(--accent-2) / 0.5));
+  border-radius: inherit;
+  z-index: -1;
+  opacity: 0;
+  transition: opacity 0.3s var(--ease-premium);
+  filter: blur(8px);
+}
+
+.glow-border:hover::before {
+  opacity: 1;
+}
+
+/* Premium card shine on hover */
+.card-shine {
+  position: relative;
+  overflow: hidden;
+}
+
+.card-shine::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(
+    to right,
+    transparent 0%,
+    rgba(255, 255, 255, 0.05) 50%,
+    transparent 100%
+  );
+  transform: rotate(30deg) translateX(-100%);
+  transition: transform 0.6s var(--ease-premium);
+}
+
+.card-shine:hover::after {
+  transform: rotate(30deg) translateX(100%);
+}
+
+/* Premium focus ring */
+.focus-ring {
+  outline: none;
+}
+
+.focus-ring:focus-visible {
+  box-shadow: 0 0 0 2px rgb(var(--bg-1)), 0 0 0 4px rgb(var(--accent) / 0.5);
+}
+
+/* Premium skeleton loading */
+@keyframes skeleton-pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.skeleton {
+  background: linear-gradient(90deg, rgba(255,255,255,0.05) 25%, rgba(255,255,255,0.1) 50%, rgba(255,255,255,0.05) 75%);
+  background-size: 200% 100%;
+  animation: premium-shimmer 1.5s ease-in-out infinite, skeleton-pulse 2s ease-in-out infinite;
+  border-radius: 8px;
 }
 
 /* =========================================================
