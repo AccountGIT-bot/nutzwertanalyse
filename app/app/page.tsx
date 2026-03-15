@@ -150,40 +150,40 @@ export default function AppPage() {
   if (phase === "select") {
     return (
       <main className="min-h-[100svh] text-white">
-        {/* Header - Light theme with smooth transition to dark content */}
+        {/* Premium Header */}
         <header className="sticky top-0 z-30">
           <div
             className={[
-              "transition-all duration-300 relative",
+              "transition-all duration-500 relative",
               scrolled
-                ? "bg-white shadow-[0_4px_30px_rgba(0,0,0,0.15)]"
+                ? "bg-white/95 backdrop-blur-xl shadow-[0_4px_30px_rgba(0,0,0,0.08)]"
                 : "bg-white",
             ].join(" ")}
           >
-            <div className="mx-auto max-w-6xl px-5 sm:px-6 h-[68px] sm:h-[76px] flex items-center justify-between">
+            <div className="mx-auto max-w-6xl px-5 sm:px-6 h-[64px] sm:h-[72px] flex items-center justify-between">
               <button
                 onClick={() => router.push("/")}
-                className="flex items-center gap-3 text-left"
+                className="group flex items-center gap-3 text-left"
                 aria-label="Zur Startseite"
                 title="Startseite"
               >
-                <div className="h-10 w-10 rounded-2xl overflow-hidden">
+                <div className="h-10 w-10 rounded-2xl overflow-hidden shadow-sm ring-1 ring-black/[0.04] transition-transform duration-300 group-hover:scale-105">
                   <img src="/images/logo.webp" alt="Logo" className="h-full w-full object-contain" />
                 </div>
                 <div className="leading-tight">
                   <div className="text-sm sm:text-base font-semibold tracking-tight text-slate-800">
                     {t.brand.name}<span className="text-slate-400">{t.brand.domain}</span>
                   </div>
-                  <div className="text-[11px] sm:text-xs text-slate-500">
+                  <div className="text-[10px] sm:text-xs text-slate-400 font-medium">
                     {t.packageSelect.headerSubtitle} • {t.packageSelect.headerSubtitle2}
                   </div>
                 </div>
               </button>
 
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 sm:gap-3">
                 <button
                   onClick={() => router.push("/")}
-                  className="p-2 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition"
+                  className="p-2.5 rounded-xl text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-all duration-200"
                   title={t.wizard?.goHome || "Zur Startseite"}
                   aria-label={t.wizard?.goHome || "Zur Startseite"}
                 >
@@ -191,35 +191,45 @@ export default function AppPage() {
                 </button>
                 <button
                   onClick={() => router.push("/login")}
-                  className="rounded-full px-4 py-2 text-sm font-semibold border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 transition shadow-sm"
+                  className={[
+                    "rounded-full px-4 sm:px-5 py-2 sm:py-2.5 text-sm font-semibold",
+                    "bg-slate-900 text-white",
+                    "shadow-[0_2px_8px_rgba(0,0,0,0.12),inset_0_1px_0_rgba(255,255,255,0.1)]",
+                    "hover:bg-slate-800 hover:shadow-[0_4px_12px_rgba(0,0,0,0.15)]",
+                    "active:scale-[0.98]",
+                    "transition-all duration-200",
+                  ].join(" ")}
                 >
                   {t.packageSelect.login}
                 </button>
               </div>
             </div>
-            {/* Gradient fade from white to transparent for smooth transition */}
-            <div className="absolute left-0 right-0 top-full h-8 bg-gradient-to-b from-white/80 via-white/40 to-transparent pointer-events-none" />
+            {/* Premium gradient fade */}
+            <div className="absolute left-0 right-0 top-full h-12 bg-gradient-to-b from-white/60 via-white/20 to-transparent pointer-events-none" />
           </div>
         </header>
 
-        <section className="mx-auto max-w-6xl px-5 sm:px-6 py-10 sm:py-12">
-          <div className="mb-8 sm:mb-10">
-            <div className="text-[11px] sm:text-xs tracking-[0.28em] uppercase text-white/45">
-              {t.packageSelect.breadcrumb} • B2C • B2B
+        <section className="mx-auto max-w-6xl px-5 sm:px-6 py-8 sm:py-12">
+          <div className="mb-8 sm:mb-10 animate-premium-fade-in-up">
+            {/* Premium badge */}
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/[0.06] border border-white/[0.08] backdrop-blur-sm mb-4">
+              <span className="flex h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
+              <span className="text-[10px] sm:text-xs tracking-[0.15em] uppercase text-white/50 font-medium">
+                {t.packageSelect.breadcrumb} • B2C • B2B
+              </span>
             </div>
 
-            <h1 className="mt-2 text-3xl sm:text-4xl font-semibold tracking-tight">
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-semibold tracking-tight leading-[1.1]">
               {t.packageSelect.title}
               <span style={{ color: `rgb(var(--accent))` }}>.</span>
             </h1>
 
-            <p className="mt-3 max-w-3xl text-sm sm:text-base text-white/55 leading-relaxed">
+            <p className="mt-4 max-w-3xl text-sm sm:text-base text-white/50 leading-relaxed">
               {t.packageSelect.subtitle}
             </p>
             
-            {/* Show context: AI interpretation domain takes priority over static preset */}
+            {/* Premium context card */}
             {(initialAIInterpretation || initialPreset) && (() => {
-              // Use AI interpretation's domain if available, otherwise fall back to preset
               const hasAIContext = initialAIInterpretation?.domain;
               const ContextIcon = hasAIContext 
                 ? getDomainIcon(initialAIInterpretation.domain) 
@@ -230,26 +240,27 @@ export default function AppPage() {
               const isAIGenerated = !!hasAIContext;
               
               return (
-                <div className="mt-4 flex items-center gap-3 rounded-xl border border-white/10 bg-white/5 px-4 py-3">
+                <div className="mt-5 inline-flex items-center gap-3 rounded-2xl border border-white/[0.08] bg-white/[0.04] backdrop-blur-xl px-4 py-3 transition-all duration-300 hover:bg-white/[0.06]">
                   <div
-                    className="h-9 w-9 rounded-lg flex items-center justify-center"
+                    className="h-10 w-10 rounded-xl flex items-center justify-center transition-transform duration-300 hover:scale-110"
                     style={{
-                      background: `rgb(var(--accent) / 0.15)`,
+                      background: `rgb(var(--accent) / 0.12)`,
                       color: `rgb(var(--accent))`,
+                      boxShadow: `0 0 20px rgb(var(--accent) / 0.1)`,
                     }}
                   >
                     <ContextIcon size={20} />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <div className="text-xs text-white/50 flex items-center gap-1.5">
+                    <div className="text-xs text-white/45 flex items-center gap-2">
                       {t.packageSelect.applicationArea}
                       {isAIGenerated && (
-                        <span className="px-1.5 py-0.5 rounded text-[10px] bg-white/10 text-white/60">
+                        <span className="px-2 py-0.5 rounded-full text-[10px] bg-white/[0.08] text-white/50 font-medium">
                           {t.packageSelect.aiDetected}
                         </span>
                       )}
                     </div>
-                    <div className="text-sm text-white font-medium truncate">
+                    <div className="text-sm text-white font-medium truncate mt-0.5">
                       {contextLabel}
                     </div>
                   </div>
@@ -258,8 +269,8 @@ export default function AppPage() {
             })()}
           </div>
 
-          <div className="grid gap-4 sm:gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
-            {MODELS.map((m) => {
+          <div className="grid gap-5 sm:gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+            {MODELS.map((m, index) => {
               const active = selectedTheme === m.id;
 
               return (
@@ -272,89 +283,113 @@ export default function AppPage() {
                   onBlur={restore}
                   onTouchStart={() => preview(m.id)}
                   className={[
-                    "group relative overflow-hidden rounded-3xl text-left",
-                    "border border-white/10",
-                    "bg-white/5 backdrop-blur-md",
-                    "shadow-[0_18px_55px_rgba(0,0,0,0.3)]",
+                    "group relative overflow-hidden rounded-3xl text-left card-shine",
+                    "border border-white/[0.08]",
+                    "bg-gradient-to-br from-white/[0.06] to-white/[0.02] backdrop-blur-xl",
+                    "shadow-[0_8px_32px_rgba(0,0,0,0.2),inset_0_1px_0_rgba(255,255,255,0.05)]",
                     "p-6 sm:p-7",
-                    "transition duration-300 ease-out",
-                    "hover:-translate-y-1 hover:shadow-[0_25px_70px_rgba(0,0,0,0.4)]",
-                    "active:translate-y-0",
-                    "focus:outline-none focus-visible:ring-2 focus-visible:ring-white/20",
+                    "transition-all duration-500",
+                    "hover:-translate-y-2 hover:shadow-[0_20px_50px_rgba(0,0,0,0.3)]",
+                    "hover:border-white/[0.12]",
+                    "active:translate-y-0 active:scale-[0.99]",
+                    "focus:outline-none focus-visible:ring-2 focus-visible:ring-white/20 focus-visible:ring-offset-2 focus-visible:ring-offset-transparent",
+                    active ? "ring-2 ring-offset-2 ring-offset-transparent" : "",
                   ].join(" ")}
+                  style={active ? { 
+                    ringColor: `rgb(${m.accent})`,
+                    boxShadow: `0 0 40px rgb(${m.accent} / 0.15), 0 8px 32px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.05)` 
+                  } : {}}
                 >
-                  {/* Accent glow */}
+                  {/* Premium accent glow on hover */}
                   <div
-                    className="absolute inset-0 opacity-0 group-hover:opacity-100 transition duration-300"
+                    className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
                     style={{
-                      background: `radial-gradient(700px 260px at 20% 0%, rgb(${m.accent} / 0.16), transparent 60%)`,
+                      background: `radial-gradient(600px 200px at 30% 0%, rgb(${m.accent} / 0.15), transparent 70%)`,
+                    }}
+                  />
+                  
+                  {/* Subtle inner border glow */}
+                  <div className="absolute inset-0 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" 
+                    style={{
+                      boxShadow: `inset 0 0 30px rgb(${m.accent} / 0.05)`,
                     }}
                   />
 
                   <div className="relative">
-                    <div className="flex items-center justify-between gap-3">
+                    <div className="flex items-start justify-between gap-3">
                       <div>
+                        {/* Package level badge */}
+                        <div className="mb-3 inline-flex items-center gap-2 px-2.5 py-1 rounded-full text-[10px] font-semibold tracking-wider uppercase"
+                          style={{
+                            background: `rgb(${m.accent} / 0.1)`,
+                            color: `rgb(${m.accent})`,
+                          }}
+                        >
+                          <span className="h-1.5 w-1.5 rounded-full" style={{ background: `rgb(${m.accent})` }} />
+                          {m.id === 'basic' ? 'Starter' : m.id === 'advanced' ? 'Professional' : 'Enterprise'}
+                        </div>
+                        
                         <div
-                          className="text-xl sm:text-2xl font-semibold tracking-wide"
+                          className="text-2xl sm:text-3xl font-bold tracking-tight"
                           style={{ color: `rgb(${m.accent})` }}
                         >
                           {m.title}
                         </div>
-                        <div className="mt-1 text-sm text-white/55">{m.subtitle}</div>
+                        <div className="mt-1.5 text-sm text-white/50">{m.subtitle}</div>
                       </div>
 
                       {active && (
                         <div
-                          className="h-10 w-10 rounded-2xl grid place-items-center"
+                          className="h-10 w-10 rounded-2xl grid place-items-center flex-shrink-0 transition-transform duration-300 animate-premium-scale-in"
                           style={{
-                            background: `rgb(${m.accent} / 0.10)`,
-                            border: `1px solid rgb(${m.accent} / 0.25)`,
+                            background: `rgb(${m.accent} / 0.15)`,
+                            border: `1px solid rgb(${m.accent} / 0.3)`,
                             color: `rgb(${m.accent})`,
+                            boxShadow: `0 0 20px rgb(${m.accent} / 0.2)`,
                           }}
                           aria-hidden="true"
                         >
-                          ✓
+                          <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                          </svg>
                         </div>
                       )}
                     </div>
 
-                    <ul className="mt-5 space-y-2.5 text-sm text-white/70">
+                    <ul className="mt-6 space-y-3 text-sm text-white/65">
                       {m.features.map((f, i) => (
-                        <li key={i} className="flex gap-3">
+                        <li key={i} className="flex gap-3 items-start">
                           <span
-                            className="mt-2 h-1.5 w-1.5 rounded-full"
-                            style={{ background: `rgb(${m.accent})` }}
+                            className="mt-1.5 h-1.5 w-1.5 rounded-full flex-shrink-0 transition-transform duration-300 group-hover:scale-125"
+                            style={{ background: `rgb(${m.accent})`, boxShadow: `0 0 6px rgb(${m.accent} / 0.5)` }}
                           />
-                          <span>{f}</span>
+                          <span className="leading-relaxed">{f}</span>
                         </li>
                       ))}
                     </ul>
 
-                    <div className="mt-7">
+                    <div className="mt-8">
                       <div
-                        className="inline-flex w-full items-center justify-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold transition group-hover:scale-[1.01]"
+                        className="inline-flex w-full items-center justify-center gap-2 rounded-2xl px-5 py-3 text-sm font-semibold transition-all duration-300 group-hover:scale-[1.02]"
                         style={{
                           background: `rgb(${m.accent} / 0.12)`,
                           color: `rgb(${m.accent})`,
-                          border: `1px solid rgb(${m.accent} / 0.24)`,
+                          border: `1px solid rgb(${m.accent} / 0.2)`,
                         }}
                       >
-                        {t.packageSelect.startAnalysis}
-                        <span
-                          className="h-2 w-2 rounded-full"
-                          style={{
-                            background: `radial-gradient(circle at 30% 30%, rgb(${m.accent}), rgb(${m.accent2}))`,
-                          }}
-                          aria-hidden="true"
-                        />
+                        <span>{t.packageSelect.startAnalysis}</span>
+                        <svg className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                        </svg>
                       </div>
                     </div>
                   </div>
 
+                  {/* Active ring */}
                   {active && (
                     <div
                       className="absolute inset-0 rounded-3xl pointer-events-none"
-                      style={{ boxShadow: `0 0 0 2px rgb(${m.accent} / 0.35)` }}
+                      style={{ boxShadow: `0 0 0 2px rgb(${m.accent} / 0.4), 0 0 30px rgb(${m.accent} / 0.1)` }}
                     />
                   )}
                 </button>
@@ -362,7 +397,10 @@ export default function AppPage() {
             })}
           </div>
 
-          <div className="mt-8 text-[11px] text-white/45">
+          <div className="mt-10 text-xs text-white/40 flex items-center gap-2">
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
             {t.packageSelect.hint}
           </div>
         </section>
