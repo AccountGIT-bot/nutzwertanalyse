@@ -865,3 +865,240 @@ html {
     opacity: 0.5;
   }
 }
+
+/* =========================================================
+   3D Parallax Background System
+   ========================================================= */
+
+/* Parallax layers with different animation speeds */
+.parallax-layer-1 {
+  animation: parallaxDrift1 40s ease-in-out infinite;
+  will-change: transform;
+}
+
+.parallax-layer-2 {
+  animation: parallaxDrift2 30s ease-in-out infinite;
+  will-change: transform;
+}
+
+.parallax-layer-3 {
+  animation: parallaxDrift3 20s ease-in-out infinite;
+  will-change: transform;
+}
+
+@keyframes parallaxDrift1 {
+  0%, 100% {
+    transform: translate3d(0, 0, 0);
+  }
+  25% {
+    transform: translate3d(20px, -15px, 0);
+  }
+  50% {
+    transform: translate3d(-15px, 10px, 0);
+  }
+  75% {
+    transform: translate3d(10px, 20px, 0);
+  }
+}
+
+@keyframes parallaxDrift2 {
+  0%, 100% {
+    transform: translate3d(0, 0, 0);
+  }
+  33% {
+    transform: translate3d(-25px, 20px, 0);
+  }
+  66% {
+    transform: translate3d(30px, -15px, 0);
+  }
+}
+
+@keyframes parallaxDrift3 {
+  0%, 100% {
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    transform: translate3d(-20px, -25px, 0);
+  }
+}
+
+@keyframes parallaxFloat1 {
+  0%, 100% {
+    transform: translate(0, 0) scale(1);
+  }
+  25% {
+    transform: translate(50px, -30px) scale(1.1);
+  }
+  50% {
+    transform: translate(-30px, 50px) scale(0.95);
+  }
+  75% {
+    transform: translate(40px, 20px) scale(1.05);
+  }
+}
+
+@keyframes parallaxFloat2 {
+  0%, 100% {
+    transform: translate(0, 0) scale(1);
+  }
+  33% {
+    transform: translate(-60px, 30px) scale(1.15);
+  }
+  66% {
+    transform: translate(40px, -40px) scale(0.9);
+  }
+}
+
+@keyframes parallaxFloat3 {
+  0%, 100% {
+    transform: translate(0, 0) scale(1);
+  }
+  20% {
+    transform: translate(30px, -40px) scale(1.05);
+  }
+  40% {
+    transform: translate(-40px, 20px) scale(0.95);
+  }
+  60% {
+    transform: translate(20px, 40px) scale(1.1);
+  }
+  80% {
+    transform: translate(-20px, -20px) scale(0.98);
+  }
+}
+
+@keyframes parallaxPulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.3;
+  }
+  50% {
+    transform: scale(1.2);
+    opacity: 0.5;
+  }
+}
+
+/* Floating geometric shapes */
+.floating-shape {
+  position: absolute;
+  border-radius: 50%;
+  opacity: 0.1;
+  will-change: transform;
+}
+
+.floating-shape-1 {
+  width: 4px;
+  height: 4px;
+  top: 20%;
+  left: 30%;
+  background: white;
+  animation: floatShape1 15s ease-in-out infinite;
+}
+
+.floating-shape-2 {
+  width: 6px;
+  height: 6px;
+  top: 60%;
+  right: 25%;
+  background: white;
+  animation: floatShape2 20s ease-in-out infinite;
+}
+
+.floating-shape-3 {
+  width: 3px;
+  height: 3px;
+  bottom: 30%;
+  left: 50%;
+  background: white;
+  animation: floatShape3 18s ease-in-out infinite;
+}
+
+.floating-shape-4 {
+  width: 5px;
+  height: 5px;
+  top: 40%;
+  right: 40%;
+  background: white;
+  animation: floatShape4 22s ease-in-out infinite;
+}
+
+@keyframes floatShape1 {
+  0%, 100% {
+    transform: translate(0, 0);
+    opacity: 0.1;
+  }
+  25% {
+    transform: translate(100px, -50px);
+    opacity: 0.3;
+  }
+  50% {
+    transform: translate(50px, -100px);
+    opacity: 0.15;
+  }
+  75% {
+    transform: translate(150px, -30px);
+    opacity: 0.25;
+  }
+}
+
+@keyframes floatShape2 {
+  0%, 100% {
+    transform: translate(0, 0);
+    opacity: 0.15;
+  }
+  33% {
+    transform: translate(-80px, 40px);
+    opacity: 0.25;
+  }
+  66% {
+    transform: translate(-120px, -30px);
+    opacity: 0.1;
+  }
+}
+
+@keyframes floatShape3 {
+  0%, 100% {
+    transform: translate(0, 0);
+    opacity: 0.1;
+  }
+  50% {
+    transform: translate(-60px, -80px);
+    opacity: 0.2;
+  }
+}
+
+@keyframes floatShape4 {
+  0%, 100% {
+    transform: translate(0, 0);
+    opacity: 0.12;
+  }
+  25% {
+    transform: translate(40px, 60px);
+    opacity: 0.2;
+  }
+  50% {
+    transform: translate(-50px, 80px);
+    opacity: 0.08;
+  }
+  75% {
+    transform: translate(30px, 40px);
+    opacity: 0.18;
+  }
+}
+
+/* Sidebar animation */
+@keyframes sidebarSlideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.sidebar-item {
+  animation: sidebarSlideIn 0.4s ease-out forwards;
+  opacity: 0;
+}

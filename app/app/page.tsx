@@ -149,15 +149,82 @@ export default function AppPage() {
   // Package selection screen
   if (phase === "select") {
     return (
-      <main className="min-h-[100svh] text-white">
+      <main className="min-h-[100svh] text-white relative overflow-hidden">
+        {/* ===== 3D PARALLAX BACKGROUND ===== */}
+        <div className="fixed inset-0 -z-10 overflow-hidden">
+          {/* Base gradient */}
+          <div className="absolute inset-0 bg-gradient-to-br from-[#0a0a0a] via-[#111827] to-[#0f172a]" />
+          
+          {/* Parallax Layer 1 - Slowest */}
+          <div className="parallax-layer-1 absolute inset-0">
+            <div 
+              className="absolute w-[700px] h-[700px] rounded-full blur-[100px] opacity-20"
+              style={{
+                top: '5%',
+                left: '5%',
+                background: `radial-gradient(circle, rgb(var(--accent) / 0.5), transparent 70%)`,
+              }}
+            />
+            <div 
+              className="absolute w-[500px] h-[500px] rounded-full blur-[80px] opacity-15"
+              style={{
+                bottom: '10%',
+                right: '10%',
+                background: `radial-gradient(circle, rgb(var(--accent-2) / 0.4), transparent 70%)`,
+              }}
+            />
+          </div>
+
+          {/* Parallax Layer 2 - Medium */}
+          <div className="parallax-layer-2 absolute inset-0">
+            <div 
+              className="absolute w-[400px] h-[400px] rounded-full blur-[60px] opacity-25"
+              style={{
+                top: '40%',
+                right: '20%',
+                background: `radial-gradient(circle, rgb(var(--accent) / 0.6), transparent 60%)`,
+              }}
+            />
+          </div>
+
+          {/* Parallax Layer 3 - Fastest */}
+          <div className="parallax-layer-3 absolute inset-0">
+            <div 
+              className="absolute w-[250px] h-[250px] rounded-full blur-[40px] opacity-30"
+              style={{
+                top: '60%',
+                left: '30%',
+                background: `radial-gradient(circle, rgb(var(--glow) / 0.5), transparent 50%)`,
+              }}
+            />
+          </div>
+
+          {/* Grid */}
+          <div className="absolute inset-0 opacity-[0.02]" style={{
+            backgroundImage: `linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)`,
+            backgroundSize: '60px 60px',
+          }} />
+
+          {/* Floating shapes */}
+          <div className="absolute inset-0 pointer-events-none">
+            <div className="floating-shape floating-shape-1" />
+            <div className="floating-shape floating-shape-2" />
+            <div className="floating-shape floating-shape-3" />
+          </div>
+
+          {/* Noise & Vignette */}
+          <div className="absolute inset-0 landing-grain opacity-[0.06]" />
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_0%,rgba(0,0,0,0.3)_100%)]" />
+        </div>
+
         {/* Premium Header */}
         <header className="sticky top-0 z-30">
           <div
             className={[
               "transition-all duration-500 relative",
               scrolled
-                ? "bg-white/95 backdrop-blur-xl shadow-[0_4px_30px_rgba(0,0,0,0.08)]"
-                : "bg-white",
+                ? "bg-black/60 backdrop-blur-2xl border-b border-white/[0.06]"
+                : "bg-transparent",
             ].join(" ")}
           >
             <div className="mx-auto max-w-6xl px-5 sm:px-6 h-[64px] sm:h-[72px] flex items-center justify-between">
@@ -167,14 +234,14 @@ export default function AppPage() {
                 aria-label="Zur Startseite"
                 title="Startseite"
               >
-                <div className="h-10 w-10 rounded-2xl overflow-hidden shadow-sm ring-1 ring-black/[0.04] transition-transform duration-300 group-hover:scale-105">
+                <div className="h-10 w-10 rounded-2xl overflow-hidden ring-2 ring-white/10 transition-all duration-300 group-hover:ring-white/20 group-hover:scale-105">
                   <img src="/images/logo.webp" alt="Logo" className="h-full w-full object-contain" />
                 </div>
                 <div className="leading-tight">
-                  <div className="text-sm sm:text-base font-semibold tracking-tight text-slate-800">
-                    {t.brand.name}<span className="text-slate-400">{t.brand.domain}</span>
+                  <div className="text-sm sm:text-base font-semibold tracking-tight text-white">
+                    {t.brand.name}<span className="text-white/40">{t.brand.domain}</span>
                   </div>
-                  <div className="text-[10px] sm:text-xs text-slate-400 font-medium">
+                  <div className="text-[10px] sm:text-xs text-white/40 font-medium">
                     {t.packageSelect.headerSubtitle} • {t.packageSelect.headerSubtitle2}
                   </div>
                 </div>
@@ -183,7 +250,7 @@ export default function AppPage() {
               <div className="flex items-center gap-2 sm:gap-3">
                 <button
                   onClick={() => router.push("/")}
-                  className="p-2.5 rounded-xl text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-all duration-200"
+                  className="p-2.5 rounded-xl text-white/40 hover:text-white hover:bg-white/[0.08] transition-all duration-200"
                   title={t.wizard?.goHome || "Zur Startseite"}
                   aria-label={t.wizard?.goHome || "Zur Startseite"}
                 >
@@ -193,9 +260,9 @@ export default function AppPage() {
                   onClick={() => router.push("/login")}
                   className={[
                     "rounded-full px-4 sm:px-5 py-2 sm:py-2.5 text-sm font-semibold",
-                    "bg-slate-900 text-white",
-                    "shadow-[0_2px_8px_rgba(0,0,0,0.12),inset_0_1px_0_rgba(255,255,255,0.1)]",
-                    "hover:bg-slate-800 hover:shadow-[0_4px_12px_rgba(0,0,0,0.15)]",
+                    "bg-white text-black",
+                    "shadow-[0_4px_12px_rgba(0,0,0,0.3)]",
+                    "hover:bg-white/90 hover:scale-[1.02]",
                     "active:scale-[0.98]",
                     "transition-all duration-200",
                   ].join(" ")}
@@ -204,22 +271,20 @@ export default function AppPage() {
                 </button>
               </div>
             </div>
-            {/* Premium gradient fade */}
-            <div className="absolute left-0 right-0 top-full h-12 bg-gradient-to-b from-white/60 via-white/20 to-transparent pointer-events-none" />
           </div>
         </header>
 
-        <section className="mx-auto max-w-6xl px-5 sm:px-6 py-8 sm:py-12">
-          <div className="mb-8 sm:mb-10 animate-premium-fade-in-up">
+        <section className="relative mx-auto max-w-6xl px-5 sm:px-6 py-10 sm:py-16">
+          <div className="mb-10 sm:mb-12 animate-premium-fade-in-up">
             {/* Premium badge */}
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/[0.06] border border-white/[0.08] backdrop-blur-sm mb-4">
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/[0.04] border border-white/[0.08] backdrop-blur-xl mb-5">
               <span className="flex h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
-              <span className="text-[10px] sm:text-xs tracking-[0.15em] uppercase text-white/50 font-medium">
+              <span className="text-[10px] sm:text-xs tracking-[0.15em] uppercase text-white/40 font-medium">
                 {t.packageSelect.breadcrumb} • B2C • B2B
               </span>
             </div>
 
-            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-semibold tracking-tight leading-[1.1]">
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight leading-[1.1]">
               {t.packageSelect.title}
               <span style={{ color: `rgb(var(--accent))` }}>.</span>
             </h1>
@@ -405,25 +470,21 @@ export default function AppPage() {
           </div>
         </section>
 
-        <footer className="relative pb-6">
-          {/* Gradient fade from content to footer */}
-          <div className="absolute -top-12 left-0 right-0 h-12 bg-gradient-to-b from-transparent via-white/20 to-white/60 pointer-events-none" />
-          <div className="relative bg-white/60 backdrop-blur-sm pt-4 rounded-t-3xl mx-4 sm:mx-6">
-            <div className="mx-auto max-w-6xl px-5 sm:px-6">
-              <div className="h-px bg-slate-200/60" />
-              <div className="pt-3 pb-2 text-[10px] sm:text-[11px] text-slate-500 flex flex-col sm:flex-row gap-2 sm:items-center sm:justify-between">
-                <div>© {new Date().getFullYear()} Nutzwertanalyse.com</div>
-                <div className="flex flex-wrap gap-x-3 gap-y-1">
-                  <a href="/impressum" className="underline underline-offset-2 decoration-slate-300 hover:text-slate-700 transition">
-                    {t.landing.footer.imprint}
-                  </a>
-                  <a href="/agb" className="underline underline-offset-2 decoration-slate-300 hover:text-slate-700 transition">
-                    {t.landing.footer.terms}
-                  </a>
-                  <a href="/datenschutz" className="underline underline-offset-2 decoration-slate-300 hover:text-slate-700 transition">
-                    {t.landing.footer.privacy}
-                  </a>
-                </div>
+        <footer className="relative py-8 mt-8">
+          <div className="mx-auto max-w-6xl px-5 sm:px-6">
+            <div className="h-px bg-white/[0.06]" />
+            <div className="pt-4 text-[10px] sm:text-[11px] text-white/30 flex flex-col sm:flex-row gap-2 sm:items-center sm:justify-between">
+              <div>© {new Date().getFullYear()} Nutzwertanalyse.com</div>
+              <div className="flex flex-wrap gap-x-4 gap-y-1">
+                <a href="/impressum" className="hover:text-white/60 transition">
+                  {t.landing.footer.imprint}
+                </a>
+                <a href="/agb" className="hover:text-white/60 transition">
+                  {t.landing.footer.terms}
+                </a>
+                <a href="/datenschutz" className="hover:text-white/60 transition">
+                  {t.landing.footer.privacy}
+                </a>
               </div>
             </div>
           </div>

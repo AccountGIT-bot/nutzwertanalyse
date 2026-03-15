@@ -25,43 +25,49 @@ const PRESET_CONFIG: Array<{
   id: PresetId;
   image: string;
   Icon: typeof SupplierIcon;
+  color: string;
 }> = [
   {
     id: "supplier",
     image: "/presets/Startseite_Lieferantenauswahl_komprimiert.jpg",
     Icon: SupplierIcon,
+    color: "59, 130, 246", // blue
   },
   {
     id: "software",
     image: "/presets/Startseite_Softwarevergleich_komprimiert.jpg",
     Icon: SoftwareIcon,
+    color: "168, 85, 247", // purple
   },
   {
     id: "investment",
     image: "/presets/Startseite_Investitionsentscheid_komprimiert.jpg",
     Icon: InvestmentIcon,
+    color: "245, 158, 11", // amber
   },
   {
     id: "machines",
     image: "/presets/Startseite_Maschinenkauf_komprimiert.jpg",
     Icon: MachinesIcon,
+    color: "16, 185, 129", // emerald
   },
   {
     id: "vehicle",
     image: "/presets/Startseite_Fahrzeugauswahl_komprimiert.jpg",
     Icon: VehicleIcon,
+    color: "239, 68, 68", // red
   },
   {
     id: "employee",
     image: "/presets/Startseite_Mitarbeiterwahl_komprimiert.jpg",
     Icon: EmployeeIcon,
+    color: "6, 182, 212", // cyan
   },
 ];
 
-const INTRO_COOLDOWN_MS = 10 * 60 * 1000; // 10 Minuten
+const INTRO_COOLDOWN_MS = 10 * 60 * 1000;
 const INTRO_KEY = "nwa_intro_lastShownAt";
 
-// Safe localStorage access - only call on client side
 function shouldShowIntroNow(): boolean {
   if (typeof window === "undefined") return false;
   try {
@@ -76,39 +82,41 @@ function markIntroShownNow(): void {
   if (typeof window === "undefined") return;
   try {
     localStorage.setItem(INTRO_KEY, String(Date.now()));
-  } catch {
-    // Silent fail for localStorage errors
-  }
+  } catch {}
 }
 
 export default function LandingWithIntro() {
   const router = useRouter();
   const t = useTranslations();
 
-  // Determine intro on client to avoid SSR mismatch
   const [phase, setPhase] = useState<Phase>("landing");
   const [shouldIntro, setShouldIntro] = useState(false);
-
   const [text, setText] = useState("");
   const [isFocused, setIsFocused] = useState(false);
-
-  // Fog on startseite only, tied to intro
   const [fogVisible, setFogVisible] = useState(false);
   const [fogSoftHide, setFogSoftHide] = useState(false);
   const fogTimer = useRef<number | null>(null);
-
   const [scrolled, setScrolled] = useState(false);
-
-  // AI interpretation state
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [aiInterpretation, setAiInterpretation] = useState<AIDecisionInterpretation | null>(null);
   const [aiError, setAiError] = useState<string | null>(null);
+  const [hoveredPreset, setHoveredPreset] = useState<PresetId | null>(null);
+  const [mouseY, setMouseY] = useState(0);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const canStart = useMemo(() => text.trim().length > 0, [text]);
   const placeholderText = t.landing.searchInputPlaceholder;
 
+  // Parallax mouse tracking
   useEffect(() => {
-    // Decide intro only once on mount
+    const handleMouseMove = (e: MouseEvent) => {
+      setMouseY(e.clientY / window.innerHeight);
+    };
+    window.addEventListener("mousemove", handleMouseMove);
+    return () => window.removeEventListener("mousemove", handleMouseMove);
+  }, []);
+
+  useEffect(() => {
     const show = shouldShowIntroNow();
     setShouldIntro(show);
 
@@ -116,16 +124,12 @@ export default function LandingWithIntro() {
       setPhase("intro");
       setFogVisible(true);
       setFogSoftHide(false);
-
-      // after 3s -> landing
       const t = window.setTimeout(() => {
         setPhase("landing");
         markIntroShownNow();
       }, 3000);
-
       return () => window.clearTimeout(t);
     } else {
-      // no intro, no fog
       setPhase("landing");
       setFogVisible(false);
       setFogSoftHide(false);
@@ -133,9 +137,7 @@ export default function LandingWithIntro() {
   }, []);
 
   useEffect(() => {
-    // Fog fade-out only if intro was shown
     if (!shouldIntro) return;
-
     if (fogTimer.current) window.clearTimeout(fogTimer.current);
 
     if (phase === "intro") {
@@ -144,7 +146,6 @@ export default function LandingWithIntro() {
       return;
     }
 
-    // landing: keep fog slightly, then fade
     setFogVisible(true);
     setFogSoftHide(false);
     fogTimer.current = window.setTimeout(() => {
@@ -173,27 +174,17 @@ export default function LandingWithIntro() {
   }) => {
     if (typeof window !== "undefined") {
       try {
-        // Clear previous values first to avoid mixing old and new data
         localStorage.removeItem("nwa_decisionDraft");
         localStorage.removeItem("nwa_preset");
         localStorage.removeItem("nwa_aiInterpretation");
-        
-        // Set new values
         localStorage.setItem("nwa_decisionDraft", payload.draft);
-        if (payload.preset) {
-          localStorage.setItem("nwa_preset", payload.preset);
-        }
-        if (payload.interpretation) {
-          localStorage.setItem("nwa_aiInterpretation", JSON.stringify(payload.interpretation));
-        }
-      } catch {
-        // Silent fail for localStorage errors
-      }
+        if (payload.preset) localStorage.setItem("nwa_preset", payload.preset);
+        if (payload.interpretation) localStorage.setItem("nwa_aiInterpretation", JSON.stringify(payload.interpretation));
+      } catch {}
     }
     router.push("/app");
   }, [router]);
 
-  // Analyze user input with AI - with robust fallback using interpretation engine
   const analyzeInput = useCallback(async () => {
     const draft = sanitizeInput(text);
     if (!draft || draft.length < 3) return;
@@ -209,9 +200,7 @@ export default function LandingWithIntro() {
         body: JSON.stringify({ userInput: draft }),
       });
 
-      if (!response.ok) {
-        throw new Error("Failed to analyze decision");
-      }
+      if (!response.ok) throw new Error("Failed to analyze decision");
 
       const data = await response.json();
       if (data.interpretation) {
@@ -220,12 +209,10 @@ export default function LandingWithIntro() {
       } else {
         throw new Error("No interpretation returned");
       }
-    } catch (err) {
-      // Use robust client-side interpretation engine as fallback
+    } catch {
       const fallback = interpretDecisionInput(draft);
       setAiInterpretation(fallback);
       setPhase("suggestion");
-      // Show subtle notice that local interpretation was used
       if (fallback.confidence === "low") {
         setAiError("Automatische Interpretation wurde verwendet. Sie können alle Felder anpassen.");
       }
@@ -234,12 +221,10 @@ export default function LandingWithIntro() {
     }
   }, [text]);
 
-  // Start from input - triggers AI analysis or uses local interpretation for simple inputs
   const startFromInput = useCallback(() => {
     const draft = sanitizeInput(text);
     if (!draft) return;
     
-    // For very short inputs (< 6 chars), use local interpretation immediately
     if (draft.length < 6) {
       const interpretation = interpretDecisionInput(draft);
       setAiInterpretation(interpretation);
@@ -247,42 +232,34 @@ export default function LandingWithIntro() {
       return;
     }
     
-    // Trigger AI analysis (which has robust fallback on error)
     analyzeInput();
   }, [text, analyzeInput]);
 
-  // Handle AI suggestion acceptance
   const handleAcceptSuggestion = useCallback((interpretation: AIDecisionInterpretation) => {
-    goToApp({ 
-      draft: interpretation.title, 
-      interpretation,
-    });
+    goToApp({ draft: interpretation.title, interpretation });
   }, [goToApp]);
 
-  // Handle AI suggestion edit
   const handleEditSuggestion = useCallback((interpretation: AIDecisionInterpretation) => {
-    // Go to app with interpretation but allow editing
-    goToApp({ 
-      draft: text.trim(), 
-      interpretation,
-    });
+    goToApp({ draft: text.trim(), interpretation });
   }, [goToApp, text]);
 
-  // Handle AI suggestion rejection
   const handleRejectSuggestion = useCallback(() => {
     setAiInterpretation(null);
     setPhase("landing");
-    // Focus on input
   }, []);
 
   const startFromPreset = useCallback((p: PresetId) => {
-    // Use user input if available, otherwise leave empty - the preset context is shown via icon
     const draft = text.trim();
     goToApp({ draft, preset: p });
   }, [text, goToApp]);
 
+  // Get dynamic background color based on hovered preset
+  const activeColor = hoveredPreset 
+    ? PRESET_CONFIG.find(p => p.id === hoveredPreset)?.color || "59, 130, 246"
+    : "59, 130, 246";
+
   return (
-    <main className="relative min-h-[100svh] text-slate-900 overflow-x-hidden pt-11">
+    <main className="relative min-h-[100svh] text-slate-900 overflow-hidden">
       {/* Construction Banner */}
       <div className="fixed top-0 left-0 right-0 z-50 bg-gradient-to-r from-amber-500 via-orange-500 to-amber-500 text-white py-2 px-4 text-center text-sm font-medium shadow-lg">
         <div className="flex items-center justify-center gap-2">
@@ -296,66 +273,122 @@ export default function LandingWithIntro() {
         </div>
       </div>
       
-      {/* Premium Dynamic Background */}
-      <div className="absolute inset-0 -z-10 overflow-hidden">
-        {/* Base gradient - warm to cool */}
-        <div className="absolute inset-0 bg-gradient-to-br from-[#faf9f7] via-[#f5f3f0] to-[#eff2f4]" />
-        
-        {/* Animated floating orbs */}
-        <div className="landing-orb landing-orb-1" />
-        <div className="landing-orb landing-orb-2" />
-        <div className="landing-orb landing-orb-3" />
-        
-        {/* Animated gradient mesh */}
-        <div className="landing-mesh" />
-        
-        {/* Static subtle color accents */}
+      {/* ===== IMMERSIVE 3D PARALLAX BACKGROUND ===== */}
+      <div className="fixed inset-0 -z-10 overflow-hidden">
+        {/* Base gradient - adapts to theme */}
         <div 
-          className="absolute inset-0"
+          className="absolute inset-0 transition-all duration-1000"
           style={{
-            background: `
-              radial-gradient(800px 600px at 12% 15%, rgba(59, 130, 246, 0.07), transparent 55%),
-              radial-gradient(600px 500px at 88% 25%, rgba(168, 85, 247, 0.05), transparent 50%),
-              radial-gradient(900px 600px at 45% 105%, rgba(16, 185, 129, 0.06), transparent 60%)
-            `,
+            background: `linear-gradient(135deg, #0a0a0a 0%, #111827 50%, #0f172a 100%)`,
           }}
         />
         
-        {/* Depth gradients */}
-        <div
-          className="absolute inset-0"
+        {/* Layer 1 - Slowest (Far background) */}
+        <div 
+          className="parallax-layer-1 absolute inset-0"
           style={{
-            background:
-              "radial-gradient(900px 650px at 18% 18%, rgba(0,0,0,0.04), transparent 62%), radial-gradient(850px 600px at 85% 40%, rgba(0,0,0,0.025), transparent 62%)",
+            transform: `translateY(${mouseY * 20}px)`,
           }}
-        />
-        
-        {/* Animated particles */}
-        <div className="landing-particles">
-          <div className="landing-particle landing-particle-1" />
-          <div className="landing-particle landing-particle-2" />
-          <div className="landing-particle landing-particle-3" />
-          <div className="landing-particle landing-particle-4" />
-          <div className="landing-particle landing-particle-5" />
+        >
+          <div 
+            className="absolute w-[800px] h-[800px] rounded-full blur-[120px] opacity-20 transition-all duration-1000"
+            style={{
+              top: '10%',
+              left: '10%',
+              background: `radial-gradient(circle, rgb(${activeColor} / 0.4), transparent 70%)`,
+            }}
+          />
+          <div 
+            className="absolute w-[600px] h-[600px] rounded-full blur-[100px] opacity-15"
+            style={{
+              bottom: '20%',
+              right: '15%',
+              background: `radial-gradient(circle, rgba(168, 85, 247, 0.3), transparent 70%)`,
+              animation: 'parallaxFloat1 30s ease-in-out infinite',
+            }}
+          />
         </div>
+
+        {/* Layer 2 - Medium speed */}
+        <div 
+          className="parallax-layer-2 absolute inset-0"
+          style={{
+            transform: `translateY(${mouseY * 40}px)`,
+          }}
+        >
+          <div 
+            className="absolute w-[500px] h-[500px] rounded-full blur-[80px] opacity-25 transition-all duration-700"
+            style={{
+              top: '30%',
+              right: '20%',
+              background: `radial-gradient(circle, rgb(${activeColor} / 0.5), transparent 60%)`,
+              animation: 'parallaxFloat2 25s ease-in-out infinite',
+            }}
+          />
+          <div 
+            className="absolute w-[400px] h-[400px] rounded-full blur-[70px] opacity-20"
+            style={{
+              bottom: '30%',
+              left: '25%',
+              background: `radial-gradient(circle, rgba(16, 185, 129, 0.4), transparent 60%)`,
+              animation: 'parallaxFloat3 20s ease-in-out infinite',
+            }}
+          />
+        </div>
+
+        {/* Layer 3 - Faster (Closer elements) */}
+        <div 
+          className="parallax-layer-3 absolute inset-0"
+          style={{
+            transform: `translateY(${mouseY * 60}px)`,
+          }}
+        >
+          <div 
+            className="absolute w-[300px] h-[300px] rounded-full blur-[50px] opacity-30 transition-all duration-500"
+            style={{
+              top: '50%',
+              left: '40%',
+              background: `radial-gradient(circle, rgb(${activeColor} / 0.6), transparent 50%)`,
+              animation: 'parallaxPulse 8s ease-in-out infinite',
+            }}
+          />
+        </div>
+
+        {/* Floating geometric shapes */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="floating-shape floating-shape-1" />
+          <div className="floating-shape floating-shape-2" />
+          <div className="floating-shape floating-shape-3" />
+          <div className="floating-shape floating-shape-4" />
+        </div>
+
+        {/* Grid overlay */}
+        <div 
+          className="absolute inset-0 opacity-[0.03]"
+          style={{
+            backgroundImage: `
+              linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px),
+              linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)
+            `,
+            backgroundSize: '60px 60px',
+          }}
+        />
+
+        {/* Noise texture */}
+        <div className="absolute inset-0 landing-grain opacity-[0.08]" />
         
-        <div className="absolute inset-0 landing-grain opacity-[0.12]" />
-        <div className="absolute inset-0 landing-sheen2 opacity-[0.55]" />
-        <div className="absolute inset-0 bg-[radial-gradient(1200px_700px_at_50%_30%,transparent_55%,rgba(0,0,0,0.08)_100%)]" />
+        {/* Vignette */}
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_0%,rgba(0,0,0,0.4)_100%)]" />
       </div>
 
-      {/* Fog Overlay only when intro is active/just ended */}
+      {/* Fog Overlay for intro */}
       {shouldIntro && fogVisible && (
         <div
           className={[
-            "fixed inset-0 z-40 pointer-events-none",
-            "transition-opacity duration-700 ease-out",
+            "fixed inset-0 z-40 pointer-events-none transition-opacity duration-700 ease-out",
             fogSoftHide ? "opacity-0" : "opacity-100",
           ].join(" ")}
-          style={{
-            backdropFilter: "blur(12px)",
-            background: "rgba(255,255,255,0.28)",
-          }}
+          style={{ backdropFilter: "blur(12px)", background: "rgba(0,0,0,0.6)" }}
         />
       )}
 
@@ -363,142 +396,185 @@ export default function LandingWithIntro() {
       {shouldIntro && (
         <div
           className={[
-            "fixed inset-0 z-50 grid place-items-center",
-            "transition-all duration-700 ease-out",
+            "fixed inset-0 z-50 grid place-items-center transition-all duration-700 ease-out",
             phase === "intro" ? "opacity-100" : "opacity-0 pointer-events-none",
           ].join(" ")}
         >
           <div
             className={[
               "text-center transition-all duration-700 ease-out",
-              phase === "intro"
-                ? "translate-y-0 scale-100 opacity-100"
-                : "-translate-y-3 scale-[0.98] opacity-0",
+              phase === "intro" ? "translate-y-0 scale-100 opacity-100" : "-translate-y-3 scale-[0.98] opacity-0",
             ].join(" ")}
           >
-            <div className="text-5xl md:text-6xl font-semibold tracking-tight text-slate-900">
-              Nutzwertanalyse<span className="opacity-70">.</span>
+            <div className="text-5xl md:text-7xl font-bold tracking-tight text-white">
+              Nutzwertanalyse<span className="opacity-40">.</span>
             </div>
-            <div className="mt-4 text-sm text-black/45">
+            <div className="mt-4 text-base text-white/50">
               Entscheidungen nachvollziehbar begründen
             </div>
           </div>
         </div>
       )}
 
-      <div className="relative min-h-[100svh] flex flex-col">
-        {/* Premium Header */}
-        <header className="sticky top-0 z-30">
-          <div
-            className={[
-              "transition-all duration-500",
-              scrolled
-                ? "bg-white/80 backdrop-blur-2xl shadow-[0_4px_30px_rgba(0,0,0,0.06)]"
-                : "bg-transparent",
-            ].join(" ")}
-          >
-            <div className="mx-auto max-w-6xl px-5 sm:px-6 h-[64px] sm:h-[72px] flex items-center justify-between">
+      {/* ===== MAIN CONTENT ===== */}
+      <div className="relative min-h-[100svh] flex">
+        {/* Dynamic Sidebar - Left */}
+        <aside 
+          className={[
+            "fixed left-0 top-0 h-full z-30 transition-all duration-500 ease-out",
+            "w-[280px] lg:w-[320px]",
+            sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0",
+          ].join(" ")}
+        >
+          <div className="h-full pt-[52px] flex flex-col bg-black/40 backdrop-blur-2xl border-r border-white/[0.06]">
+            {/* Sidebar Header */}
+            <div className="px-5 py-6 border-b border-white/[0.06]">
               <button
                 onClick={() => router.push("/")}
-                className="group flex items-center gap-3 text-left"
-                aria-label="Zur Startseite"
-                title="Startseite"
+                className="group flex items-center gap-3"
               >
-                <div className="h-10 w-10 rounded-2xl overflow-hidden shadow-sm ring-1 ring-black/[0.04] transition-transform duration-300 group-hover:scale-105">
+                <div className="h-11 w-11 rounded-2xl overflow-hidden ring-2 ring-white/10 transition-all duration-300 group-hover:ring-white/20 group-hover:scale-105">
                   <img src="/images/logo.webp" alt="Logo" className="h-full w-full object-contain" />
                 </div>
-                <div className="leading-tight">
-                  <div className="text-sm sm:text-base font-semibold tracking-tight text-slate-900">
-                    {t.brand.name}<span className="text-slate-400">{t.brand.domain}</span>
+                <div>
+                  <div className="text-base font-semibold text-white">
+                    {t.brand.name}<span className="text-white/40">{t.brand.domain}</span>
                   </div>
-                  <div className="text-[10px] sm:text-xs text-slate-400 font-medium">
-                    {t.brand.tagline} • {t.brand.swissQuality}
+                  <div className="text-[11px] text-white/40">
+                    {t.brand.tagline}
                   </div>
                 </div>
               </button>
+            </div>
 
-              <nav className="hidden lg:flex items-center gap-1">
-                <a className="px-4 py-2 rounded-full text-sm text-slate-500 hover:text-slate-800 hover:bg-black/[0.03] transition-all duration-200" href="#principles">
-                  {t.landing.footer.principles}
-                </a>
-                <a className="px-4 py-2 rounded-full text-sm text-slate-500 hover:text-slate-800 hover:bg-black/[0.03] transition-all duration-200" href="#framework">
-                  {t.landing.footer.framework}
-                </a>
-                <a className="px-4 py-2 rounded-full text-sm text-slate-500 hover:text-slate-800 hover:bg-black/[0.03] transition-all duration-200" href="/datenschutz">
-                  {t.landing.footer.privacy}
-                </a>
-              </nav>
+            {/* Preset Items */}
+            <div className="flex-1 overflow-y-auto py-4 px-3">
+              <div className="text-[10px] font-semibold uppercase tracking-[0.2em] text-white/30 px-3 mb-3">
+                Schnellstart
+              </div>
+              <div className="space-y-1">
+                {PRESET_CONFIG.map((p, index) => {
+                  const presetTranslations = t.presets[p.id as keyof typeof t.presets];
+                  const isHovered = hoveredPreset === p.id;
+                  
+                  return (
+                    <button
+                      key={p.id}
+                      onClick={() => startFromPreset(p.id)}
+                      onMouseEnter={() => setHoveredPreset(p.id)}
+                      onMouseLeave={() => setHoveredPreset(null)}
+                      className={[
+                        "group w-full flex items-center gap-3 px-3 py-3 rounded-xl",
+                        "transition-all duration-300",
+                        isHovered 
+                          ? "bg-white/[0.08] scale-[1.02]" 
+                          : "hover:bg-white/[0.04]",
+                      ].join(" ")}
+                      style={{
+                        animationDelay: `${index * 0.1}s`,
+                      }}
+                    >
+                      <div 
+                        className={[
+                          "h-10 w-10 rounded-xl flex items-center justify-center transition-all duration-300",
+                          isHovered ? "scale-110" : "",
+                        ].join(" ")}
+                        style={{
+                          background: `rgba(${p.color}, ${isHovered ? 0.25 : 0.15})`,
+                          boxShadow: isHovered ? `0 0 20px rgba(${p.color}, 0.3)` : 'none',
+                        }}
+                      >
+                        <p.Icon size={20} className="text-white" />
+                      </div>
+                      <div className="flex-1 text-left">
+                        <div className="text-sm font-medium text-white/90">
+                          {presetTranslations.label}
+                        </div>
+                        <div className="text-[11px] text-white/40">
+                          {presetTranslations.hint}
+                        </div>
+                      </div>
+                      <svg 
+                        className={[
+                          "w-4 h-4 text-white/30 transition-all duration-300",
+                          isHovered ? "translate-x-1 text-white/60" : "",
+                        ].join(" ")} 
+                        fill="none" 
+                        viewBox="0 0 24 24" 
+                        stroke="currentColor"
+                      >
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                      </svg>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
 
-              <div className="flex items-center gap-2 sm:gap-3">
+            {/* Sidebar Footer */}
+            <div className="px-5 py-4 border-t border-white/[0.06]">
+              <div className="flex items-center justify-between">
                 <LanguageSwitcher />
                 <button
                   onClick={() => router.push("/login")}
-                  className={[
-                    "rounded-full px-4 sm:px-5 py-2 sm:py-2.5 text-sm font-semibold",
-                    "bg-slate-900 text-white",
-                    "shadow-[0_2px_8px_rgba(0,0,0,0.12),inset_0_1px_0_rgba(255,255,255,0.1)]",
-                    "hover:bg-slate-800 hover:shadow-[0_4px_12px_rgba(0,0,0,0.15)]",
-                    "active:scale-[0.98]",
-                    "transition-all duration-200",
-                  ].join(" ")}
+                  className="px-4 py-2 rounded-full text-xs font-medium text-white/60 hover:text-white hover:bg-white/[0.08] transition-all duration-200"
                 >
                   Login
                 </button>
               </div>
             </div>
-            <div className={[
-              "h-px transition-opacity duration-300",
-              scrolled ? "bg-black/[0.06]" : "bg-transparent",
-            ].join(" ")} />
           </div>
-        </header>
+        </aside>
 
-        {/* Content */}
-        <section className="flex-1 min-h-0">
-          <div className="mx-auto max-w-6xl px-5 sm:px-6 h-full flex flex-col">
+        {/* Mobile Sidebar Toggle */}
+        <button
+          onClick={() => setSidebarOpen(!sidebarOpen)}
+          className="lg:hidden fixed left-4 bottom-4 z-40 h-12 w-12 rounded-full bg-white/10 backdrop-blur-xl border border-white/10 flex items-center justify-center text-white transition-all duration-300 hover:bg-white/20"
+        >
+          <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={sidebarOpen ? "M6 18L18 6M6 6l12 12" : "M4 6h16M4 12h16M4 18h16"} />
+          </svg>
+        </button>
+
+        {/* Main Content Area */}
+        <div className="flex-1 lg:ml-[320px] pt-[52px]">
+          <div className="min-h-[calc(100svh-52px)] flex flex-col items-center justify-center px-6 py-12">
+            
             {/* Analyzing Phase */}
             {phase === "analyzing" && (
-              <div className="flex-1 flex items-center justify-center py-12">
-                <div className="text-center">
-                  <div className="relative mx-auto w-16 h-16 mb-6">
-                    <div className="absolute inset-0 rounded-full border-2 border-black/10" />
-                    <div 
-                      className="absolute inset-0 rounded-full border-2 border-transparent border-t-black/60 animate-spin"
-                      style={{ animationDuration: "1s" }}
-                    />
-<div className="absolute inset-0 flex items-center justify-center p-3">
+              <div className="text-center animate-premium-fade-in-up">
+                <div className="relative mx-auto w-20 h-20 mb-8">
+                  <div className="absolute inset-0 rounded-full border-2 border-white/10" />
+                  <div 
+                    className="absolute inset-0 rounded-full border-2 border-transparent border-t-white/60 animate-spin"
+                    style={{ animationDuration: "1s" }}
+                  />
+                  <div className="absolute inset-0 flex items-center justify-center p-4">
                     <img src="/images/logo.webp" alt="Logo" className="h-full w-full object-contain" />
                   </div>
-                  </div>
-                  <h2 className="text-xl font-semibold text-slate-900 mb-2">
-                    Analysiere Ihre Entscheidung...
-                  </h2>
-                  <p className="text-sm text-black/50 max-w-md mx-auto">
-                    Wir interpretieren Ihre Eingabe und generieren passende Alternativen und Kriterien.
-                  </p>
-                  <div className="mt-4 px-4 py-2 rounded-xl bg-black/5 inline-block">
-                    <div className="text-sm text-black/60 italic">{`"${text}"`}</div>
-                  </div>
+                </div>
+                <h2 className="text-2xl font-semibold text-white mb-3">
+                  Analysiere Ihre Entscheidung...
+                </h2>
+                <p className="text-sm text-white/40 max-w-md mx-auto">
+                  Wir interpretieren Ihre Eingabe und generieren passende Alternativen und Kriterien.
+                </p>
+                <div className="mt-6 px-5 py-3 rounded-2xl bg-white/[0.05] border border-white/[0.08] inline-block">
+                  <div className="text-sm text-white/60 italic">{`"${text}"`}</div>
                 </div>
               </div>
             )}
 
             {/* Suggestion Phase */}
             {phase === "suggestion" && aiInterpretation && (
-              <div className="flex-1 py-8 overflow-y-auto">
-                {/* Warning if fallback was used */}
+              <div className="w-full max-w-4xl animate-premium-fade-in-up">
                 {aiError && (
-                  <div className="max-w-4xl mx-auto mb-4 px-4 py-3 rounded-xl bg-amber-50 border border-amber-200 text-sm text-amber-700 flex items-center gap-2">
-                    <svg className="h-4 w-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <div className="mb-6 px-5 py-4 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-sm text-amber-200 flex items-center gap-3">
+                    <svg className="h-5 w-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                     <span>{aiError}</span>
-                    <button
-                      onClick={() => setAiError(null)}
-                      className="ml-auto text-amber-600 hover:text-amber-800 font-medium"
-                    >
-                      OK
-                    </button>
+                    <button onClick={() => setAiError(null)} className="ml-auto text-amber-300 hover:text-amber-100 font-medium">OK</button>
                   </div>
                 )}
                 <DecisionSuggestion
@@ -511,319 +587,125 @@ export default function LandingWithIntro() {
               </div>
             )}
 
-            {/* Normal Landing Phase */}
+            {/* Normal Landing Phase - Centered Search */}
             {(phase === "landing" || phase === "intro") && (
-              <>
-                <div className="pt-6 sm:pt-10">
-                  <div className="max-w-3xl">
-                    {/* Premium badge */}
-                    <div className="animate-premium-fade-in-up inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-gradient-to-r from-black/[0.03] to-black/[0.06] border border-black/[0.08] backdrop-blur-sm mb-4">
-                      <span className="flex h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
-                      <span className="text-[11px] sm:text-xs tracking-[0.2em] uppercase text-black/60 font-medium">
-                        Nutzwertanalyse • Dokumentation • Vergleichbarkeit
-                      </span>
-                    </div>
-
-                    <h1 className="text-4xl sm:text-5xl lg:text-6xl font-semibold tracking-tight text-slate-900 leading-[1.1]">
-                      <span className="inline-block animate-premium-fade-in-up">{t.landing.headline.part1}</span>{" "}
-                      <span className="inline-block animate-premium-fade-in-up stagger-2 bg-gradient-to-r from-slate-900 via-slate-600 to-slate-900 bg-clip-text text-transparent">{t.landing.headline.part2}</span>{" "}
-                      <span className="inline-block animate-premium-fade-in-up stagger-3 text-slate-400">{t.landing.headline.part3}</span>
-                    </h1>
-
-                    <p className="mt-5 text-base sm:text-lg text-black/50 leading-relaxed max-w-2xl animate-premium-fade-in-up stagger-4">
-                      {t.landing.description}
-                    </p>
-                  </div>
+              <div className="w-full max-w-2xl text-center">
+                {/* Minimal Hero Text */}
+                <div className="mb-10 animate-premium-fade-in-up">
+                  <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white tracking-tight leading-[1.1]">
+                    {t.landing.headline.part1}
+                    <br />
+                    <span className="text-white/40">{t.landing.headline.part2}</span>
+                  </h1>
+                  <p className="mt-5 text-base text-white/40 max-w-lg mx-auto">
+                    {t.landing.description}
+                  </p>
                 </div>
 
-                {/* AI Error Message */}
+                {/* AI Error */}
                 {aiError && (
-                  <div className="mt-4 px-4 py-3 rounded-xl bg-red-50 border border-red-200 text-sm text-red-700">
+                  <div className="mb-6 px-4 py-3 rounded-xl bg-red-500/10 border border-red-500/20 text-sm text-red-300">
                     {aiError}
-                    <button
-                      onClick={() => setAiError(null)}
-                      className="ml-2 text-red-500 hover:text-red-700 font-medium"
-                    >
-                      Schliessen
-                    </button>
+                    <button onClick={() => setAiError(null)} className="ml-2 text-red-200 hover:text-white font-medium">Schliessen</button>
                   </div>
                 )}
 
-                {/* Premium Search Input */}
-                <div className="mt-6 sm:mt-8 animate-premium-fade-in-up stagger-5">
-                  <div className="w-full max-w-4xl">
-                    <div 
-                      className={[
-                        "relative rounded-2xl sm:rounded-[999px]",
-                        "bg-white/80 backdrop-blur-xl",
-                        "border border-black/[0.08]",
-                        "shadow-[0_20px_60px_rgba(0,0,0,0.08),0_8px_24px_rgba(0,0,0,0.04)]",
-                        "px-3 sm:px-5 py-3 sm:py-4",
-                        "transition-all duration-300",
-                        isFocused ? "shadow-[0_24px_70px_rgba(0,0,0,0.12),0_0_0_2px_rgba(0,0,0,0.05)]" : "",
-                      ].join(" ")}
-                    >
-                      {/* Subtle inner glow */}
-                      <div className="absolute inset-0 rounded-2xl sm:rounded-[999px] bg-gradient-to-b from-white/60 to-transparent pointer-events-none" />
-                      
-                      <div className="relative flex items-center gap-3 sm:gap-4">
-                        <div
-                          className="h-10 w-10 sm:h-12 sm:w-12 shrink-0 rounded-full flex items-center justify-center bg-gradient-to-br from-slate-50 to-slate-100 border border-black/[0.06] shadow-sm"
-                          aria-hidden="true"
-                        >
-                          <img src="/images/logo.webp" alt="" className="h-5 w-5 sm:h-6 sm:w-6 object-contain" />
-                        </div>
-
-                        <div className="relative w-full min-w-0">
-                          <input
-                            value={text}
-                            onChange={(e) => setText(e.target.value)}
-                            onKeyDown={(e) => {
-                              if (e.key === "Enter") startFromInput();
-                            }}
-                            onFocus={() => setIsFocused(true)}
-                            onBlur={() => setIsFocused(false)}
-                            className={[
-                              "w-full bg-transparent outline-none font-medium tracking-wide text-slate-800",
-                              "text-sm sm:text-base",
-                              "placeholder:text-transparent",
-                              "pr-1 sm:pr-2",
-                            ].join(" ")}
-                            placeholder={placeholderText}
-                            aria-label={t.landing.searchInputAriaLabel}
-                          />
-
-                          {!text && !isFocused && (
-                            <div className="pointer-events-none absolute inset-y-0 left-0 hidden sm:flex items-center">
-                              <span className="text-slate-400 text-sm sm:text-base font-medium tracking-[0.08em] uppercase">
-                                {placeholderText}
-                              </span>
-                            </div>
-                          )}
-
-                          {!text && !isFocused && (
-                            <div className="pointer-events-none absolute inset-y-0 left-0 flex sm:hidden items-center w-full overflow-hidden">
-                              <div className="w-full landing-marquee-mask">
-                                <div className="landing-marquee text-slate-400 text-xs font-medium tracking-[0.06em] uppercase whitespace-nowrap">
-                                  {placeholderText}&nbsp;&nbsp;&nbsp;•&nbsp;&nbsp;&nbsp;
-                                  {placeholderText}
-                                </div>
-                              </div>
-                            </div>
-                          )}
-                        </div>
-
-                        <button
-                          onClick={startFromInput}
-                          disabled={!canStart || isAnalyzing}
-                          className={[
-                            "shrink-0 rounded-full px-5 sm:px-8 py-2.5 sm:py-3",
-                            "text-xs sm:text-sm font-semibold",
-                            "bg-gradient-to-b from-slate-800 to-slate-900 text-white",
-                            "shadow-[0_4px_12px_rgba(0,0,0,0.15),inset_0_1px_0_rgba(255,255,255,0.1)]",
-                            "transition-all duration-200",
-                            "active:scale-[0.98]",
-                            canStart && !isAnalyzing
-                              ? "hover:shadow-[0_8px_20px_rgba(0,0,0,0.2)] hover:from-slate-700 hover:to-slate-800"
-                              : "opacity-50 cursor-not-allowed",
-                          ].join(" ")}
-                          aria-label={t.landing.startButton}
-                          title={t.landing.startButton}
-                        >
-                          {isAnalyzing ? (
-                            <span className="flex items-center gap-2">
-                              <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
-                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-                              </svg>
-                              <span className="hidden sm:inline">{t.landing.startButtonLoading}</span>
-                            </span>
-                          ) : t.landing.startButton}
-                        </button>
+                {/* Centered Search Input */}
+                <div className="animate-premium-fade-in-up stagger-2">
+                  <div 
+                    className={[
+                      "relative rounded-2xl",
+                      "bg-white/[0.06] backdrop-blur-2xl",
+                      "border transition-all duration-500",
+                      isFocused 
+                        ? "border-white/20 shadow-[0_0_60px_rgba(255,255,255,0.1)]" 
+                        : "border-white/[0.08]",
+                      "p-2",
+                    ].join(" ")}
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="h-12 w-12 shrink-0 rounded-xl flex items-center justify-center bg-white/[0.06]">
+                        <img src="/images/logo.webp" alt="" className="h-6 w-6 object-contain" />
                       </div>
-                    </div>
 
-                    <div className="mt-3 text-xs sm:text-sm text-slate-400 flex items-center gap-2 pl-1">
-                      <span className="relative flex h-2 w-2">
-                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-                        <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
-                      </span>
-                      {t.landing.searchHint}
-                    </div>
-                  </div>
-                </div>
+                      <input
+                        value={text}
+                        onChange={(e) => setText(e.target.value)}
+                        onKeyDown={(e) => { if (e.key === "Enter") startFromInput(); }}
+                        onFocus={() => setIsFocused(true)}
+                        onBlur={() => setIsFocused(false)}
+                        className="flex-1 bg-transparent outline-none text-white text-base placeholder:text-white/30 py-3"
+                        placeholder={placeholderText}
+                        aria-label={t.landing.searchInputAriaLabel}
+                      />
 
-                {/* Premium Preset Cards */}
-                <div className="mt-6 sm:mt-8 flex-1 min-h-0 animate-premium-fade-in-up stagger-6">
-                  <div className="h-full flex flex-col">
-                    <div className="grid gap-4 sm:gap-5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-                      {PRESET_CONFIG.map((p, index) => {
-                        const presetTranslations = t.presets[p.id as keyof typeof t.presets];
-                        return (
-                          <button
-                            key={p.id}
-                            onClick={() => startFromPreset(p.id)}
-                            className={[
-                              "group relative overflow-hidden rounded-3xl text-left card-shine",
-                              "border border-black/[0.06]",
-                              "shadow-[0_8px_30px_rgba(0,0,0,0.08),0_4px_12px_rgba(0,0,0,0.04)]",
-                              "transition-all duration-500 ease-out",
-                              "hover:-translate-y-1 hover:shadow-[0_20px_50px_rgba(0,0,0,0.15)]",
-                              "active:translate-y-0 active:scale-[0.99]",
-                              "focus:outline-none focus-visible:ring-2 focus-visible:ring-black/20 focus-visible:ring-offset-2",
-                              "h-[clamp(140px,20vh,190px)]",
-                            ].join(" ")}
-                            style={{ animationDelay: `${index * 0.05}s` }}
-                          >
-                            {/* Image with premium overlays */}
-                            <div className="absolute inset-0">
-                              <Image
-                                src={p.image}
-                                alt=""
-                                fill
-                                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                                className="object-cover object-[74%_50%] scale-[1.05] transition-transform duration-700 ease-out group-hover:scale-[1.12]"
-                                priority={p.id === "supplier"}
-                              />
-                              {/* Premium gradient overlays */}
-                              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
-                              <div className="absolute inset-0 bg-gradient-to-br from-black/30 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                              <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition duration-500">
-                                <div className="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-transparent to-transparent" />
-                              </div>
-                            </div>
-
-                            {/* Content */}
-                            <div className="absolute inset-0 flex flex-col justify-end p-4 sm:p-5">
-                              <div
-                                className="inline-flex items-start gap-3 rounded-2xl px-4 py-3 backdrop-blur-xl transition-all duration-300 group-hover:scale-[1.02]"
-                                style={{
-                                  background: "rgba(255,255,255,0.12)",
-                                  border: "1px solid rgba(255,255,255,0.15)",
-                                  boxShadow: "0 8px 32px rgba(0,0,0,0.12), inset 0 1px 0 rgba(255,255,255,0.1)",
-                                }}
-                              >
-                                <div className="h-9 w-9 rounded-xl flex items-center justify-center bg-white/15 backdrop-blur-sm flex-shrink-0 transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3">
-                                  <p.Icon size={20} className="text-white" />
-                                </div>
-                                <div className="flex flex-col gap-0.5">
-                                  <div className="text-sm sm:text-base font-semibold text-white leading-tight tracking-tight">
-                                    {presetTranslations.label}
-                                  </div>
-                                  <div className="text-[11px] sm:text-xs text-white/70 font-medium">
-                                    {presetTranslations.hint}
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-                            
-                            {/* Hover arrow indicator */}
-                            <div className="absolute top-4 right-4 h-8 w-8 rounded-full bg-white/10 backdrop-blur-sm flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 translate-x-2 group-hover:translate-x-0">
-                              <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                              </svg>
-                            </div>
-                          </button>
-                        );
-                      })}
-                    </div>
-
-                    {/* Premium Info Cards */}
-                    <div className="mt-5 hidden sm:grid grid-cols-3 gap-4 text-xs text-slate-500">
-                      <div
-                        id="principles"
-                        className="group rounded-2xl border border-black/[0.06] bg-white/60 backdrop-blur-xl px-5 py-4 transition-all duration-300 hover:bg-white/80 hover:shadow-[0_8px_30px_rgba(0,0,0,0.06)]"
+                      <button
+                        onClick={startFromInput}
+                        disabled={!canStart || isAnalyzing}
+                        className={[
+                          "shrink-0 rounded-xl px-6 py-3",
+                          "text-sm font-semibold",
+                          "transition-all duration-300",
+                          canStart && !isAnalyzing
+                            ? "bg-white text-black hover:bg-white/90 hover:scale-[1.02] active:scale-[0.98]"
+                            : "bg-white/10 text-white/30 cursor-not-allowed",
+                        ].join(" ")}
                       >
-                        <div className="font-semibold text-slate-700 flex items-center gap-2">
-                          <div className="h-6 w-6 rounded-lg bg-gradient-to-br from-slate-100 to-slate-200 flex items-center justify-center">
-                            <svg className="w-3.5 h-3.5 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                            </svg>
-                          </div>
-                          {t.landing.footer.principles}
-                        </div>
-                        <div className="mt-2 leading-relaxed">
-                          {t.landing.footer.principlesText}
-                        </div>
-                      </div>
+                        {isAnalyzing ? (
+                          <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
+                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                          </svg>
+                        ) : t.landing.startButton}
+                      </button>
+                    </div>
+                  </div>
 
-                      <div
-                        id="framework"
-                        className="group rounded-2xl border border-black/[0.06] bg-white/60 backdrop-blur-xl px-5 py-4 transition-all duration-300 hover:bg-white/80 hover:shadow-[0_8px_30px_rgba(0,0,0,0.06)]"
+                  {/* Hint */}
+                  <div className="mt-4 text-sm text-white/30 flex items-center justify-center gap-2">
+                    <span className="relative flex h-2 w-2">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+                      <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
+                    </span>
+                    {t.landing.searchHint}
+                  </div>
+                </div>
+
+                {/* Quick preset pills - mobile only */}
+                <div className="mt-8 lg:hidden flex flex-wrap justify-center gap-2 animate-premium-fade-in-up stagger-3">
+                  {PRESET_CONFIG.slice(0, 4).map((p) => {
+                    const presetTranslations = t.presets[p.id as keyof typeof t.presets];
+                    return (
+                      <button
+                        key={p.id}
+                        onClick={() => startFromPreset(p.id)}
+                        className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/[0.06] border border-white/[0.08] text-sm text-white/70 hover:bg-white/[0.1] hover:text-white transition-all duration-300"
                       >
-                        <div className="font-semibold text-slate-700 flex items-center gap-2">
-                          <div className="h-6 w-6 rounded-lg bg-gradient-to-br from-slate-100 to-slate-200 flex items-center justify-center">
-                            <svg className="w-3.5 h-3.5 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z" />
-                            </svg>
-                          </div>
-                          {t.landing.footer.framework}
-                        </div>
-                        <div className="mt-2 leading-relaxed">
-                          {t.landing.footer.frameworkText}
-                        </div>
-                      </div>
-
-                      <div className="group rounded-2xl border border-black/[0.06] bg-white/60 backdrop-blur-xl px-5 py-4 transition-all duration-300 hover:bg-white/80 hover:shadow-[0_8px_30px_rgba(0,0,0,0.06)]">
-                        <div className="font-semibold text-slate-700 flex items-center gap-2">
-                          <div className="h-6 w-6 rounded-lg bg-gradient-to-br from-slate-100 to-slate-200 flex items-center justify-center">
-                            <svg className="w-3.5 h-3.5 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                            </svg>
-                          </div>
-                          {t.landing.footer.legal}
-                        </div>
-                        <div className="mt-2 leading-relaxed flex flex-wrap gap-x-2 gap-y-1">
-                          <a className="hover:text-slate-700 underline underline-offset-2 decoration-slate-300 transition-colors" href="/datenschutz">
-                            {t.landing.footer.privacy}
-                          </a>
-                          <span className="text-slate-300">•</span>
-                          <a className="hover:text-slate-700 underline underline-offset-2 decoration-slate-300 transition-colors" href="/agb">
-                            {t.landing.footer.terms}
-                          </a>
-                          <span className="text-slate-300">•</span>
-                          <a className="hover:text-slate-700 underline underline-offset-2 decoration-slate-300 transition-colors" href="/impressum">
-                            {t.landing.footer.imprint}
-                          </a>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
+                        <p.Icon size={16} />
+                        <span>{presetTranslations.label}</span>
+                      </button>
+                    );
+                  })}
                 </div>
 
-              {/* Premium Footer */}
-              <footer className="mt-6 pb-6 sm:pb-8">
-                <div className="h-px bg-gradient-to-r from-transparent via-black/10 to-transparent" />
-                <div className="pt-4 flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="h-8 w-8 rounded-xl overflow-hidden opacity-60">
-                      <img src="/images/logo.webp" alt="" className="h-full w-full object-contain" />
-                    </div>
-                    <div className="text-[11px] sm:text-xs text-slate-400">
-                      © {new Date().getFullYear()} Nutzwertanalyse.com
-                      <span className="hidden sm:inline"> • Decision Studio</span>
-                    </div>
+                {/* Footer */}
+                <div className="mt-16 text-xs text-white/20 animate-premium-fade-in-up stagger-4">
+                  <div className="flex flex-wrap justify-center gap-4">
+                    <a href="/datenschutz" className="hover:text-white/40 transition-colors">{t.landing.footer.privacy}</a>
+                    <span>•</span>
+                    <a href="/agb" className="hover:text-white/40 transition-colors">{t.landing.footer.terms}</a>
+                    <span>•</span>
+                    <a href="/impressum" className="hover:text-white/40 transition-colors">{t.landing.footer.imprint}</a>
                   </div>
-                  <div className="flex flex-wrap gap-x-4 gap-y-1 text-[11px] sm:text-xs text-slate-400">
-                    <a href="/impressum" className="hover:text-slate-600 transition-colors">
-                      {t.landing.footer.imprint}
-                    </a>
-                    <a href="/agb" className="hover:text-slate-600 transition-colors">
-                      {t.landing.footer.terms}
-                    </a>
-                    <a href="/datenschutz" className="hover:text-slate-600 transition-colors">
-                      {t.landing.footer.privacy}
-                    </a>
+                  <div className="mt-3">
+                    © {new Date().getFullYear()} Nutzwertanalyse.com
                   </div>
                 </div>
-              </footer>
-            </>
+              </div>
             )}
           </div>
-        </section>
+        </div>
       </div>
-
-      
     </main>
   );
 }
