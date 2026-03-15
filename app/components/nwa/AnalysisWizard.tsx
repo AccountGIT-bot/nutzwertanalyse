@@ -159,7 +159,77 @@ export function AnalysisWizard() {
       : "Business";
 
   return (
-    <div className="wizard-root">
+    <div className="wizard-root relative">
+      {/* ===== PARALLAX BACKGROUND ===== */}
+      <div className="fixed inset-0 -z-10 overflow-hidden">
+        {/* Base gradient */}
+        <div className="absolute inset-0 bg-gradient-to-br from-[#0a0a0a] via-[#111827] to-[#0f172a]" />
+        
+        {/* Parallax Layer 1 - Slowest */}
+        <div className="parallax-layer-1 absolute inset-0">
+          <div 
+            className="absolute w-[700px] h-[700px] rounded-full blur-[120px] opacity-15"
+            style={{
+              top: '-10%',
+              left: '-5%',
+              background: `radial-gradient(circle, rgb(var(--accent) / 0.5), transparent 70%)`,
+            }}
+          />
+          <div 
+            className="absolute w-[400px] h-[400px] rounded-full blur-[80px] opacity-10"
+            style={{
+              bottom: '5%',
+              right: '5%',
+              background: `radial-gradient(circle, rgb(var(--accent-2) / 0.4), transparent 70%)`,
+            }}
+          />
+        </div>
+
+        {/* Parallax Layer 2 - Medium */}
+        <div className="parallax-layer-2 absolute inset-0">
+          <div 
+            className="absolute w-[350px] h-[350px] rounded-full blur-[60px] opacity-20"
+            style={{
+              top: '30%',
+              right: '15%',
+              background: `radial-gradient(circle, rgb(var(--accent) / 0.5), transparent 60%)`,
+            }}
+          />
+        </div>
+
+        {/* Floating Particles */}
+        <div className="absolute inset-0 pointer-events-none overflow-hidden">
+          {[...Array(12)].map((_, i) => (
+            <div
+              key={`particle-${i}`}
+              className="absolute rounded-full"
+              style={{
+                width: `${2 + (i % 3)}px`,
+                height: `${2 + (i % 3)}px`,
+                left: `${8 + i * 8}%`,
+                top: `${10 + (i % 5) * 18}%`,
+                background: `rgba(255, 255, 255, ${0.08 + (i % 4) * 0.04})`,
+                animation: `particleFloat ${14 + i * 2}s ease-in-out infinite`,
+                animationDelay: `${i * -1.5}s`,
+              }}
+            />
+          ))}
+        </div>
+
+        {/* Grid pattern */}
+        <div 
+          className="absolute inset-0 opacity-[0.012]"
+          style={{
+            backgroundImage: `linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)`,
+            backgroundSize: '60px 60px',
+          }}
+        />
+
+        {/* Noise & Vignette */}
+        <div className="absolute inset-0 landing-grain opacity-[0.04]" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_0%,rgba(0,0,0,0.25)_100%)]" />
+      </div>
+
       {showDraftPrompt && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
           <div className="bg-[#1a1a1a] border border-white/10 rounded-2xl p-6 max-w-md mx-4 shadow-2xl">
@@ -237,9 +307,9 @@ export function AnalysisWizard() {
         </div>
       )}
 
-      <div className="min-h-[calc(100vh-76px)] flex flex-col">
+      <div className="min-h-screen flex flex-col relative">
         {/* Premium Step Navigation Header */}
-        <div className="border-b border-white/[0.06] bg-gradient-to-b from-black/30 to-black/20 backdrop-blur-xl sticky top-[72px] z-20">
+        <div className="border-b border-white/[0.06] bg-black/40 backdrop-blur-2xl sticky top-0 z-20">
           <div className="mx-auto max-w-5xl px-5 sm:px-6 py-4">
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-3">
@@ -375,7 +445,7 @@ export function AnalysisWizard() {
         </div>
 
         {/* Premium Footer Navigation */}
-        <div className="border-t border-white/[0.06] bg-gradient-to-t from-black/30 to-black/20 backdrop-blur-xl sticky bottom-0 z-20">
+        <div className="border-t border-white/[0.06] bg-black/40 backdrop-blur-2xl sticky bottom-0 z-20">
           <div className="mx-auto max-w-5xl px-5 sm:px-6 py-4">
             <div className="flex items-center justify-between">
               <button

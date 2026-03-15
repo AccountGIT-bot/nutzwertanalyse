@@ -667,21 +667,25 @@ export default function LandingWithIntro() {
             })}
           </div>
 
-          {/* Dots Indicator - with glow effect */}
-          <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-2.5 p-2 rounded-full bg-black/20 backdrop-blur-xl">
+          {/* Dots Indicator - fixed at bottom of carousel */}
+        </div>
+        
+        {/* Dots Navigation - Below carousel with proper spacing */}
+        <div className="flex items-center justify-center gap-3 mt-8 animate-premium-fade-in-up stagger-3">
+          <div className="flex items-center gap-2 px-4 py-2.5 rounded-full bg-black/30 backdrop-blur-2xl border border-white/[0.08]">
             {PRESET_CONFIG.map((preset, idx) => (
               <button
                 key={idx}
                 onClick={() => goToSlide(idx)}
-                className="relative rounded-full transition-all duration-500"
+                className="relative rounded-full transition-all duration-500 hover:scale-110"
                 style={{
-                  width: idx === activeIndex ? '32px' : '10px',
-                  height: '10px',
+                  width: idx === activeIndex ? '36px' : '12px',
+                  height: '12px',
                   background: idx === activeIndex 
                     ? `rgb(${preset.color})` 
-                    : 'rgb(255 255 255 / 0.15)',
+                    : 'rgb(255 255 255 / 0.2)',
                   boxShadow: idx === activeIndex 
-                    ? `0 0 20px rgb(${preset.color} / 0.6)` 
+                    ? `0 0 24px rgb(${preset.color} / 0.7), 0 0 8px rgb(${preset.color} / 0.5)` 
                     : 'none',
                 }}
                 aria-label={`Gehe zu ${getPresetLabel(preset.id)}`}
@@ -691,7 +695,7 @@ export default function LandingWithIntro() {
         </div>
 
         {/* Quick start text */}
-        <div className="mt-12 text-center text-white/30 text-sm animate-premium-fade-in-up stagger-3">
+        <div className="mt-6 text-center text-white/30 text-sm">
           {t.landing?.quickStart || "Oder wählen Sie eine Vorlage oben"}
         </div>
       </main>

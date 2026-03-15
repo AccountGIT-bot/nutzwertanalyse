@@ -212,6 +212,25 @@ export default function AppPage() {
             <div className="floating-shape floating-shape-3" />
           </div>
 
+          {/* Floating Particles */}
+          <div className="absolute inset-0 pointer-events-none overflow-hidden">
+            {[...Array(15)].map((_, i) => (
+              <div
+                key={`particle-${i}`}
+                className="absolute rounded-full"
+                style={{
+                  width: `${2 + Math.random() * 4}px`,
+                  height: `${2 + Math.random() * 4}px`,
+                  left: `${Math.random() * 100}%`,
+                  top: `${Math.random() * 100}%`,
+                  background: `rgba(255, 255, 255, ${0.1 + Math.random() * 0.2})`,
+                  animation: `particleFloat ${12 + Math.random() * 10}s ease-in-out infinite`,
+                  animationDelay: `${Math.random() * -15}s`,
+                }}
+              />
+            ))}
+          </div>
+
           {/* Noise & Vignette */}
           <div className="absolute inset-0 landing-grain opacity-[0.06]" />
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_0%,rgba(0,0,0,0.3)_100%)]" />
@@ -230,21 +249,10 @@ export default function AppPage() {
             <div className="mx-auto max-w-6xl px-5 sm:px-6 h-[64px] sm:h-[72px] flex items-center justify-between">
               <button
                 onClick={() => router.push("/")}
-                className="group flex items-center gap-3 text-left"
+                className="text-xl font-bold text-white tracking-tight hover:opacity-80 transition-opacity"
                 aria-label="Zur Startseite"
-                title="Startseite"
               >
-                <div className="h-10 w-10 rounded-2xl overflow-hidden ring-2 ring-white/10 transition-all duration-300 group-hover:ring-white/20 group-hover:scale-105">
-                  <img src="/images/logo.webp" alt="Logo" className="h-full w-full object-contain" />
-                </div>
-                <div className="leading-tight">
-                  <div className="text-sm sm:text-base font-semibold tracking-tight text-white">
-                    {t.brand.name}<span className="text-white/40">{t.brand.domain}</span>
-                  </div>
-                  <div className="text-[10px] sm:text-xs text-white/40 font-medium">
-                    {t.packageSelect.headerSubtitle} • {t.packageSelect.headerSubtitle2}
-                  </div>
-                </div>
+                {t.brand.name}<span className="text-white/30">.com</span>
               </button>
 
               <div className="flex items-center gap-2 sm:gap-3">
