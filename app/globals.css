@@ -1102,3 +1102,46 @@ html {
   animation: sidebarSlideIn 0.4s ease-out forwards;
   opacity: 0;
 }
+
+/* =========================================================
+   3D Carousel System
+   ========================================================= */
+
+.perspective-\[1200px\] {
+  perspective: 1200px;
+}
+
+/* Carousel card shine effect */
+@keyframes carouselShine {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.carousel-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.1),
+    transparent
+  );
+  background-size: 200% 100%;
+  animation: carouselShine 3s ease-in-out infinite;
+}
+
+/* Stagger animations for carousel */
+.stagger-1 { animation-delay: 0.1s; }
+.stagger-2 { animation-delay: 0.2s; }
+.stagger-3 { animation-delay: 0.3s; }
+.stagger-4 { animation-delay: 0.4s; }
+
+/* Smooth color transitions */
+.color-transition {
+  transition: background-color 1s ease-out, box-shadow 1s ease-out;
+}
