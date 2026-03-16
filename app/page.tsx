@@ -352,54 +352,54 @@ export default function LandingWithIntro() {
 
         {/* ===== FLOATING PARTICLES ===== */}
         <div className="absolute inset-0 pointer-events-none overflow-hidden">
-          {/* Particle Group 1 - Large slow particles */}
+          {/* Particle Group 1 - Large slow particles (deterministic values) */}
           {[...Array(8)].map((_, i) => (
             <div
               key={`particle-lg-${i}`}
               className="absolute rounded-full transition-all duration-1000"
               style={{
-                width: `${4 + Math.random() * 4}px`,
-                height: `${4 + Math.random() * 4}px`,
+                width: `${4 + (i * 0.5)}px`,
+                height: `${4 + ((i + 2) % 5) * 0.8}px`,
                 left: `${10 + i * 12}%`,
                 top: `${15 + (i % 3) * 25}%`,
                 background: `rgb(${currentPreset.color})`,
-                opacity: 0.3 + Math.random() * 0.3,
+                opacity: 0.35 + (i % 4) * 0.08,
                 animation: `particleFloat ${15 + i * 3}s ease-in-out infinite`,
                 animationDelay: `${i * -2}s`,
               }}
             />
           ))}
           
-          {/* Particle Group 2 - Medium particles */}
+          {/* Particle Group 2 - Medium particles (deterministic values) */}
           {[...Array(12)].map((_, i) => (
             <div
               key={`particle-md-${i}`}
               className="absolute rounded-full transition-all duration-1000"
               style={{
-                width: `${2 + Math.random() * 3}px`,
-                height: `${2 + Math.random() * 3}px`,
+                width: `${2.5 + (i % 3) * 0.8}px`,
+                height: `${2.5 + ((i + 1) % 4) * 0.6}px`,
                 left: `${5 + i * 8}%`,
                 top: `${20 + (i % 4) * 20}%`,
-                background: `rgba(255, 255, 255, ${0.2 + Math.random() * 0.3})`,
+                background: `rgba(255, 255, 255, ${0.25 + (i % 5) * 0.05})`,
                 animation: `particleFloat ${10 + i * 2}s ease-in-out infinite`,
                 animationDelay: `${i * -1.5}s`,
               }}
             />
           ))}
           
-          {/* Particle Group 3 - Small fast particles */}
+          {/* Particle Group 3 - Small particles (deterministic values) */}
           {[...Array(20)].map((_, i) => (
             <div
               key={`particle-sm-${i}`}
               className="absolute rounded-full transition-all duration-1000"
               style={{
-                width: `${1 + Math.random() * 2}px`,
-                height: `${1 + Math.random() * 2}px`,
-                left: `${Math.random() * 100}%`,
-                top: `${Math.random() * 100}%`,
-                background: `rgba(255, 255, 255, ${0.1 + Math.random() * 0.2})`,
-                animation: `particleFloat ${8 + Math.random() * 8}s ease-in-out infinite`,
-                animationDelay: `${Math.random() * -10}s`,
+                width: `${1.5 + (i % 3) * 0.5}px`,
+                height: `${1.5 + ((i + 2) % 4) * 0.4}px`,
+                left: `${(i * 5) % 100}%`,
+                top: `${(i * 7 + 10) % 100}%`,
+                background: `rgba(255, 255, 255, ${0.15 + (i % 6) * 0.03})`,
+                animation: `particleFloat ${10 + (i % 8) * 2}s ease-in-out infinite`,
+                animationDelay: `${(i % 10) * -1}s`,
               }}
             />
           ))}
