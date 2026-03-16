@@ -571,13 +571,13 @@ export default function LandingWithIntro() {
               const isCenter = item.offset === 0;
               const isAdjacent = Math.abs(item.offset) === 1;
 
-              // Improved transform calculations for better 3D effect - responsive
-              const isMobile = typeof window !== 'undefined' && window.innerWidth < 640;
-              const translateX = item.offset * (isMobile ? 140 : 200);
+              // Use CSS clamp for responsive translateX instead of JS window check
               const translateZ = isCenter ? 100 : isAdjacent ? -20 : -100;
               const scale = isCenter ? 1.15 : isAdjacent ? 0.75 : 0.5;
               const opacity = isCenter ? 1 : isAdjacent ? 0.7 : 0.3;
               const rotateY = item.offset * -10;
+              // Base translateX - CSS will handle responsive via container width
+              const translateX = item.offset * 180;
 
               return (
                 <button
@@ -599,7 +599,10 @@ export default function LandingWithIntro() {
                   style={{
                     transform: `translateX(${translateX}px) translateZ(${translateZ}px) scale(${scale}) rotateY(${rotateY}deg)`,
                     opacity,
-                    transitionDuration: '700ms',
+                    transitionDuration: '500ms',
+                    transitionTimingFunction: 'cubic-bezier(0.4, 0, 0.2, 1)',
+                    willChange: 'transform, opacity',
+                    backfaceVisibility: 'hidden',
                     boxShadow: isCenter 
                       ? `0 0 0 3px rgb(${item.color} / 0.4), 0 40px 120px -20px rgb(${item.color} / 0.7), 0 0 100px rgb(${item.color} / 0.5), 0 0 150px rgb(${item.color} / 0.3)`
                       : `0 20px 50px -15px rgba(0,0,0,0.5)`,
@@ -609,10 +612,12 @@ export default function LandingWithIntro() {
                   <img
                     src={item.image}
                     alt=""
+                    loading="eager"
                     className="absolute inset-0 w-full h-full object-cover"
                     style={{ 
-                      transform: isCenter ? 'scale(1.1)' : 'scale(1)',
-                      transition: 'transform 8s ease-out',
+                      transform: isCenter ? 'scale(1.05)' : 'scale(1)',
+                      transition: 'transform 4s ease-out',
+                      willChange: 'transform',
                     }}
                   />
 
