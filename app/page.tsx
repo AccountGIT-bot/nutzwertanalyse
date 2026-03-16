@@ -769,7 +769,7 @@ export default function LandingWithIntro() {
 
         {/* Quick start text */}
         <div className="mt-6 text-center text-white/30 text-sm">
-          {t.landing?.quickStart || "Oder wählen Sie eine Vorlage oben"}
+          Oder wählen Sie eine Vorlage oben
         </div>
       </main>
 

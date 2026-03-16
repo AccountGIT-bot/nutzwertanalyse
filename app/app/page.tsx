@@ -212,20 +212,20 @@ export default function AppPage() {
             <div className="floating-shape floating-shape-3" />
           </div>
 
-          {/* Floating Particles */}
+          {/* Floating Particles - deterministic values to avoid hydration mismatch */}
           <div className="absolute inset-0 pointer-events-none overflow-hidden">
             {[...Array(15)].map((_, i) => (
               <div
                 key={`particle-${i}`}
                 className="absolute rounded-full"
                 style={{
-                  width: `${2 + Math.random() * 4}px`,
-                  height: `${2 + Math.random() * 4}px`,
-                  left: `${Math.random() * 100}%`,
-                  top: `${Math.random() * 100}%`,
-                  background: `rgba(255, 255, 255, ${0.1 + Math.random() * 0.2})`,
-                  animation: `particleFloat ${12 + Math.random() * 10}s ease-in-out infinite`,
-                  animationDelay: `${Math.random() * -15}s`,
+                  width: `${2 + (i % 4) * 1}px`,
+                  height: `${2 + ((i + 2) % 4) * 1}px`,
+                  left: `${(i * 7) % 100}%`,
+                  top: `${(i * 11 + 5) % 100}%`,
+                  background: `rgba(255, 255, 255, ${0.1 + (i % 5) * 0.04})`,
+                  animation: `particleFloat ${12 + (i % 5) * 2}s ease-in-out infinite`,
+                  animationDelay: `${(i % 8) * -2}s`,
                 }}
               />
             ))}
