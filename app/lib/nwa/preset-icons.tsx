@@ -9,6 +9,8 @@ export type PresetId =
   | "machines" 
   | "vehicle" 
   | "employee"
+  | "realEstate"
+  | "product"
   | "custom";
 
 interface PresetIconProps {

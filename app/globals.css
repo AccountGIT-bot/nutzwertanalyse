@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 /* =========================================================
-   Base Theme Tokens (App Themes)
+   Premium Design System - Base Theme Tokens
    ========================================================= */
 
 /* Default (falls noch kein Theme gesetzt ist) */
@@ -15,9 +15,25 @@
 
   /* Landing Accent */
   --landing-accent: 0 115 106; /* #00736a */
+  
+  /* Premium shadows */
+  --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -2px rgba(0,0,0,0.1);
+  --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.1);
+  --shadow-xl: 0 20px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.1);
+  --shadow-2xl: 0 25px 50px -12px rgba(0,0,0,0.25);
+  --shadow-glow: 0 0 40px rgba(var(--accent), 0.15);
+  
+  /* Premium timing functions */
+  --ease-premium: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+  
+  /* Premium spacing rhythm */
+  --space-unit: 4px;
 }
 
-/* BASIC */
+/* BASIC - Professional Blue */
 [data-theme="basic"] {
   --accent: 37 99 235;
   --accent-2: 59 130 246;
@@ -26,7 +42,7 @@
   --bg-2: 15 23 42;
 }
 
-/* ADVANCED */
+/* ADVANCED - Elegant Emerald */
 [data-theme="advanced"] {
   --accent: 16 185 129;
   --accent-2: 45 212 191;
@@ -35,22 +51,27 @@
   --bg-2: 12 24 30;
 }
 
-/* BUSINESS (Gold dominiert, Violett nur als Akzent) */
+/* BUSINESS - Luxurious Gold */
 [data-theme="business"] {
-  --accent: 245 158 11;   /* Gold */
-  --accent-2: 168 85 247; /* Violett */
-  --glow: 251 191 36;     /* warmes Gold-Glow */
+  --accent: 245 158 11;
+  --accent-2: 168 85 247;
+  --glow: 251 191 36;
   --bg-1: 7 6 18;
   --bg-2: 14 14 28;
 }
 
+/* =========================================================
+   Premium Typography & Base Styles
+   ========================================================= */
+
 body {
   min-height: 100vh;
-  font-family: Arial, Helvetica, sans-serif;
-  /* Enable hardware acceleration for smoother animations */
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
+  font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+  letter-spacing: -0.011em;
 }
 
 /* Optimize rendering for interactive elements */
@@ -95,6 +116,256 @@ html {
 .fixed {
   backface-visibility: hidden;
   transform: translateZ(0);
+}
+
+/* =========================================================
+   Premium Animation Classes
+   ========================================================= */
+
+/* Stagger animation delays */
+.stagger-1 { animation-delay: 0.05s; }
+.stagger-2 { animation-delay: 0.1s; }
+.stagger-3 { animation-delay: 0.15s; }
+.stagger-4 { animation-delay: 0.2s; }
+.stagger-5 { animation-delay: 0.25s; }
+.stagger-6 { animation-delay: 0.3s; }
+
+/* Premium fade in up */
+@keyframes premium-fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.98);
+    filter: blur(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0);
+  }
+}
+
+.animate-premium-fade-in-up {
+  animation: premium-fade-in-up 0.7s var(--ease-premium) forwards;
+  opacity: 0;
+}
+
+/* Premium scale in */
+@keyframes premium-scale-in {
+  from {
+    opacity: 0;
+    transform: scale(0.92);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.animate-premium-scale-in {
+  animation: premium-scale-in 0.5s var(--ease-premium) forwards;
+  opacity: 0;
+}
+
+/* Premium slide in from left */
+@keyframes premium-slide-in-left {
+  from {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.animate-premium-slide-in-left {
+  animation: premium-slide-in-left 0.6s var(--ease-premium) forwards;
+  opacity: 0;
+}
+
+/* Premium slide in from right */
+@keyframes premium-slide-in-right {
+  from {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.animate-premium-slide-in-right {
+  animation: premium-slide-in-right 0.6s var(--ease-premium) forwards;
+  opacity: 0;
+}
+
+/* Premium blur reveal */
+@keyframes premium-blur-reveal {
+  from {
+    opacity: 0;
+    filter: blur(10px);
+  }
+  to {
+    opacity: 1;
+    filter: blur(0);
+  }
+}
+
+.animate-premium-blur-reveal {
+  animation: premium-blur-reveal 0.8s var(--ease-premium) forwards;
+  opacity: 0;
+}
+
+/* Premium pulse glow */
+@keyframes premium-pulse-glow {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgb(var(--accent) / 0.4);
+  }
+  50% {
+    box-shadow: 0 0 20px 4px rgb(var(--accent) / 0.2);
+  }
+}
+
+.animate-premium-pulse-glow {
+  animation: premium-pulse-glow 2s ease-in-out infinite;
+}
+
+/* Premium shimmer effect */
+@keyframes premium-shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.animate-premium-shimmer {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255,255,255,0.1) 50%,
+    transparent 100%
+  );
+  background-size: 200% 100%;
+  animation: premium-shimmer 2s linear infinite;
+}
+
+/* Premium hover lift */
+.hover-lift {
+  transition: transform 0.3s var(--ease-premium), box-shadow 0.3s var(--ease-premium);
+}
+
+.hover-lift:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-xl);
+}
+
+/* Premium hover scale */
+.hover-scale {
+  transition: transform 0.2s var(--ease-premium);
+}
+
+.hover-scale:hover {
+  transform: scale(1.02);
+}
+
+/* Premium glass effect */
+.glass {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.glass-dark {
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Premium gradient text */
+.gradient-text {
+  background: linear-gradient(135deg, rgb(var(--accent)), rgb(var(--accent-2)));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Premium glow border */
+.glow-border {
+  position: relative;
+}
+
+.glow-border::before {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  background: linear-gradient(135deg, rgb(var(--accent) / 0.5), rgb(var(--accent-2) / 0.5));
+  border-radius: inherit;
+  z-index: -1;
+  opacity: 0;
+  transition: opacity 0.3s var(--ease-premium);
+  filter: blur(8px);
+}
+
+.glow-border:hover::before {
+  opacity: 1;
+}
+
+/* Premium card shine on hover */
+.card-shine {
+  position: relative;
+  overflow: hidden;
+}
+
+.card-shine::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(
+    to right,
+    transparent 0%,
+    rgba(255, 255, 255, 0.05) 50%,
+    transparent 100%
+  );
+  transform: rotate(30deg) translateX(-100%);
+  transition: transform 0.6s var(--ease-premium);
+}
+
+.card-shine:hover::after {
+  transform: rotate(30deg) translateX(100%);
+}
+
+/* Premium focus ring */
+.focus-ring {
+  outline: none;
+}
+
+.focus-ring:focus-visible {
+  box-shadow: 0 0 0 2px rgb(var(--bg-1)), 0 0 0 4px rgb(var(--accent) / 0.5);
+}
+
+/* Premium skeleton loading */
+@keyframes skeleton-pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.skeleton {
+  background: linear-gradient(90deg, rgba(255,255,255,0.05) 25%, rgba(255,255,255,0.1) 50%, rgba(255,255,255,0.05) 75%);
+  background-size: 200% 100%;
+  animation: premium-shimmer 1.5s ease-in-out infinite, skeleton-pulse 2s ease-in-out infinite;
+  border-radius: 8px;
 }
 
 /* =========================================================
@@ -593,4 +864,568 @@ html {
     transform: translate(25px, -40px);
     opacity: 0.5;
   }
+}
+
+/* =========================================================
+   3D Parallax Background System
+   ========================================================= */
+
+/* Parallax layers with different animation speeds */
+.parallax-layer-1 {
+  animation: parallaxDrift1 40s ease-in-out infinite;
+  will-change: transform;
+}
+
+.parallax-layer-2 {
+  animation: parallaxDrift2 30s ease-in-out infinite;
+  will-change: transform;
+}
+
+.parallax-layer-3 {
+  animation: parallaxDrift3 20s ease-in-out infinite;
+  will-change: transform;
+}
+
+@keyframes parallaxDrift1 {
+  0%, 100% {
+    transform: translate3d(0, 0, 0);
+  }
+  25% {
+    transform: translate3d(20px, -15px, 0);
+  }
+  50% {
+    transform: translate3d(-15px, 10px, 0);
+  }
+  75% {
+    transform: translate3d(10px, 20px, 0);
+  }
+}
+
+@keyframes parallaxDrift2 {
+  0%, 100% {
+    transform: translate3d(0, 0, 0);
+  }
+  33% {
+    transform: translate3d(-25px, 20px, 0);
+  }
+  66% {
+    transform: translate3d(30px, -15px, 0);
+  }
+}
+
+@keyframes parallaxDrift3 {
+  0%, 100% {
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    transform: translate3d(-20px, -25px, 0);
+  }
+}
+
+@keyframes parallaxFloat1 {
+  0%, 100% {
+    transform: translate(0, 0) scale(1);
+  }
+  25% {
+    transform: translate(50px, -30px) scale(1.1);
+  }
+  50% {
+    transform: translate(-30px, 50px) scale(0.95);
+  }
+  75% {
+    transform: translate(40px, 20px) scale(1.05);
+  }
+}
+
+@keyframes parallaxFloat2 {
+  0%, 100% {
+    transform: translate(0, 0) scale(1);
+  }
+  33% {
+    transform: translate(-60px, 30px) scale(1.15);
+  }
+  66% {
+    transform: translate(40px, -40px) scale(0.9);
+  }
+}
+
+@keyframes parallaxFloat3 {
+  0%, 100% {
+    transform: translate(0, 0) scale(1);
+  }
+  20% {
+    transform: translate(30px, -40px) scale(1.05);
+  }
+  40% {
+    transform: translate(-40px, 20px) scale(0.95);
+  }
+  60% {
+    transform: translate(20px, 40px) scale(1.1);
+  }
+  80% {
+    transform: translate(-20px, -20px) scale(0.98);
+  }
+}
+
+@keyframes parallaxPulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.3;
+  }
+  50% {
+    transform: scale(1.2);
+    opacity: 0.5;
+  }
+}
+
+/* Floating geometric shapes */
+.floating-shape {
+  position: absolute;
+  border-radius: 50%;
+  opacity: 0.1;
+  will-change: transform;
+}
+
+.floating-shape-1 {
+  width: 4px;
+  height: 4px;
+  top: 20%;
+  left: 30%;
+  background: white;
+  animation: floatShape1 15s ease-in-out infinite;
+}
+
+.floating-shape-2 {
+  width: 6px;
+  height: 6px;
+  top: 60%;
+  right: 25%;
+  background: white;
+  animation: floatShape2 20s ease-in-out infinite;
+}
+
+.floating-shape-3 {
+  width: 3px;
+  height: 3px;
+  bottom: 30%;
+  left: 50%;
+  background: white;
+  animation: floatShape3 18s ease-in-out infinite;
+}
+
+.floating-shape-4 {
+  width: 5px;
+  height: 5px;
+  top: 40%;
+  right: 40%;
+  background: white;
+  animation: floatShape4 22s ease-in-out infinite;
+}
+
+@keyframes floatShape1 {
+  0%, 100% {
+    transform: translate(0, 0);
+    opacity: 0.1;
+  }
+  25% {
+    transform: translate(100px, -50px);
+    opacity: 0.3;
+  }
+  50% {
+    transform: translate(50px, -100px);
+    opacity: 0.15;
+  }
+  75% {
+    transform: translate(150px, -30px);
+    opacity: 0.25;
+  }
+}
+
+@keyframes floatShape2 {
+  0%, 100% {
+    transform: translate(0, 0);
+    opacity: 0.15;
+  }
+  33% {
+    transform: translate(-80px, 40px);
+    opacity: 0.25;
+  }
+  66% {
+    transform: translate(-120px, -30px);
+    opacity: 0.1;
+  }
+}
+
+@keyframes floatShape3 {
+  0%, 100% {
+    transform: translate(0, 0);
+    opacity: 0.1;
+  }
+  50% {
+    transform: translate(-60px, -80px);
+    opacity: 0.2;
+  }
+}
+
+@keyframes floatShape4 {
+  0%, 100% {
+    transform: translate(0, 0);
+    opacity: 0.12;
+  }
+  25% {
+    transform: translate(40px, 60px);
+    opacity: 0.2;
+  }
+  50% {
+    transform: translate(-50px, 80px);
+    opacity: 0.08;
+  }
+  75% {
+    transform: translate(30px, 40px);
+    opacity: 0.18;
+  }
+}
+
+/* Sidebar animation */
+@keyframes sidebarSlideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.sidebar-item {
+  animation: sidebarSlideIn 0.4s ease-out forwards;
+  opacity: 0;
+}
+
+/* =========================================================
+   3D Carousel System
+   ========================================================= */
+
+.perspective-\[1200px\] {
+  perspective: 1200px;
+}
+
+/* Carousel card shine effect */
+@keyframes carouselShine {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.carousel-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.1),
+    transparent
+  );
+  background-size: 200% 100%;
+  animation: carouselShine 3s ease-in-out infinite;
+}
+
+/* Stagger animations for carousel */
+.stagger-1 { animation-delay: 0.1s; }
+.stagger-2 { animation-delay: 0.2s; }
+.stagger-3 { animation-delay: 0.3s; }
+.stagger-4 { animation-delay: 0.4s; }
+
+/* Smooth color transitions */
+.color-transition {
+  transition: background-color 1s ease-out, box-shadow 1s ease-out;
+}
+
+/* 3D Carousel transitions */
+.duration-600 {
+  transition-duration: 600ms;
+}
+
+/* Perspective utility */
+.perspective-\[1200px\] {
+  perspective: 1200px;
+}
+
+/* Carousel item hover effect */
+@keyframes carouselPulse {
+  0%, 100% {
+    box-shadow: 0 25px 80px -10px var(--glow-color, rgba(255,255,255,0.3));
+  }
+  50% {
+    box-shadow: 0 30px 100px -10px var(--glow-color, rgba(255,255,255,0.4));
+  }
+}
+
+/* =========================================================
+   Premium Laser Glow Effect for Center Card
+   ========================================================= */
+
+@keyframes laserGlowPulse {
+  0%, 100% {
+    opacity: 0.6;
+    filter: blur(15px);
+  }
+  50% {
+    opacity: 1;
+    filter: blur(20px);
+  }
+}
+
+@keyframes laserGlowRotate {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes laserBeamSweep {
+  0% {
+    transform: translateX(-100%) rotate(-45deg);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(200%) rotate(-45deg);
+    opacity: 0;
+  }
+}
+
+.laser-glow-container {
+  position: absolute;
+  inset: -4px;
+  border-radius: 32px;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.laser-glow-outer {
+  position: absolute;
+  inset: -8px;
+  border-radius: 36px;
+  animation: laserGlowPulse 2s ease-in-out infinite;
+}
+
+.laser-glow-inner {
+  position: absolute;
+  inset: -2px;
+  border-radius: 30px;
+  animation: laserGlowPulse 2s ease-in-out infinite;
+  animation-delay: 0.5s;
+}
+
+.laser-beam {
+  position: absolute;
+  top: 0;
+  left: -50%;
+  width: 100%;
+  height: 3px;
+  background: linear-gradient(90deg, transparent, var(--laser-color, white), transparent);
+  animation: laserBeamSweep 4s ease-in-out infinite;
+  filter: blur(1px);
+}
+
+.laser-corner {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  border-style: solid;
+  border-width: 2px;
+  animation: laserGlowPulse 1.5s ease-in-out infinite;
+}
+
+.laser-corner-tl {
+  top: -4px;
+  left: -4px;
+  border-color: var(--laser-color, white) transparent transparent var(--laser-color, white);
+  border-radius: 8px 0 0 0;
+}
+
+.laser-corner-tr {
+  top: -4px;
+  right: -4px;
+  border-color: var(--laser-color, white) var(--laser-color, white) transparent transparent;
+  border-radius: 0 8px 0 0;
+  animation-delay: 0.3s;
+}
+
+.laser-corner-bl {
+  bottom: -4px;
+  left: -4px;
+  border-color: transparent transparent var(--laser-color, white) var(--laser-color, white);
+  border-radius: 0 0 0 8px;
+  animation-delay: 0.6s;
+}
+
+.laser-corner-br {
+  bottom: -4px;
+  right: -4px;
+  border-color: transparent var(--laser-color, white) var(--laser-color, white) transparent;
+  border-radius: 0 0 8px 0;
+  animation-delay: 0.9s;
+}
+
+/* =========================================================
+   Category-Specific Background Animations
+   ========================================================= */
+
+/* Code scroll animation for Software */
+@keyframes codeScroll {
+  0% {
+    transform: translateY(0);
+  }
+  100% {
+    transform: translateY(-50%);
+  }
+}
+
+.code-scroll {
+  animation: codeScroll 20s linear infinite;
+}
+
+/* Stock chart animation for Investment */
+@keyframes stockLine {
+  0% {
+    stroke-dashoffset: 2000;
+  }
+  100% {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes stockPulse {
+  0%, 100% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+.stock-line {
+  stroke-dasharray: 2000;
+  animation: stockLine 10s ease-in-out infinite;
+}
+
+.stock-pulse {
+  animation: stockPulse 2s ease-in-out infinite;
+}
+
+/* Car motion animation for Vehicle */
+@keyframes roadMove {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.road-move {
+  animation: roadMove 3s linear infinite;
+}
+
+/* Building rise animation for Real Estate */
+@keyframes buildingRise {
+  0% {
+    transform: translateY(100%) scaleY(0);
+    opacity: 0;
+  }
+  50% {
+    opacity: 0.4;
+  }
+  100% {
+    transform: translateY(0) scaleY(1);
+    opacity: 0.3;
+  }
+}
+
+.building-rise {
+  animation: buildingRise 8s ease-out forwards;
+}
+
+/* Network pulse animation for Supplier/Employee */
+@keyframes networkPulse {
+  0%, 100% {
+    r: 3;
+    opacity: 0.6;
+  }
+  50% {
+    r: 6;
+    opacity: 1;
+  }
+}
+
+@keyframes networkLine {
+  0% {
+    stroke-dashoffset: 100;
+    opacity: 0.2;
+  }
+  50% {
+    opacity: 0.6;
+  }
+  100% {
+    stroke-dashoffset: 0;
+    opacity: 0.2;
+  }
+}
+
+.network-node {
+  animation: networkPulse 3s ease-in-out infinite;
+}
+
+.network-line {
+  stroke-dasharray: 100;
+  animation: networkLine 4s ease-in-out infinite;
+}
+
+/* Product showcase animation */
+@keyframes productFloat {
+  0%, 100% {
+    transform: translateY(0) rotateY(0deg);
+  }
+  25% {
+    transform: translateY(-10px) rotateY(5deg);
+  }
+  75% {
+    transform: translateY(-5px) rotateY(-5deg);
+  }
+}
+
+.product-float {
+  animation: productFloat 6s ease-in-out infinite;
+}
+
+/* Machine/gear rotation */
+@keyframes gearRotate {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.gear-rotate {
+  animation: gearRotate 10s linear infinite;
+}
+
+.gear-rotate-reverse {
+  animation: gearRotate 10s linear infinite reverse;
 }
