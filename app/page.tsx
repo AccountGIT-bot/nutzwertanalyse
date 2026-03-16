@@ -265,15 +265,24 @@ export default function LandingWithIntro() {
       <div className="min-h-[100svh] bg-[#0a0a0b]">
         <DecisionSuggestion
           interpretation={interpretation}
-          onBack={handleBack}
-          onProceed={(level) => {
+          originalInput={text.trim()}
+          onAccept={(acceptedInterpretation) => {
             const params = new URLSearchParams();
-            params.set("title", text.trim());
-            params.set("package", level);
-            if (interpretation?.domain) params.set("domain", interpretation.domain);
-            params.set("ai", encodeURIComponent(JSON.stringify(interpretation)));
+            params.set("title", acceptedInterpretation.title || text.trim());
+            params.set("package", "standard");
+            if (acceptedInterpretation?.domain) params.set("domain", acceptedInterpretation.domain);
+            params.set("ai", encodeURIComponent(JSON.stringify(acceptedInterpretation)));
             router.push(`/app?${params.toString()}`);
           }}
+          onEdit={(editedInterpretation) => {
+            const params = new URLSearchParams();
+            params.set("title", editedInterpretation.title || text.trim());
+            params.set("package", "standard");
+            if (editedInterpretation?.domain) params.set("domain", editedInterpretation.domain);
+            params.set("ai", encodeURIComponent(JSON.stringify(editedInterpretation)));
+            router.push(`/app?${params.toString()}`);
+          }}
+          onReject={handleBack}
         />
       </div>
     );

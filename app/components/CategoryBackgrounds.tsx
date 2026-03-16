@@ -259,10 +259,12 @@ export function RealEstateBackground({ color, opacity = 0.1 }: { color: string; 
 // Supplier/Employee: Subtle network connections
 export function NetworkBackground({ color, opacity = 0.12 }: { color: string; opacity?: number }) {
   const nodes = useMemo(() => {
+    // Deterministic sizes based on index to avoid hydration mismatch
+    const sizes = [2.0, 2.3, 1.8, 2.5, 1.7, 2.2, 2.6, 1.9];
     return [...Array(8)].map((_, i) => ({
       x: 15 + (i % 4) * 22,
       y: 20 + Math.floor(i / 4) * 35,
-      size: 1.5 + Math.random() * 1.5,
+      size: sizes[i],
       delay: i * 0.3,
     }));
   }, []);
