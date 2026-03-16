@@ -793,7 +793,7 @@ export default function LandingWithIntro() {
               className="w-16 h-16 rounded-full border-4 border-t-transparent animate-spin mx-auto mb-4"
               style={{ borderColor: `rgb(${currentPreset.color})`, borderTopColor: 'transparent' }}
             />
-            <div className="text-white text-lg font-medium">{t.landing?.analyzing || "Analysiere..."}</div>
+            <div className="text-white text-lg font-medium">Analysiere...</div>
           </div>
         </div>
       )}

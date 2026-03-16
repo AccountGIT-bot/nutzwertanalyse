@@ -261,25 +261,40 @@ export function RealEstateBackground({ color, opacity = 0.1 }: { color: string; 
 
 // Supplier/Employee: Subtle network connections
 export function NetworkBackground({ color, opacity = 0.12 }: { color: string; opacity?: number }) {
-  const nodes = useMemo(() => {
-    // Deterministic sizes based on index to avoid hydration mismatch
-    const sizes = [2.0, 2.3, 1.8, 2.5, 1.7, 2.2, 2.6, 1.9];
-    return [...Array(8)].map((_, i) => ({
-      x: 15 + (i % 4) * 22,
-      y: 20 + Math.floor(i / 4) * 35,
-      size: sizes[i],
-      delay: i * 0.3,
-    }));
+  const [mounted, setMounted] = useState(false);
+  
+  useEffect(() => {
+    setMounted(true);
   }, []);
 
-  const connections = useMemo(() => {
-    const conns: Array<{from: number; to: number}> = [];
-    nodes.forEach((_, i) => {
-      const target = (i + 1) % nodes.length;
-      if (target !== i) conns.push({ from: i, to: target });
-    });
-    return conns;
-  }, [nodes]);
+  // Fixed deterministic node positions and sizes
+  const nodes = [
+    { x: 15, y: 20, size: 2.0, delay: 0 },
+    { x: 37, y: 20, size: 2.3, delay: 0.3 },
+    { x: 59, y: 20, size: 1.8, delay: 0.6 },
+    { x: 81, y: 20, size: 2.5, delay: 0.9 },
+    { x: 15, y: 55, size: 1.7, delay: 1.2 },
+    { x: 37, y: 55, size: 2.2, delay: 1.5 },
+    { x: 59, y: 55, size: 2.6, delay: 1.8 },
+    { x: 81, y: 55, size: 1.9, delay: 2.1 },
+  ];
+
+  // Fixed deterministic connections
+  const connections = [
+    { from: 0, to: 1 },
+    { from: 1, to: 2 },
+    { from: 2, to: 3 },
+    { from: 3, to: 4 },
+    { from: 4, to: 5 },
+    { from: 5, to: 6 },
+    { from: 6, to: 7 },
+    { from: 7, to: 0 },
+  ];
+
+  // Only render after mount to prevent hydration mismatch
+  if (!mounted) {
+    return <div className="absolute inset-0 overflow-hidden pointer-events-none" style={{ opacity }} />;
+  }
 
   return (
     <div className="absolute inset-0 overflow-hidden pointer-events-none" style={{ opacity }}>
