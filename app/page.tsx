@@ -489,7 +489,7 @@ export default function LandingWithIntro() {
                 value={text}
                 onChange={(e) => setText(e.target.value)}
                 onKeyDown={handleKeyDown}
-                placeholder={t.landing?.inputPlaceholder || "Was möchten Sie vergleichen?"}
+                placeholder={t.landing?.searchInputPlaceholder || "Was möchten Sie vergleichen?"}
                 className="w-full px-6 py-5 bg-transparent text-white text-lg placeholder:text-white/30 focus:outline-none"
               />
               <button

@@ -58,7 +58,7 @@ export function SoftwareBackground({ color, opacity = 0.15 }: { color: string; o
           ))}
         </div>
       </div>
-      {/* Binary rain effect */}
+      {/* Binary rain effect - deterministic values */}
       <div className="absolute inset-0 opacity-20">
         {[...Array(15)].map((_, i) => (
           <div
@@ -66,13 +66,13 @@ export function SoftwareBackground({ color, opacity = 0.15 }: { color: string; o
             className="absolute text-[8px] font-mono animate-pulse"
             style={{
               left: `${5 + i * 7}%`,
-              top: `${Math.random() * 100}%`,
+              top: `${(i * 17 + 10) % 100}%`,
               color: `rgb(${color})`,
               animationDelay: `${i * 0.3}s`,
-              animationDuration: `${2 + Math.random() * 2}s`,
+              animationDuration: `${2 + (i % 4) * 0.5}s`,
             }}
           >
-            {Math.random() > 0.5 ? '1' : '0'}
+            {i % 2 === 0 ? '1' : '0'}
           </div>
         ))}
       </div>
@@ -208,10 +208,13 @@ export function VehicleBackground({ color, opacity = 0.1 }: { color: string; opa
 // Real Estate: Subtle building silhouettes
 export function RealEstateBackground({ color, opacity = 0.1 }: { color: string; opacity?: number }) {
   const buildings = useMemo(() => {
+    // Deterministic values to avoid hydration mismatch
+    const widths = [3.5, 4.2, 3.8, 4.5, 3.3, 4.0];
+    const heights = [25, 38, 20, 42, 30, 35];
     return [...Array(6)].map((_, i) => ({
       x: 60 + i * 6,
-      width: 3 + Math.random() * 2,
-      height: 15 + Math.random() * 30,
+      width: widths[i],
+      height: heights[i],
       delay: i * 0.4,
     }));
   }, []);
