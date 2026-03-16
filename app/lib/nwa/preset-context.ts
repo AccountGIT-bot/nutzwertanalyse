@@ -200,6 +200,66 @@ export const PRESET_CONTEXTS: Record<PresetId, PresetContext> = {
     ],
     keywords: ["mitarbeiter", "employee", "kandidat", "candidate", "bewerber", "personal", "hiring"],
   },
+
+  realEstate: {
+    id: "realEstate",
+    label: "Immobilienbewertung",
+    titlePlaceholder: "z.B. Welche Immobilie passt am besten zu unseren Anforderungen?",
+    titleHelperText: "Beschreiben Sie, welche Immobilie Sie bewerten oder auswählen möchten.",
+    titleExamples: [
+      "Welches Bürogebäude sollen wir mieten?",
+      "In welche Immobilie sollen wir investieren?",
+      "Auswahl des neuen Firmenstandorts",
+    ],
+    descriptionPlaceholder: "Beschreiben Sie den Zweck: Eigennutzung oder Investment? Welche Lage bevorzugen Sie?",
+    descriptionHelperText: "Definieren Sie Ihre Immobilienanforderungen.",
+    constraintsPlaceholder: "z.B. Budget max. CHF 2 Mio., mindestens 4 Zimmer, Nähe zu öffentlichen Verkehrsmitteln",
+    constraintsExamples: [
+      "Zentrale Lage erforderlich",
+      "Parkplätze vorhanden",
+      "Erweiterungsmöglichkeiten wichtig",
+    ],
+    alternativePlaceholders: ["Immobilie A", "Immobilie B", "Immobilie C"],
+    alternativeHelperText: "Geben Sie die Immobilien ein, die Sie vergleichen möchten.",
+    suggestions: [
+      { label: "Lage bewerten", description: "Standortqualität und Erreichbarkeit" },
+      { label: "Kosten vergleichen", description: "Kaufpreis oder Mietkosten" },
+      { label: "Zustand prüfen", description: "Renovierungsbedarf und Ausstattung" },
+      { label: "Potenzial einschätzen", description: "Wertsteigerung und Entwicklung" },
+      { label: "Infrastruktur analysieren", description: "Anbindung und Umgebung" },
+    ],
+    keywords: ["immobilie", "real estate", "wohnung", "haus", "gebäude", "büro", "standort", "mieten", "kaufen"],
+  },
+
+  product: {
+    id: "product",
+    label: "Produktvergleich",
+    titlePlaceholder: "z.B. Welches Produkt bietet das beste Preis-Leistungs-Verhältnis?",
+    titleHelperText: "Beschreiben Sie, welche Produkte Sie vergleichen möchten.",
+    titleExamples: [
+      "Welchen Laptop sollen wir anschaffen?",
+      "Welche Kamera erfüllt unsere Anforderungen?",
+      "Auswahl des neuen Büromobiliars",
+    ],
+    descriptionPlaceholder: "Beschreiben Sie den Verwendungszweck und die wichtigsten Anforderungen an das Produkt.",
+    descriptionHelperText: "Definieren Sie Ihre Produktanforderungen.",
+    constraintsPlaceholder: "z.B. Budget max. CHF 2'000, Garantie mind. 2 Jahre, sofort verfügbar",
+    constraintsExamples: [
+      "Markenprodukt bevorzugt",
+      "Guter Kundenservice wichtig",
+      "Nachhaltigkeit erwünscht",
+    ],
+    alternativePlaceholders: ["Produkt A", "Produkt B", "Produkt C"],
+    alternativeHelperText: "Geben Sie die Produkte ein, die Sie vergleichen möchten.",
+    suggestions: [
+      { label: "Qualität bewerten", description: "Verarbeitung und Materialien" },
+      { label: "Preis vergleichen", description: "Anschaffungskosten und Folgekosten" },
+      { label: "Funktionen prüfen", description: "Features und Leistungsumfang" },
+      { label: "Bewertungen lesen", description: "Erfahrungen anderer Käufer" },
+      { label: "Garantie vergleichen", description: "Service und Gewährleistung" },
+    ],
+    keywords: ["produkt", "product", "kaufen", "anschaffen", "vergleichen", "laptop", "kamera", "gerät"],
+  },
   
   custom: {
     id: "custom",
@@ -245,6 +305,8 @@ export const DOMAIN_SUGGESTIONS: Record<string, DomainSuggestion[]> = {
   machines: PRESET_CONTEXTS.machines.suggestions,
   vehicle: PRESET_CONTEXTS.vehicle.suggestions,
   employee: PRESET_CONTEXTS.employee.suggestions,
+  realEstate: PRESET_CONTEXTS.realEstate.suggestions,
+  product: PRESET_CONTEXTS.product.suggestions,
   personal: [
     { label: "Kosten abwägen", description: "Finanzielle Auswirkungen bedenken" },
     { label: "Emotionen berücksichtigen", description: "Persönliche Präferenzen einbeziehen" },
