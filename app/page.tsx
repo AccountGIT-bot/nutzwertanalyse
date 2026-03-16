@@ -287,13 +287,13 @@ export default function LandingWithIntro() {
         className="fixed inset-0 -z-10 transition-all duration-1000 ease-out"
         style={{ backgroundColor: currentPreset.bgColor }}
       >
-        {/* Background Image */}
+        {/* Background Image - higher opacity for visibility */}
         {PRESET_CONFIG.map((preset, idx) => (
           <div
             key={preset.id}
             className="absolute inset-0 transition-opacity duration-1000"
             style={{ 
-              opacity: idx === activeIndex ? 0.35 : 0,
+              opacity: idx === activeIndex ? 0.5 : 0,
               backgroundImage: `url(${preset.image})`,
               backgroundSize: 'cover',
               backgroundPosition: 'center',
@@ -301,9 +301,9 @@ export default function LandingWithIntro() {
           />
         ))}
 
-        {/* Gradient overlays */}
-        <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/50 to-black/90" />
-        <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent" />
+        {/* Gradient overlays - lighter for better visibility */}
+        <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/30 to-black/60" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
         
         {/* Animated color orbs - Layer 1 (slowest) */}
         <div className="parallax-layer-1 absolute inset-0 pointer-events-none">
@@ -432,8 +432,8 @@ export default function LandingWithIntro() {
         {/* Noise texture */}
         <div className="absolute inset-0 landing-grain opacity-[0.04]" />
         
-        {/* Vignette */}
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_0%,rgba(0,0,0,0.4)_100%)]" />
+        {/* Vignette - lighter */}
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_0%,rgba(0,0,0,0.25)_100%)]" />
       </div>
 
       {/* ===== HEADER ===== */}
@@ -596,11 +596,12 @@ export default function LandingWithIntro() {
                       : `0 20px 50px -15px rgba(0,0,0,0.5)`,
                   }}
                 >
-                  {/* Background Image with Ken Burns effect */}
-                  <div 
-                    className="absolute inset-0 bg-cover bg-center"
+                  {/* Background Image with Ken Burns effect - using img for proper fill */}
+                  <img
+                    src={item.image}
+                    alt=""
+                    className="absolute inset-0 w-full h-full object-cover"
                     style={{ 
-                      backgroundImage: `url(${item.image})`,
                       transform: isCenter ? 'scale(1.1)' : 'scale(1)',
                       transition: 'transform 8s ease-out',
                     }}
