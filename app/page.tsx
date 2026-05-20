@@ -17,16 +17,17 @@ import type { AIDecisionInterpretation } from "@/app/lib/nwa/types";
 import { interpretDecisionInput, sanitizeInput } from "@/app/lib/nwa/interpretation-engine";
 import { useTranslations } from "@/app/lib/i18n";
 import { LanguageSwitcher } from "@/app/components/LanguageSwitcher";
-import { 
-  Sparkles, 
-  FileDown, 
-  BarChart3, 
-  Users, 
-  ArrowRight, 
+import {
+  Sparkles,
+  FileDown,
+  BarChart3,
+  Users,
+  ArrowRight,
   CheckCircle2,
   Zap,
   Shield,
-  Clock
+  Clock,
+  Brain,
 } from "lucide-react";
 
 type Phase = "landing" | "analyzing" | "suggestion";
@@ -49,21 +50,21 @@ const PRESET_CONFIG: Array<{
 // USP Features
 const USP_FEATURES = [
   {
-    icon: Sparkles,
-    title: "KI-gestützte Analyse",
-    description: "Intelligente Interpretation Ihrer Entscheidungsfragen mit automatischer Kriterienerstellung.",
+    icon: Brain,
+    title: "GPT-4 Powered",
+    description: "Modernste KI analysiert Ihre Eingabe und generiert automatisch passende Kriterien, Alternativen und Bewertungsrahmen.",
     color: "168, 85, 247",
   },
   {
     icon: FileDown,
     title: "Export als PDF & Excel",
-    description: "Professionelle Berichte für Präsentationen und Dokumentation.",
+    description: "Professionelle Berichte fuer Praesentationen, Dokumentation und Entscheidungsvorlagen.",
     color: "16, 185, 129",
   },
   {
     icon: BarChart3,
     title: "Visuelle Auswertung",
-    description: "Übersichtliche Diagramme und Vergleiche für fundierte Entscheidungen.",
+    description: "Interaktive Diagramme, Gewichtungsvisualisierung und Sensitivitaetsanalysen.",
     color: "59, 130, 246",
   },
 ];
@@ -81,6 +82,7 @@ export default function LandingPage() {
   const [phase, setPhase] = useState<Phase>("landing");
   const [text, setText] = useState("");
   const [interpretation, setInterpretation] = useState<AIDecisionInterpretation | null>(null);
+  const [aiError, setAiError] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const [hoveredPreset, setHoveredPreset] = useState<PresetId | null>(null);
 
@@ -99,7 +101,7 @@ export default function LandingPage() {
     return labels[id] || String(id);
   };
 
-  const handleSubmit = useCallback((e?: React.FormEvent) => {
+  const handleSubmit = useCallback(async (e?: React.FormEvent) => {
     e?.preventDefault();
     const trimmed = text.trim();
     if (!trimmed) {
@@ -108,11 +110,46 @@ export default function LandingPage() {
     }
     const safe = sanitizeInput(trimmed);
     setPhase("analyzing");
-    requestAnimationFrame(() => {
-      const result = interpretDecisionInput(safe);
-      setInterpretation(result);
+    setAiError(null);
+    
+    try {
+      // Call the real AI API
+      const response = await fetch("/api/interpret-decision", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userInput: safe, packageLevel: "advanced" }),
+      });
+      
+      if (!response.ok) {
+        throw new Error("AI request failed");
+      }
+      
+      const data = await response.json();
+      
+      if (data.interpretation) {
+        // Map API response to AIDecisionInterpretation format
+        const aiResult: AIDecisionInterpretation = {
+          title: data.interpretation.title,
+          description: data.interpretation.description,
+          domain: data.interpretation.domain,
+          alternatives: data.interpretation.alternatives,
+          criteria: data.interpretation.criteria,
+          constraints: data.interpretation.constraints,
+          confidence: data.interpretation.confidence,
+        };
+        setInterpretation(aiResult);
+        setPhase("suggestion");
+      } else {
+        throw new Error("No interpretation returned");
+      }
+    } catch (error) {
+      console.error("[v0] AI interpretation error:", error);
+      // Fallback to local interpretation
+      const fallbackResult = interpretDecisionInput(safe);
+      setInterpretation(fallbackResult);
+      setAiError("KI-Analyse nicht verfuegbar - lokale Analyse wird verwendet");
       setPhase("suggestion");
-    });
+    }
   }, [text]);
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -214,11 +251,11 @@ export default function LandingPage() {
       {/* ===== HERO SECTION ===== */}
       <section className="relative pt-12 sm:pt-20 pb-8 px-5">
         <div className="mx-auto max-w-4xl text-center">
-          {/* Badge - Liquid Glass */}
+          {/* Badge - Liquid Glass with AI indicator */}
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/[0.05] backdrop-blur-xl border border-white/[0.1] text-sm text-white/80 mb-8 shadow-lg shadow-black/5">
-            <div className="w-2 h-2 rounded-full bg-gradient-to-r from-green-400 to-emerald-500 animate-pulse" />
-            <span>KI-gestuetzte Entscheidungsfindung</span>
-            <Sparkles className="w-4 h-4 text-amber-400" />
+            <Brain className="w-4 h-4 text-blue-400" />
+            <span>Powered by GPT-4</span>
+            <div className="w-1.5 h-1.5 rounded-full bg-gradient-to-r from-green-400 to-emerald-500 animate-pulse" />
           </div>
           
           {/* Main Headline */}
@@ -596,17 +633,35 @@ export default function LandingPage() {
         </div>
       </footer>
 
-      {/* Analyzing Overlay - Premium Glass */}
+      {/* Analyzing Overlay - Premium Glass with AI branding */}
       {phase === "analyzing" && (
         <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-2xl flex items-center justify-center">
-          <div className="text-center p-10 rounded-3xl bg-white/[0.03] border border-white/[0.1] backdrop-blur-xl">
-            <div className="relative w-20 h-20 mx-auto mb-6">
+          <div className="text-center p-10 rounded-3xl bg-white/[0.03] border border-white/[0.1] backdrop-blur-xl max-w-md">
+            {/* AI Brain Icon with animated rings */}
+            <div className="relative w-24 h-24 mx-auto mb-6">
               <div className="absolute inset-0 rounded-full border-4 border-white/10" />
               <div className="absolute inset-0 rounded-full border-4 border-transparent border-t-blue-500 border-r-purple-500 animate-spin" />
               <div className="absolute inset-2 rounded-full border-4 border-transparent border-b-pink-500 border-l-cyan-500 animate-spin" style={{ animationDirection: 'reverse', animationDuration: '1.5s' }} />
+              <div className="absolute inset-0 flex items-center justify-center">
+                <Brain className="w-10 h-10 text-purple-400 animate-pulse" />
+              </div>
             </div>
-            <div className="text-white text-xl font-semibold mb-2">Analysiere Ihre Anfrage</div>
-            <div className="text-white/50 text-sm">KI verarbeitet Ihre Eingabe...</div>
+            
+            <div className="text-white text-xl font-semibold mb-2">GPT-4 analysiert Ihre Anfrage</div>
+            <div className="text-white/50 text-sm mb-4">Generiere Kriterien und Alternativen...</div>
+            
+            {/* Animated progress indicators */}
+            <div className="flex justify-center gap-2">
+              {["Verstehen", "Strukturieren", "Optimieren"].map((step, i) => (
+                <div 
+                  key={step}
+                  className="px-3 py-1 rounded-full text-xs bg-white/5 border border-white/10 text-white/40 animate-pulse"
+                  style={{ animationDelay: `${i * 0.3}s` }}
+                >
+                  {step}
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       )}
