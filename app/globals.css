@@ -4,6 +4,11 @@
    Premium Design System - Base Theme Tokens
    ========================================================= */
 
+/* Smooth scroll for the whole page */
+html {
+  scroll-behavior: smooth;
+}
+
 /* Default (falls noch kein Theme gesetzt ist) */
 :root {
   --accent: 37 99 235;
@@ -95,6 +100,16 @@ button, input, textarea, select {
   will-change: transform;
   transform: translateZ(0);
   backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+/* Carousel cards optimization */
+.carousel-card-optimized {
+  contain: layout style paint;
+  will-change: transform, opacity;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  transform: translateZ(0);
 }
 
 /* Smooth scrolling for the entire page */

@@ -48,37 +48,43 @@ export type DecisionInterpretation = z.infer<typeof decisionInterpretationSchema
 const SYSTEM_PROMPT = `Du bist ein professioneller Entscheidungsanalyse-Assistent für ein Nutzwertanalyse-Tool.
 Deine Aufgabe: Interpretiere Benutzereingaben und erstelle strukturierte Analyserahmen.
 
+Du bist ein GPT-4 Modell und sollst die volle Leistungsfaehigkeit nutzen um:
+1. Die Absicht des Benutzers praezise zu verstehen
+2. Relevante Alternativen und Kriterien zu identifizieren
+3. Einen professionellen Analyserahmen zu erstellen
+
 WICHTIG: Die Eingabe muss NICHT in eine der 6 Standardkategorien passen. 
-Analysiere den genauen Text des Benutzers und erstelle passende Alternativen und Kriterien dafür.
+Analysiere den genauen Text des Benutzers und erstelle passende Alternativen und Kriterien dafuer.
 
 Richtlinien:
 1. TITEL: Erstelle einen klaren, professionellen Entscheidungstitel auf Deutsch.
    - Wenn der Benutzer "X oder Y" fragt, nutze genau diese Begriffe
-   - Halte es kurz aber aussagekräftig
+   - Halte es kurz aber aussagekraeftig
 
 2. BESCHREIBUNG: Verbessere die Formulierung zu einer professionellen Beschreibung.
    - Korrigiere Grammatik und Rechtschreibung
-   - Behalte die ursprüngliche Bedeutung bei
+   - Behalte die urspruengliche Bedeutung bei
    - Auf Deutsch schreiben
 
-3. DOMAIN: Wähle die passendste Kategorie. Bei unklaren Eingaben wähle "other".
+3. DOMAIN: Waehle die passendste Kategorie. Bei unklaren Eingaben waehle "other".
 
 4. ALTERNATIVEN: Generiere 2-6 realistische Entscheidungsalternativen.
    - Wenn der Benutzer "A oder B" fragt, nutze A und B als Alternativen (kapitalisiert)
-   - Füge ggf. eine "Status quo" Option hinzu
-   - Alternativen sollten sich gegenseitig ausschließen
-   - WICHTIG: Erster Buchstabe jeder Alternative groß schreiben
+   - Fuege ggf. eine "Status quo" Option hinzu
+   - Alternativen sollten sich gegenseitig ausschliessen
+   - WICHTIG: Erster Buchstabe jeder Alternative gross schreiben
 
 5. KRITERIEN: Schlage 4-10 relevante Bewertungskriterien vor.
    - Kriterien sollten messbar oder vergleichbar sein
    - Mix aus wirtschaftlichen, qualitativen, strategischen und Risiko-Kriterien
    - Passend zum spezifischen Entscheidungskontext
+   - Jedes Kriterium braucht einen klaren Namen und eine Beschreibung
 
-6. EINSCHRÄNKUNGEN: Extrahiere erkannte Rahmenbedingungen.
+6. EINSCHRAENKUNGEN: Extrahiere erkannte Rahmenbedingungen (Budget, Zeit, etc.).
 
-7. KONFIDENZ: Bewerte deine Interpretationssicherheit.
+7. KONFIDENZ: Bewerte deine Interpretationssicherheit basierend auf der Klarheit der Eingabe.
 
-Antworte IMMER auf Deutsch. Sei praktisch und realistisch.`;
+Antworte IMMER auf Deutsch. Sei praktisch und realistisch. Nutze dein Wissen um branchenspezifische Kriterien vorzuschlagen.`;
 
 // Additional security: sanitize and validate input
 function sanitizeUserInput(input: unknown): string | null {
@@ -120,6 +126,8 @@ export async function POST(req: Request) {
     const sanitizedInput = sanitizeUserInput(userInput);
     const validPackageLevel = validatePackageLevel(packageLevel);
 
+    console.log("[v0] AI interpret-decision called with:", { sanitizedInput, validPackageLevel });
+
     if (!sanitizedInput) {
       return Response.json(
         { error: "Missing or invalid user input" },
@@ -139,29 +147,34 @@ export async function POST(req: Request) {
     const maxAlternatives = validPackageLevel === "basic" ? 5 : 8;
 
     const { output } = await generateText({
-      model: "openai/gpt-4o-mini",
+      model: "openai/gpt-4o",
       output: Output.object({
         schema: decisionInterpretationSchema,
       }),
       system: SYSTEM_PROMPT,
-      prompt: `Interpret the following decision and generate a structured analysis framework.
+      prompt: `Analysiere diese Benutzereingabe und erstelle einen strukturierten Entscheidungsrahmen.
 
-User Input: "${sanitizedInput}"
+WICHTIG: Extrahiere die KONKRETEN Alternativen aus dem Text des Benutzers!
+- Wenn der Benutzer zwei Dinge vergleicht (z.B. "BMW vs Audi" oder "ob X besser ist als Y"), nutze GENAU diese Begriffe als Alternativen
+- Erstelle NIEMALS generische Namen wie "Option A" oder "Option B"
+- Behalte Markennamen, Modellbezeichnungen und spezifische Begriffe bei
 
-Package Level: ${validPackageLevel} (${validPackageLevel === "basic" ? "simpler, max 6 criteria" : validPackageLevel === "advanced" ? "detailed, max 8 criteria" : "comprehensive, max 10 criteria"})
+Benutzereingabe: "${sanitizedInput}"
 
-Requirements:
-- Maximum ${maxAlternatives} alternatives
-- Maximum ${maxCriteria} criteria
-- All text in German
-- Practical and realistic suggestions`,
+Package Level: ${validPackageLevel}
+- Maximum ${maxAlternatives} Alternativen
+- Maximum ${maxCriteria} Kriterien
+- Alle Texte auf Deutsch
+- Kriterien muessen spezifisch zum Thema passen`,
     });
+
+    console.log("[v0] AI output received:", JSON.stringify(output, null, 2));
 
     return Response.json({ interpretation: output });
   } catch (error) {
     console.error("[interpret-decision] Error:", error);
     return Response.json(
-      { error: "Failed to interpret decision" },
+      { error: "Failed to interpret decision", details: error instanceof Error ? error.message : "Unknown error" },
       { status: 500 }
     );
   }

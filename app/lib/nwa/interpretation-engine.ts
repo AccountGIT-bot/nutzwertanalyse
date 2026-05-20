@@ -59,14 +59,26 @@ const DOMAIN_KEYWORDS: Record<AIDecisionInterpretation["domain"], string[]> = {
   other: [],
 };
 
-// Comparison patterns
+// Comparison patterns - expanded to catch more natural language
 const COMPARISON_PATTERNS = [
+  // Direct comparisons: "X oder Y"
   /^(.+?)\s+(?:oder|vs\.?|versus|oder\s+doch|oder\s+lieber)\s+(.+?)[\?\.\!]?$/i,
+  // Question starters: "soll ich X oder Y"
   /^(?:soll\s+ich|sollte\s+ich|sollen\s+wir|welche[rns]?|was\s+ist\s+besser|lieber)\s+(.+?)\s+(?:oder|vs\.?)\s+(.+?)[\?\.\!]?$/i,
+  // Comparison with: "X vergleichen mit Y"
   /^(.+?)\s+(?:vergleichen\s+mit|verglichen\s+mit|im\s+vergleich\s+zu)\s+(.+?)[\?\.\!]?$/i,
+  // Explicit comparison: "vergleich: X und Y"
   /^vergleich(?:en)?\s*[:\-]?\s*(.+?)\s+(?:und|&|,)\s+(.+?)[\?\.\!]?$/i,
+  // English: "X or Y"
   /^(.+?)\s+(?:or|vs\.?|versus)\s+(.+?)[\?\.\!]?$/i,
-  /^compare\s+(.+?)\s+(?:and|&|with|to)\s+(.+?)[\?\.\!]?$/i,
+  // "besser als" pattern: "ob X besser ist als Y"
+  /(?:ob|wenn|dass)\s+(?:mein[e]?|dein[e]?|sein[e]?|ihr[e]?|unser[e]?)?\s*(.+?)\s+besser\s+(?:ist|sind|wäre|waere)\s+als\s+(?:der|die|das|den|dem|mein[e]?|dein[e]?|sein[e]?|ihr[e]?|unser[e]?)?\s*(?:alte[nr]?)?\s*(.+?)(?:\s+von|\s*[\?\.\!]|$)/i,
+  // "besser als" simpler: "X besser als Y"
+  /(.+?)\s+besser\s+(?:ist|sind|wäre|waere)?\s*als\s+(.+?)[\?\.\!]?$/i,
+  // "schauen ob" pattern
+  /(?:schauen|prüfen|checken|testen)\s+ob\s+(.+?)\s+besser\s+(?:ist|sind)\s+als\s+(.+?)[\?\.\!]?$/i,
+  // "entscheiden zwischen" pattern
+  /(?:entscheiden|wählen|aussuchen)\s+zwischen\s+(.+?)\s+(?:und|oder|&)\s+(.+?)[\?\.\!]?$/i,
 ];
 
 // Domain-specific criteria
@@ -176,16 +188,36 @@ function detectDomain(input: string): AIDecisionInterpretation["domain"] {
 function extractAlternatives(input: string): { alt1: string; alt2: string } | null {
   const trimmed = input.trim();
   
+  // First try all the comparison patterns
   for (const pattern of COMPARISON_PATTERNS) {
     const match = trimmed.match(pattern);
     if (match && match[1] && match[2]) {
-      return {
-        alt1: capitalizeFirst(match[1].trim()),
-        alt2: capitalizeFirst(match[2].trim()),
-      };
+      // Clean up extracted alternatives
+      let alt1 = match[1].trim();
+      let alt2 = match[2].trim();
+      
+      // Remove common prefixes/suffixes
+      alt1 = cleanAlternativeName(alt1);
+      alt2 = cleanAlternativeName(alt2);
+      
+      if (alt1 && alt2 && alt1.length > 1 && alt2.length > 1) {
+        return {
+          alt1: capitalizeFirst(alt1),
+          alt2: capitalizeFirst(alt2),
+        };
+      }
     }
   }
   return null;
+}
+
+// Clean up alternative names by removing common filler words
+function cleanAlternativeName(name: string): string {
+  return name
+    .replace(/^(mein[e]?|dein[e]?|sein[e]?|ihr[e]?|unser[e]?|der|die|das|den|dem|ein[e]?|einem?)\s+/i, "")
+    .replace(/\s+(von\s+.+)$/i, "") // Remove "von meiner oma" etc.
+    .replace(/^(alte[nr]?|neue[nr]?)\s+/i, "") // Remove "alten" etc.
+    .trim();
 }
 
 // Generate title based on input
