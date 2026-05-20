@@ -162,99 +162,116 @@ export default function LandingPage() {
   }
 
   return (
-    <div className="min-h-[100svh] bg-[#030712] text-white">
-      {/* Subtle gradient background */}
+    <div className="min-h-[100svh] bg-[#030712] text-white overflow-x-hidden">
+      {/* Dynamic Colorful Gradient Background */}
       <div className="fixed inset-0 -z-10">
-        <div className="absolute inset-0 bg-gradient-to-b from-[#030712] via-[#0a1628] to-[#030712]" />
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[600px] bg-blue-500/5 rounded-full blur-[120px]" />
-        <div className="absolute bottom-0 right-0 w-[600px] h-[400px] bg-purple-500/5 rounded-full blur-[100px]" />
+        {/* Base dark gradient */}
+        <div className="absolute inset-0 bg-gradient-to-br from-[#030712] via-[#0a0f1a] to-[#030712]" />
+        
+        {/* Animated color orbs */}
+        <div className="absolute top-[-20%] left-[-10%] w-[600px] h-[600px] bg-gradient-to-br from-blue-600/30 via-blue-500/20 to-transparent rounded-full blur-[100px] animate-pulse" style={{ animationDuration: '8s' }} />
+        <div className="absolute top-[10%] right-[-5%] w-[500px] h-[500px] bg-gradient-to-bl from-purple-600/25 via-purple-500/15 to-transparent rounded-full blur-[100px] animate-pulse" style={{ animationDuration: '10s', animationDelay: '1s' }} />
+        <div className="absolute bottom-[-10%] left-[20%] w-[700px] h-[500px] bg-gradient-to-tr from-emerald-600/20 via-teal-500/15 to-transparent rounded-full blur-[120px] animate-pulse" style={{ animationDuration: '12s', animationDelay: '2s' }} />
+        <div className="absolute bottom-[20%] right-[10%] w-[400px] h-[400px] bg-gradient-to-tl from-amber-500/20 via-orange-500/10 to-transparent rounded-full blur-[80px] animate-pulse" style={{ animationDuration: '9s', animationDelay: '0.5s' }} />
+        <div className="absolute top-[40%] left-[30%] w-[300px] h-[300px] bg-gradient-to-br from-pink-500/15 via-rose-500/10 to-transparent rounded-full blur-[60px] animate-pulse" style={{ animationDuration: '7s', animationDelay: '3s' }} />
+        
+        {/* Subtle grid pattern overlay */}
+        <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: 'radial-gradient(circle at 1px 1px, white 1px, transparent 0)', backgroundSize: '40px 40px' }} />
+        
+        {/* Top gradient fade for readability */}
+        <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-black/60" />
       </div>
 
-      {/* ===== HEADER ===== */}
-      <header className="relative z-20 px-5 sm:px-8 py-5 border-b border-white/5">
-        <div className="mx-auto max-w-6xl flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
-              <BarChart3 className="w-4 h-4 text-white" />
+      {/* ===== HEADER - Liquid Glass ===== */}
+      <header className="relative z-20 px-5 sm:px-8 py-4">
+        <div className="mx-auto max-w-6xl">
+          <div className="flex items-center justify-between px-4 py-3 rounded-2xl bg-white/[0.03] backdrop-blur-xl border border-white/[0.08] shadow-lg shadow-black/10">
+            <div className="flex items-center gap-2.5">
+              <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500 flex items-center justify-center shadow-lg shadow-purple-500/20">
+                <BarChart3 className="w-4.5 h-4.5 text-white" />
+              </div>
+              <span className="text-lg font-bold tracking-tight">Nutzwertanalyse<span className="text-white/30">.com</span></span>
             </div>
-            <span className="text-lg font-bold">Nutzwertanalyse<span className="text-white/40">.com</span></span>
-          </div>
-          <div className="flex items-center gap-3">
-            <LanguageSwitcher />
-            <button
-              onClick={() => router.push("/login")}
-              className="hidden sm:block px-4 py-2 text-sm text-white/70 hover:text-white transition"
-            >
-              Anmelden
-            </button>
-            <button
-              onClick={() => router.push("/app")}
-              className="px-4 py-2 text-sm font-medium bg-white text-gray-900 rounded-lg hover:bg-gray-100 transition"
-            >
-              Kostenlos starten
-            </button>
+            <div className="flex items-center gap-2 sm:gap-3">
+              <LanguageSwitcher />
+              <button
+                onClick={() => router.push("/login")}
+                className="hidden sm:block px-4 py-2 text-sm text-white/60 hover:text-white transition-colors"
+              >
+                Anmelden
+              </button>
+              <button
+                onClick={() => router.push("/app")}
+                className="px-4 py-2.5 text-sm font-semibold bg-white text-gray-900 rounded-xl hover:bg-gray-100 transition-all shadow-lg shadow-white/10"
+              >
+                Kostenlos starten
+              </button>
+            </div>
           </div>
         </div>
       </header>
 
       {/* ===== HERO SECTION ===== */}
-      <section className="relative pt-16 sm:pt-24 pb-12 px-5">
+      <section className="relative pt-12 sm:pt-20 pb-8 px-5">
         <div className="mx-auto max-w-4xl text-center">
-          {/* Badge */}
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/5 border border-white/10 text-sm text-white/70 mb-6">
-            <Sparkles className="w-4 h-4 text-purple-400" />
-            <span>KI-gestützte Entscheidungsfindung</span>
+          {/* Badge - Liquid Glass */}
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/[0.05] backdrop-blur-xl border border-white/[0.1] text-sm text-white/80 mb-8 shadow-lg shadow-black/5">
+            <div className="w-2 h-2 rounded-full bg-gradient-to-r from-green-400 to-emerald-500 animate-pulse" />
+            <span>KI-gestuetzte Entscheidungsfindung</span>
+            <Sparkles className="w-4 h-4 text-amber-400" />
           </div>
           
           {/* Main Headline */}
-          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight mb-6">
-            Komplexe Entscheidungen
+          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight mb-6 leading-[1.1]">
+            <span className="text-white drop-shadow-lg">Komplexe Entscheidungen</span>
             <br />
-            <span className="bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent drop-shadow-lg">
               einfach analysiert.
             </span>
           </h1>
           
           {/* Subheadline */}
-          <p className="text-lg sm:text-xl text-white/60 max-w-2xl mx-auto mb-10">
-            Die professionelle Nutzwertanalyse für Unternehmen. Vergleichen Sie Alternativen systematisch, 
-            gewichten Sie Kriterien und treffen Sie fundierte Entscheidungen.
+          <p className="text-lg sm:text-xl text-white/70 max-w-2xl mx-auto mb-10 leading-relaxed">
+            Die professionelle Nutzwertanalyse fuer Unternehmen. Vergleichen Sie Alternativen systematisch 
+            und treffen Sie fundierte Entscheidungen.
           </p>
           
-          {/* Search Input */}
-          <form onSubmit={handleSubmit} className="w-full max-w-xl mx-auto mb-6">
+          {/* Search Input - Liquid Glass Style */}
+          <form onSubmit={handleSubmit} className="w-full max-w-xl mx-auto mb-8">
             <div className="relative group">
-              <div className="absolute -inset-0.5 bg-gradient-to-r from-blue-500 to-purple-500 rounded-xl opacity-20 blur group-hover:opacity-30 transition" />
-              <div className="relative flex items-center bg-white/5 backdrop-blur-xl rounded-xl border border-white/10 overflow-hidden">
+              {/* Animated glow border */}
+              <div className="absolute -inset-1 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 rounded-2xl opacity-20 blur-lg group-hover:opacity-40 transition-opacity duration-500" />
+              
+              {/* Glass container */}
+              <div className="relative flex items-center bg-white/[0.07] backdrop-blur-2xl rounded-2xl border border-white/[0.15] overflow-hidden shadow-2xl shadow-black/20">
                 <input
                   ref={inputRef}
                   type="text"
                   value={text}
                   onChange={(e) => setText(e.target.value)}
                   onKeyDown={handleKeyDown}
-                  placeholder="Was möchten Sie vergleichen oder entscheiden?"
-                  className="flex-1 px-5 py-4 bg-transparent text-white placeholder:text-white/30 focus:outline-none"
+                  placeholder="Was moechten Sie vergleichen oder entscheiden?"
+                  className="flex-1 px-6 py-5 bg-transparent text-white text-lg placeholder:text-white/40 focus:outline-none"
                 />
                 <button
                   type="submit"
                   disabled={!text.trim()}
-                  className="m-2 px-5 py-2.5 bg-gradient-to-r from-blue-500 to-purple-500 text-white font-medium rounded-lg disabled:opacity-30 disabled:cursor-not-allowed hover:opacity-90 transition flex items-center gap-2"
+                  className="m-2.5 px-6 py-3 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 text-white font-semibold rounded-xl disabled:opacity-30 disabled:cursor-not-allowed hover:shadow-lg hover:shadow-purple-500/30 transition-all duration-300 flex items-center gap-2"
                 >
                   <span className="hidden sm:inline">Analysieren</span>
-                  <ArrowRight className="w-4 h-4" />
+                  <ArrowRight className="w-5 h-5" />
                 </button>
               </div>
             </div>
           </form>
           
-          {/* Quick Examples */}
-          <p className="text-sm text-white/40 mb-2">Beispiele:</p>
+          {/* Quick Examples - Pills */}
           <div className="flex flex-wrap justify-center gap-2">
-            {["Welchen CRM anbieter wählen?", "Bester Dienstwagen?", "Neuer Lieferant für Bauteile"].map((example) => (
+            {["Welchen CRM Anbieter waehlen?", "Bester Dienstwagen?", "Neuer Lieferant fuer Bauteile"].map((example) => (
               <button
                 key={example}
                 onClick={() => setText(example)}
-                className="px-3 py-1.5 text-sm text-white/50 bg-white/5 rounded-full border border-white/10 hover:bg-white/10 hover:text-white/70 transition"
+                className="px-4 py-2 text-sm text-white/60 bg-white/[0.05] backdrop-blur-sm rounded-full border border-white/[0.1] hover:bg-white/[0.1] hover:text-white hover:border-white/20 transition-all duration-300"
               >
                 {example}
               </button>
@@ -263,124 +280,167 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ===== CATEGORY CARDS ===== */}
+      {/* ===== CATEGORY CARDS - Liquid Glass with Images ===== */}
       <section className="py-12 px-5">
-        <div className="mx-auto max-w-5xl">
-          <h2 className="text-center text-sm font-medium text-white/40 uppercase tracking-wider mb-8">
+        <div className="mx-auto max-w-6xl">
+          <h2 className="text-center text-sm font-semibold text-white/50 uppercase tracking-widest mb-10">
             Oder starten Sie direkt mit einer Vorlage
           </h2>
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
             {PRESET_CONFIG.map((preset) => (
               <button
                 key={preset.id}
                 onClick={() => handlePresetClick(preset.id)}
                 onMouseEnter={() => setHoveredPreset(preset.id)}
                 onMouseLeave={() => setHoveredPreset(null)}
-                className="group relative aspect-[4/5] rounded-2xl overflow-hidden border border-white/10 hover:border-white/20 transition-all duration-300 hover:scale-[1.02]"
+                className="group relative aspect-[3/4] rounded-2xl overflow-hidden transition-all duration-500 hover:scale-[1.03]"
                 style={{
                   boxShadow: hoveredPreset === preset.id 
-                    ? `0 20px 40px -15px rgb(${preset.color} / 0.3)` 
-                    : 'none',
+                    ? `0 25px 50px -12px rgb(${preset.color} / 0.5), 0 0 0 1px rgb(${preset.color} / 0.3), inset 0 1px 0 rgba(255,255,255,0.1)` 
+                    : '0 10px 40px -15px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.05)',
                 }}
               >
                 {/* Background Image */}
                 <img
                   src={preset.image}
-                  alt=""
-                  className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                  alt={getPresetLabel(preset.id)}
+                  className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                 />
                 
-                {/* Overlay */}
+                {/* Color Gradient Overlay matching preset color */}
                 <div 
-                  className="absolute inset-0 transition-opacity duration-300"
+                  className="absolute inset-0 transition-opacity duration-500"
                   style={{
-                    background: `linear-gradient(to top, rgb(${preset.color} / 0.9) 0%, rgb(${preset.color} / 0.3) 50%, transparent 100%)`,
+                    background: `linear-gradient(to top, rgb(${preset.color}) 0%, rgb(${preset.color} / 0.7) 30%, rgb(${preset.color} / 0.2) 60%, transparent 100%)`,
+                    opacity: hoveredPreset === preset.id ? 0.95 : 0.85,
+                  }}
+                />
+                
+                {/* Liquid Glass overlay on hover */}
+                <div 
+                  className="absolute inset-0 backdrop-blur-[2px] transition-opacity duration-500"
+                  style={{ opacity: hoveredPreset === preset.id ? 0.3 : 0 }}
+                />
+                
+                {/* Inner glow border */}
+                <div 
+                  className="absolute inset-0 rounded-2xl transition-opacity duration-500"
+                  style={{
+                    boxShadow: `inset 0 0 30px rgb(${preset.color} / 0.3)`,
+                    opacity: hoveredPreset === preset.id ? 1 : 0,
                   }}
                 />
                 
                 {/* Content */}
-                <div className="absolute inset-0 flex flex-col items-center justify-end p-3 pb-4">
+                <div className="absolute inset-0 flex flex-col items-center justify-end p-4 pb-5">
+                  {/* Icon with glass effect */}
                   <div 
-                    className="w-10 h-10 rounded-xl flex items-center justify-center mb-2 backdrop-blur-sm transition-transform duration-300 group-hover:scale-110"
-                    style={{ background: `rgb(${preset.color} / 0.5)` }}
+                    className="w-12 h-12 rounded-xl flex items-center justify-center mb-3 backdrop-blur-md border border-white/20 transition-all duration-500 group-hover:scale-110 group-hover:shadow-lg"
+                    style={{ 
+                      background: `rgba(255,255,255,0.15)`,
+                      boxShadow: hoveredPreset === preset.id ? `0 8px 32px rgb(${preset.color} / 0.4)` : 'none',
+                    }}
                   >
-                    <preset.Icon className="w-5 h-5 text-white" />
+                    <preset.Icon className="w-6 h-6 text-white drop-shadow-lg" />
                   </div>
-                  <span className="text-sm font-semibold text-white text-center">
+                  <span className="text-sm font-bold text-white text-center drop-shadow-lg tracking-wide">
                     {getPresetLabel(preset.id)}
                   </span>
                 </div>
+                
+                {/* Shine effect on hover */}
+                <div 
+                  className="absolute inset-0 transition-opacity duration-700 pointer-events-none"
+                  style={{
+                    background: 'linear-gradient(105deg, transparent 40%, rgba(255,255,255,0.1) 45%, rgba(255,255,255,0.2) 50%, rgba(255,255,255,0.1) 55%, transparent 60%)',
+                    opacity: hoveredPreset === preset.id ? 1 : 0,
+                  }}
+                />
               </button>
             ))}
           </div>
         </div>
       </section>
 
-      {/* ===== WHAT IS IT SECTION ===== */}
-      <section className="py-20 px-5 border-t border-white/5">
-        <div className="mx-auto max-w-5xl">
+      {/* ===== WHAT IS IT SECTION - Liquid Glass ===== */}
+      <section className="py-20 px-5">
+        <div className="mx-auto max-w-6xl">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             {/* Left: Text */}
             <div>
-              <h2 className="text-3xl sm:text-4xl font-bold mb-6">
-                Was ist eine Nutzwertanalyse?
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-blue-500/10 border border-blue-500/20 text-sm text-blue-400 mb-6">
+                <BarChart3 className="w-4 h-4" />
+                <span>Methodik</span>
+              </div>
+              <h2 className="text-3xl sm:text-4xl font-bold mb-6 leading-tight">
+                Was ist eine <span className="bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">Nutzwertanalyse</span>?
               </h2>
-              <p className="text-white/60 text-lg mb-6 leading-relaxed">
-                Die Nutzwertanalyse ist eine bewährte Methode zur systematischen Bewertung 
-                von Alternativen anhand mehrerer Kriterien. Sie ermöglicht objektive, 
+              <p className="text-white/60 text-lg mb-8 leading-relaxed">
+                Die Nutzwertanalyse ist eine bewaehrte Methode zur systematischen Bewertung 
+                von Alternativen anhand mehrerer Kriterien. Sie ermoeglicht objektive, 
                 nachvollziehbare Entscheidungen bei komplexen Fragestellungen.
               </p>
               <ul className="space-y-4">
                 {[
-                  "Definieren Sie Ihre Bewertungskriterien",
-                  "Gewichten Sie nach Wichtigkeit",
-                  "Bewerten Sie jede Alternative systematisch",
-                  "Erhalten Sie ein klares, fundiertes Ergebnis",
+                  { text: "Definieren Sie Ihre Bewertungskriterien", color: "blue" },
+                  { text: "Gewichten Sie nach Wichtigkeit", color: "purple" },
+                  { text: "Bewerten Sie jede Alternative systematisch", color: "pink" },
+                  { text: "Erhalten Sie ein klares, fundiertes Ergebnis", color: "emerald" },
                 ].map((item, i) => (
-                  <li key={i} className="flex items-start gap-3">
-                    <CheckCircle2 className="w-5 h-5 text-green-400 mt-0.5 flex-shrink-0" />
-                    <span className="text-white/70">{item}</span>
+                  <li key={i} className="flex items-start gap-4 group">
+                    <div className={`w-8 h-8 rounded-lg bg-${item.color}-500/20 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform`}>
+                      <CheckCircle2 className={`w-4 h-4 text-${item.color}-400`} />
+                    </div>
+                    <span className="text-white/80 pt-1">{item.text}</span>
                   </li>
                 ))}
               </ul>
             </div>
             
-            {/* Right: Visual */}
+            {/* Right: Visual - Liquid Glass Card */}
             <div className="relative">
-              <div className="bg-white/5 rounded-2xl border border-white/10 p-6 backdrop-blur-xl">
-                <div className="flex items-center gap-2 mb-4">
-                  <div className="w-3 h-3 rounded-full bg-red-500" />
-                  <div className="w-3 h-3 rounded-full bg-yellow-500" />
-                  <div className="w-3 h-3 rounded-full bg-green-500" />
+              {/* Glow effect behind */}
+              <div className="absolute -inset-4 bg-gradient-to-br from-blue-500/20 via-purple-500/10 to-pink-500/20 rounded-3xl blur-2xl" />
+              
+              {/* Glass card */}
+              <div className="relative bg-white/[0.03] backdrop-blur-2xl rounded-3xl border border-white/[0.1] p-6 shadow-2xl shadow-black/20">
+                {/* Window controls */}
+                <div className="flex items-center gap-2 mb-5">
+                  <div className="w-3 h-3 rounded-full bg-red-500 shadow-lg shadow-red-500/30" />
+                  <div className="w-3 h-3 rounded-full bg-yellow-500 shadow-lg shadow-yellow-500/30" />
+                  <div className="w-3 h-3 rounded-full bg-green-500 shadow-lg shadow-green-500/30" />
+                  <span className="ml-3 text-xs text-white/30 font-mono">Ergebnis-Vorschau</span>
                 </div>
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between p-3 bg-white/5 rounded-lg">
-                    <span className="text-sm text-white/70">Option A</span>
-                    <div className="flex items-center gap-2">
-                      <div className="w-24 h-2 bg-blue-500 rounded-full" />
-                      <span className="text-sm font-medium text-blue-400">87%</span>
+                
+                {/* Results visualization */}
+                <div className="space-y-4">
+                  {[
+                    { name: "Option A", score: 87, color: "from-blue-500 to-cyan-500" },
+                    { name: "Option B", score: 72, color: "from-purple-500 to-pink-500" },
+                    { name: "Option C", score: 58, color: "from-amber-500 to-orange-500" },
+                  ].map((option, i) => (
+                    <div key={i} className="group p-4 rounded-xl bg-white/[0.03] border border-white/[0.08] hover:bg-white/[0.05] transition-all">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-sm font-medium text-white/80">{option.name}</span>
+                        <span className={`text-sm font-bold bg-gradient-to-r ${option.color} bg-clip-text text-transparent`}>{option.score}%</span>
+                      </div>
+                      <div className="h-2 bg-white/[0.05] rounded-full overflow-hidden">
+                        <div 
+                          className={`h-full bg-gradient-to-r ${option.color} rounded-full transition-all duration-1000`}
+                          style={{ width: `${option.score}%` }}
+                        />
+                      </div>
                     </div>
-                  </div>
-                  <div className="flex items-center justify-between p-3 bg-white/5 rounded-lg">
-                    <span className="text-sm text-white/70">Option B</span>
-                    <div className="flex items-center gap-2">
-                      <div className="w-20 h-2 bg-purple-500 rounded-full" />
-                      <span className="text-sm font-medium text-purple-400">72%</span>
-                    </div>
-                  </div>
-                  <div className="flex items-center justify-between p-3 bg-white/5 rounded-lg">
-                    <span className="text-sm text-white/70">Option C</span>
-                    <div className="flex items-center gap-2">
-                      <div className="w-16 h-2 bg-pink-500 rounded-full" />
-                      <span className="text-sm font-medium text-pink-400">58%</span>
-                    </div>
-                  </div>
+                  ))}
                 </div>
-                <div className="mt-4 pt-4 border-t border-white/10 flex items-center justify-between">
-                  <span className="text-sm text-white/50">Empfehlung:</span>
-                  <span className="text-sm font-semibold text-green-400 flex items-center gap-1">
-                    <CheckCircle2 className="w-4 h-4" /> Option A
-                  </span>
+                
+                {/* Recommendation */}
+                <div className="mt-5 pt-5 border-t border-white/[0.08] flex items-center justify-between">
+                  <span className="text-sm text-white/40">Empfehlung:</span>
+                  <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-emerald-500/10 border border-emerald-500/20">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                    <span className="text-sm font-semibold text-emerald-400">Option A</span>
+                  </div>
                 </div>
               </div>
             </div>
@@ -388,14 +448,14 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ===== USP FEATURES ===== */}
-      <section className="py-20 px-5 bg-white/[0.02]">
-        <div className="mx-auto max-w-5xl">
-          <div className="text-center mb-12">
+      {/* ===== USP FEATURES - Liquid Glass Cards ===== */}
+      <section className="py-20 px-5">
+        <div className="mx-auto max-w-6xl">
+          <div className="text-center mb-14">
             <h2 className="text-3xl sm:text-4xl font-bold mb-4">
-              Ihre Vorteile
+              Ihre <span className="bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent">Vorteile</span>
             </h2>
-            <p className="text-white/60 max-w-2xl mx-auto">
+            <p className="text-white/50 max-w-2xl mx-auto text-lg">
               Professionelle Entscheidungsfindung mit modernsten Werkzeugen.
             </p>
           </div>
@@ -404,39 +464,68 @@ export default function LandingPage() {
             {USP_FEATURES.map((feature, i) => (
               <div 
                 key={i}
-                className="group p-6 rounded-2xl bg-white/5 border border-white/10 hover:border-white/20 transition-all duration-300 hover:-translate-y-1"
+                className="group relative p-8 rounded-3xl transition-all duration-500 hover:-translate-y-2"
+                style={{
+                  background: 'rgba(255,255,255,0.02)',
+                  border: '1px solid rgba(255,255,255,0.08)',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.boxShadow = `0 30px 60px -15px rgb(${feature.color} / 0.3), 0 0 0 1px rgb(${feature.color} / 0.2)`;
+                  e.currentTarget.style.borderColor = `rgb(${feature.color} / 0.3)`;
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.boxShadow = 'none';
+                  e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)';
+                }}
               >
+                {/* Gradient glow on hover */}
                 <div 
-                  className="w-12 h-12 rounded-xl flex items-center justify-center mb-4 transition-transform duration-300 group-hover:scale-110"
-                  style={{ background: `rgb(${feature.color} / 0.2)` }}
+                  className="absolute inset-0 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 -z-10"
+                  style={{ background: `radial-gradient(circle at 50% 0%, rgb(${feature.color} / 0.15) 0%, transparent 70%)` }}
+                />
+                
+                {/* Icon */}
+                <div 
+                  className="w-14 h-14 rounded-2xl flex items-center justify-center mb-6 transition-all duration-500 group-hover:scale-110 group-hover:shadow-lg"
+                  style={{ 
+                    background: `rgb(${feature.color} / 0.15)`,
+                    boxShadow: `inset 0 1px 0 rgba(255,255,255,0.1)`,
+                  }}
                 >
-                  <feature.icon className="w-6 h-6" style={{ color: `rgb(${feature.color})` }} />
+                  <feature.icon className="w-7 h-7" style={{ color: `rgb(${feature.color})` }} />
                 </div>
-                <h3 className="text-lg font-semibold mb-2">{feature.title}</h3>
-                <p className="text-white/50 text-sm leading-relaxed">{feature.description}</p>
+                
+                <h3 className="text-xl font-bold mb-3 text-white">{feature.title}</h3>
+                <p className="text-white/50 leading-relaxed">{feature.description}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* ===== MORE BENEFITS ===== */}
-      <section className="py-20 px-5">
-        <div className="mx-auto max-w-5xl">
+      {/* ===== MORE BENEFITS - Compact Glass Pills ===== */}
+      <section className="py-16 px-5">
+        <div className="mx-auto max-w-6xl">
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {[
-              { icon: Zap, text: "Sofort einsatzbereit", sub: "Keine Installation" },
-              { icon: Shield, text: "DSGVO-konform", sub: "Daten in Deutschland" },
-              { icon: Users, text: "Team-fähig", sub: "Kollaboratives Arbeiten" },
-              { icon: Clock, text: "Zeit sparen", sub: "Schnelle Ergebnisse" },
+              { icon: Zap, text: "Sofort einsatzbereit", sub: "Keine Installation", color: "245, 158, 11" },
+              { icon: Shield, text: "DSGVO-konform", sub: "Daten in Deutschland", color: "16, 185, 129" },
+              { icon: Users, text: "Team-faehig", sub: "Kollaboratives Arbeiten", color: "59, 130, 246" },
+              { icon: Clock, text: "Zeit sparen", sub: "Schnelle Ergebnisse", color: "168, 85, 247" },
             ].map((item, i) => (
-              <div key={i} className="flex items-center gap-3 p-4 rounded-xl bg-white/5 border border-white/10">
-                <div className="w-10 h-10 rounded-lg bg-white/10 flex items-center justify-center flex-shrink-0">
-                  <item.icon className="w-5 h-5 text-white/70" />
+              <div 
+                key={i} 
+                className="group flex items-center gap-4 p-4 rounded-2xl bg-white/[0.03] backdrop-blur-xl border border-white/[0.08] hover:bg-white/[0.06] hover:border-white/[0.15] transition-all duration-300"
+              >
+                <div 
+                  className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 transition-all duration-300 group-hover:scale-110"
+                  style={{ background: `rgb(${item.color} / 0.15)` }}
+                >
+                  <item.icon className="w-5 h-5" style={{ color: `rgb(${item.color})` }} />
                 </div>
                 <div>
-                  <div className="font-medium text-sm">{item.text}</div>
-                  <div className="text-xs text-white/40">{item.sub}</div>
+                  <div className="font-semibold text-white">{item.text}</div>
+                  <div className="text-sm text-white/40">{item.sub}</div>
                 </div>
               </div>
             ))}
@@ -444,56 +533,80 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ===== CTA SECTION ===== */}
+      {/* ===== CTA SECTION - Liquid Glass ===== */}
       <section className="py-20 px-5">
-        <div className="mx-auto max-w-3xl text-center">
-          <h2 className="text-3xl sm:text-4xl font-bold mb-4">
-            Bereit für bessere Entscheidungen?
-          </h2>
-          <p className="text-white/60 mb-8">
-            Starten Sie jetzt kostenlos und erleben Sie, wie einfach fundierte Entscheidungen sein können.
-          </p>
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <button
-              onClick={() => router.push("/app")}
-              className="px-8 py-3.5 bg-gradient-to-r from-blue-500 to-purple-500 text-white font-semibold rounded-xl hover:opacity-90 transition flex items-center gap-2"
-            >
-              Kostenlos starten
-              <ArrowRight className="w-4 h-4" />
-            </button>
-            <button
-              onClick={() => inputRef.current?.focus()}
-              className="px-8 py-3.5 bg-white/10 text-white font-medium rounded-xl border border-white/20 hover:bg-white/15 transition"
-            >
-              Mehr erfahren
-            </button>
+        <div className="mx-auto max-w-4xl">
+          {/* Glass card */}
+          <div className="relative p-10 sm:p-14 rounded-3xl text-center overflow-hidden">
+            {/* Animated gradient background */}
+            <div className="absolute inset-0 bg-gradient-to-br from-blue-600/20 via-purple-600/20 to-pink-600/20" />
+            <div className="absolute inset-0 backdrop-blur-3xl" />
+            <div className="absolute inset-0 border border-white/[0.1] rounded-3xl" />
+            
+            {/* Floating orbs */}
+            <div className="absolute top-0 left-1/4 w-32 h-32 bg-blue-500/30 rounded-full blur-3xl" />
+            <div className="absolute bottom-0 right-1/4 w-40 h-40 bg-purple-500/30 rounded-full blur-3xl" />
+            
+            <div className="relative z-10">
+              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-5 leading-tight">
+                Bereit fuer <span className="bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">bessere Entscheidungen</span>?
+              </h2>
+              <p className="text-white/60 mb-10 text-lg max-w-xl mx-auto">
+                Starten Sie jetzt kostenlos und erleben Sie, wie einfach fundierte Entscheidungen sein koennen.
+              </p>
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+                <button
+                  onClick={() => router.push("/app")}
+                  className="group px-8 py-4 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 text-white font-bold rounded-2xl transition-all duration-300 hover:shadow-xl hover:shadow-purple-500/30 hover:scale-[1.02] flex items-center gap-3"
+                >
+                  <span className="text-lg">Jetzt kostenlos starten</span>
+                  <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                </button>
+                <button
+                  onClick={() => {
+                    const el = document.querySelector('section:nth-of-type(3)');
+                    el?.scrollIntoView({ behavior: 'smooth' });
+                  }}
+                  className="px-8 py-4 bg-white/[0.05] backdrop-blur-xl text-white font-semibold rounded-2xl border border-white/[0.15] hover:bg-white/[0.1] hover:border-white/[0.25] transition-all duration-300"
+                >
+                  Mehr erfahren
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* ===== FOOTER ===== */}
-      <footer className="py-8 px-5 border-t border-white/5">
-        <div className="mx-auto max-w-6xl flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-white/40">
-          <div className="flex items-center gap-2">
-            <div className="w-6 h-6 rounded-md bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
-              <BarChart3 className="w-3 h-3 text-white" />
+      {/* ===== FOOTER - Clean Glass ===== */}
+      <footer className="py-10 px-5 border-t border-white/[0.05]">
+        <div className="mx-auto max-w-6xl">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-6 text-sm text-white/40">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500 flex items-center justify-center shadow-lg shadow-purple-500/20">
+                <BarChart3 className="w-4 h-4 text-white" />
+              </div>
+              <span className="font-medium">&copy; {new Date().getFullYear()} Nutzwertanalyse.com</span>
             </div>
-            <span>© {new Date().getFullYear()} Nutzwertanalyse.com</span>
-          </div>
-          <div className="flex gap-6">
-            <a href="/impressum" className="hover:text-white/70 transition">Impressum</a>
-            <a href="/agb" className="hover:text-white/70 transition">AGB</a>
-            <a href="/datenschutz" className="hover:text-white/70 transition">Datenschutz</a>
+            <div className="flex gap-8">
+              <a href="/impressum" className="hover:text-white/70 transition-colors">Impressum</a>
+              <a href="/agb" className="hover:text-white/70 transition-colors">AGB</a>
+              <a href="/datenschutz" className="hover:text-white/70 transition-colors">Datenschutz</a>
+            </div>
           </div>
         </div>
       </footer>
 
-      {/* Analyzing Overlay */}
+      {/* Analyzing Overlay - Premium Glass */}
       {phase === "analyzing" && (
-        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-xl flex items-center justify-center">
-          <div className="text-center">
-            <div className="w-16 h-16 rounded-full border-4 border-blue-500 border-t-transparent animate-spin mx-auto mb-4" />
-            <div className="text-white text-lg font-medium">Analysiere Ihre Anfrage...</div>
+        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-2xl flex items-center justify-center">
+          <div className="text-center p-10 rounded-3xl bg-white/[0.03] border border-white/[0.1] backdrop-blur-xl">
+            <div className="relative w-20 h-20 mx-auto mb-6">
+              <div className="absolute inset-0 rounded-full border-4 border-white/10" />
+              <div className="absolute inset-0 rounded-full border-4 border-transparent border-t-blue-500 border-r-purple-500 animate-spin" />
+              <div className="absolute inset-2 rounded-full border-4 border-transparent border-b-pink-500 border-l-cyan-500 animate-spin" style={{ animationDirection: 'reverse', animationDuration: '1.5s' }} />
+            </div>
+            <div className="text-white text-xl font-semibold mb-2">Analysiere Ihre Anfrage</div>
+            <div className="text-white/50 text-sm">KI verarbeitet Ihre Eingabe...</div>
           </div>
         </div>
       )}

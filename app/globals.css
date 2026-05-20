@@ -4,6 +4,11 @@
    Premium Design System - Base Theme Tokens
    ========================================================= */
 
+/* Smooth scroll for the whole page */
+html {
+  scroll-behavior: smooth;
+}
+
 /* Default (falls noch kein Theme gesetzt ist) */
 :root {
   --accent: 37 99 235;
