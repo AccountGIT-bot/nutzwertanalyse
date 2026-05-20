@@ -510,7 +510,7 @@ export default function LandingWithIntro() {
 
         {/* ===== INFINITE 3D CAROUSEL ===== */}
         <div 
-          className="relative w-full max-w-6xl h-[260px] sm:h-[320px] lg:h-[360px] animate-premium-fade-in-up stagger-2"
+          className="relative w-full max-w-6xl h-[240px] sm:h-[300px] lg:h-[360px] animate-premium-fade-in-up stagger-2"
           onMouseEnter={() => setIsPaused(true)}
           onMouseLeave={() => setIsPaused(false)}
           ref={carouselRef}
@@ -571,13 +571,13 @@ export default function LandingWithIntro() {
               const isCenter = item.offset === 0;
               const isAdjacent = Math.abs(item.offset) === 1;
 
-              // Use CSS clamp for responsive translateX instead of JS window check
+              // Responsive translateX values based on screen size via CSS custom properties
               const translateZ = isCenter ? 100 : isAdjacent ? -20 : -100;
               const scale = isCenter ? 1.15 : isAdjacent ? 0.75 : 0.5;
               const opacity = isCenter ? 1 : isAdjacent ? 0.7 : 0.3;
               const rotateY = item.offset * -10;
-              // Base translateX - CSS will handle responsive via container width
-              const translateX = item.offset * 180;
+              // Smaller translateX on mobile for better fit
+              const translateX = item.offset * 160;
 
               return (
                 <button
@@ -593,31 +593,32 @@ export default function LandingWithIntro() {
                     "absolute rounded-[24px] sm:rounded-[28px] overflow-hidden",
                     "transition-all ease-out",
                     isCenter 
-                      ? "z-30 cursor-pointer w-[180px] sm:w-[240px] lg:w-[280px] h-[220px] sm:h-[280px] lg:h-[320px]" 
-                      : "z-10 cursor-pointer w-[140px] sm:w-[180px] lg:w-[220px] h-[180px] sm:h-[220px] lg:h-[260px]",
+                      ? "z-30 cursor-pointer w-[160px] sm:w-[220px] lg:w-[280px] h-[200px] sm:h-[260px] lg:h-[320px]" 
+                      : "z-10 cursor-pointer w-[120px] sm:w-[160px] lg:w-[220px] h-[160px] sm:h-[200px] lg:h-[260px]",
                   ].join(" ")}
                   style={{
                     transform: `translateX(${translateX}px) translateZ(${translateZ}px) scale(${scale}) rotateY(${rotateY}deg)`,
                     opacity,
-                    transitionDuration: '500ms',
-                    transitionTimingFunction: 'cubic-bezier(0.4, 0, 0.2, 1)',
+                    transitionDuration: '400ms',
+                    transitionTimingFunction: 'cubic-bezier(0.25, 0.46, 0.45, 0.94)',
                     willChange: 'transform, opacity',
                     backfaceVisibility: 'hidden',
+                    contain: 'layout style paint',
                     boxShadow: isCenter 
-                      ? `0 0 0 3px rgb(${item.color} / 0.4), 0 40px 120px -20px rgb(${item.color} / 0.7), 0 0 100px rgb(${item.color} / 0.5), 0 0 150px rgb(${item.color} / 0.3)`
-                      : `0 20px 50px -15px rgba(0,0,0,0.5)`,
+                      ? `0 0 0 3px rgb(${item.color} / 0.4), 0 30px 80px -15px rgb(${item.color} / 0.6), 0 0 60px rgb(${item.color} / 0.4)`
+                      : `0 15px 40px -10px rgba(0,0,0,0.5)`,
                   }}
                 >
-                  {/* Background Image with Ken Burns effect - using img for proper fill */}
+                  {/* Background Image - optimized */}
                   <img
                     src={item.image}
                     alt=""
                     loading="eager"
+                    decoding="async"
                     className="absolute inset-0 w-full h-full object-cover"
                     style={{ 
-                      transform: isCenter ? 'scale(1.05)' : 'scale(1)',
-                      transition: 'transform 4s ease-out',
-                      willChange: 'transform',
+                      transform: isCenter ? 'scale(1.02)' : 'scale(1)',
+                      transition: 'transform 2s ease-out',
                     }}
                   />
 
