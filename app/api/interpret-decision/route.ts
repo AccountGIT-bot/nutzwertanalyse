@@ -126,6 +126,8 @@ export async function POST(req: Request) {
     const sanitizedInput = sanitizeUserInput(userInput);
     const validPackageLevel = validatePackageLevel(packageLevel);
 
+    console.log("[v0] AI interpret-decision called with:", { sanitizedInput, validPackageLevel });
+
     if (!sanitizedInput) {
       return Response.json(
         { error: "Missing or invalid user input" },
@@ -150,25 +152,29 @@ export async function POST(req: Request) {
         schema: decisionInterpretationSchema,
       }),
       system: SYSTEM_PROMPT,
-      prompt: `Interpretiere die folgende Entscheidungsfrage und erstelle einen strukturierten Analyserahmen.
+      prompt: `Analysiere diese Benutzereingabe und erstelle einen strukturierten Entscheidungsrahmen.
+
+WICHTIG: Extrahiere die KONKRETEN Alternativen aus dem Text des Benutzers!
+- Wenn der Benutzer zwei Dinge vergleicht (z.B. "BMW vs Audi" oder "ob X besser ist als Y"), nutze GENAU diese Begriffe als Alternativen
+- Erstelle NIEMALS generische Namen wie "Option A" oder "Option B"
+- Behalte Markennamen, Modellbezeichnungen und spezifische Begriffe bei
 
 Benutzereingabe: "${sanitizedInput}"
 
-Package Level: ${validPackageLevel} (${validPackageLevel === "basic" ? "einfacher, max 6 Kriterien" : validPackageLevel === "advanced" ? "detailliert, max 8 Kriterien" : "umfassend, max 10 Kriterien"})
-
-Anforderungen:
+Package Level: ${validPackageLevel}
 - Maximum ${maxAlternatives} Alternativen
 - Maximum ${maxCriteria} Kriterien
 - Alle Texte auf Deutsch
-- Praktische und realistische Vorschlaege
-- Branchenspezifische Kriterien wenn moeglich`,
+- Kriterien muessen spezifisch zum Thema passen`,
     });
+
+    console.log("[v0] AI output received:", JSON.stringify(output, null, 2));
 
     return Response.json({ interpretation: output });
   } catch (error) {
     console.error("[interpret-decision] Error:", error);
     return Response.json(
-      { error: "Failed to interpret decision" },
+      { error: "Failed to interpret decision", details: error instanceof Error ? error.message : "Unknown error" },
       { status: 500 }
     );
   }

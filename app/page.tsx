@@ -114,17 +114,19 @@ export default function LandingPage() {
     
     try {
       // Call the real AI API
+      console.log("[v0] Calling AI API with:", safe);
       const response = await fetch("/api/interpret-decision", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ userInput: safe, packageLevel: "advanced" }),
       });
       
-      if (!response.ok) {
-        throw new Error("AI request failed");
-      }
-      
       const data = await response.json();
+      console.log("[v0] AI API response:", data);
+      
+      if (!response.ok) {
+        throw new Error(data.error || "AI request failed");
+      }
       
       if (data.interpretation) {
         // Map API response to AIDecisionInterpretation format
@@ -137,6 +139,7 @@ export default function LandingPage() {
           constraints: data.interpretation.constraints,
           confidence: data.interpretation.confidence,
         };
+        console.log("[v0] AI result mapped:", aiResult);
         setInterpretation(aiResult);
         setPhase("suggestion");
       } else {
@@ -146,6 +149,7 @@ export default function LandingPage() {
       console.error("[v0] AI interpretation error:", error);
       // Fallback to local interpretation
       const fallbackResult = interpretDecisionInput(safe);
+      console.log("[v0] Using fallback result:", fallbackResult);
       setInterpretation(fallbackResult);
       setAiError("KI-Analyse nicht verfuegbar - lokale Analyse wird verwendet");
       setPhase("suggestion");
