@@ -25,6 +25,7 @@ export interface SavedAnalysisMeta {
   criterionCount: number;
   /** Bestplatzierte Alternative, sofern bereits berechnet. */
   topAlternative: string | null;
+  /** Nutzwert der bestplatzierten Alternative (Skala 1–10). */
   topScore: number | null;
 }
 
@@ -85,7 +86,7 @@ function buildMeta(id: string, state: AnalysisState): SavedAnalysisMeta {
     alternativeCount: state.alternatives.length,
     criterionCount: state.criteria.length,
     topAlternative: bestAlternative?.name ?? null,
-    topScore: best ? best.normalizedScore : null,
+    topScore: best ? best.totalScore : null,
   };
 }
 

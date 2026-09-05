@@ -9,6 +9,7 @@ import type { PackageLevel, AIDecisionInterpretation } from "@/app/lib/nwa/types
 import { renderPresetIcon, getPresetLabel, renderDomainIcon, getDomainLabel } from "@/app/lib/nwa/preset-icons";
 import { useTranslations } from "@/app/lib/i18n";
 import { useStoredValue, setStoredValue, removeStoredValue } from "@/app/lib/client-state";
+import { LegalLinks } from "@/app/components/LegalLinks";
 import { Home } from "lucide-react";
 
 type Theme = "basic" | "advanced" | "business";
@@ -460,17 +461,7 @@ export default function AppPage() {
             <div className="h-px bg-white/[0.06]" />
             <div className="pt-4 text-[10px] sm:text-[11px] text-white/30 flex flex-col sm:flex-row gap-2 sm:items-center sm:justify-between">
               <div>© {new Date().getFullYear()} Nutzwertanalyse.com</div>
-              <div className="flex flex-wrap gap-x-4 gap-y-1">
-                <a href="/impressum" className="hover:text-white/60 transition">
-                  {t.landing.footer.imprint}
-                </a>
-                <a href="/agb" className="hover:text-white/60 transition">
-                  {t.landing.footer.terms}
-                </a>
-                <a href="/datenschutz" className="hover:text-white/60 transition">
-                  {t.landing.footer.privacy}
-                </a>
-              </div>
+              <LegalLinks linkClassName="hover:text-white/60 transition" />
             </div>
           </div>
         </footer>

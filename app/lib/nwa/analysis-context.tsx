@@ -99,6 +99,29 @@ type Action =
   | { type: "DUPLICATE_ALTERNATIVE"; payload: string }
   | { type: "DUPLICATE_CRITERION"; payload: string };
 
+/**
+ * Wendet die gewählte Gewichtungsmethode an und liefert die normierten
+ * Kriterien samt AHP-Konsistenz zurück.
+ */
+function applyWeightingMethod(state: AnalysisState): {
+  criteria: Criterion[];
+  consistency: AnalysisState["ahpConsistency"];
+} {
+  switch (state.weightingMethod) {
+    case "simple":
+      return { criteria: applySimpleWeights(state.criteria), consistency: state.ahpConsistency };
+    case "percentage":
+      return { criteria: applyPercentageWeights(state.criteria), consistency: state.ahpConsistency };
+    case "ahp-light":
+    case "ahp-full": {
+      const result = applyAHPWeights(state.criteria, state.ahpComparisons);
+      return { criteria: result.criteria, consistency: result.consistency };
+    }
+    default:
+      return { criteria: state.criteria, consistency: state.ahpConsistency };
+  }
+}
+
 // Reducer
 function analysisReducer(state: AnalysisState, action: Action): AnalysisState {
   switch (action.type) {
@@ -349,28 +372,32 @@ function analysisReducer(state: AnalysisState, action: Action): AnalysisState {
         alternatives: state.alternatives.filter((a) => a.scenarioId !== action.payload),
       };
 
-    case "SET_STEP":
-      return { ...state, currentStep: action.payload };
+    case "SET_STEP": {
+      // Beim Verlassen der Gewichtung die normierten Gewichte übernehmen –
+      // sonst zeigt die Bewertungsmatrix "Gewicht: 0 %" an, obwohl die
+      // Berechnung intern längst normiert.
+      const applyWeightsNow =
+        state.currentStep === "weighting" ||
+        action.payload === "evaluation" ||
+        action.payload === "results";
+
+      if (!applyWeightsNow) {
+        return { ...state, currentStep: action.payload };
+      }
+
+      const { criteria, consistency } = applyWeightingMethod(state);
+      return {
+        ...state,
+        criteria,
+        ahpConsistency: consistency,
+        currentStep: action.payload,
+      };
+    }
 
     case "CALCULATE_RESULTS": {
       // Apply weights based on method
-      let weightedCriteria = state.criteria;
-      let ahpConsistency = state.ahpConsistency;
-
-      switch (state.weightingMethod) {
-        case "simple":
-          weightedCriteria = applySimpleWeights(state.criteria);
-          break;
-        case "percentage":
-          weightedCriteria = applyPercentageWeights(state.criteria);
-          break;
-        case "ahp-light":
-        case "ahp-full":
-          const ahpResult = applyAHPWeights(state.criteria, state.ahpComparisons);
-          weightedCriteria = ahpResult.criteria;
-          ahpConsistency = ahpResult.consistency;
-          break;
-      }
+      const { criteria: weightedCriteria, consistency: ahpConsistency } =
+        applyWeightingMethod(state);
 
       // Calculate base results
       let results = calculateNwa(

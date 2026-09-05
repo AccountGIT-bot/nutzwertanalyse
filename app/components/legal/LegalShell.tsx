@@ -84,7 +84,7 @@ export function LegalShell({
           <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-[11px] font-medium uppercase tracking-[0.14em] text-white/50">
             {eyebrow}
           </span>
-          <h1 className="mt-5 text-4xl font-bold leading-[1.08] tracking-tight sm:text-5xl">
+          <h1 className="mt-5 text-[clamp(1.85rem,7vw,3rem)] font-bold leading-[1.1] tracking-tight [hyphens:auto] break-words">
             <span className="bg-gradient-to-r from-white via-white to-white/60 bg-clip-text text-transparent">
               {title}
             </span>

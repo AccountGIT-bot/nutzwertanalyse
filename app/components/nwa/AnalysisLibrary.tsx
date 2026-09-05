@@ -290,7 +290,7 @@ export function AnalysisLibrary({ open, onClose }: { open: boolean; onClose: () 
                             <>
                               <span className="text-white/20">•</span>
                               <span style={{ color: "rgb(var(--accent))" }}>
-                                {entry.topAlternative} ({entry.topScore.toFixed(0)} %)
+                                {entry.topAlternative} ({entry.topScore.toFixed(2)} Punkte)
                               </span>
                             </>
                           )}

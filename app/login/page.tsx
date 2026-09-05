@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { LegalLinks } from "@/app/components/LegalLinks";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 
@@ -419,6 +420,14 @@ export default function LoginPage() {
           © {new Date().getFullYear()} Nutzwertanalyse.com
         </div>
       </section>
+      <footer className="mx-auto max-w-6xl px-5 sm:px-6 pb-8">
+        <div className="h-px bg-black/10" />
+        <div className="pt-3 flex flex-col gap-2 text-[11px] text-black/40 sm:flex-row sm:items-center sm:justify-between">
+          <div>© {new Date().getFullYear()} Nutzwertanalyse.com</div>
+          <LegalLinks linkClassName="transition hover:text-black/70" />
+        </div>
+      </footer>
+
     </main>
   );
 }

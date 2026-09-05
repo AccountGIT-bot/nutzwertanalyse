@@ -18,6 +18,12 @@ export function EvaluationMatrix() {
     altId: string;
     critId: string;
   } | null>(null);
+  // Zusätzlich zum Hover: per Klick oder Tastatur geöffnete Zelle. Ohne das
+  // wäre die Bewertung auf Touchgeräten und per Tastatur nicht erreichbar.
+  const [activeCell, setActiveCell] = useState<{
+    altId: string;
+    critId: string;
+  } | null>(null);
 
   // Get rating value for a cell
   const getRating = (altId: string, critId: string): number => {
@@ -171,9 +177,11 @@ export function EvaluationMatrix() {
                   {/* Rating cells */}
                   {alternatives.map((alt) => {
                     const rating = getRating(alt.id, criterion.id);
-                    const isHovered =
-                      hoveredCell?.altId === alt.id &&
-                      hoveredCell?.critId === criterion.id;
+                    const isExpanded =
+                      (hoveredCell?.altId === alt.id &&
+                        hoveredCell?.critId === criterion.id) ||
+                      (activeCell?.altId === alt.id &&
+                        activeCell?.critId === criterion.id);
                     const isFailed = failedAlternatives.includes(alt.id);
 
                     return (
@@ -185,13 +193,18 @@ export function EvaluationMatrix() {
                         }
                         onMouseLeave={() => setHoveredCell(null)}
                       >
-                        {isHovered ? (
+                        {isExpanded ? (
                           // Expanded rating buttons
                           <div className="flex gap-0.5 justify-center">
                             {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((score) => (
                               <button
                                 key={score}
-                                onClick={() => handleRating(alt.id, criterion.id, score)}
+                                type="button"
+                                aria-label={`${alt.name} – ${criterion.name}: ${score} von 10`}
+                                onClick={() => {
+                                  handleRating(alt.id, criterion.id, score);
+                                  setActiveCell(null);
+                                }}
                                 className={`h-8 w-6 rounded text-xs font-medium transition ${
                                   rating === score
                                     ? "bg-[rgb(var(--accent))] text-white"
@@ -203,9 +216,17 @@ export function EvaluationMatrix() {
                             ))}
                           </div>
                         ) : (
-                          // Compact view
-                          <div
-                            className={`h-10 rounded-lg flex items-center justify-center cursor-pointer transition ${
+                          // Compact view – klick- und tastaturbedienbar
+                          <button
+                            type="button"
+                            aria-label={
+                              rating > 0
+                                ? `${alt.name} – ${criterion.name}: aktuell ${rating} von 10, Bewertung ändern`
+                                : `${alt.name} – ${criterion.name}: bewerten`
+                            }
+                            onClick={() => setActiveCell({ altId: alt.id, critId: criterion.id })}
+                            onFocus={() => setActiveCell({ altId: alt.id, critId: criterion.id })}
+                            className={`h-10 w-full rounded-lg flex items-center justify-center cursor-pointer transition focus:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent))] ${
                               isFailed
                                 ? "bg-red-500/20 border border-red-500/30"
                                 : rating > 0
@@ -224,7 +245,7 @@ export function EvaluationMatrix() {
                             ) : (
                               <span className="text-white/30 text-sm">—</span>
                             )}
-                          </div>
+                          </button>
                         )}
                       </div>
                     );

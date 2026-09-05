@@ -13,6 +13,7 @@ import { ResultsDashboard } from "./ResultsDashboard";
 import { useTranslations } from "@/app/lib/i18n";
 import { AnalysisLibrary } from "./AnalysisLibrary";
 import { removeStoredValue } from "@/app/lib/client-state";
+import { LegalLinks } from "@/app/components/LegalLinks";
 import type { AnalysisStep } from "@/app/lib/nwa/types";
 import { FolderOpen, Home, RotateCcw } from "lucide-react";
 
@@ -476,8 +477,14 @@ export function AnalysisWizard() {
                 </svg>
                 {t.common.back}
               </button>
-              <div className="text-xs text-white/35 font-medium">
-                {t.steps.step} {currentStepIndex + 1} / {STEPS.length}
+              <div className="flex flex-col items-center gap-1">
+                <div className="text-xs text-white/35 font-medium">
+                  {t.steps.step} {currentStepIndex + 1} / {STEPS.length}
+                </div>
+                <LegalLinks
+                  className="hidden justify-center text-[10px] text-white/20 sm:flex"
+                  linkClassName="transition hover:text-white/50"
+                />
               </div>
               {currentStep !== "results" && (
                 <button

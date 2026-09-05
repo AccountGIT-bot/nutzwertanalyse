@@ -210,7 +210,7 @@ export function toCsv(state: AnalysisState): string {
 
   // Rangliste
   lines.push(csvRow(["Ergebnis"]));
-  lines.push(csvRow(["Rang", "Alternative", "Nutzwert", "Erfüllungsgrad (%)"]));
+  lines.push(csvRow(["Rang", "Alternative", "Nutzwert", "Normalisiert (%)"]));
   const ranked = [...results].sort((a, b) => a.rank - b.rank);
   for (const result of ranked) {
     const alternative = alternatives.find((entry) => entry.id === result.alternativeId);
@@ -273,16 +273,16 @@ export function toMarkdown(state: AnalysisState): string {
     lines.push("## Empfehlung");
     lines.push("");
     lines.push(
-      `**${winner.name}** erreicht mit ${ranked[0].totalScore.toFixed(2)} Punkten ` +
-        `(${ranked[0].normalizedScore.toFixed(1)} % Erfüllungsgrad) den höchsten Nutzwert.`
+      `**${winner.name}** erreicht mit ${ranked[0].totalScore.toFixed(2)} von 10 möglichen ` +
+        `Punkten den höchsten Nutzwert.`
     );
     if (ranked[1]) {
       const runnerUp = alternatives.find((entry) => entry.id === ranked[1].alternativeId);
-      const gap = ranked[0].normalizedScore - ranked[1].normalizedScore;
+      const gap = ranked[0].totalScore - ranked[1].totalScore;
       lines.push("");
       lines.push(
         `Der Vorsprung gegenüber ${runnerUp?.name ?? "der zweitplatzierten Alternative"} ` +
-          `beträgt ${gap.toFixed(1)} Prozentpunkte.`
+          `beträgt ${gap.toFixed(2)} Punkte.`
       );
     }
     lines.push("");
@@ -290,7 +290,7 @@ export function toMarkdown(state: AnalysisState): string {
 
   lines.push("## Rangliste");
   lines.push("");
-  lines.push("| Rang | Alternative | Nutzwert | Erfüllungsgrad |");
+  lines.push("| Rang | Alternative | Nutzwert | Normalisiert |");
   lines.push("| ---: | --- | ---: | ---: |");
   for (const result of ranked) {
     const alternative = alternatives.find((entry) => entry.id === result.alternativeId);
@@ -332,7 +332,9 @@ export function toMarkdown(state: AnalysisState): string {
   lines.push(
     "Der Nutzwert einer Alternative ergibt sich als Summe der mit dem jeweiligen " +
       "Kriteriengewicht multiplizierten Einzelbewertungen. Die Gewichte sind auf 100 % " +
-      "normiert, die Bewertungen erfolgen auf einer Skala von 1 bis 10."
+      "normiert, die Bewertungen erfolgen auf einer Skala von 1 bis 10. Die Spalte " +
+      "„Normalisiert“ skaliert die Nutzwerte linear zwischen der schlechtesten (0 %) " +
+      "und der besten Alternative (100 %) und dient nur dem Vergleich innerhalb dieser Analyse."
   );
   lines.push("");
   lines.push(
@@ -357,8 +359,7 @@ export function toSummaryText(state: AnalysisState): string {
     "",
     ...ranked.map(
       (result) =>
-        `${result.rank}. ${nameOf(result)} – ${result.totalScore.toFixed(2)} Punkte ` +
-        `(${result.normalizedScore.toFixed(1)} %)`
+        `${result.rank}. ${nameOf(result)} – ${result.totalScore.toFixed(2)} Punkte`
     ),
     "",
     `Kriterien: ${state.criteria.length} · Alternativen: ${state.alternatives.length}`,

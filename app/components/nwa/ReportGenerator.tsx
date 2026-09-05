@@ -437,7 +437,8 @@ function generateReportHTML(state: AnalysisState, config: ReportConfig): string 
   html += `
   <div class="footer">
     <p>Erstellt mit Nutzwertanalyse.com | ${date}</p>
-    <p>Diese Analyse dient als Entscheidungsunterstützung. Die finale Entscheidung liegt beim Anwender.</p>
+    <p>Methodik: Der Nutzwert ist die Summe der mit dem jeweiligen Kriteriengewicht multiplizierten Einzelbewertungen (Skala 1&ndash;10); die Gewichte sind auf 100&nbsp;% normiert. Die Spalte &bdquo;Normalisiert&ldquo; skaliert die Nutzwerte linear zwischen der schlechtesten (0&nbsp;%) und der besten Alternative (100&nbsp;%).</p>
+    <p>Diese Analyse dient ausschliesslich der Entscheidungsunterst&uuml;tzung und beruht vollst&auml;ndig auf den eingegebenen Kriterien, Gewichten und Bewertungen. Sie stellt keine Rechts-, Steuer- oder Finanzberatung dar. Die Verantwortung f&uuml;r die getroffene Entscheidung liegt beim Anwender.</p>
   </div>
 </body>
 </html>
@@ -522,17 +523,6 @@ export function ReportGenerator() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h3 className="text-lg font-semibold text-white">Report exportieren</h3>
-        <p className="mt-1 text-sm text-white/50">
-          {packageLevel === "basic"
-            ? "Kompakter Entscheidungsreport"
-            : packageLevel === "advanced"
-            ? "Vollständiger Analysebericht"
-            : "Executive Report mit Audit-Dokumentation"}
-        </p>
-      </div>
-
       {/* Config options */}
       <div className="space-y-3">
         <div className="text-sm font-medium text-white/70">Report-Inhalt</div>
