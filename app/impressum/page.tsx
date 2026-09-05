@@ -1,138 +1,186 @@
-"use client";
+import type { Metadata } from "next";
+import Link from "next/link";
+import {
+  LegalShell,
+  LegalSectionBlock,
+  LegalNote,
+  LegalDataList,
+  type LegalSection,
+} from "@/app/components/legal/LegalShell";
+import { siteConfig, displayValue } from "@/app/lib/site-config";
 
-import { useRouter } from "next/navigation";
+export const metadata: Metadata = {
+  title: "Impressum",
+  description:
+    "Impressum und Anbieterkennzeichnung von Nutzwertanalyse.com gemäss Art. 3 Abs. 1 lit. s UWG.",
+  alternates: { canonical: "/impressum" },
+};
+
+const SECTIONS: LegalSection[] = [
+  { id: "anbieter", title: "Anbieter und Kontakt" },
+  { id: "vertretung", title: "Vertretungsberechtigte Personen" },
+  { id: "register", title: "Register- und Steuerangaben" },
+  { id: "verantwortlich", title: "Inhaltliche Verantwortung" },
+  { id: "haftung-inhalte", title: "Haftung für Inhalte" },
+  { id: "haftung-links", title: "Haftung für Links" },
+  { id: "urheberrecht", title: "Urheber- und Kennzeichenrecht" },
+  { id: "streitbeilegung", title: "Streitbeilegung" },
+  { id: "meldung", title: "Hinweise und Beanstandungen" },
+];
 
 export default function ImpressumPage() {
-  const router = useRouter();
+  const o = siteConfig.operator;
 
   return (
-    <main className="premium-light-bg relative min-h-[100svh] text-slate-900 overflow-hidden">
-      <header className="sticky top-0 z-30">
-        <div className="bg-white/70 backdrop-blur-xl shadow-[0_12px_30px_rgba(0,0,0,0.08)]">
-          <div className="mx-auto max-w-4xl px-5 sm:px-6 h-[68px] sm:h-[76px] flex items-center justify-between">
-            <button
-              onClick={() => router.push("/")}
-              className="flex items-center gap-3 text-left"
-              aria-label="Zur Startseite"
-              title="Startseite"
-            >
-              <div className="h-10 w-10 rounded-2xl overflow-hidden">
-                <img src="/images/logo.webp" alt="Logo" className="h-full w-full object-contain" />
-              </div>
-              <div className="leading-tight">
-                <div className="text-sm sm:text-base font-semibold tracking-tight text-slate-900">
-                  Nutzwertanalyse<span className="opacity-60">.com</span>
-                </div>
-                <div className="text-[11px] sm:text-xs text-black/45">Impressum</div>
-              </div>
-            </button>
+    <LegalShell
+      eyebrow="Impressum"
+      title="Impressum"
+      lead="Anbieterkennzeichnung nach Art. 3 Abs. 1 lit. s des Bundesgesetzes gegen den unlauteren Wettbewerb (UWG). Die nachfolgenden Angaben ermöglichen eine unmittelbare Kontaktaufnahme mit dem Betreiber dieses Angebots."
+      sections={SECTIONS}
+      currentPath="/impressum"
+    >
+      <LegalSectionBlock id="anbieter" index={1} title="Anbieter und Kontakt">
+        <p>
+          Verantwortlich für dieses Online-Angebot und Vertragspartner der Nutzerinnen und Nutzer ist:
+        </p>
+        <LegalDataList
+          items={[
+            { label: "Firma / Betreiber", value: displayValue(o.legalName) },
+            { label: "Rechtsform", value: displayValue(o.legalForm) },
+            {
+              label: "Adresse",
+              value: (
+                <>
+                  {displayValue(o.street)}
+                  <br />
+                  {displayValue(o.zip)} {displayValue(o.city)}
+                  <br />
+                  {o.country}
+                </>
+              ),
+            },
+            {
+              label: "E-Mail",
+              value: <a href={`mailto:${o.email}`}>{displayValue(o.email)}</a>,
+            },
+            { label: "Telefon", value: displayValue(o.phone) },
+            { label: "Website", value: <a href={siteConfig.url}>{siteConfig.domain}</a> },
+          ]}
+        />
+        <LegalNote tone="accent" title="Rechtsgrundlage">
+          Nach <span className="legal-ref">Art. 3 Abs. 1 lit. s UWG</span> müssen Anbieter im
+          elektronischen Geschäftsverkehr klare Angaben über ihre Identität und ihre Kontaktadresse –
+          einschliesslich einer E-Mail-Adresse – machen. Ein Verstoss stellt unlauteren Wettbewerb dar
+          und ist nach <span className="legal-ref">Art. 23 UWG</span> strafbewehrt.
+        </LegalNote>
+      </LegalSectionBlock>
 
-            <button
-              onClick={() => router.back()}
-              className="rounded-full px-4 py-2 text-sm font-semibold border border-black/10 bg-white/70 hover:bg-white/85 transition"
-            >
-              Zurück
-            </button>
-          </div>
-          <div className="h-px bg-black/10" />
-        </div>
-      </header>
+      <LegalSectionBlock id="vertretung" index={2} title="Vertretungsberechtigte Personen">
+        <p>Zeichnungsberechtigt für den Anbieter sind:</p>
+        <ul>
+          {o.representatives.map((person, index) => (
+            <li key={`${person}-${index}`}>{displayValue(person)}</li>
+          ))}
+        </ul>
+      </LegalSectionBlock>
 
-      <section className="relative z-10 mx-auto max-w-4xl px-5 sm:px-6 py-10 sm:py-12">
-        <div className="rounded-3xl bg-white/72 border border-black/10 shadow-[0_30px_80px_rgba(0,0,0,0.10)] backdrop-blur-md p-6 sm:p-8">
-          <h1 className="text-3xl sm:text-4xl font-semibold tracking-tight">Impressum</h1>
-          <p className="mt-3 text-sm sm:text-base text-black/55">
-            Musterangaben – bitte mit deinen echten Unternehmensdaten ersetzen.
-          </p>
+      <LegalSectionBlock id="register" index={3} title="Register- und Steuerangaben">
+        <LegalDataList
+          items={[
+            { label: "Handelsregister", value: displayValue(o.commercialRegister) },
+            { label: "UID (Art. 3 UIDG)", value: displayValue(o.uid) },
+            { label: "MWST-Nummer", value: displayValue(o.vatId) },
+            { label: "Sitz", value: displayValue(o.jurisdiction) },
+          ]}
+        />
+        <p>
+          Sofern der Anbieter nicht mehrwertsteuerpflichtig ist (Umsatz unter der Limite von{" "}
+          <span className="legal-ref">Art. 10 Abs. 2 lit. a MWSTG</span>), wird keine Mehrwertsteuer
+          ausgewiesen und keine MWST-Nummer geführt.
+        </p>
+      </LegalSectionBlock>
 
-          <div className="mt-8 grid gap-6">
-            <div>
-              <div className="text-sm font-semibold text-black/75">Anbieter / Betreiber</div>
-              <div className="mt-2 text-sm text-black/60 leading-relaxed">
-                Firmenname / Betreiber: <span className="font-medium">[Dein Firmenname]</span>
-                <br />
-                Rechtsform: <span className="font-medium">[GmbH / AG / Einzelfirma]</span>
-                <br />
-                Adresse: <span className="font-medium">[Strasse, Nr., PLZ Ort, Schweiz]</span>
-                <br />
-                E-Mail: <span className="font-medium">[info@domain.ch]</span>
-                <br />
-                Telefon: <span className="font-medium">[+41 …]</span>
-                <br />
-                UID: <span className="font-medium">[CHE-…]</span>
-              </div>
-            </div>
+      <LegalSectionBlock id="verantwortlich" index={4} title="Inhaltliche Verantwortung">
+        <p>
+          Verantwortlich für den redaktionellen Inhalt dieser Website ist der unter Ziffer 1 genannte
+          Anbieter, vertreten durch die unter Ziffer 2 aufgeführten Personen.
+        </p>
+      </LegalSectionBlock>
 
-            <div>
-              <div className="text-sm font-semibold text-black/75">
-                Vertretungsberechtigte Person(en)
-              </div>
-              <div className="mt-2 text-sm text-black/60 leading-relaxed">
-                <span className="font-medium">[Name, Funktion]</span>
-              </div>
-            </div>
+      <LegalSectionBlock id="haftung-inhalte" index={5} title="Haftung für Inhalte">
+        <p>
+          Die Inhalte dieser Website werden mit grösstmöglicher Sorgfalt erstellt. Der Anbieter
+          übernimmt gleichwohl keine Gewähr für Richtigkeit, Vollständigkeit und Aktualität der
+          bereitgestellten Informationen.
+        </p>
+        <p>
+          Die angebotene Nutzwertanalyse ist ein methodisches Hilfsmittel zur Strukturierung von
+          Entscheidungen. Die Ergebnisse hängen vollständig von den durch die Nutzerinnen und Nutzer
+          eingegebenen Kriterien, Gewichten und Bewertungen ab. Sie stellen{" "}
+          <strong>keine Rechts-, Steuer-, Finanz-, Anlage- oder medizinische Beratung</strong> dar und
+          ersetzen keine fachliche Beurteilung im Einzelfall.
+        </p>
+        <p>
+          Haftungsansprüche gegen den Anbieter wegen Schäden materieller oder immaterieller Art, die aus
+          dem Zugriff, der Nutzung oder Nichtnutzung der veröffentlichten Informationen entstanden sind,
+          werden – soweit gesetzlich zulässig – ausgeschlossen. Nicht ausgeschlossen wird die Haftung für
+          rechtswidrige Absicht und grobe Fahrlässigkeit (
+          <span className="legal-ref">Art. 100 Abs. 1 OR</span>) sowie die Haftung nach dem
+          Produktehaftpflichtgesetz.
+        </p>
+      </LegalSectionBlock>
 
-            <div>
-              <div className="text-sm font-semibold text-black/75">Haftungsausschluss</div>
-              <div className="mt-2 text-sm text-black/60 leading-relaxed">
-                Inhalte dieser Website werden mit Sorgfalt erstellt. Für Richtigkeit, Vollständigkeit
-                und Aktualität kann jedoch keine Gewähr übernommen werden. Das Tool unterstützt
-                Entscheidungsprozesse, ersetzt jedoch keine rechtliche, steuerliche oder finanzielle
-                Beratung.
-              </div>
-            </div>
+      <LegalSectionBlock id="haftung-links" index={6} title="Haftung für Links">
+        <p>
+          Verweise und Links auf Websites Dritter liegen ausserhalb des Verantwortungsbereichs des
+          Anbieters. Zum Zeitpunkt der Verlinkung waren keine Rechtsverstösse erkennbar. Für Inhalte
+          verlinkter Seiten ist ausschliesslich deren Betreiber verantwortlich. Der Zugriff und die
+          Nutzung erfolgen auf eigene Verantwortung der Nutzerinnen und Nutzer.
+        </p>
+      </LegalSectionBlock>
 
-            <div>
-              <div className="text-sm font-semibold text-black/75">Haftung für Links</div>
-              <div className="mt-2 text-sm text-black/60 leading-relaxed">
-                Verweise und Links auf Websites Dritter liegen ausserhalb unseres Verantwortungsbereichs.
-                Der Zugriff und die Nutzung erfolgen auf eigene Gefahr.
-              </div>
-            </div>
+      <LegalSectionBlock id="urheberrecht" index={7} title="Urheber- und Kennzeichenrecht">
+        <p>
+          Die auf dieser Website veröffentlichten Inhalte, Texte, Grafiken, Layouts, Quellcodes und
+          Methodenbeschreibungen sind nach dem Bundesgesetz über das Urheberrecht und verwandte
+          Schutzrechte (<span className="legal-ref">URG</span>) geschützt. Jede Vervielfältigung,
+          Bearbeitung, Verbreitung oder öffentliche Zugänglichmachung ausserhalb der gesetzlich
+          erlaubten Nutzungen (insbesondere <span className="legal-ref">Art. 19 URG</span>,
+          Eigengebrauch) bedarf der vorgängigen schriftlichen Zustimmung des Anbieters.
+        </p>
+        <p>
+          Von Nutzerinnen und Nutzern eingegebene Inhalte (Entscheidungsfragen, Kriterien, Bewertungen,
+          Berichte) verbleiben in deren Rechtszuständigkeit. Der Anbieter erwirbt daran keine
+          Nutzungsrechte über den zur Erbringung der Dienstleistung erforderlichen Umfang hinaus.
+        </p>
+      </LegalSectionBlock>
 
-            <div>
-              <div className="text-sm font-semibold text-black/75">Urheberrechte</div>
-              <div className="mt-2 text-sm text-black/60 leading-relaxed">
-                Die Inhalte, Struktur und Gestaltung dieser Website sind urheberrechtlich geschützt.
-                Jede Vervielfältigung, Bearbeitung oder Verbreitung bedarf der vorherigen schriftlichen
-                Zustimmung.
-              </div>
-            </div>
-          </div>
+      <LegalSectionBlock id="streitbeilegung" index={8} title="Streitbeilegung">
+        <p>
+          Der Anbieter ist nicht verpflichtet und grundsätzlich nicht bereit, an
+          Streitbeilegungsverfahren vor einer Verbraucherschlichtungsstelle teilzunehmen. Die Schweiz
+          kennt kein der EU-Online-Streitbeilegungsplattform entsprechendes obligatorisches Verfahren.
+        </p>
+        <p>
+          Für Konsumentinnen und Konsumenten mit Wohnsitz in der Schweiz bleibt der zwingende
+          Gerichtsstand nach <span className="legal-ref">Art. 32 ZPO</span> vorbehalten. Weitere
+          Einzelheiten regeln die{" "}
+          <Link href="/agb">Allgemeinen Geschäftsbedingungen</Link>.
+        </p>
+      </LegalSectionBlock>
 
-          <div className="mt-10 flex flex-wrap gap-3 text-sm">
-            <a
-              className="rounded-full px-4 py-2 border border-black/10 bg-white/70 hover:bg-white/85 transition"
-              href="/datenschutz"
-            >
-              Datenschutz
-            </a>
-            <a
-              className="rounded-full px-4 py-2 border border-black/10 bg-white/70 hover:bg-white/85 transition"
-              href="/agb"
-            >
-              AGB
-            </a>
-          </div>
-        </div>
-      </section>
-
-      <footer className="relative z-10 pb-6">
-        <div className="mx-auto max-w-4xl px-5 sm:px-6">
-          <div className="h-px bg-black/10" />
-          <div className="pt-3 text-[10px] sm:text-[11px] text-black/40 flex flex-col sm:flex-row gap-2 sm:items-center sm:justify-between">
-            <div>© {new Date().getFullYear()} Nutzwertanalyse.com</div>
-            <div className="flex flex-wrap gap-x-3 gap-y-1">
-              <a href="/agb" className="underline underline-offset-2 decoration-black/20">
-                AGB
-              </a>
-              <a href="/datenschutz" className="underline underline-offset-2 decoration-black/20">
-                Datenschutz
-              </a>
-            </div>
-          </div>
-        </div>
-      </footer>
-    </main>
+      <LegalSectionBlock id="meldung" index={9} title="Hinweise und Beanstandungen">
+        <p>
+          Rechtsverletzungen, fehlerhafte Inhalte oder Sicherheitslücken können jederzeit unter{" "}
+          <a href={`mailto:${o.email}`}>{displayValue(o.email)}</a> gemeldet werden. Der Anbieter prüft
+          eingehende Meldungen zeitnah und entfernt rechtswidrige Inhalte nach Kenntnisnahme.
+        </p>
+        <p>
+          Anliegen zum Datenschutz – insbesondere Auskunfts-, Berichtigungs- und Löschungsbegehren –
+          richten Sie bitte an die in der <Link href="/datenschutz">Datenschutzerklärung</Link>{" "}
+          genannte Kontaktstelle.
+        </p>
+      </LegalSectionBlock>
+    </LegalShell>
   );
 }

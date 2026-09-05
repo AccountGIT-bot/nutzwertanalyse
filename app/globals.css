@@ -1444,3 +1444,79 @@ html {
 .gear-rotate-reverse {
   animation: gearRotate 10s linear infinite reverse;
 }
+
+/* =========================================================
+   Rechtsseiten (Impressum, Datenschutz, AGB, Cookies)
+   ========================================================= */
+
+.legal-prose a:not([class]) {
+  color: rgb(147 197 253);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-color: rgba(147, 197, 253, 0.35);
+  transition: color 0.2s ease, text-decoration-color 0.2s ease;
+}
+
+.legal-prose a:not([class]):hover {
+  color: rgb(191 219 254);
+  text-decoration-color: rgba(191, 219, 254, 0.8);
+}
+
+.legal-prose ul:not([class]),
+.legal-prose ol:not([class]) {
+  padding-left: 1.15rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.legal-prose ul:not([class]) {
+  list-style: disc;
+}
+
+.legal-prose ol:not([class]) {
+  list-style: decimal;
+}
+
+.legal-prose ul:not([class]) ::marker,
+.legal-prose ol:not([class]) ::marker {
+  color: rgba(255, 255, 255, 0.28);
+}
+
+.legal-prose strong {
+  color: rgba(255, 255, 255, 0.9);
+  font-weight: 600;
+}
+
+.legal-prose code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.85em;
+}
+
+/* Gesetzesverweis-Chip */
+.legal-ref {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 9999px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.04);
+  padding: 0.1rem 0.5rem;
+  font-size: 11px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.55);
+  white-space: nowrap;
+}
+
+/* Druck-/PDF-Ausgabe der Rechtstexte */
+@media print {
+  .legal-prose,
+  .legal-prose * {
+    color: #111 !important;
+    background: transparent !important;
+    border-color: rgba(0, 0, 0, 0.15) !important;
+  }
+
+  body {
+    background: #fff !important;
+  }
+}
