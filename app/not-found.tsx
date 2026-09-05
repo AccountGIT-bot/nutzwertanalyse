@@ -236,7 +236,7 @@ export default function NotFoundPage() {
   const showRows = open && hasRun;
 
   return (
-    <main className="premium-light-bg relative min-h-[100svh] text-slate-900 overflow-hidden">
+    <main id="main" className="premium-light-bg relative min-h-[100svh] text-slate-900 overflow-hidden">
       {/* Header (wie ursprünglich) */}
       <header className="sticky top-0 z-30">
         <div className="bg-white/70 backdrop-blur-xl shadow-[0_12px_30px_rgba(0,0,0,0.08)]">

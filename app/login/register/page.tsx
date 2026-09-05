@@ -152,7 +152,7 @@ export default function RegisterPage() {
     "focus:outline-none focus-visible:ring-4";
 
   return (
-    <main className="premium-light-bg relative min-h-[100svh] text-slate-900 overflow-x-hidden">
+    <main id="main" className="premium-light-bg relative min-h-[100svh] text-slate-900 overflow-x-hidden">
       <header className="sticky top-0 z-20">
         <div className="bg-white/0">
           <div className="mx-auto max-w-6xl px-5 sm:px-6 h-[68px] sm:h-[76px] flex items-center justify-between">

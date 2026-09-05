@@ -78,7 +78,7 @@ export function LegalShell({
         </div>
       </header>
 
-      <div className="relative z-10 mx-auto max-w-6xl px-5 pb-24 pt-12 sm:px-6 sm:pt-16">
+      <main id="main" className="relative z-10 mx-auto max-w-6xl px-5 pb-24 pt-12 sm:px-6 sm:pt-16">
         {/* Hero */}
         <div className="max-w-3xl">
           <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-[11px] font-medium uppercase tracking-[0.14em] text-white/50">
@@ -166,7 +166,7 @@ export function LegalShell({
           {/* Inhalt */}
           <div className="legal-prose min-w-0">{children}</div>
         </div>
-      </div>
+      </main>
 
       <LegalFooter />
     </div>

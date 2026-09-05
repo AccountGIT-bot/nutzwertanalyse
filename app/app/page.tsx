@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState, useMemo } from "react";
-import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { AnalysisProvider } from "@/app/lib/nwa/analysis-context";
 import { AnalysisWizard } from "@/app/components/nwa/AnalysisWizard";
@@ -127,7 +126,7 @@ export default function AppPage() {
   // Package selection screen
   if (phase === "select") {
     return (
-      <main className="min-h-[100svh] text-white relative overflow-hidden">
+      <main id="main" className="min-h-[100svh] text-white relative overflow-hidden">
         {/* ===== 3D PARALLAX BACKGROUND ===== */}
         <div className="fixed inset-0 -z-10 overflow-hidden">
           {/* Base gradient */}
@@ -477,73 +476,16 @@ export default function AppPage() {
       initialPreset={initialPreset}
       initialAIInterpretation={initialAIInterpretation}
     >
-      <main className="min-h-[100svh] text-white">
-        {/* Header - Light theme with smooth transition */}
-        <header className="sticky top-0 z-30">
-          <div
-            className={[
-              "transition-all duration-300 relative",
-              scrolled
-                ? "bg-white shadow-[0_4px_30px_rgba(0,0,0,0.15)]"
-                : "bg-white",
-            ].join(" ")}
-          >
-            <div className="mx-auto max-w-6xl px-5 sm:px-6 h-[68px] sm:h-[76px] flex items-center justify-between">
-              <button
-                onClick={() => {
-                  // Clear stored decision and go back to selection
-                  safeLocalStorage.remove("nwa_decisionDraft");
-                  safeLocalStorage.remove("nwa_preset");
-                  safeLocalStorage.remove("nwa_aiInterpretation");
-                  setPhase("select");
-                }}
-                className="flex items-center gap-3 text-left"
-                aria-label={t.packageSelect.backToSelection}
-                title={t.packageSelect.backToSelection}
-              >
-                <div className="h-10 w-10 rounded-2xl overflow-hidden">
-                  <Image
-                  src="/images/logo.webp"
-                  alt="Nutzwertanalyse.com"
-                  width={40}
-                  height={40}
-                  priority
-                  className="h-full w-full object-contain"
-                />
-                </div>
-                <div className="leading-tight">
-                  <div className="text-sm sm:text-base font-semibold tracking-tight text-slate-800">
-                    {t.brand.name}<span className="text-slate-400">{t.brand.domain}</span>
-                  </div>
-                  <div className="text-[11px] sm:text-xs text-slate-500">
-                    {t.packageSelect.backToSelection}
-                  </div>
-                </div>
-              </button>
-
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={() => router.push("/")}
-                  className="p-2 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition"
-                  title={t.wizard?.goHome || "Zur Startseite"}
-                  aria-label={t.wizard?.goHome || "Zur Startseite"}
-                >
-                  <Home size={18} />
-                </button>
-                <button
-                  onClick={() => router.push("/login")}
-                  className="rounded-full px-4 py-2 text-sm font-semibold border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 transition shadow-sm"
-                >
-                  {t.packageSelect.login}
-                </button>
-              </div>
-            </div>
-            {/* Gradient fade from white to transparent for smooth transition */}
-            <div className="absolute left-0 right-0 top-full h-8 bg-gradient-to-b from-white/80 via-white/40 to-transparent pointer-events-none" />
-          </div>
-        </header>
-
-        <AnalysisWizard />
+      <main id="main" className="min-h-[100svh] text-white">
+        <AnalysisWizard
+          onBackToPackages={() => {
+            // Kontext der Startseite verwerfen und zurück zur Paketauswahl.
+            safeLocalStorage.remove("nwa_decisionDraft");
+            safeLocalStorage.remove("nwa_preset");
+            safeLocalStorage.remove("nwa_aiInterpretation");
+            setPhase("select");
+          }}
+        />
       </main>
     </AnalysisProvider>
   );

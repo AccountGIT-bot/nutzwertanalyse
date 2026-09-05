@@ -103,7 +103,7 @@ export default function RechtlichesPage() {
         </div>
       </header>
 
-      <main className="relative z-10 mx-auto max-w-6xl px-5 pb-24 pt-14 sm:px-6 sm:pt-20">
+      <main id="main" className="relative z-10 mx-auto max-w-6xl px-5 pb-24 pt-14 sm:px-6 sm:pt-20">
         <div className="max-w-3xl">
           <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-[11px] font-medium uppercase tracking-[0.14em] text-white/50">
             Compliance

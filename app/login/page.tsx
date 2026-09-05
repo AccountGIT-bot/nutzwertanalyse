@@ -91,7 +91,7 @@ export default function LoginPage() {
     "focus:outline-none focus-visible:ring-4";
 
   return (
-    <main className="premium-light-bg relative min-h-[100svh] text-slate-900 overflow-x-hidden">
+    <main id="main" className="premium-light-bg relative min-h-[100svh] text-slate-900 overflow-x-hidden">
       {/* Header */}
       <header className="sticky top-0 z-20">
         <div className="bg-white/0">

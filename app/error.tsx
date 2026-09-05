@@ -334,7 +334,7 @@ export default function GlobalError({
   }, [error]);
 
   return (
-    <main className="premium-light-bg relative min-h-[100svh] text-slate-900 overflow-hidden">
+    <main id="main" className="premium-light-bg relative min-h-[100svh] text-slate-900 overflow-hidden">
       <header className="sticky top-0 z-30">
         <div className="bg-white/70 backdrop-blur-xl shadow-[0_12px_30px_rgba(0,0,0,0.08)]">
           <div className="mx-auto max-w-6xl px-5 sm:px-6 h-[68px] sm:h-[76px] flex items-center justify-between">

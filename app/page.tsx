@@ -250,7 +250,7 @@ export default function LandingPage() {
       </header>
 
       {/* ===== HERO SECTION ===== */}
-      <section className="relative pt-12 sm:pt-20 pb-8 px-5">
+      <section id="main" className="relative pt-12 sm:pt-20 pb-8 px-5">
         <div className="mx-auto max-w-4xl text-center">
           {/* Badge - Liquid Glass with AI indicator */}
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/[0.05] backdrop-blur-xl border border-white/[0.1] text-sm text-white/80 mb-8 shadow-lg shadow-black/5">

@@ -15,11 +15,16 @@ import { AnalysisLibrary } from "./AnalysisLibrary";
 import { removeStoredValue } from "@/app/lib/client-state";
 import { LegalLinks } from "@/app/components/LegalLinks";
 import type { AnalysisStep } from "@/app/lib/nwa/types";
-import { FolderOpen, Home, RotateCcw } from "lucide-react";
+import { FolderOpen, Home, Layers, RotateCcw } from "lucide-react";
 
 const STEP_IDS: AnalysisStep[] = ["decision", "alternatives", "criteria", "weighting", "evaluation", "results"];
 
-export function AnalysisWizard() {
+export function AnalysisWizard({
+  onBackToPackages,
+}: {
+  /** Zurück zur Paketauswahl – wird von /app übergeben. */
+  onBackToPackages?: () => void;
+} = {}) {
   const router = useRouter();
   const { state, setStep, calculateResults, canProceedToNext, reset, saveDraft, hasDraft, loadDraft } = useAnalysis();
   const { currentStep, decision } = state;
@@ -344,6 +349,16 @@ export function AnalysisWizard() {
                 </div>
               </div>
               <div className="flex items-center gap-1">
+                {onBackToPackages && (
+                  <button
+                    onClick={onBackToPackages}
+                    className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-medium text-white/45 hover:text-white/80 hover:bg-white/[0.06] border border-transparent hover:border-white/[0.08] transition-all duration-200"
+                    title="Analysepaket wechseln"
+                  >
+                    <Layers size={14} />
+                    <span className="hidden md:inline">Paket</span>
+                  </button>
+                )}
                 <button
                   onClick={handleHomeClick}
                   className="p-2 rounded-xl text-white/40 hover:text-white/75 hover:bg-white/[0.06] border border-transparent hover:border-white/[0.08] transition-all duration-200"
