@@ -102,6 +102,41 @@ function sanitizeUserInput(input: unknown): string | null {
     .slice(0, 1000);
 }
 
+/**
+ * Einfache Ratenbegrenzung pro IP (Missbrauchs- und Kostenschutz).
+ * In-Memory und damit pro Instanz – für ein verteiltes Deployment sollte sie
+ * durch einen gemeinsamen Speicher (z. B. Redis) ersetzt werden.
+ */
+const RATE_LIMIT_WINDOW_MS = 60_000;
+const RATE_LIMIT_MAX_REQUESTS = 10;
+const rateLimitBuckets = new Map<string, { count: number; resetAt: number }>();
+
+function clientKey(req: Request): string {
+  const forwarded = req.headers.get("x-forwarded-for");
+  if (forwarded) return forwarded.split(",")[0]!.trim();
+  return req.headers.get("x-real-ip") ?? "unknown";
+}
+
+function isRateLimited(req: Request): boolean {
+  const key = clientKey(req);
+  const now = Date.now();
+  const bucket = rateLimitBuckets.get(key);
+
+  if (!bucket || bucket.resetAt <= now) {
+    rateLimitBuckets.set(key, { count: 1, resetAt: now + RATE_LIMIT_WINDOW_MS });
+    // Abgelaufene Einträge gelegentlich aufräumen, damit die Map nicht wächst.
+    if (rateLimitBuckets.size > 5000) {
+      for (const [entryKey, entry] of rateLimitBuckets) {
+        if (entry.resetAt <= now) rateLimitBuckets.delete(entryKey);
+      }
+    }
+    return false;
+  }
+
+  bucket.count += 1;
+  return bucket.count > RATE_LIMIT_MAX_REQUESTS;
+}
+
 // Validate package level
 function validatePackageLevel(level: unknown): "basic" | "advanced" | "business" {
   if (level === "advanced") return "advanced";
@@ -111,6 +146,13 @@ function validatePackageLevel(level: unknown): "basic" | "advanced" | "business"
 
 export async function POST(req: Request) {
   try {
+    if (isRateLimited(req)) {
+      return Response.json(
+        { error: "Zu viele Anfragen. Bitte versuchen Sie es in einer Minute erneut." },
+        { status: 429, headers: { "Retry-After": "60" } }
+      );
+    }
+
     // Parse request body with error handling
     let body: Record<string, unknown>;
     try {
@@ -168,10 +210,12 @@ Package Level: ${validPackageLevel}
 
     return Response.json({ interpretation: output });
   } catch (error) {
+    // Nur serverseitig protokollieren – die Fehlermeldung kann interne
+    // Konfigurationsdetails enthalten und gehört nicht in die Antwort.
     console.error("[interpret-decision] Error:", error);
     return Response.json(
-      { error: "Failed to interpret decision", details: error instanceof Error ? error.message : "Unknown error" },
-      { status: 500 }
+      { error: "Die KI-Analyse ist derzeit nicht verfügbar." },
+      { status: 502 }
     );
   }
 }
