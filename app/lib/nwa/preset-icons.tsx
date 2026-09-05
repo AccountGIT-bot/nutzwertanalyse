@@ -204,6 +204,32 @@ export function getPresetIcon(presetId: PresetId | string | undefined): (props: 
   }
 }
 
+/**
+ * Rendert das Icon direkt als Element. Dadurch wird während des Renderings
+ * kein Komponententyp erzeugt – das erlaubt dem React Compiler zu optimieren.
+ */
+export function renderPresetIcon(
+  presetId: PresetId | string | undefined,
+  props: PresetIconProps = {}
+): ReactNode {
+  switch (presetId) {
+    case "supplier":
+      return <SupplierIcon {...props} />;
+    case "software":
+      return <SoftwareIcon {...props} />;
+    case "investment":
+      return <InvestmentIcon {...props} />;
+    case "machines":
+      return <MachinesIcon {...props} />;
+    case "vehicle":
+      return <VehicleIcon {...props} />;
+    case "employee":
+      return <EmployeeIcon {...props} />;
+    default:
+      return <CustomIcon {...props} />;
+  }
+}
+
 // Get preset label by ID
 export function getPresetLabel(presetId: PresetId | string | undefined): string {
   switch (presetId) {
@@ -264,6 +290,15 @@ export function getDomainIcon(domain: string | undefined): (props: PresetIconPro
   return getPresetIcon(presetId);
 }
 
+/** Rendert das Icon zu einer KI-Domäne direkt als Element. */
+export function renderDomainIcon(
+  domain: string | undefined,
+  props: PresetIconProps = {}
+): ReactNode {
+  const presetId = domain ? DOMAIN_TO_PRESET_ID[domain] : undefined;
+  return renderPresetIcon(presetId, props);
+}
+
 // Preset context indicator component - shows the selected preset with icon
 export function PresetIndicator({ 
   presetId, 
@@ -274,7 +309,6 @@ export function PresetIndicator({
   size?: "sm" | "md" | "lg";
   showLabel?: boolean;
 }) {
-  const IconComponent = getPresetIcon(presetId);
   const label = getPresetLabel(presetId);
   
   const sizeClasses = {
@@ -300,7 +334,7 @@ export function PresetIndicator({
           color: "rgb(var(--accent))",
         }}
       >
-        <IconComponent size={iconSizes[size]} />
+        {renderPresetIcon(presetId, { size: iconSizes[size] })}
       </div>
       {showLabel && (
         <span className={`${size === "sm" ? "text-xs" : size === "md" ? "text-sm" : "text-base"} text-white/70`}>

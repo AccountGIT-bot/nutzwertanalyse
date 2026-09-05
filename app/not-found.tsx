@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 
 type StepStatus = "idle" | "running" | "ok" | "fail";
@@ -145,12 +146,12 @@ function useDiagnostics() {
           ms,
           detail: res.ok ? `HTTP ${res.status}` : `Nicht OK (HTTP ${res.status})`,
         });
-      } catch (e: any) {
+      } catch (error: unknown) {
         const ms = Math.round(msNow() - t2);
         patch("app", {
           status: "fail",
           ms,
-          detail: e?.name === "AbortError" ? "Timeout" : "Fehler (Netz/Adblock/Firewall)",
+          detail: (error as { name?: string })?.name === "AbortError" ? "Timeout" : "Fehler (Netz/Adblock/Firewall)",
         });
       }
 
@@ -247,7 +248,14 @@ export default function NotFoundPage() {
               title="Startseite"
             >
               <div className="h-10 w-10 rounded-2xl overflow-hidden">
-                <img src="/images/logo.webp" alt="Logo" className="h-full w-full object-contain" />
+                <Image
+                  src="/images/logo.webp"
+                  alt="Nutzwertanalyse.com"
+                  width={40}
+                  height={40}
+                  priority
+                  className="h-full w-full object-contain"
+                />
               </div>
               <div className="leading-tight">
                 <div className="text-sm sm:text-base font-semibold tracking-tight text-slate-900">
@@ -278,9 +286,12 @@ export default function NotFoundPage() {
 
       {/* Image block: kleiner + weiter oben */}
       <div className="mx-auto max-w-6xl px-5 sm:px-6 pt-2 sm:pt-3">
-        <img
+        <Image
           src="/presets/404_Error_Image.png"
-          alt="404"
+          alt="Seite nicht gefunden"
+          width={480}
+          height={480}
+          priority
           className="mx-auto w-full max-w-[360px] sm:max-w-[420px] xl:max-w-[480px] h-auto select-none pointer-events-none"
           style={{ opacity: 0.98, filter: "contrast(1.02) saturate(1.06)" }}
         />

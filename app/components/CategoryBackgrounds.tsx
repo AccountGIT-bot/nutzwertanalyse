@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useMemo } from "react";
+import { useIsHydrated } from "@/app/lib/client-state";
 
 // Code snippets for Software category
 const CODE_SNIPPETS = [
@@ -97,9 +98,15 @@ export function InvestmentBackground({ color, opacity = 0.12 }: { color: string;
       return path;
     };
     
-    setPoints(generatePath());
+    // Die erste (zufällige) Kurve wird bewusst erst nach dem Commit gesetzt:
+    // im Effekt-Rumpf würde das eine zusätzliche Renderrunde auslösen und beim
+    // Server-Rendering zu einer Hydration-Abweichung führen.
+    const initialFrame = requestAnimationFrame(() => setPoints(generatePath()));
     const interval = setInterval(() => setPoints(generatePath()), 10000);
-    return () => clearInterval(interval);
+    return () => {
+      cancelAnimationFrame(initialFrame);
+      clearInterval(interval);
+    };
   }, []);
 
   return (
@@ -261,11 +268,7 @@ export function RealEstateBackground({ color, opacity = 0.1 }: { color: string; 
 
 // Supplier/Employee: Subtle network connections
 export function NetworkBackground({ color, opacity = 0.12 }: { color: string; opacity?: number }) {
-  const [mounted, setMounted] = useState(false);
-  
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+  const mounted = useIsHydrated();
 
   // Fixed deterministic node positions and sizes
   const nodes = [

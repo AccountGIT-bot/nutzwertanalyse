@@ -9,6 +9,9 @@ export const it = {
     tagline: "Uno strumento Decision Studio",
     headerSubtitle: "Documentazione strutturata delle decisioni",
     swissQuality: "Qualità Svizzera",
+    login: "Accedi",
+    startFree: "Inizia gratuitamente",
+    learnMore: "Scopri di più",
   },
   constructionBanner: {
     text: "Questo sito è in costruzione – alcune funzionalità sono in sviluppo",

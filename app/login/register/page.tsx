@@ -61,6 +61,7 @@ export default function RegisterPage() {
   const [submitAttempted, setSubmitAttempted] = useState(false);
   const [serverMsg, setServerMsg] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [authNotice, setAuthNotice] = useState<string | null>(null);
 
   // Trial note after 15s
   const [showTrial, setShowTrial] = useState(false);
@@ -111,8 +112,10 @@ export default function RegisterPage() {
     ].join(" ");
   }
 
-  function startOAuth(_provider: "apple" | "google") {
-    // OAuth not configured yet - will be implemented with auth provider
+  function startOAuth(provider: "apple" | "google") {
+    setAuthNotice(
+      `Die Registrierung mit ${provider === "apple" ? "Apple" : "Google"} ist noch nicht aktiviert. Sie können ohne Konto starten – alle Funktionen sind verfügbar.`
+    );
   }
 
   async function onSubmit(e: React.FormEvent) {
@@ -122,11 +125,12 @@ export default function RegisterPage() {
 
     if (Object.keys(errors).length) return;
 
-    setIsSubmitting(true);
+    // Es besteht noch keine Benutzerverwaltung – kein Konto vortäuschen.
+    setServerMsg(
+      "Die Registrierung ist noch nicht freigeschaltet. Sie können die Nutzwertanalyse ohne Konto in vollem Umfang nutzen – Ihre Daten bleiben lokal in Ihrem Browser."
+    );
     try {
-      // TODO: echtes Register (API/Auth)
-      setServerMsg("Account erstellt (Demo). Du kannst dich jetzt einloggen.");
-      window.setTimeout(() => router.push("/login"), 900);
+      setAuthNotice(null);
     } finally {
       setIsSubmitting(false);
     }
@@ -158,7 +162,14 @@ export default function RegisterPage() {
               title="Login"
             >
               <div className="h-10 w-10 rounded-2xl overflow-hidden">
-                <img src="/images/logo.webp" alt="Logo" className="h-full w-full object-contain" />
+                <Image
+                  src="/images/logo.webp"
+                  alt="Nutzwertanalyse.com"
+                  width={40}
+                  height={40}
+                  priority
+                  className="h-full w-full object-contain"
+                />
               </div>
               <div className="leading-tight">
                 <div className="text-sm sm:text-base font-semibold tracking-tight text-slate-900">
@@ -466,7 +477,19 @@ export default function RegisterPage() {
                   </div>
                 </div>
 
-                {serverMsg && (
+{authNotice && (
+                  <div className="rounded-2xl border border-amber-500/25 bg-amber-500/[0.08] px-4 py-3 text-sm text-amber-900">
+                    <div className="font-medium">{authNotice}</div>
+                    <a
+                      href="/app"
+                      className="mt-2 inline-flex items-center gap-1.5 text-sm font-semibold underline underline-offset-4"
+                    >
+                      Ohne Konto starten →
+                    </a>
+                  </div>
+                )}
+
+                                {serverMsg && (
                   <div
                     className="rounded-2xl border px-4 py-3 text-sm"
                     style={{

@@ -12,6 +12,9 @@ export const de = {
     tagline: "Ein Tool von Decision Studio",
     headerSubtitle: "Entscheidungen strukturiert dokumentieren",
     swissQuality: "Swiss Quality",
+    login: "Anmelden",
+    startFree: "Kostenlos starten",
+    learnMore: "Mehr erfahren",
   },
   
   // Construction Banner
@@ -94,7 +97,7 @@ export const de = {
       titlePlaceholder: "z.B. Welches Fahrzeug passt am besten zu unserem Einsatzzweck?",
       descriptionPlaceholder: "Beschreiben Sie den Einsatzzweck: Wie viele Kilometer pro Jahr? Welche Ladung/Personen?",
       constraintsPlaceholder: "z.B. Budget max. CHF 60'000, Mindestreichweite 400km, Anhängerkupplung erforderlich",
-      titleExamples: ["Welches Firmenfahrzeug sollen wir anschaffen?", "Elektroauto oder Verbrenner für den Außendienst?"],
+      titleExamples: ["Welches Firmenfahrzeug sollen wir anschaffen?", "Elektroauto oder Verbrenner für den Aussendienst?"],
       constraintsExamples: ["Mindestens 5 Sitzplätze", "Allradantrieb bevorzugt"],
       alternativePlaceholders: ["Fahrzeug A", "Fahrzeug B", "Fahrzeug C"],
     },
@@ -105,7 +108,7 @@ export const de = {
       descriptionPlaceholder: "Beschreiben Sie die Position: Welche Aufgaben umfasst sie? Welche Qualifikationen sind wichtig?",
       constraintsPlaceholder: "z.B. Gehaltsrahmen 80-100k, Startdatum spätestens Q2, Berufserfahrung mind. 5 Jahre",
       titleExamples: ["Wen sollen wir für die Stelle als Projektleiter einstellen?", "Welcher Bewerber passt am besten ins Team?"],
-      constraintsExamples: ["Fließende Englischkenntnisse", "Führungserfahrung erforderlich"],
+      constraintsExamples: ["Fliessende Englischkenntnisse", "Führungserfahrung erforderlich"],
       alternativePlaceholders: ["Kandidat A", "Kandidat B", "Kandidat C"],
     },
     realEstate: {
@@ -148,7 +151,7 @@ export const de = {
     save: "Speichern",
     delete: "Löschen",
     edit: "Bearbeiten",
-    close: "Schließen",
+    close: "Schliessen",
     loading: "Lädt...",
     error: "Fehler",
     success: "Erfolgreich",
@@ -470,7 +473,7 @@ export const de = {
   
   // Info Buttons
   info: {
-    close: "Schließen",
+    close: "Schliessen",
     learnMore: "Mehr erfahren",
     tip: "Tipp",
     example: "Beispiel",

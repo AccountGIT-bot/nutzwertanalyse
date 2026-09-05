@@ -1,12 +1,14 @@
 "use client";
 
 import { useEffect, useState, useMemo } from "react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { AnalysisProvider } from "@/app/lib/nwa/analysis-context";
 import { AnalysisWizard } from "@/app/components/nwa/AnalysisWizard";
 import type { PackageLevel, AIDecisionInterpretation } from "@/app/lib/nwa/types";
-import { getPresetIcon, getPresetLabel, getDomainIcon, getDomainLabel } from "@/app/lib/nwa/preset-icons";
+import { renderPresetIcon, getPresetLabel, renderDomainIcon, getDomainLabel } from "@/app/lib/nwa/preset-icons";
 import { useTranslations } from "@/app/lib/i18n";
+import { useStoredValue, setStoredValue, removeStoredValue } from "@/app/lib/client-state";
 import { Home } from "lucide-react";
 
 type Theme = "basic" | "advanced" | "business";
@@ -27,56 +29,43 @@ const safeLocalStorage = {
       return null;
     }
   },
-  set(key: string, value: string): void {
-    if (typeof window === "undefined") return;
-    try {
-      localStorage.setItem(key, value);
-    } catch {
-      // Silent fail for localStorage errors (quota, private browsing)
-    }
-  },
-  remove(key: string): void {
-    if (typeof window === "undefined") return;
-    try {
-      localStorage.removeItem(key);
-    } catch {
-      // Silent fail
-    }
-  },
+  set: setStoredValue,
+  remove: removeStoredValue,
 };
 
-function getSavedTheme(): Theme {
-  const saved = safeLocalStorage.get("nwa_theme");
-  return (saved === "basic" || saved === "advanced" || saved === "business") ? saved : "basic";
-}
 
-function getSavedDecision(): string {
-  return safeLocalStorage.get("nwa_decisionDraft") || "";
-}
 
-function getSavedPreset(): string | undefined {
-  return safeLocalStorage.get("nwa_preset") || undefined;
-}
 
-function getSavedAIInterpretation(): AIDecisionInterpretation | undefined {
-  const saved = safeLocalStorage.get("nwa_aiInterpretation");
-  if (!saved) return undefined;
-  try {
-    return JSON.parse(saved);
-  } catch {
-    return undefined;
-  }
-}
 
 export default function AppPage() {
   const router = useRouter();
   const t = useTranslations();
   const [scrolled, setScrolled] = useState(false);
   const [phase, setPhase] = useState<"select" | "analysis">("select");
-  const [selectedTheme, setSelectedTheme] = useState<Theme>("basic");
-  const [initialDecision, setInitialDecision] = useState("");
-  const [initialPreset, setInitialPreset] = useState<string | undefined>();
-  const [initialAIInterpretation, setInitialAIInterpretation] = useState<AIDecisionInterpretation | undefined>();
+  const [previewTheme, setPreviewTheme] = useState<Theme | null>(null);
+  const [chosenTheme, setChosenTheme] = useState<Theme | null>(null);
+
+  // Gespeicherte Werte hydrationssicher lesen (serverseitig `null`).
+  const storedTheme = useStoredValue("nwa_theme");
+  const storedDecision = useStoredValue("nwa_decisionDraft");
+  const storedPreset = useStoredValue("nwa_preset");
+  const storedInterpretation = useStoredValue("nwa_aiInterpretation");
+
+  const selectedTheme: Theme =
+    chosenTheme ??
+    (storedTheme === "basic" || storedTheme === "advanced" || storedTheme === "business"
+      ? storedTheme
+      : "basic");
+  const initialDecision = storedDecision ?? "";
+  const initialPreset = storedPreset ?? undefined;
+  const initialAIInterpretation = useMemo<AIDecisionInterpretation | undefined>(() => {
+    if (!storedInterpretation) return undefined;
+    try {
+      return JSON.parse(storedInterpretation) as AIDecisionInterpretation;
+    } catch {
+      return undefined;
+    }
+  }, [storedInterpretation]);
 
   // Dynamic models with translations
   const MODELS = useMemo(() => [
@@ -104,24 +93,6 @@ export default function AppPage() {
   ], [t]);
 
   useEffect(() => {
-    const saved = getSavedTheme();
-    setSelectedTheme(saved);
-    document.documentElement.dataset.theme = saved;
-    
-    const decision = getSavedDecision();
-    const preset = getSavedPreset();
-    const aiInterpretation = getSavedAIInterpretation();
-    setInitialDecision(decision);
-    setInitialPreset(preset);
-    setInitialAIInterpretation(aiInterpretation);
-    
-    // Note: Even if coming from landing with a decision/preset,
-    // we always start with package selection so the user can
-    // consciously choose the intensity level (Basic/Advanced/Business).
-    // The preset only determines the use case context, not the package level.
-  }, []);
-
-  useEffect(() => {
     function onScroll() {
       setScrolled(window.scrollY > 8);
     }
@@ -130,19 +101,25 @@ export default function AppPage() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
+  // Das Theme wird als Effekt an das DOM gespiegelt – der Render bleibt frei
+  // von Seiteneffekten.
+  useEffect(() => {
+    document.documentElement.dataset.theme = previewTheme ?? selectedTheme;
+  }, [previewTheme, selectedTheme]);
+
   function preview(theme: Theme) {
-    document.documentElement.dataset.theme = theme;
+    setPreviewTheme(theme);
   }
 
   function restore() {
-    document.documentElement.dataset.theme = selectedTheme;
+    setPreviewTheme(null);
   }
 
   function choose(theme: Theme) {
-    setSelectedTheme(theme);
+    setChosenTheme(theme);
+    setPreviewTheme(null);
     safeLocalStorage.set("nwa_theme", theme);
     safeLocalStorage.set("nwa_packageLevel", theme);
-    document.documentElement.dataset.theme = theme;
     setPhase("analysis");
   }
 
@@ -304,9 +281,9 @@ export default function AppPage() {
             {/* Premium context card */}
             {(initialAIInterpretation || initialPreset) && (() => {
               const hasAIContext = initialAIInterpretation?.domain;
-              const ContextIcon = hasAIContext 
-                ? getDomainIcon(initialAIInterpretation.domain) 
-                : getPresetIcon(initialPreset);
+              const contextIcon = hasAIContext
+                ? renderDomainIcon(initialAIInterpretation.domain, { size: 20 })
+                : renderPresetIcon(initialPreset, { size: 20 });
               const contextLabel = hasAIContext 
                 ? getDomainLabel(initialAIInterpretation.domain) 
                 : getPresetLabel(initialPreset);
@@ -322,7 +299,7 @@ export default function AppPage() {
                       boxShadow: `0 0 20px rgb(var(--accent) / 0.1)`,
                     }}
                   >
-                    <ContextIcon size={20} />
+                    {contextIcon}
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="text-xs text-white/45 flex items-center gap-2">
@@ -343,7 +320,7 @@ export default function AppPage() {
           </div>
 
           <div className="grid gap-5 sm:gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
-            {MODELS.map((m, index) => {
+            {MODELS.map((m) => {
               const active = selectedTheme === m.id;
 
               return (
@@ -526,8 +503,7 @@ export default function AppPage() {
                   // Clear stored decision and go back to selection
                   safeLocalStorage.remove("nwa_decisionDraft");
                   safeLocalStorage.remove("nwa_preset");
-                  setInitialDecision("");
-                  setInitialPreset(undefined);
+                  safeLocalStorage.remove("nwa_aiInterpretation");
                   setPhase("select");
                 }}
                 className="flex items-center gap-3 text-left"
@@ -535,7 +511,14 @@ export default function AppPage() {
                 title={t.packageSelect.backToSelection}
               >
                 <div className="h-10 w-10 rounded-2xl overflow-hidden">
-                  <img src="/images/logo.webp" alt="Logo" className="h-full w-full object-contain" />
+                  <Image
+                  src="/images/logo.webp"
+                  alt="Nutzwertanalyse.com"
+                  width={40}
+                  height={40}
+                  priority
+                  className="h-full w-full object-contain"
+                />
                 </div>
                 <div className="leading-tight">
                   <div className="text-sm sm:text-base font-semibold tracking-tight text-slate-800">

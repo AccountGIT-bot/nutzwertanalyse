@@ -12,6 +12,9 @@ export const en = {
     tagline: "A Decision Studio Tool",
     headerSubtitle: "Structured decision documentation",
     swissQuality: "Swiss Quality",
+    login: "Sign in",
+    startFree: "Start for free",
+    learnMore: "Learn more",
   },
   
   // Construction Banner

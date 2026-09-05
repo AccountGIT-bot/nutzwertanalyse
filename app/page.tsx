@@ -1,9 +1,10 @@
 "use client";
 
-import { useEffect, useRef, useState, useCallback } from "react";
+import { useRef, useState, useCallback } from "react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
+import { removeStoredValue, setStoredValue } from "@/app/lib/client-state";
 import { 
-  getPresetIcon, 
   type PresetId,
   SupplierIcon,
   SoftwareIcon,
@@ -17,8 +18,9 @@ import type { AIDecisionInterpretation } from "@/app/lib/nwa/types";
 import { interpretDecisionInput, sanitizeInput } from "@/app/lib/nwa/interpretation-engine";
 import { useTranslations } from "@/app/lib/i18n";
 import { LanguageSwitcher } from "@/app/components/LanguageSwitcher";
+import { ConsentSettingsButton } from "@/app/components/CookieConsent";
 import {
-  Sparkles,
+  AlertTriangle,
   FileDown,
   BarChart3,
   Users,
@@ -58,7 +60,7 @@ const USP_FEATURES = [
   {
     icon: FileDown,
     title: "Export als PDF & Excel",
-    description: "Professionelle Berichte fuer Praesentationen, Dokumentation und Entscheidungsvorlagen.",
+    description: "Professionelle Berichte für Präsentationen, Dokumentation und Entscheidungsvorlagen.",
     color: "16, 185, 129",
   },
   {
@@ -67,13 +69,6 @@ const USP_FEATURES = [
     description: "Interaktive Diagramme, Gewichtungsvisualisierung und Sensitivitaetsanalysen.",
     color: "59, 130, 246",
   },
-];
-
-// Trust badges
-const STATS = [
-  { value: "10k+", label: "Analysen erstellt" },
-  { value: "98%", label: "Zufriedenheit" },
-  { value: "50+", label: "Unternehmen" },
 ];
 
 export default function LandingPage() {
@@ -114,7 +109,6 @@ export default function LandingPage() {
     
     try {
       // Call the real AI API
-      console.log("[v0] Calling AI API with:", safe);
       const response = await fetch("/api/interpret-decision", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -122,7 +116,6 @@ export default function LandingPage() {
       });
       
       const data = await response.json();
-      console.log("[v0] AI API response:", data);
       
       if (!response.ok) {
         throw new Error(data.error || "AI request failed");
@@ -139,8 +132,7 @@ export default function LandingPage() {
           constraints: data.interpretation.constraints,
           confidence: data.interpretation.confidence,
         };
-        console.log("[v0] AI result mapped:", aiResult);
-        setInterpretation(aiResult);
+          setInterpretation(aiResult);
         setPhase("suggestion");
       } else {
         throw new Error("No interpretation returned");
@@ -149,9 +141,8 @@ export default function LandingPage() {
       console.error("[v0] AI interpretation error:", error);
       // Fallback to local interpretation
       const fallbackResult = interpretDecisionInput(safe);
-      console.log("[v0] Using fallback result:", fallbackResult);
       setInterpretation(fallbackResult);
-      setAiError("KI-Analyse nicht verfuegbar - lokale Analyse wird verwendet");
+      setAiError("KI-Analyse nicht verfügbar – es wird eine lokal erzeugte Struktur verwendet. Sie können alle Vorschläge frei anpassen.");
       setPhase("suggestion");
     }
   }, [text]);
@@ -170,32 +161,38 @@ export default function LandingPage() {
   };
 
   const handlePresetClick = (presetId: PresetId) => {
-    router.push(`/app?preset=${presetId}`);
+    // /app liest den Kontext aus dem lokalen Speicher – so überlebt er auch
+    // einen Reload und verlässt nie den Browser.
+    setStoredValue("nwa_preset", presetId);
+    removeStoredValue("nwa_aiInterpretation");
+    removeStoredValue("nwa_decisionDraft");
+    router.push("/app");
+  };
+
+  const startAnalysis = (result: AIDecisionInterpretation) => {
+    setStoredValue("nwa_aiInterpretation", JSON.stringify(result));
+    setStoredValue("nwa_decisionDraft", result.title || text.trim());
+    removeStoredValue("nwa_preset");
+    router.push("/app");
   };
 
   // Suggestion Phase
   if (phase === "suggestion" && interpretation) {
     return (
       <div className="min-h-[100svh] bg-[#030712]">
+        {aiError && (
+          <div className="mx-auto max-w-3xl px-5 pt-5">
+            <div className="flex items-start gap-2.5 rounded-2xl border border-amber-400/25 bg-amber-400/[0.08] p-3.5 text-sm text-amber-100/85">
+              <AlertTriangle className="mt-0.5 h-4 w-4 flex-shrink-0" />
+              <span>{aiError}</span>
+            </div>
+          </div>
+        )}
         <DecisionSuggestion
           interpretation={interpretation}
           originalInput={text.trim()}
-          onAccept={(acceptedInterpretation) => {
-            const params = new URLSearchParams();
-            params.set("title", acceptedInterpretation.title || text.trim());
-            params.set("package", "standard");
-            if (acceptedInterpretation?.domain) params.set("domain", acceptedInterpretation.domain);
-            params.set("ai", encodeURIComponent(JSON.stringify(acceptedInterpretation)));
-            router.push(`/app?${params.toString()}`);
-          }}
-          onEdit={(editedInterpretation) => {
-            const params = new URLSearchParams();
-            params.set("title", editedInterpretation.title || text.trim());
-            params.set("package", "standard");
-            if (editedInterpretation?.domain) params.set("domain", editedInterpretation.domain);
-            params.set("ai", encodeURIComponent(JSON.stringify(editedInterpretation)));
-            router.push(`/app?${params.toString()}`);
-          }}
+          onAccept={startAnalysis}
+          onEdit={startAnalysis}
           onReject={handleBack}
         />
       </div>
@@ -239,13 +236,13 @@ export default function LandingPage() {
                 onClick={() => router.push("/login")}
                 className="hidden sm:block px-4 py-2 text-sm text-white/60 hover:text-white transition-colors"
               >
-                Anmelden
+                {t.brand.login}
               </button>
               <button
                 onClick={() => router.push("/app")}
                 className="px-4 py-2.5 text-sm font-semibold bg-white text-gray-900 rounded-xl hover:bg-gray-100 transition-all shadow-lg shadow-white/10"
               >
-                Kostenlos starten
+                {t.brand.startFree}
               </button>
             </div>
           </div>
@@ -264,17 +261,17 @@ export default function LandingPage() {
           
           {/* Main Headline */}
           <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight mb-6 leading-[1.1]">
-            <span className="text-white drop-shadow-lg">Komplexe Entscheidungen</span>
+            <span className="text-white drop-shadow-lg">{t.landing.headline.part1}</span>{" "}
+            <span className="text-white drop-shadow-lg">{t.landing.headline.part2}</span>
             <br />
             <span className="bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent drop-shadow-lg">
-              einfach analysiert.
+              {t.landing.headline.part3}
             </span>
           </h1>
           
           {/* Subheadline */}
           <p className="text-lg sm:text-xl text-white/70 max-w-2xl mx-auto mb-10 leading-relaxed">
-            Die professionelle Nutzwertanalyse fuer Unternehmen. Vergleichen Sie Alternativen systematisch 
-            und treffen Sie fundierte Entscheidungen.
+            {t.landing.description}
           </p>
           
           {/* Search Input - Liquid Glass Style */}
@@ -291,7 +288,8 @@ export default function LandingPage() {
                   value={text}
                   onChange={(e) => setText(e.target.value)}
                   onKeyDown={handleKeyDown}
-                  placeholder="Was moechten Sie vergleichen oder entscheiden?"
+                  placeholder={t.landing.searchPlaceholder}
+                  aria-label={t.landing.searchInputAriaLabel}
                   className="flex-1 px-6 py-5 bg-transparent text-white text-lg placeholder:text-white/40 focus:outline-none"
                 />
                 <button
@@ -299,7 +297,7 @@ export default function LandingPage() {
                   disabled={!text.trim()}
                   className="m-2.5 px-6 py-3 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 text-white font-semibold rounded-xl disabled:opacity-30 disabled:cursor-not-allowed hover:shadow-lg hover:shadow-purple-500/30 transition-all duration-300 flex items-center gap-2"
                 >
-                  <span className="hidden sm:inline">Analysieren</span>
+                  <span className="hidden sm:inline">{t.landing.startButton}</span>
                   <ArrowRight className="w-5 h-5" />
                 </button>
               </div>
@@ -308,7 +306,7 @@ export default function LandingPage() {
           
           {/* Quick Examples - Pills */}
           <div className="flex flex-wrap justify-center gap-2">
-            {["Welchen CRM Anbieter waehlen?", "Bester Dienstwagen?", "Neuer Lieferant fuer Bauteile"].map((example) => (
+            {["Welchen CRM Anbieter wählen?", "Bester Dienstwagen?", "Neuer Lieferant für Bauteile"].map((example) => (
               <button
                 key={example}
                 onClick={() => setText(example)}
@@ -325,7 +323,7 @@ export default function LandingPage() {
       <section className="py-12 px-5">
         <div className="mx-auto max-w-6xl">
           <h2 className="text-center text-sm font-semibold text-white/50 uppercase tracking-widest mb-10">
-            Oder starten Sie direkt mit einer Vorlage
+            {t.landing.orChooseTemplate}
           </h2>
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
             {PRESET_CONFIG.map((preset) => (
@@ -342,9 +340,11 @@ export default function LandingPage() {
                 }}
               >
                 {/* Background Image */}
-                <img
+                <Image
                   src={preset.image}
                   alt={getPresetLabel(preset.id)}
+                  fill
+                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                   className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                 />
                 
@@ -590,17 +590,17 @@ export default function LandingPage() {
             
             <div className="relative z-10">
               <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-5 leading-tight">
-                Bereit fuer <span className="bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">bessere Entscheidungen</span>?
+                Bereit für <span className="bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">bessere Entscheidungen</span>?
               </h2>
               <p className="text-white/60 mb-10 text-lg max-w-xl mx-auto">
-                Starten Sie jetzt kostenlos und erleben Sie, wie einfach fundierte Entscheidungen sein koennen.
+                Starten Sie jetzt kostenlos und erleben Sie, wie einfach fundierte Entscheidungen sein können.
               </p>
               <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
                 <button
                   onClick={() => router.push("/app")}
                   className="group px-8 py-4 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 text-white font-bold rounded-2xl transition-all duration-300 hover:shadow-xl hover:shadow-purple-500/30 hover:scale-[1.02] flex items-center gap-3"
                 >
-                  <span className="text-lg">Jetzt kostenlos starten</span>
+                  <span className="text-lg">{t.brand.startFree}</span>
                   <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                 </button>
                 <button
@@ -610,7 +610,7 @@ export default function LandingPage() {
                   }}
                   className="px-8 py-4 bg-white/[0.05] backdrop-blur-xl text-white font-semibold rounded-2xl border border-white/[0.15] hover:bg-white/[0.1] hover:border-white/[0.25] transition-all duration-300"
                 >
-                  Mehr erfahren
+                  {t.brand.learnMore}
                 </button>
               </div>
             </div>
@@ -628,10 +628,23 @@ export default function LandingPage() {
               </div>
               <span className="font-medium">&copy; {new Date().getFullYear()} Nutzwertanalyse.com</span>
             </div>
-            <div className="flex gap-8">
-              <a href="/impressum" className="hover:text-white/70 transition-colors">Impressum</a>
-              <a href="/agb" className="hover:text-white/70 transition-colors">AGB</a>
-              <a href="/datenschutz" className="hover:text-white/70 transition-colors">Datenschutz</a>
+            <div className="flex flex-wrap justify-center gap-x-6 gap-y-2">
+              <a href="/rechtliches" className="hover:text-white/70 transition-colors">
+                {t.landing.footer.legal}
+              </a>
+              <a href="/impressum" className="hover:text-white/70 transition-colors">
+                {t.landing.footer.imprint}
+              </a>
+              <a href="/datenschutz" className="hover:text-white/70 transition-colors">
+                {t.landing.footer.privacy}
+              </a>
+              <a href="/cookies" className="hover:text-white/70 transition-colors">
+                Cookies
+              </a>
+              <a href="/agb" className="hover:text-white/70 transition-colors">
+                {t.landing.footer.terms}
+              </a>
+              <ConsentSettingsButton className="hover:text-white/70 transition-colors" />
             </div>
           </div>
         </div>

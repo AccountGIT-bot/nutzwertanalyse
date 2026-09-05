@@ -9,6 +9,9 @@ export const fr = {
     tagline: "Un outil Decision Studio",
     headerSubtitle: "Documentation structurée des décisions",
     swissQuality: "Qualité Suisse",
+    login: "Se connecter",
+    startFree: "Commencer gratuitement",
+    learnMore: "En savoir plus",
   },
   constructionBanner: {
     text: "Ce site est en construction – certaines fonctionnalités sont encore en développement",

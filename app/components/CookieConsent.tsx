@@ -1,10 +1,12 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { Cookie, ShieldCheck, SlidersHorizontal, X } from "lucide-react";
+import { useIsHydrated, useStoredValue } from "@/app/lib/client-state";
 import {
   CONSENT_CATEGORIES,
+  CONSENT_STORAGE_KEY,
   CONSENT_CHANGE_EVENT,
   CONSENT_OPEN_EVENT,
   DEFAULT_CONSENT,
@@ -22,39 +24,51 @@ const ALL_ACCEPTED: Selection = { necessary: true, preferences: true, statistics
  * Erscheint erst nach dem Mounten, damit keine Hydration-Abweichung entsteht.
  */
 export function CookieConsent() {
-  const [visible, setVisible] = useState(false);
+  const hydrated = useIsHydrated();
+  const storedConsent = useStoredValue(CONSENT_STORAGE_KEY);
+
+  // Wurde bereits eingewilligt, bleibt der Banner geschlossen. Der Wert kommt
+  // hydrationssicher aus dem localStorage – kein setState im Effekt nötig.
+  const [dismissed, setDismissed] = useState(false);
+  const [manuallyOpened, setManuallyOpened] = useState(false);
   const [showDetails, setShowDetails] = useState(false);
-  const [selection, setSelection] = useState<Selection>(DEFAULT_CONSENT);
+  const [selection, setSelection] = useState<Selection | null>(null);
+
+  const storedSelection = useMemo<Selection | null>(() => {
+    void storedConsent; // Neu auswerten, sobald sich der Speichereintrag ändert.
+    return readConsent()?.categories ?? null;
+  }, [storedConsent]);
+
+  const effectiveSelection = selection ?? storedSelection ?? DEFAULT_CONSENT;
 
   useEffect(() => {
-    const existing = readConsent();
-    if (existing) {
-      setSelection(existing.categories);
-    } else {
-      setVisible(true);
-    }
-
     function handleOpen() {
-      const current = readConsent();
-      if (current) setSelection(current.categories);
+      setSelection(readConsent()?.categories ?? DEFAULT_CONSENT);
       setShowDetails(true);
-      setVisible(true);
+      setManuallyOpened(true);
+      setDismissed(false);
     }
 
     window.addEventListener(CONSENT_OPEN_EVENT, handleOpen);
     return () => window.removeEventListener(CONSENT_OPEN_EVENT, handleOpen);
   }, []);
 
+  const visible = hydrated && !dismissed && (manuallyOpened || storedSelection === null);
+
   const persist = useCallback((categories: Selection) => {
     writeConsent(categories);
     setSelection(categories);
-    setVisible(false);
+    setDismissed(true);
+    setManuallyOpened(false);
     setShowDetails(false);
   }, []);
 
-  const toggle = useCallback((category: ConsentCategory) => {
-    setSelection((current) => ({ ...current, [category]: !current[category] }));
-  }, []);
+  const toggle = useCallback(
+    (category: ConsentCategory) => {
+      setSelection({ ...effectiveSelection, [category]: !effectiveSelection[category] });
+    },
+    [effectiveSelection]
+  );
 
   if (!visible) return null;
 
@@ -82,7 +96,10 @@ export function CookieConsent() {
                 </h2>
                 <button
                   type="button"
-                  onClick={() => setVisible(false)}
+                  onClick={() => {
+                    setDismissed(true);
+                    setManuallyOpened(false);
+                  }}
                   aria-label="Schliessen"
                   className="-mr-1 -mt-1 rounded-lg p-1.5 text-white/35 transition hover:bg-white/[0.06] hover:text-white/70"
                 >
@@ -109,7 +126,7 @@ export function CookieConsent() {
               {showDetails && (
                 <div className="mt-4 space-y-2.5">
                   {CONSENT_CATEGORIES.map((category) => {
-                    const checked = category.required || selection[category.id];
+                    const checked = category.required || effectiveSelection[category.id];
                     return (
                       <div
                         key={category.id}
@@ -173,7 +190,7 @@ export function CookieConsent() {
                 {showDetails ? (
                   <button
                     type="button"
-                    onClick={() => persist(selection)}
+                    onClick={() => persist(effectiveSelection)}
                     className="order-3 flex-1 rounded-xl border border-white/10 bg-white/[0.04] px-5 py-2.5 text-sm font-semibold text-white/75 transition hover:bg-white/[0.09] hover:text-white sm:order-1"
                   >
                     Auswahl speichern

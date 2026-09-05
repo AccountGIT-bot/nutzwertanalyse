@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import type { AIDecisionInterpretation } from "@/app/lib/nwa/types";
-import { getDomainIcon, getDomainLabel } from "@/app/lib/nwa/preset-icons";
+import { renderDomainIcon, getDomainLabel } from "@/app/lib/nwa/preset-icons";
 
 interface DecisionSuggestionProps {
   interpretation: AIDecisionInterpretation;
@@ -37,7 +37,7 @@ export function DecisionSuggestion({
   const [mounted, setMounted] = useState(false);
   const [criteriaOpen, setCriteriaOpen] = useState(false);
   
-  const DomainIcon = getDomainIcon(interpretation.domain);
+  const domainIcon = renderDomainIcon(interpretation.domain, { size: 26, className: "text-white" });
   const domainLabel = getDomainLabel(interpretation.domain);
 
   useEffect(() => {
@@ -177,7 +177,7 @@ export function DecisionSuggestion({
             
             <div className="relative">
               <div className="h-14 w-14 rounded-2xl bg-gradient-to-br from-white/10 to-white/5 border border-white/10 flex items-center justify-center shadow-lg">
-                <DomainIcon size={26} className="text-white" />
+                {domainIcon}
               </div>
             </div>
             <div className="flex-1">

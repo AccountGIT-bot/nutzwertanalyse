@@ -211,7 +211,7 @@ export function WeightingModule() {
 
       {/* AHP Matrix */}
       <div className="space-y-2">
-        {ahpPairs.map(([i, j], pairIndex) => {
+        {ahpPairs.map(([i, j]) => {
           const value = getAHPValue(i, j);
           const isActive = activeAHPPair?.[0] === i && activeAHPPair?.[1] === j;
 

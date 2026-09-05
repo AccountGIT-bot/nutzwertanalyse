@@ -24,7 +24,8 @@ export default function LoginPage() {
   });
 
   const [submitAttempted, setSubmitAttempted] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const isSubmitting = false;
+  const [authNotice, setAuthNotice] = useState<string | null>(null);
 
   // Right invite appears after 3s
   const [showInvite, setShowInvite] = useState(false);
@@ -47,7 +48,7 @@ export default function LoginPage() {
     return e;
   }, [email, password]);
 
-  const canSubmit = Object.keys(errors).length === 0 && !isSubmitting;
+  const canSubmit = Object.keys(errors).length === 0;
 
   function fieldClass(hasError: boolean) {
     return [
@@ -65,19 +66,18 @@ export default function LoginPage() {
 
     if (Object.keys(errors).length) return;
 
-    setIsSubmitting(true);
-    try {
-      // TODO: echtes Login (API/Auth)
-      router.push("/app");
-    } finally {
-      setIsSubmitting(false);
-    }
+    // Es besteht noch keine Benutzerverwaltung. Statt einen erfolgreichen Login
+    // vorzutäuschen, wird transparent darauf hingewiesen – die Analyse
+    // funktioniert vollständig ohne Konto.
+    setAuthNotice(
+      "Konten sind noch nicht freigeschaltet. Die Nutzwertanalyse steht Ihnen ohne Anmeldung in vollem Umfang zur Verfügung – Ihre Daten bleiben dabei lokal in Ihrem Browser."
+    );
   }
 
-  function startOAuth(_provider: "apple" | "google") {
-    // TODO: echte OAuth Anbindung (z.B. NextAuth/Clerk/Supabase)
-    // bewusst: keine Alerts, keine Passwörter loggen, keine LocalStorage Credentials.
-    // OAuth wird konfiguriert und leitet dann direkt um.
+  function startOAuth(provider: "apple" | "google") {
+    setAuthNotice(
+      `Die Anmeldung mit ${provider === "apple" ? "Apple" : "Google"} ist noch nicht aktiviert. Sie können ohne Konto starten – alle Funktionen sind verfügbar.`
+    );
   }
 
   const showEmailError = (touched.email || submitAttempted) && !!errors.email;
@@ -102,7 +102,14 @@ export default function LoginPage() {
               title="Startseite"
             >
               <div className="h-10 w-10 rounded-2xl overflow-hidden">
-                <img src="/images/logo.webp" alt="Logo" className="h-full w-full object-contain" />
+                <Image
+                  src="/images/logo.webp"
+                  alt="Nutzwertanalyse.com"
+                  width={40}
+                  height={40}
+                  priority
+                  className="h-full w-full object-contain"
+                />
               </div>
               <div className="leading-tight">
                 <div className="text-sm sm:text-base font-semibold tracking-tight text-slate-900">
@@ -342,6 +349,18 @@ export default function LoginPage() {
                     >
                       Passwort vergessen?
                     </button>
+
+                    {authNotice && (
+                      <div className="w-full rounded-2xl border border-amber-500/25 bg-amber-500/[0.08] px-4 py-3 text-sm text-amber-900">
+                        <div className="font-medium">{authNotice}</div>
+                        <a
+                          href="/app"
+                          className="mt-2 inline-flex items-center gap-1.5 text-sm font-semibold underline underline-offset-4"
+                        >
+                          Ohne Konto starten →
+                        </a>
+                      </div>
+                    )}
 
                     <button
                       type="submit"

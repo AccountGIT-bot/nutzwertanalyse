@@ -9,7 +9,6 @@ import {
   AHPConsistencyResult,
   Risk,
   Evaluator,
-  WeightingMethod,
 } from "./types";
 
 // Random Index values for AHP consistency check (n = 1 to 15)
@@ -351,13 +350,19 @@ export function applySimpleWeights(criteria: Criterion[]): Criterion[] {
 
 /**
  * Percentage weighting: Ensure weights sum to 100%
+ *
+ * Die eingegebenen Prozentwerte summieren sich nicht zwingend auf 100. Damit
+ * die angezeigten Gewichte denjenigen entsprechen, mit denen `calculateNwa`
+ * tatsächlich rechnet (dort wird stets über `normalizeWeights` normiert), wird
+ * hier ebenfalls auf die Summe normiert statt fix durch 100 geteilt.
  */
 export function applyPercentageWeights(criteria: Criterion[]): Criterion[] {
   const totalWeight = criteria.reduce((sum, c) => sum + c.rawWeight, 0);
-  
+  if (totalWeight === 0) return criteria;
+
   return criteria.map((c) => ({
     ...c,
-    weight: c.rawWeight / 100, // Convert percentage to decimal
+    weight: c.rawWeight / totalWeight,
   }));
 }
 

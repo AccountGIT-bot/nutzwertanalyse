@@ -1,6 +1,7 @@
 "use client";
 
-import { createContext, useContext, useState, useEffect, useCallback, type ReactNode } from "react";
+import { createContext, useContext, useState, useEffect, useCallback, useMemo, type ReactNode } from "react";
+import { useStoredValue } from "@/app/lib/client-state";
 import { type Locale, defaultLocale, locales } from "./config";
 import { translations, type Translations } from "./translations";
 
@@ -15,31 +16,26 @@ interface I18nContextValue {
 const I18nContext = createContext<I18nContextValue | null>(null);
 
 export function I18nProvider({ children }: { children: ReactNode }) {
-  const [locale, setLocaleState] = useState<Locale>(defaultLocale);
-  const [isHydrated, setIsHydrated] = useState(false);
+  // Gespeicherte Sprache hydrationssicher lesen: serverseitig `null`,
+  // nach der Hydration der echte Wert.
+  const storedLocale = useStoredValue(LOCALE_STORAGE_KEY);
+  const [overrideLocale, setOverrideLocale] = useState<Locale | null>(null);
 
-  // Load saved locale on mount
-  useEffect(() => {
-    try {
-      const saved = localStorage.getItem(LOCALE_STORAGE_KEY) as Locale | null;
-      if (saved && locales.includes(saved)) {
-        setLocaleState(saved);
-      }
-    } catch {
-      // localStorage not available
+  const locale = useMemo<Locale>(() => {
+    if (overrideLocale) return overrideLocale;
+    if (storedLocale && locales.includes(storedLocale as Locale)) {
+      return storedLocale as Locale;
     }
-    setIsHydrated(true);
-  }, []);
+    return defaultLocale;
+  }, [overrideLocale, storedLocale]);
 
-  // Update HTML lang attribute when locale changes
+  // Sprache am <html>-Element spiegeln (externes System).
   useEffect(() => {
-    if (isHydrated) {
-      document.documentElement.lang = locale;
-    }
-  }, [locale, isHydrated]);
+    document.documentElement.lang = locale;
+  }, [locale]);
 
   const setLocale = useCallback((newLocale: Locale) => {
-    setLocaleState(newLocale);
+    setOverrideLocale(newLocale);
     try {
       localStorage.setItem(LOCALE_STORAGE_KEY, newLocale);
     } catch {
@@ -47,13 +43,12 @@ export function I18nProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
-  const t = translations[locale];
-
-  return (
-    <I18nContext.Provider value={{ locale, setLocale, t }}>
-      {children}
-    </I18nContext.Provider>
+  const value = useMemo(
+    () => ({ locale, setLocale, t: translations[locale] }),
+    [locale, setLocale]
   );
+
+  return <I18nContext.Provider value={value}>{children}</I18nContext.Provider>;
 }
 
 export function useI18n() {

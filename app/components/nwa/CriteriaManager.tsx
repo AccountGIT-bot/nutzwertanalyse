@@ -168,7 +168,7 @@ const {
 
       {/* Criteria list */}
       <div className="space-y-4">
-        {groupedCriteria.map(({ category, criteria: groupCriteria }, groupIndex) => (
+        {groupedCriteria.map(({ category, criteria: groupCriteria }) => (
           <div key={category?.id || "uncategorized"}>
             {category && packageLevel !== "basic" && (
               <div className="mb-3 flex items-center gap-2">

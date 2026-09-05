@@ -2,7 +2,7 @@
 
 import { useAnalysis } from "@/app/lib/nwa/analysis-context";
 import { getPresetContext } from "@/app/lib/nwa/preset-context";
-import { getPresetIcon, getDomainIcon, getDomainLabel, type PresetId } from "@/app/lib/nwa/preset-icons";
+import { renderPresetIcon, renderDomainIcon, getDomainLabel, type PresetId } from "@/app/lib/nwa/preset-icons";
 import { StepInfoButton } from "./StepInfoButton";
 import { useTranslations } from "@/app/lib/i18n";
 
@@ -21,10 +21,10 @@ export function DecisionSetup() {
   const presetTranslations = t.presets[presetKey] || t.presets.custom;
   
   // Determine the appropriate icon and label
-  const ContextIcon = hasAIContext 
-    ? getDomainIcon(decision.aiInterpretation?.domain)
-    : decision.preset 
-      ? getPresetIcon(decision.preset)
+  const contextIcon = hasAIContext
+    ? renderDomainIcon(decision.aiInterpretation?.domain, { size: 20 })
+    : decision.preset
+      ? renderPresetIcon(decision.preset, { size: 20 })
       : null;
   const contextLabel = hasAIContext
     ? getDomainLabel(decision.aiInterpretation?.domain)
@@ -46,7 +46,7 @@ export function DecisionSetup() {
   return (
     <div className="space-y-6">
       {/* Context indicator */}
-      {(decision.preset || hasAIContext) && ContextIcon && (
+      {(decision.preset || hasAIContext) && contextIcon && (
         <div className="flex items-center gap-3 px-4 py-3 rounded-xl bg-white/5 border border-white/10">
           <div 
             className="h-9 w-9 rounded-lg flex items-center justify-center"
@@ -55,7 +55,7 @@ export function DecisionSetup() {
               color: "rgb(var(--accent))",
             }}
           >
-            <ContextIcon size={20} />
+            {contextIcon}
           </div>
           <div className="flex-1 min-w-0">
             <div className="text-xs text-white/50 flex items-center gap-1.5">

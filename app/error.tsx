@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 
 type StepStatus = "idle" | "running" | "ok" | "fail";
@@ -66,7 +67,7 @@ function StatusIcon({ status }: { status: StepStatus }) {
   );
 }
 
-function Diagnostics({ variant }: { variant: "error" }) {
+function Diagnostics() {
   const [steps, setSteps] = useState<Step[]>([
     {
       key: "internet",
@@ -151,7 +152,7 @@ function Diagnostics({ variant }: { variant: "error" }) {
             : s
         )
       );
-    } catch (e: any) {
+    } catch (error: unknown) {
       const ms = Math.round(msNow() - appStart);
       setSteps((prev) =>
         prev.map((s) =>
@@ -161,7 +162,7 @@ function Diagnostics({ variant }: { variant: "error" }) {
                 status: "fail",
                 ms,
                 detail:
-                  e?.name === "AbortError"
+                  (error as { name?: string })?.name === "AbortError"
                     ? "Zeitüberschreitung – die App reagiert nicht."
                     : "Fehler beim Laden – Netzwerk/Firewall/Adblock prüfen.",
               }
@@ -253,7 +254,6 @@ function Diagnostics({ variant }: { variant: "error" }) {
     return () => {
       if (loopRef.current) window.clearInterval(loopRef.current);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
@@ -345,7 +345,14 @@ export default function GlobalError({
               title="Startseite"
             >
               <div className="h-10 w-10 rounded-2xl overflow-hidden">
-                <img src="/images/logo.webp" alt="Logo" className="h-full w-full object-contain" />
+                <Image
+                  src="/images/logo.webp"
+                  alt="Nutzwertanalyse.com"
+                  width={40}
+                  height={40}
+                  priority
+                  className="h-full w-full object-contain"
+                />
               </div>
               <div className="leading-tight">
                 <div className="text-sm sm:text-base font-semibold tracking-tight text-slate-900">
@@ -405,7 +412,7 @@ export default function GlobalError({
             </div>
           </div>
 
-          <Diagnostics variant="error" />
+          <Diagnostics />
 
           <div className="mt-8 flex flex-wrap gap-x-4 gap-y-2 text-[11px] text-black/45">
             <a href="/impressum" className="underline underline-offset-2 decoration-black/20">

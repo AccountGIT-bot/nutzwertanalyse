@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useCallback, useEffect } from "react";
+import { useState, useMemo, useCallback } from "react";
 import { useAnalysis } from "@/app/lib/nwa/analysis-context";
 import { StepInfoButton } from "./StepInfoButton";
 import { useTranslations } from "@/app/lib/i18n";
@@ -66,10 +66,6 @@ export function EvaluationMatrix() {
   // Check if alternative failed knockout criteria - O(1) with map
   const isKnockout = useCallback((altId: string): boolean => {
     return knockoutMap.has(altId);
-  }, [knockoutMap]);
-
-  const getFailedCriteria = useCallback((altId: string): string[] => {
-    return knockoutMap.get(altId) || [];
   }, [knockoutMap]);
 
   return (

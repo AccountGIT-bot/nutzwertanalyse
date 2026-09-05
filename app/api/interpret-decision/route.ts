@@ -48,29 +48,29 @@ export type DecisionInterpretation = z.infer<typeof decisionInterpretationSchema
 const SYSTEM_PROMPT = `Du bist ein professioneller Entscheidungsanalyse-Assistent für ein Nutzwertanalyse-Tool.
 Deine Aufgabe: Interpretiere Benutzereingaben und erstelle strukturierte Analyserahmen.
 
-Du bist ein GPT-4 Modell und sollst die volle Leistungsfaehigkeit nutzen um:
-1. Die Absicht des Benutzers praezise zu verstehen
+Du bist ein GPT-4 Modell und sollst die volle Leistungsfähigkeit nutzen um:
+1. Die Absicht des Benutzers präzise zu verstehen
 2. Relevante Alternativen und Kriterien zu identifizieren
 3. Einen professionellen Analyserahmen zu erstellen
 
 WICHTIG: Die Eingabe muss NICHT in eine der 6 Standardkategorien passen. 
-Analysiere den genauen Text des Benutzers und erstelle passende Alternativen und Kriterien dafuer.
+Analysiere den genauen Text des Benutzers und erstelle passende Alternativen und Kriterien dafür.
 
 Richtlinien:
 1. TITEL: Erstelle einen klaren, professionellen Entscheidungstitel auf Deutsch.
    - Wenn der Benutzer "X oder Y" fragt, nutze genau diese Begriffe
-   - Halte es kurz aber aussagekraeftig
+   - Halte es kurz aber aussagekräftig
 
 2. BESCHREIBUNG: Verbessere die Formulierung zu einer professionellen Beschreibung.
    - Korrigiere Grammatik und Rechtschreibung
-   - Behalte die urspruengliche Bedeutung bei
+   - Behalte die ursprüngliche Bedeutung bei
    - Auf Deutsch schreiben
 
-3. DOMAIN: Waehle die passendste Kategorie. Bei unklaren Eingaben waehle "other".
+3. DOMAIN: Wähle die passendste Kategorie. Bei unklaren Eingaben wähle "other".
 
 4. ALTERNATIVEN: Generiere 2-6 realistische Entscheidungsalternativen.
    - Wenn der Benutzer "A oder B" fragt, nutze A und B als Alternativen (kapitalisiert)
-   - Fuege ggf. eine "Status quo" Option hinzu
+   - Füge ggf. eine "Status quo" Option hinzu
    - Alternativen sollten sich gegenseitig ausschliessen
    - WICHTIG: Erster Buchstabe jeder Alternative gross schreiben
 
@@ -80,7 +80,7 @@ Richtlinien:
    - Passend zum spezifischen Entscheidungskontext
    - Jedes Kriterium braucht einen klaren Namen und eine Beschreibung
 
-6. EINSCHRAENKUNGEN: Extrahiere erkannte Rahmenbedingungen (Budget, Zeit, etc.).
+6. EINSCHRÄNKUNGEN: Extrahiere erkannte Rahmenbedingungen (Budget, Zeit, etc.).
 
 7. KONFIDENZ: Bewerte deine Interpretationssicherheit basierend auf der Klarheit der Eingabe.
 
@@ -126,8 +126,6 @@ export async function POST(req: Request) {
     const sanitizedInput = sanitizeUserInput(userInput);
     const validPackageLevel = validatePackageLevel(packageLevel);
 
-    console.log("[v0] AI interpret-decision called with:", { sanitizedInput, validPackageLevel });
-
     if (!sanitizedInput) {
       return Response.json(
         { error: "Missing or invalid user input" },
@@ -165,10 +163,8 @@ Package Level: ${validPackageLevel}
 - Maximum ${maxAlternatives} Alternativen
 - Maximum ${maxCriteria} Kriterien
 - Alle Texte auf Deutsch
-- Kriterien muessen spezifisch zum Thema passen`,
+- Kriterien müssen spezifisch zum Thema passen`,
     });
-
-    console.log("[v0] AI output received:", JSON.stringify(output, null, 2));
 
     return Response.json({ interpretation: output });
   } catch (error) {

@@ -6,6 +6,7 @@ import {
   useReducer,
   useCallback,
   useMemo,
+  useSyncExternalStore,
   type ReactNode,
 } from "react";
 import {
@@ -35,6 +36,7 @@ import {
   checkKnockoutCriteria,
 } from "./calculate";
 import { getTemplateByPreset, DEFAULT_CATEGORIES, getDefaultTemplate, DEFAULT_ALTERNATIVES } from "./templates";
+import { LOCAL_STORAGE_EVENT, notifyStorageChange } from "@/app/lib/client-state";
 
 // Initial state factory
 function createInitialState(packageLevel: PackageLevel = "basic"): AnalysisState {
@@ -439,6 +441,30 @@ case "RESET":
   }
 }
 
+const DRAFT_STORAGE_KEY = "nwa_draft_state";
+
+function subscribeToDraftStorage(onChange: () => void): () => void {
+  if (typeof window === "undefined") return () => {};
+  window.addEventListener("storage", onChange);
+  window.addEventListener(LOCAL_STORAGE_EVENT, onChange);
+  return () => {
+    window.removeEventListener("storage", onChange);
+    window.removeEventListener(LOCAL_STORAGE_EVENT, onChange);
+  };
+}
+
+function getDraftSnapshot(): boolean {
+  try {
+    return localStorage.getItem(DRAFT_STORAGE_KEY) !== null;
+  } catch {
+    return false;
+  }
+}
+
+function getDraftServerSnapshot(): boolean {
+  return false;
+}
+
 // Context
 interface AnalysisContextType {
   state: AnalysisState;
@@ -467,6 +493,7 @@ calculateResults: () => void;
   duplicateCriterion: (id: string) => void;
   saveDraft: () => void;
   loadDraft: () => boolean;
+  loadState: (state: AnalysisState) => void;
   hasDraft: boolean;
   // Computed values
   canProceedToNext: boolean;
@@ -634,7 +661,8 @@ const reset = useCallback(() => {
     // Also clear draft from localStorage
     if (typeof window !== "undefined") {
       try {
-        localStorage.removeItem("nwa_draft_state");
+        localStorage.removeItem(DRAFT_STORAGE_KEY);
+        notifyStorageChange();
       } catch {
         // Ignore localStorage errors
       }
@@ -660,7 +688,8 @@ const reset = useCallback(() => {
           updatedAt: new Date().toISOString(),
         },
       };
-      localStorage.setItem("nwa_draft_state", JSON.stringify(stateToSave));
+      localStorage.setItem(DRAFT_STORAGE_KEY, JSON.stringify(stateToSave));
+      notifyStorageChange();
     } catch {
       // Silent fail for localStorage errors (quota, private browsing)
     }
@@ -669,7 +698,7 @@ const reset = useCallback(() => {
   const loadDraft = useCallback((): boolean => {
     if (typeof window === "undefined") return false;
     try {
-      const savedState = localStorage.getItem("nwa_draft_state");
+      const savedState = localStorage.getItem(DRAFT_STORAGE_KEY);
       if (savedState) {
         const parsed = JSON.parse(savedState);
         // Validate basic structure
@@ -684,20 +713,19 @@ const reset = useCallback(() => {
     return false;
   }, []);
   
-  // Check if draft exists
-  const hasDraft = useMemo(() => {
-    if (typeof window === "undefined") return false;
-    try {
-      const savedState = localStorage.getItem("nwa_draft_state");
-      if (savedState) {
-        const parsed = JSON.parse(savedState);
-        return !!(parsed && parsed.decision && parsed.alternatives);
-      }
-    } catch {
-      // Ignore errors
-    }
-    return false;
+  /** Übernimmt eine vollständige Analyse (Import oder Bibliothek). */
+  const loadState = useCallback((next: AnalysisState) => {
+    dispatch({ type: "LOAD_STATE", payload: next });
   }, []);
+
+  // Prüft, ob ein Entwurf vorliegt. useSyncExternalStore liefert serverseitig
+  // stets `false` und gleicht den echten Wert nach der Hydration an – so
+  // entsteht weder eine Hydration-Abweichung noch ein setState im Effekt.
+  const hasDraft = useSyncExternalStore(
+    subscribeToDraftStorage,
+    getDraftSnapshot,
+    getDraftServerSnapshot
+  );
 
   // Computed values
   const canProceedToNext = useMemo(() => {
@@ -759,13 +787,14 @@ setStep,
     duplicateCriterion,
     saveDraft,
     loadDraft,
+    loadState,
   }),
   [
     setPackageLevel, setDecision, addAlternative, updateAlternative, removeAlternative,
     addCriterion, updateCriterion, removeCriterion, setCriteriaFromTemplate,
     setRating, setWeightingMethod, setAHPComparison, addRisk,
     addEvaluator, updateEvaluator, removeEvaluator, setStep, calculateResults, reset,
-    duplicateAlternative, duplicateCriterion, saveDraft, loadDraft,
+    duplicateAlternative, duplicateCriterion, saveDraft, loadDraft, loadState,
   ]
   );
 

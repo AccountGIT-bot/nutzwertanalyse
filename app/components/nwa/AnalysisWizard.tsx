@@ -3,7 +3,7 @@
 import { useEffect, useCallback, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAnalysis } from "@/app/lib/nwa/analysis-context";
-import { getPresetIcon, getDomainIcon, getDomainLabel } from "@/app/lib/nwa/preset-icons";
+import { renderPresetIcon, renderDomainIcon, getDomainLabel } from "@/app/lib/nwa/preset-icons";
 import { DecisionSetup } from "./DecisionSetup";
 import { AlternativesManager } from "./AlternativesManager";
 import { CriteriaManager } from "./CriteriaManager";
@@ -11,8 +11,10 @@ import { WeightingModule } from "./WeightingModule";
 import { EvaluationMatrix } from "./EvaluationMatrix";
 import { ResultsDashboard } from "./ResultsDashboard";
 import { useTranslations } from "@/app/lib/i18n";
+import { AnalysisLibrary } from "./AnalysisLibrary";
+import { removeStoredValue } from "@/app/lib/client-state";
 import type { AnalysisStep } from "@/app/lib/nwa/types";
-import { Home } from "lucide-react";
+import { FolderOpen, Home, RotateCcw } from "lucide-react";
 
 const STEP_IDS: AnalysisStep[] = ["decision", "alternatives", "criteria", "weighting", "evaluation", "results"];
 
@@ -21,10 +23,15 @@ export function AnalysisWizard() {
   const { state, setStep, calculateResults, canProceedToNext, reset, saveDraft, hasDraft, loadDraft } = useAnalysis();
   const { currentStep, decision } = state;
   const [showResetConfirm, setShowResetConfirm] = useState(false);
-  const [showDraftPrompt, setShowDraftPrompt] = useState(false);
   const [showHomeConfirm, setShowHomeConfirm] = useState(false);
-  const [draftChecked, setDraftChecked] = useState(false);
+  const [showLibrary, setShowLibrary] = useState(false);
+  const [draftPromptDismissed, setDraftPromptDismissed] = useState(false);
   const t = useTranslations();
+
+  // Abgeleitet statt im Effekt gesetzt: kein zusätzlicher Render, keine
+  // Hydration-Abweichung (hasDraft ist serverseitig immer false).
+  const showDraftPrompt =
+    !draftPromptDismissed && hasDraft && currentStep === "decision" && !decision.title;
 
   // Dynamic steps with translations
   const STEPS = useMemo(() => [
@@ -54,27 +61,14 @@ export function AnalysisWizard() {
     return () => clearTimeout(timeoutId);
   }, [state, saveDraft]);
 
-  useEffect(() => {
-    if (!draftChecked && hasDraft && currentStep === "decision" && !decision.title) {
-      setShowDraftPrompt(true);
-    }
-    setDraftChecked(true);
-  }, [draftChecked, hasDraft, currentStep, decision.title]);
-
   const handleLoadDraft = useCallback(() => {
     loadDraft();
-    setShowDraftPrompt(false);
+    setDraftPromptDismissed(true);
   }, [loadDraft]);
 
   const handleDiscardDraft = useCallback(() => {
-    setShowDraftPrompt(false);
-    if (typeof window !== "undefined") {
-      try {
-        localStorage.removeItem("nwa_draft_state");
-      } catch {
-        /* ignore */
-      }
-    }
+    setDraftPromptDismissed(true);
+    removeStoredValue("nwa_draft_state");
   }, []);
 
   const handleResetClick = useCallback(() => {
@@ -105,21 +99,20 @@ export function AnalysisWizard() {
   }, []);
 
   const goToStep = useCallback((step: AnalysisStep) => {
-    const targetIndex = STEPS.findIndex((s) => s.id === step);
-    if (targetIndex <= currentStepIndex) {
+    if (STEP_IDS.indexOf(step) <= currentStepIndex) {
       setStep(step);
     }
   }, [currentStepIndex, setStep]);
 
   const goNext = useCallback(() => {
-    if (canProceedToNext && currentStepIndex < STEPS.length - 1) {
-      setStep(STEPS[currentStepIndex + 1].id);
+    if (canProceedToNext && currentStepIndex < STEP_IDS.length - 1) {
+      setStep(STEP_IDS[currentStepIndex + 1]);
     }
   }, [canProceedToNext, currentStepIndex, setStep]);
 
   const goBack = useCallback(() => {
     if (currentStepIndex > 0) {
-      setStep(STEPS[currentStepIndex - 1].id);
+      setStep(STEP_IDS[currentStepIndex - 1]);
     }
   }, [currentStepIndex, setStep]);
 
@@ -143,10 +136,10 @@ export function AnalysisWizard() {
   }, [currentStep]);
 
   const hasAIContext = decision.aiInterpretation?.domain;
-  const ContextIconComponent = hasAIContext 
-    ? getDomainIcon(decision.aiInterpretation?.domain) 
-    : decision.preset 
-      ? getPresetIcon(decision.preset) 
+  const contextIcon = hasAIContext
+    ? renderDomainIcon(decision.aiInterpretation?.domain, { size: 20 })
+    : decision.preset
+      ? renderPresetIcon(decision.preset, { size: 20 })
       : null;
   const contextLabel = hasAIContext 
     ? getDomainLabel(decision.aiInterpretation?.domain)
@@ -229,6 +222,8 @@ export function AnalysisWizard() {
         <div className="absolute inset-0 landing-grain opacity-[0.04]" />
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_0%,rgba(0,0,0,0.25)_100%)]" />
       </div>
+
+      <AnalysisLibrary open={showLibrary} onClose={() => setShowLibrary(false)} />
 
       {showDraftPrompt && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
@@ -313,7 +308,7 @@ export function AnalysisWizard() {
           <div className="mx-auto max-w-5xl px-5 sm:px-6 py-4">
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-3">
-                {ContextIconComponent ? (
+                {contextIcon ? (
                   <div
                     className="h-10 w-10 rounded-xl flex items-center justify-center transition-transform duration-300 hover:scale-105"
                     style={{ 
@@ -322,7 +317,7 @@ export function AnalysisWizard() {
                       boxShadow: "0 0 20px rgb(var(--accent) / 0.1)"
                     }}
                   >
-                    <ContextIconComponent size={20} />
+                    {contextIcon}
                   </div>
                 ) : (
                   <div
@@ -347,13 +342,32 @@ export function AnalysisWizard() {
                   </div>
                 </div>
               </div>
-              <button
-                onClick={handleResetClick}
-                className="px-3.5 py-2 rounded-xl text-xs font-medium text-white/45 hover:text-white/70 hover:bg-white/[0.06] border border-transparent hover:border-white/[0.08] transition-all duration-200"
-                title={t.wizard.resetAnalysis}
-              >
-                {t.wizard.reset}
-              </button>
+              <div className="flex items-center gap-1">
+                <button
+                  onClick={handleHomeClick}
+                  className="p-2 rounded-xl text-white/40 hover:text-white/75 hover:bg-white/[0.06] border border-transparent hover:border-white/[0.08] transition-all duration-200"
+                  title={t.wizard.goHome || "Zur Startseite"}
+                  aria-label={t.wizard.goHome || "Zur Startseite"}
+                >
+                  <Home size={16} />
+                </button>
+                <button
+                  onClick={() => setShowLibrary(true)}
+                  className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-medium text-white/45 hover:text-white/80 hover:bg-white/[0.06] border border-transparent hover:border-white/[0.08] transition-all duration-200"
+                  title="Gespeicherte Analysen"
+                >
+                  <FolderOpen size={14} />
+                  <span className="hidden sm:inline">Analysen</span>
+                </button>
+                <button
+                  onClick={handleResetClick}
+                  className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-medium text-white/45 hover:text-white/80 hover:bg-white/[0.06] border border-transparent hover:border-white/[0.08] transition-all duration-200"
+                  title={t.wizard.resetAnalysis}
+                >
+                  <RotateCcw size={14} />
+                  <span className="hidden sm:inline">{t.wizard.reset}</span>
+                </button>
+              </div>
             </div>
 
             {/* Premium Progress Bar */}

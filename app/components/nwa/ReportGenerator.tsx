@@ -1,8 +1,17 @@
 "use client";
 
 import { useState, useCallback } from "react";
+import { FileJson, FileSpreadsheet, FileText, Check, Copy, Printer } from "lucide-react";
 import { useAnalysis } from "@/app/lib/nwa/analysis-context";
 import { getRecommendation } from "@/app/lib/nwa/calculate";
+import {
+  buildFileName,
+  downloadFile,
+  toCsv,
+  toJson,
+  toMarkdown,
+  toSummaryText,
+} from "@/app/lib/nwa/export";
 import type { AnalysisState, ReportConfig } from "@/app/lib/nwa/types";
 
 const DEFAULT_REPORT_CONFIG: Record<string, ReportConfig> = {
@@ -443,6 +452,7 @@ export function ReportGenerator() {
   const packageLevel = decision.packageLevel;
 
   const [isGenerating, setIsGenerating] = useState(false);
+  const [copied, setCopied] = useState(false);
   const [config, setConfig] = useState<ReportConfig>(
     DEFAULT_REPORT_CONFIG[packageLevel] || DEFAULT_REPORT_CONFIG.basic
   );
@@ -483,6 +493,28 @@ export function ReportGenerator() {
       setIsGenerating(false);
     }
   }, [state, config, knockoutFailures, decision.title]);
+
+  const handleExportCsv = useCallback(() => {
+    downloadFile(toCsv(state), buildFileName(decision.title, "csv"), "text/csv");
+  }, [state, decision.title]);
+
+  const handleExportJson = useCallback(() => {
+    downloadFile(toJson(state), buildFileName(decision.title, "json"), "application/json");
+  }, [state, decision.title]);
+
+  const handleExportMarkdown = useCallback(() => {
+    downloadFile(toMarkdown(state), buildFileName(decision.title, "md"), "text/markdown");
+  }, [state, decision.title]);
+
+  const handleCopySummary = useCallback(async () => {
+    try {
+      await navigator.clipboard.writeText(toSummaryText(state));
+      setCopied(true);
+      window.setTimeout(() => setCopied(false), 2000);
+    } catch {
+      // Zwischenablage nicht verfügbar (z. B. ohne HTTPS) – Nutzer kann exportieren.
+    }
+  }, [state]);
 
   const toggleConfig = (key: keyof ReportConfig) => {
     setConfig((prev) => ({ ...prev, [key]: !prev[key] }));
@@ -540,16 +572,13 @@ export function ReportGenerator() {
         })}
       </div>
 
-      {/* Export button */}
+      {/* Hauptexport: Bericht */}
       <button
         data-export-pdf
         onClick={handleExportPDF}
         disabled={isGenerating}
         className="w-full h-12 rounded-xl font-semibold transition disabled:opacity-50 flex items-center justify-center gap-2 hover:brightness-110"
-        style={{
-          background: `rgb(var(--accent))`,
-          color: "white",
-        }}
+        style={{ background: `rgb(var(--accent))`, color: "white" }}
       >
         {isGenerating ? (
           <>
@@ -573,22 +602,89 @@ export function ReportGenerator() {
           </>
         ) : (
           <>
-            <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-              />
-            </svg>
-            Report exportieren (PDF/HTML)
+            <Printer className="h-5 w-5" />
+            Bericht erstellen (PDF / HTML)
           </>
         )}
       </button>
 
-      <div className="text-xs text-white/40 text-center">
-        Der Report wird als HTML-Datei generiert und kann direkt als PDF gedruckt werden.
+      {/* Weitere Formate */}
+      <div className="space-y-3">
+        <div className="text-sm font-medium text-white/70">Daten exportieren</div>
+        <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
+          <ExportTile
+            icon={<FileSpreadsheet className="h-4 w-4" />}
+            label="CSV"
+            hint="Excel / Numbers"
+            onClick={handleExportCsv}
+          />
+          <ExportTile
+            icon={<FileJson className="h-4 w-4" />}
+            label="JSON"
+            hint="Sichern & importieren"
+            onClick={handleExportJson}
+          />
+          <ExportTile
+            icon={<FileText className="h-4 w-4" />}
+            label="Markdown"
+            hint="Doku & Wiki"
+            onClick={handleExportMarkdown}
+          />
+        </div>
+
+        <button
+          onClick={handleCopySummary}
+          className="flex w-full items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/[0.04] px-4 py-2.5 text-sm font-medium text-white/70 transition hover:bg-white/[0.08] hover:text-white"
+        >
+          {copied ? (
+            <>
+              <Check className="h-4 w-4 text-emerald-400" />
+              In Zwischenablage kopiert
+            </>
+          ) : (
+            <>
+              <Copy className="h-4 w-4" />
+              Kurzfassung kopieren
+            </>
+          )}
+        </button>
       </div>
+
+      <div className="text-xs text-white/40 text-center leading-relaxed">
+        Der Bericht wird als HTML-Datei erzeugt und lässt sich direkt als PDF drucken. Der
+        JSON-Export enthält Ihre vollständige Analyse und kann jederzeit wieder importiert werden.
+      </div>
+
     </div>
+  );
+}
+
+function ExportTile({
+  icon,
+  label,
+  hint,
+  onClick,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  hint: string;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      onClick={onClick}
+      className="group flex items-center gap-3 rounded-xl border border-white/10 bg-white/[0.03] px-3.5 py-3 text-left transition hover:border-white/20 hover:bg-white/[0.07]"
+    >
+      <span
+        className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg transition group-hover:scale-105"
+        style={{ background: "rgb(var(--accent) / 0.15)", color: "rgb(var(--accent))" }}
+      >
+        {icon}
+      </span>
+      <span className="min-w-0">
+        <span className="block text-sm font-semibold text-white/85">{label}</span>
+        <span className="block truncate text-[11px] text-white/40">{hint}</span>
+      </span>
+    </button>
   );
 }

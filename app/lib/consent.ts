@@ -12,6 +12,8 @@
  * Einwilligungsdaten an den Server übermittelt.
  */
 
+import { notifyStorageChange } from "@/app/lib/client-state";
+
 export const CONSENT_STORAGE_KEY = "nwa_consent";
 export const CONSENT_VERSION = 1;
 export const CONSENT_CHANGE_EVENT = "nwa:consent-change";
@@ -102,6 +104,7 @@ export function writeConsent(categories: Record<ConsentCategory, boolean>): Cons
     } catch {
       // Speicherung kann im privaten Modus fehlschlagen – Einwilligung gilt dann nur für die Sitzung.
     }
+    notifyStorageChange();
     window.dispatchEvent(new CustomEvent<ConsentState>(CONSENT_CHANGE_EVENT, { detail: state }));
   }
 
@@ -116,6 +119,7 @@ export function revokeConsent(): void {
   } catch {
     // ignorieren
   }
+  notifyStorageChange();
   window.dispatchEvent(new CustomEvent(CONSENT_CHANGE_EVENT, { detail: null }));
 }
 
