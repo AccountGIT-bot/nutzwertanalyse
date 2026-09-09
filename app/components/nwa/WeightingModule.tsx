@@ -24,18 +24,27 @@ export function WeightingModule() {
     updateCriterion,
     setWeightingMethod,
     setAHPComparison,
+    dispatch,
     canProceedToNext,
   } = useAnalysis();
-  const { criteria, decision, weightingMethod, ahpComparisons, ahpConsistency } = state;
+  const {
+    criteria,
+    decision,
+    weightingMethod,
+    ahpComparisons,
+    ahpConsistency,
+  } = state;
   const packageLevel = decision.packageLevel;
   const t = useTranslations();
 
-  const [activeAHPPair, setActiveAHPPair] = useState<[number, number] | null>(null);
+  const [activeAHPPair, setActiveAHPPair] = useState<[number, number] | null>(
+    null,
+  );
 
   // Calculate total weight for percentage method
   const totalWeight = useMemo(
     () => criteria.reduce((sum, c) => sum + c.rawWeight, 0),
-    [criteria]
+    [criteria],
   );
 
   // Generate AHP pairs
@@ -53,8 +62,10 @@ export function WeightingModule() {
   const getAHPValue = (i: number, j: number): number => {
     const comp = ahpComparisons.find(
       (c) =>
-        (c.criterionId1 === criteria[i]?.id && c.criterionId2 === criteria[j]?.id) ||
-        (c.criterionId1 === criteria[j]?.id && c.criterionId2 === criteria[i]?.id)
+        (c.criterionId1 === criteria[i]?.id &&
+          c.criterionId2 === criteria[j]?.id) ||
+        (c.criterionId1 === criteria[j]?.id &&
+          c.criterionId2 === criteria[i]?.id),
     );
     if (!comp) return 1;
     if (comp.criterionId1 === criteria[i]?.id) return comp.value;
@@ -83,7 +94,8 @@ export function WeightingModule() {
   const renderSimpleWeighting = () => (
     <div className="space-y-4">
       <p className="text-sm text-white/50">
-        Bewerten Sie die Wichtigkeit jedes Kriteriums auf einer Skala von 1 bis 5.
+        Bewerten Sie die Wichtigkeit jedes Kriteriums auf einer Skala von 1 bis
+        5.
       </p>
       <div className="space-y-3">
         {criteria.map((criterion) => (
@@ -107,6 +119,8 @@ export function WeightingModule() {
                   <button
                     key={val}
                     onClick={() => handleWeightChange(criterion.id, val)}
+                    aria-label={`Wichtigkeit ${criterion.name}: ${val}`}
+                    aria-pressed={criterion.rawWeight === val}
                     className={`h-10 w-10 rounded-lg font-medium transition ${
                       criterion.rawWeight === val
                         ? "bg-[rgb(var(--accent))] text-white"
@@ -132,6 +146,23 @@ export function WeightingModule() {
       <p className="text-sm text-white/50">
         Verteilen Sie 100% auf die Kriterien entsprechend ihrer Wichtigkeit.
       </p>
+      <button
+        className="studio-button secondary"
+        onClick={() => {
+          const each = Math.floor(10000 / criteria.length) / 100;
+          criteria.forEach((c, i) =>
+            updateCriterion({
+              ...c,
+              rawWeight:
+                i === criteria.length - 1
+                  ? Number((100 - each * (criteria.length - 1)).toFixed(2))
+                  : each,
+            }),
+          );
+        }}
+      >
+        Gleichmässig auf 100 % verteilen
+      </button>
       <div className="space-y-3">
         {criteria.map((criterion) => (
           <div
@@ -146,6 +177,7 @@ export function WeightingModule() {
               </div>
               <div className="flex items-center gap-3">
                 <input
+                  aria-label={`Gewicht ${criterion.name}`}
                   type="range"
                   min={0}
                   max={100}
@@ -157,6 +189,7 @@ export function WeightingModule() {
                 />
                 <div className="w-16 text-right">
                   <input
+                    aria-label={`Gewicht in Prozent ${criterion.name}`}
                     type="number"
                     min={0}
                     max={100}
@@ -164,7 +197,10 @@ export function WeightingModule() {
                     onChange={(e) =>
                       handleWeightChange(
                         criterion.id,
-                        Math.min(100, Math.max(0, parseInt(e.target.value) || 0))
+                        Math.min(
+                          100,
+                          Math.max(0, parseInt(e.target.value) || 0),
+                        ),
                       )
                     }
                     className="w-full h-9 px-2 rounded-lg bg-white/10 border border-white/10 text-white text-center outline-none"
@@ -190,9 +226,25 @@ export function WeightingModule() {
     <div className="space-y-6">
       <p className="text-sm text-white/50">
         Vergleichen Sie jeweils zwei Kriterien paarweise miteinander.
-        {packageLevel === "business" && " Die Konsistenz Ihrer Bewertungen wird geprüft."}
+        {packageLevel === "business" &&
+          " Die Konsistenz Ihrer Bewertungen wird geprüft."}
       </p>
 
+      <button
+        className="studio-button secondary"
+        onClick={() =>
+          dispatch({
+            type: "SET_AHP_COMPARISONS_BATCH",
+            payload: ahpPairs.map(([i, j]) => ({
+              criterionId1: criteria[i].id,
+              criterionId2: criteria[j].id,
+              value: 1,
+            })),
+          })
+        }
+      >
+        Alle Kriterien als gleich wichtig bestätigen
+      </button>
       {/* Progress */}
       <div className="rounded-xl border border-white/10 bg-white/5 p-4">
         <div className="flex items-center justify-between mb-2">
@@ -204,14 +256,16 @@ export function WeightingModule() {
         <div className="h-2 rounded-full bg-white/10 overflow-hidden">
           <div
             className="h-full rounded-full bg-[rgb(var(--accent))] transition-all"
-            style={{ width: `${(completedComparisons / totalComparisons) * 100}%` }}
+            style={{
+              width: `${(completedComparisons / totalComparisons) * 100}%`,
+            }}
           />
         </div>
       </div>
 
       {/* AHP Matrix */}
       <div className="space-y-2">
-        {ahpPairs.map(([i, j], pairIndex) => {
+        {ahpPairs.map(([i, j]) => {
           const value = getAHPValue(i, j);
           const isActive = activeAHPPair?.[0] === i && activeAHPPair?.[1] === j;
 
@@ -236,7 +290,14 @@ export function WeightingModule() {
 
               <div className="flex items-center justify-center gap-1">
                 {AHP_SCALE.map((scale) => {
-                  const isSelected = Math.abs(value - scale.value) < 0.01;
+                  const isSelected =
+                    ahpComparisons.some(
+                      (c) =>
+                        (c.criterionId1 === criteria[i].id &&
+                          c.criterionId2 === criteria[j].id) ||
+                        (c.criterionId2 === criteria[i].id &&
+                          c.criterionId1 === criteria[j].id),
+                    ) && Math.abs(value - scale.value) < 0.01;
                   return (
                     <button
                       key={scale.label}
@@ -249,6 +310,8 @@ export function WeightingModule() {
                           : "bg-white/10 text-white/60 hover:bg-white/20"
                       }`}
                       title={scale.desc}
+                      aria-label={`${criteria[i].name} gegenüber ${criteria[j].name}: ${scale.desc}`}
+                      aria-pressed={isSelected}
                     >
                       {scale.label}
                     </button>
@@ -260,8 +323,8 @@ export function WeightingModule() {
                 {value < 1
                   ? `${criteria[j]?.name} ist wichtiger`
                   : value > 1
-                  ? `${criteria[i]?.name} ist wichtiger`
-                  : "Gleich wichtig"}
+                    ? `${criteria[i]?.name} ist wichtiger`
+                    : "Gleich wichtig"}
               </div>
             </div>
           );
@@ -285,7 +348,9 @@ export function WeightingModule() {
             />
             <span
               className={`text-sm font-medium ${
-                ahpConsistency.isConsistent ? "text-green-400" : "text-yellow-400"
+                ahpConsistency.isConsistent
+                  ? "text-green-400"
+                  : "text-yellow-400"
               }`}
             >
               Konsistenzprüfung
@@ -294,7 +359,9 @@ export function WeightingModule() {
           <p className="text-sm text-white/70">{ahpConsistency.message}</p>
           <div className="mt-2 text-xs text-white/50">
             CR = {(ahpConsistency.consistencyRatio * 100).toFixed(1)}%
-            {ahpConsistency.consistencyRatio < 0.1 ? " (akzeptabel < 10%)" : " (sollte < 10% sein)"}
+            {ahpConsistency.consistencyRatio < 0.1
+              ? " (akzeptabel < 10%)"
+              : " (sollte < 10% sein)"}
           </div>
         </div>
       )}
@@ -302,18 +369,44 @@ export function WeightingModule() {
   );
 
   // Determine available methods based on package
-  const availableMethods: { id: WeightingMethod; label: string; desc: string }[] =
+  const availableMethods: {
+    id: WeightingMethod;
+    label: string;
+    desc: string;
+  }[] =
     packageLevel === "basic"
-      ? [{ id: "simple", label: t.weightingSetup.methods.simple, desc: t.weightingSetup.methods.simpleDesc }]
-      : packageLevel === "advanced"
       ? [
-          { id: "percentage", label: t.weightingSetup.methods.percentage, desc: t.weightingSetup.methods.percentageDesc },
-          { id: "ahp-light", label: t.weightingSetup.methods.ahpLight, desc: t.weightingSetup.methods.ahpLightDesc },
+          {
+            id: "simple",
+            label: t.weightingSetup.methods.simple,
+            desc: t.weightingSetup.methods.simpleDesc,
+          },
         ]
-      : [
-          { id: "percentage", label: t.weightingSetup.methods.percentage, desc: t.weightingSetup.methods.percentageDesc },
-          { id: "ahp-full", label: t.weightingSetup.methods.ahpFull, desc: t.weightingSetup.methods.ahpFullDesc },
-        ];
+      : packageLevel === "advanced"
+        ? [
+            {
+              id: "percentage",
+              label: t.weightingSetup.methods.percentage,
+              desc: t.weightingSetup.methods.percentageDesc,
+            },
+            {
+              id: "ahp-light",
+              label: t.weightingSetup.methods.ahpLight,
+              desc: t.weightingSetup.methods.ahpLightDesc,
+            },
+          ]
+        : [
+            {
+              id: "percentage",
+              label: t.weightingSetup.methods.percentage,
+              desc: t.weightingSetup.methods.percentageDesc,
+            },
+            {
+              id: "ahp-full",
+              label: t.weightingSetup.methods.ahpFull,
+              desc: t.weightingSetup.methods.ahpFullDesc,
+            },
+          ];
 
   return (
     <div className="space-y-6">
@@ -322,7 +415,9 @@ export function WeightingModule() {
           {t.steps.step} 4
           <StepInfoButton stepId="weighting" />
         </div>
-        <h2 className="mt-1 text-xl font-semibold text-white">{t.weightingSetup.title}</h2>
+        <h2 className="mt-1 text-xl font-semibold text-white">
+          {t.weightingSetup.title}
+        </h2>
         <p className="mt-2 text-sm text-white/50">
           {t.weightingSetup.description}
         </p>
@@ -335,6 +430,8 @@ export function WeightingModule() {
             <button
               key={method.id}
               onClick={() => setWeightingMethod(method.id)}
+              aria-pressed={weightingMethod === method.id}
+              disabled={method.id.startsWith("ahp") && criteria.length > 15}
               className={`flex-1 rounded-xl p-4 text-left transition ${
                 weightingMethod === method.id
                   ? "border-[rgb(var(--accent))] bg-[rgb(var(--accent))]/10 border"
@@ -348,6 +445,12 @@ export function WeightingModule() {
         </div>
       )}
 
+      {criteria.length > 15 && (
+        <p className="notice warning">
+          AHP ist für maximal 15 Kriterien verfügbar. Verwende Prozentgewichte
+          oder reduziere die Kriterienzahl.
+        </p>
+      )}
       {/* Weighting interface */}
       {weightingMethod === "simple" && renderSimpleWeighting()}
       {weightingMethod === "percentage" && renderPercentageWeighting()}

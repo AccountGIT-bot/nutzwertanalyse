@@ -1,29 +1,32 @@
 import "./globals.css";
 import type { Metadata, Viewport } from "next";
-import { I18nProvider } from "@/app/lib/i18n";
-
+import { I18nProvider } from "./lib/i18n";
 export const metadata: Metadata = {
   title: {
-    default: "Nutzwertanalyse.com",
-    template: "%s | Nutzwertanalyse.com",
+    default: "DecisionStudio – Klar entscheiden",
+    template: "%s | DecisionStudio",
   },
-  description: "Entscheidungen strukturiert treffen – mit Nutzwertanalyse. Kriterien definieren, gewichten, bewerten und dokumentieren.",
+  description:
+    "Alternativen vergleichen, Kriterien gewichten und Entscheidungen nachvollziehbar dokumentieren. Deine Nutzwertanalyse ohne Konto.",
+  icons: { icon: "/icon.svg" },
+  robots: { index: false, follow: false },
 };
-
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  themeColor: "#fbfbfb",
+  themeColor: "#0a1918",
 };
-
 export default function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
   return (
-    <html lang="de" suppressHydrationWarning data-scroll-behavior="smooth">
-      <body className="min-h-screen">
+    <html lang="de-CH" suppressHydrationWarning>
+      <body>
+        <a className="skip-link" href="#main-content">
+          Zum Inhalt
+        </a>
         <I18nProvider>{children}</I18nProvider>
       </body>
     </html>

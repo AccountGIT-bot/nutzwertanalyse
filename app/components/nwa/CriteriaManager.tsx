@@ -9,7 +9,7 @@ import { useTranslations } from "@/app/lib/i18n";
 
 export function CriteriaManager() {
   const t = useTranslations();
-const {
+  const {
     state,
     addCriterion,
     updateCriterion,
@@ -24,13 +24,15 @@ const {
   const [newName, setNewName] = useState("");
   const [newCategory, setNewCategory] = useState("");
   const [showTemplateHint, setShowTemplateHint] = useState(
-    criteria.length === 0 && !!decision.preset
+    criteria.length === 0 && !!decision.preset,
   );
 
-  const template = decision.preset ? getTemplateByPreset(decision.preset) : null;
+  const template = decision.preset
+    ? getTemplateByPreset(decision.preset)
+    : null;
 
   const handleAdd = () => {
-    if (newName.trim()) {
+    if (newName.trim() && criteria.length < 20) {
       addCriterion({
         name: newName.trim(),
         rawWeight: packageLevel === "basic" ? 3 : 10,
@@ -59,8 +61,11 @@ const {
   };
 
   // Group criteria by category for Advanced/Business
-  type CriteriaGroup = { category: typeof categories[number] | null; criteria: typeof criteria };
-  
+  type CriteriaGroup = {
+    category: (typeof categories)[number] | null;
+    criteria: typeof criteria;
+  };
+
   const groupedCriteria: CriteriaGroup[] =
     packageLevel !== "basic" && categories.length > 0
       ? categories.map((cat) => ({
@@ -71,9 +76,13 @@ const {
 
   // Add uncategorized group
   const uncategorized = criteria.filter(
-    (c) => !c.categoryId || !categories.find((cat) => cat.id === c.categoryId)
+    (c) => !c.categoryId || !categories.find((cat) => cat.id === c.categoryId),
   );
-  if (uncategorized.length > 0 && packageLevel !== "basic") {
+  if (
+    uncategorized.length > 0 &&
+    packageLevel !== "basic" &&
+    categories.length > 0
+  ) {
     groupedCriteria.push({ category: null, criteria: uncategorized });
   }
 
@@ -84,7 +93,9 @@ const {
           {t.steps.step} 3
           <StepInfoButton stepId="criteria" />
         </div>
-        <h2 className="mt-1 text-xl font-semibold text-white">{t.criteriaSetup.title}</h2>
+        <h2 className="mt-1 text-xl font-semibold text-white">
+          {t.criteriaSetup.title}
+        </h2>
         <p className="mt-2 text-sm text-white/50">
           {packageLevel === "basic"
             ? t.criteriaSetup.description
@@ -130,6 +141,8 @@ const {
       <div className="flex gap-3">
         <input
           type="text"
+          maxLength={200}
+          aria-label="Neues Kriterium"
           value={newName}
           onChange={(e) => setNewName(e.target.value)}
           onKeyDown={handleKeyDown}
@@ -139,6 +152,7 @@ const {
 
         {packageLevel !== "basic" && categories.length > 0 && (
           <select
+            aria-label="Kategorie für neues Kriterium"
             value={newCategory}
             onChange={(e) => setNewCategory(e.target.value)}
             className="h-12 px-4 rounded-xl bg-slate-800 border border-white/10 text-white outline-none focus:border-[rgb(var(--accent))] transition [&>option]:bg-slate-800 [&>option]:text-white"
@@ -154,7 +168,7 @@ const {
 
         <button
           onClick={handleAdd}
-          disabled={!newName.trim()}
+          disabled={!newName.trim() || criteria.length >= 20}
           className="h-12 px-6 rounded-xl font-medium transition disabled:opacity-50 disabled:cursor-not-allowed"
           style={{
             background: `rgb(var(--accent) / 0.15)`,
@@ -168,7 +182,7 @@ const {
 
       {/* Criteria list */}
       <div className="space-y-4">
-        {groupedCriteria.map(({ category, criteria: groupCriteria }, groupIndex) => (
+        {groupedCriteria.map(({ category, criteria: groupCriteria }) => (
           <div key={category?.id || "uncategorized"}>
             {category && packageLevel !== "basic" && (
               <div className="mb-3 flex items-center gap-2">
@@ -198,6 +212,8 @@ const {
                     <div className="flex-1 min-w-0 space-y-2">
                       <input
                         type="text"
+                        maxLength={200}
+                        aria-label={`Name für ${criterion.name}`}
                         value={criterion.name}
                         onChange={(e) =>
                           handleUpdate(criterion, { name: e.target.value })
@@ -209,9 +225,13 @@ const {
                         <>
                           <input
                             type="text"
+                            maxLength={200}
+                            aria-label={`Definition für ${criterion.name}`}
                             value={criterion.description || ""}
                             onChange={(e) =>
-                              handleUpdate(criterion, { description: e.target.value })
+                              handleUpdate(criterion, {
+                                description: e.target.value,
+                              })
                             }
                             placeholder="Beschreibung / Definition..."
                             className="w-full h-9 px-3 rounded-lg bg-white/5 border border-white/10 text-sm text-white/70 placeholder:text-white/30 outline-none focus:border-[rgb(var(--accent))]/50"
@@ -221,6 +241,7 @@ const {
                             {/* Category selector */}
                             {categories.length > 0 && (
                               <select
+                                aria-label={`Kategorie für ${criterion.name}`}
                                 value={criterion.categoryId || ""}
                                 onChange={(e) =>
                                   handleUpdate(criterion, {
@@ -229,7 +250,9 @@ const {
                                 }
                                 className="h-9 px-3 rounded-lg bg-slate-800 border border-white/10 text-sm text-white/70 outline-none [&>option]:bg-slate-800 [&>option]:text-white"
                               >
-                                <option value="">{t.criteriaSetup.noCategory}</option>
+                                <option value="">
+                                  {t.criteriaSetup.noCategory}
+                                </option>
                                 {categories.map((cat) => (
                                   <option key={cat.id} value={cat.id}>
                                     {cat.name}
@@ -246,6 +269,7 @@ const {
                                 onChange={(e) =>
                                   handleUpdate(criterion, {
                                     isKnockout: e.target.checked,
+                                    minThreshold: criterion.minThreshold ?? 5,
                                   })
                                 }
                                 className="rounded border-white/20 bg-white/5 text-[rgb(var(--accent))] focus:ring-[rgb(var(--accent))]/20"
@@ -255,15 +279,24 @@ const {
 
                             {criterion.isKnockout && (
                               <div className="flex items-center gap-2">
-                                <span className="text-xs text-white/50">{t.criteriaSetup.knockoutThreshold}:</span>
+                                <span className="text-xs text-white/50">
+                                  {t.criteriaSetup.knockoutThreshold}:
+                                </span>
                                 <input
                                   type="number"
                                   min={1}
                                   max={10}
+                                  aria-label={`K.O.-Schwelle für ${criterion.name}`}
                                   value={criterion.minThreshold || 5}
                                   onChange={(e) =>
                                     handleUpdate(criterion, {
-                                      minThreshold: parseInt(e.target.value) || 5,
+                                      minThreshold: Math.max(
+                                        1,
+                                        Math.min(
+                                          10,
+                                          parseInt(e.target.value) || 5,
+                                        ),
+                                      ),
                                     })
                                   }
                                   className="w-16 h-8 px-2 rounded-lg bg-white/5 border border-white/10 text-sm text-white text-center outline-none"
@@ -277,18 +310,26 @@ const {
                             <div className="grid grid-cols-2 gap-2 mt-2">
                               <input
                                 type="text"
+                                maxLength={200}
+                                aria-label={`Begründung für ${criterion.name}`}
                                 value={criterion.rationale || ""}
                                 onChange={(e) =>
-                                  handleUpdate(criterion, { rationale: e.target.value })
+                                  handleUpdate(criterion, {
+                                    rationale: e.target.value,
+                                  })
                                 }
                                 placeholder="Begründung..."
                                 className="h-9 px-3 rounded-lg bg-white/5 border border-white/10 text-sm text-white/70 placeholder:text-white/30 outline-none"
                               />
                               <input
                                 type="text"
+                                maxLength={200}
+                                aria-label={`Quelle für ${criterion.name}`}
                                 value={criterion.source || ""}
                                 onChange={(e) =>
-                                  handleUpdate(criterion, { source: e.target.value })
+                                  handleUpdate(criterion, {
+                                    source: e.target.value,
+                                  })
                                 }
                                 placeholder="Quelle..."
                                 className="h-9 px-3 rounded-lg bg-white/5 border border-white/10 text-sm text-white/70 placeholder:text-white/30 outline-none"
@@ -297,34 +338,57 @@ const {
                           )}
                         </>
                       )}
-</div>
-              
-              <div className="flex gap-2">
-                {/* Duplicate button */}
-                <button
-                  onClick={() => duplicateCriterion(criterion.id)}
-                  className="flex-shrink-0 h-8 w-8 rounded-lg bg-white/5 text-white/50 hover:bg-white/10 hover:text-white/70 transition flex items-center justify-center"
-                  title={t.criteriaSetup.duplicateCrit}
-                >
-                  <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                  </svg>
-                </button>
-                
-                {/* Delete button */}
-                <button
-                  onClick={() => removeCriterion(criterion.id)}
-                  className="flex-shrink-0 h-8 w-8 rounded-lg bg-red-500/10 text-red-400 hover:bg-red-500/20 transition flex items-center justify-center"
-                  title={t.criteriaSetup.removeCrit}
-                >
-                  <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                </button>
-              </div>
-            </div>
-          </div>
-        ))}
+                    </div>
+
+                    <div className="flex gap-2">
+                      {/* Duplicate button */}
+                      <button
+                        onClick={() => duplicateCriterion(criterion.id)}
+                        disabled={criteria.length >= 20}
+                        aria-label={`${criterion.name} duplizieren`}
+                        className="flex-shrink-0 h-8 w-8 rounded-lg bg-white/5 text-white/50 hover:bg-white/10 hover:text-white/70 transition flex items-center justify-center"
+                        title={t.criteriaSetup.duplicateCrit}
+                      >
+                        <svg
+                          className="h-4 w-4"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
+                          />
+                        </svg>
+                      </button>
+
+                      {/* Delete button */}
+                      <button
+                        onClick={() => removeCriterion(criterion.id)}
+                        aria-label={`${criterion.name} entfernen`}
+                        className="flex-shrink-0 h-8 w-8 rounded-lg bg-red-500/10 text-red-400 hover:bg-red-500/20 transition flex items-center justify-center"
+                        title={t.criteriaSetup.removeCrit}
+                      >
+                        <svg
+                          className="h-4 w-4"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M6 18L18 6M6 6l12 12"
+                          />
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         ))}
@@ -341,7 +405,12 @@ const {
 
       {/* Status */}
       <div className="flex items-center justify-between text-sm">
-        <div className="text-white/50">{t.criteriaSetup.countStatus.replace("{count}", String(criteria.length))}</div>
+        <div className="text-white/50">
+          {t.criteriaSetup.countStatus.replace(
+            "{count}",
+            String(criteria.length),
+          )}
+        </div>
         {!canProceedToNext && criteria.length < 2 && (
           <div className="text-[rgb(var(--accent))]/80">
             {t.criteriaSetup.minRequired}

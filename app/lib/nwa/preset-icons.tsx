@@ -2,12 +2,12 @@
 
 import type { ReactNode } from "react";
 
-export type PresetId = 
-  | "supplier" 
-  | "software" 
-  | "investment" 
-  | "machines" 
-  | "vehicle" 
+export type PresetId =
+  | "supplier"
+  | "software"
+  | "investment"
+  | "machines"
+  | "vehicle"
   | "employee"
   | "realEstate"
   | "product"
@@ -23,14 +23,14 @@ interface PresetIconProps {
 
 export function SupplierIcon({ className = "", size = 24 }: PresetIconProps) {
   return (
-    <svg 
-      width={size} 
-      height={size} 
-      viewBox="0 0 24 24" 
-      fill="none" 
-      stroke="currentColor" 
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
       strokeWidth={1.5}
-      strokeLinecap="round" 
+      strokeLinecap="round"
       strokeLinejoin="round"
       className={className}
     >
@@ -47,14 +47,14 @@ export function SupplierIcon({ className = "", size = 24 }: PresetIconProps) {
 
 export function SoftwareIcon({ className = "", size = 24 }: PresetIconProps) {
   return (
-    <svg 
-      width={size} 
-      height={size} 
-      viewBox="0 0 24 24" 
-      fill="none" 
-      stroke="currentColor" 
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
       strokeWidth={1.5}
-      strokeLinecap="round" 
+      strokeLinecap="round"
       strokeLinejoin="round"
       className={className}
     >
@@ -71,14 +71,14 @@ export function SoftwareIcon({ className = "", size = 24 }: PresetIconProps) {
 
 export function InvestmentIcon({ className = "", size = 24 }: PresetIconProps) {
   return (
-    <svg 
-      width={size} 
-      height={size} 
-      viewBox="0 0 24 24" 
-      fill="none" 
-      stroke="currentColor" 
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
       strokeWidth={1.5}
-      strokeLinecap="round" 
+      strokeLinecap="round"
       strokeLinejoin="round"
       className={className}
     >
@@ -92,14 +92,14 @@ export function InvestmentIcon({ className = "", size = 24 }: PresetIconProps) {
 
 export function MachinesIcon({ className = "", size = 24 }: PresetIconProps) {
   return (
-    <svg 
-      width={size} 
-      height={size} 
-      viewBox="0 0 24 24" 
-      fill="none" 
-      stroke="currentColor" 
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
       strokeWidth={1.5}
-      strokeLinecap="round" 
+      strokeLinecap="round"
       strokeLinejoin="round"
       className={className}
     >
@@ -119,14 +119,14 @@ export function MachinesIcon({ className = "", size = 24 }: PresetIconProps) {
 
 export function VehicleIcon({ className = "", size = 24 }: PresetIconProps) {
   return (
-    <svg 
-      width={size} 
-      height={size} 
-      viewBox="0 0 24 24" 
-      fill="none" 
-      stroke="currentColor" 
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
       strokeWidth={1.5}
-      strokeLinecap="round" 
+      strokeLinecap="round"
       strokeLinejoin="round"
       className={className}
     >
@@ -142,14 +142,14 @@ export function VehicleIcon({ className = "", size = 24 }: PresetIconProps) {
 
 export function EmployeeIcon({ className = "", size = 24 }: PresetIconProps) {
   return (
-    <svg 
-      width={size} 
-      height={size} 
-      viewBox="0 0 24 24" 
-      fill="none" 
-      stroke="currentColor" 
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
       strokeWidth={1.5}
-      strokeLinecap="round" 
+      strokeLinecap="round"
       strokeLinejoin="round"
       className={className}
     >
@@ -164,14 +164,14 @@ export function EmployeeIcon({ className = "", size = 24 }: PresetIconProps) {
 
 export function CustomIcon({ className = "", size = 24 }: PresetIconProps) {
   return (
-    <svg 
-      width={size} 
-      height={size} 
-      viewBox="0 0 24 24" 
-      fill="none" 
-      stroke="currentColor" 
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
       strokeWidth={1.5}
-      strokeLinecap="round" 
+      strokeLinecap="round"
       strokeLinejoin="round"
       className={className}
     >
@@ -184,28 +184,32 @@ export function CustomIcon({ className = "", size = 24 }: PresetIconProps) {
   );
 }
 
-// Map preset ID to icon component
-export function getPresetIcon(presetId: PresetId | string | undefined): (props: PresetIconProps) => ReactNode {
-  switch (presetId) {
-    case "supplier":
-      return SupplierIcon;
-    case "software":
-      return SoftwareIcon;
-    case "investment":
-      return InvestmentIcon;
-    case "machines":
-      return MachinesIcon;
-    case "vehicle":
-      return VehicleIcon;
-    case "employee":
-      return EmployeeIcon;
-    default:
-      return CustomIcon;
-  }
+const PRESET_ICONS: Record<string, (props: PresetIconProps) => ReactNode> = {
+  supplier: SupplierIcon,
+  software: SoftwareIcon,
+  investment: InvestmentIcon,
+  machines: MachinesIcon,
+  vehicle: VehicleIcon,
+  employee: EmployeeIcon,
+  custom: CustomIcon,
+};
+
+export function getPresetIcon(presetId: PresetId | string | undefined) {
+  return PRESET_ICONS[presetId || "custom"] || CustomIcon;
+}
+
+export function PresetIcon({
+  presetId,
+  ...props
+}: PresetIconProps & { presetId?: string }) {
+  const Icon = PRESET_ICONS[presetId || "custom"] || CustomIcon;
+  return <Icon {...props} />;
 }
 
 // Get preset label by ID
-export function getPresetLabel(presetId: PresetId | string | undefined): string {
+export function getPresetLabel(
+  presetId: PresetId | string | undefined,
+): string {
   switch (presetId) {
     case "supplier":
       return "Lieferantenauswahl";
@@ -259,51 +263,54 @@ const DOMAIN_TO_PRESET_ID: Record<string, PresetId> = {
 };
 
 // Get icon for AI domain
-export function getDomainIcon(domain: string | undefined): (props: PresetIconProps) => ReactNode {
+export function getDomainIcon(
+  domain: string | undefined,
+): (props: PresetIconProps) => ReactNode {
   const presetId = domain ? DOMAIN_TO_PRESET_ID[domain] : undefined;
   return getPresetIcon(presetId);
 }
 
 // Preset context indicator component - shows the selected preset with icon
-export function PresetIndicator({ 
-  presetId, 
+export function PresetIndicator({
+  presetId,
   size = "sm",
   showLabel = true,
-}: { 
+}: {
   presetId: PresetId | string | undefined;
   size?: "sm" | "md" | "lg";
   showLabel?: boolean;
 }) {
-  const IconComponent = getPresetIcon(presetId);
   const label = getPresetLabel(presetId);
-  
+
   const sizeClasses = {
     sm: "h-6 w-6 text-xs",
     md: "h-8 w-8 text-sm",
     lg: "h-10 w-10 text-base",
   };
-  
+
   const iconSizes = {
     sm: 14,
     md: 18,
     lg: 22,
   };
-  
+
   if (!presetId) return null;
-  
+
   return (
     <div className="flex items-center gap-2">
-      <div 
+      <div
         className={`${sizeClasses[size]} rounded-lg flex items-center justify-center`}
-        style={{ 
+        style={{
           background: "rgb(var(--accent) / 0.15)",
           color: "rgb(var(--accent))",
         }}
       >
-        <IconComponent size={iconSizes[size]} />
+        <PresetIcon presetId={presetId} size={iconSizes[size]} />
       </div>
       {showLabel && (
-        <span className={`${size === "sm" ? "text-xs" : size === "md" ? "text-sm" : "text-base"} text-white/70`}>
+        <span
+          className={`${size === "sm" ? "text-xs" : size === "md" ? "text-sm" : "text-base"} text-white/70`}
+        >
           {label}
         </span>
       )}

@@ -1,293 +1,248 @@
 "use client";
-
-import { useState, useMemo, useCallback, useEffect } from "react";
-import { useAnalysis } from "@/app/lib/nwa/analysis-context";
-import { StepInfoButton } from "./StepInfoButton";
-import { useTranslations } from "@/app/lib/i18n";
-
+import { useState } from "react";
+import { Plus, Trash2 } from "lucide-react";
+import { useAnalysis } from "../../lib/nwa/analysis-context";
+import { useTranslations } from "../../lib/i18n";
+import { BusinessDetails } from "./BusinessDetails";
 export function EvaluationMatrix() {
-  const { state, setRating, canProceedToNext, knockoutFailures } = useAnalysis();
+  const {
+    state,
+    setRating,
+    addEvaluator,
+    updateEvaluator,
+    removeEvaluator,
+    knockoutFailures,
+  } = useAnalysis();
   const { alternatives, criteria, ratings, evaluators, decision } = state;
-  const packageLevel = decision.packageLevel;
   const t = useTranslations();
-
-  const [selectedEvaluator, setSelectedEvaluator] = useState(
-    evaluators[0]?.id || undefined
-  );
-  const [hoveredCell, setHoveredCell] = useState<{
-    altId: string;
-    critId: string;
-  } | null>(null);
-
-  // Get rating value for a cell
-  const getRating = (altId: string, critId: string): number => {
-    const rating = ratings.find(
-      (r) =>
-        r.alternativeId === altId &&
-        r.criterionId === critId &&
-        (packageLevel !== "business" || r.evaluatorId === selectedEvaluator)
-    );
-    return rating?.score || 0;
-  };
-
-  // Calculate completion percentage
-  const completionPercent = useMemo(() => {
-    const total = alternatives.length * criteria.length;
-    const completed = new Set(
-      ratings
-        .filter(
-          (r) =>
-            r.score > 0 &&
-            (packageLevel !== "business" || r.evaluatorId === selectedEvaluator)
-        )
-        .map((r) => `${r.alternativeId}-${r.criterionId}`)
-    ).size;
-    return total > 0 ? Math.round((completed / total) * 100) : 0;
-  }, [alternatives, criteria, ratings, packageLevel, selectedEvaluator]);
-
-  const handleRating = useCallback((altId: string, critId: string, score: number) => {
-    setRating({
-      alternativeId: altId,
-      criterionId: critId,
-      score,
-      evaluatorId: packageLevel === "business" ? selectedEvaluator : undefined,
-    });
-  }, [setRating, packageLevel, selectedEvaluator]);
-
-  // Memoized knockout lookup map for O(1) access
-  const knockoutMap = useMemo(() => {
-    const map = new Map<string, string[]>();
-    for (const f of knockoutFailures) {
-      map.set(f.alternativeId, f.failedCriteria);
-    }
-    return map;
-  }, [knockoutFailures]);
-
-  // Check if alternative failed knockout criteria - O(1) with map
-  const isKnockout = useCallback((altId: string): boolean => {
-    return knockoutMap.has(altId);
-  }, [knockoutMap]);
-
-  const getFailedCriteria = useCallback((altId: string): string[] => {
-    return knockoutMap.get(altId) || [];
-  }, [knockoutMap]);
-
+  const [selected, setSelected] = useState(evaluators[0]?.id);
+  const [name, setName] = useState("");
+  const business = decision.packageLevel === "business";
+  const person = business
+    ? evaluators.some((e) => e.id === selected)
+      ? selected
+      : evaluators[0]?.id
+    : undefined;
+  const completed = ratings.filter(
+    (r) =>
+      r.evaluatorId === person &&
+      alternatives.some((a) => a.id === r.alternativeId) &&
+      criteria.some((c) => c.id === r.criterionId),
+  ).length;
+  const total = alternatives.length * criteria.length;
   return (
     <div className="space-y-6">
       <div>
-        <div className="text-sm text-white/60 flex items-center gap-2">
-          {t.steps.step} 5
-          <StepInfoButton stepId="rating" />
-        </div>
-        <h2 className="mt-1 text-xl font-semibold text-white">
-          {t.evaluationSetup.title}
-        </h2>
-        <p className="mt-2 text-sm text-white/50">
-          {t.evaluationSetup.description}
+        <p className="eyebrow">05 / {t.steps.evaluation}</p>
+        <h2>{t.evaluationSetup.title}</h2>
+        <p className="muted mt-3">
+          1 = schlecht geeignet, 10 = sehr gut geeignet. Bei Kosten, Lieferzeit
+          und Risiko gilt: ein tieferer tatsächlicher Wert erhält eine höhere
+          Bewertung.
         </p>
       </div>
-
-      {/* Evaluator selector (Business) */}
-      {packageLevel === "business" && evaluators.length > 1 && (
-        <div className="flex items-center gap-4">
-          <span className="text-sm text-white/60">{t.evaluationSetup.evaluator}:</span>
-          <div className="flex gap-2">
-            {evaluators.map((evaluator) => (
-              <button
-                key={evaluator.id}
-                onClick={() => setSelectedEvaluator(evaluator.id)}
-                className={`px-4 py-2 rounded-lg text-sm transition ${
-                  selectedEvaluator === evaluator.id
-                    ? "bg-[rgb(var(--accent))] text-white"
-                    : "bg-white/10 text-white/60 hover:bg-white/20"
-                }`}
-              >
-                {evaluator.name}
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* Progress */}
-      <div className="rounded-xl border border-white/10 bg-white/5 p-4">
-        <div className="flex items-center justify-between mb-2">
-          <span className="text-sm text-white/60">{t.evaluationSetup.progress}</span>
-          <span className="text-sm font-medium text-white">{completionPercent}%</span>
-        </div>
-        <div className="h-2 rounded-full bg-white/10 overflow-hidden">
-          <div
-            className="h-full rounded-full bg-[rgb(var(--accent))] transition-all"
-            style={{ width: `${completionPercent}%` }}
-          />
-        </div>
-      </div>
-
-      {/* Evaluation Matrix */}
-      <div className="overflow-x-auto">
-        <div className="min-w-[600px]">
-          {/* Header */}
-          <div className="flex gap-2 mb-3">
-            <div className="w-40 flex-shrink-0" />
-            {alternatives.map((alt) => (
-              <div
-                key={alt.id}
-                className={`flex-1 text-center text-sm font-medium truncate px-2 ${
-                  isKnockout(alt.id) ? "text-red-400" : "text-white"
-                }`}
-                title={alt.name}
-              >
-                {alt.name}
-                {isKnockout(alt.id) && (
-                  <div className="text-xs text-red-400/70 font-normal">K.O.</div>
-                )}
+      {business && (
+        <details className="workspace-details" open>
+          <summary>Bewertende · {evaluators.length}</summary>
+          <p className="muted">
+            Bewertungen werden nacheinander auf diesem Gerät erfasst. Das
+            Personengewicht bestimmt den Anteil am Mittelwert.
+          </p>
+          <div className="people-list">
+            {evaluators.map((e) => (
+              <div key={e.id}>
+                <label>
+                  Name
+                  <input
+                    aria-label="Name der bewertenden Person"
+                    maxLength={200}
+                    value={e.name}
+                    onChange={(x) =>
+                      updateEvaluator({ ...e, name: x.target.value })
+                    }
+                  />
+                </label>
+                <label>
+                  Gewicht
+                  <input
+                    aria-label={`Personengewicht ${e.name}`}
+                    type="number"
+                    min="1"
+                    max="100"
+                    value={e.weight ?? 1}
+                    onChange={(x) =>
+                      updateEvaluator({
+                        ...e,
+                        weight: Math.max(
+                          1,
+                          Math.min(100, Number(x.target.value) || 1),
+                        ),
+                      })
+                    }
+                  />
+                </label>
+                <button
+                  aria-label={`${e.name} entfernen`}
+                  disabled={evaluators.length <= 1}
+                  onClick={() => removeEvaluator(e.id)}
+                >
+                  <Trash2 size={17} />
+                </button>
               </div>
             ))}
           </div>
-
-          {/* Criteria rows */}
-          <div className="space-y-2">
-            {criteria.map((criterion) => {
-              const failedAlternatives = knockoutFailures
-                .filter((f) => f.failedCriteria.includes(criterion.id))
-                .map((f) => f.alternativeId);
-
-              return (
-                <div
-                  key={criterion.id}
-                  className="flex gap-2 items-center rounded-xl border border-white/10 bg-white/5 p-3"
-                >
-                  {/* Criterion label */}
-                  <div className="w-40 flex-shrink-0">
-                    <div className="text-sm font-medium text-white truncate">
-                      {criterion.name}
-                    </div>
-                    <div className="text-xs text-white/40">
-                      {t.evaluationSetup.weight}: {(criterion.weight * 100).toFixed(0)}%
-                      {criterion.isKnockout && (
-                        <span className="ml-2 text-yellow-400">
-                          {t.criteriaSetup.knockoutThreshold}: {criterion.minThreshold}
-                        </span>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Rating cells */}
-                  {alternatives.map((alt) => {
-                    const rating = getRating(alt.id, criterion.id);
-                    const isHovered =
-                      hoveredCell?.altId === alt.id &&
-                      hoveredCell?.critId === criterion.id;
-                    const isFailed = failedAlternatives.includes(alt.id);
-
-                    return (
-                      <div
-                        key={alt.id}
-                        className="flex-1"
-                        onMouseEnter={() =>
-                          setHoveredCell({ altId: alt.id, critId: criterion.id })
+          <form
+            className="action-row"
+            onSubmit={(e) => {
+              e.preventDefault();
+              if (name.trim()) {
+                addEvaluator({ name: name.trim(), weight: 1 });
+                setName("");
+              }
+            }}
+          >
+            <input
+              aria-label="Weitere bewertende Person"
+              placeholder="Weitere Person"
+              maxLength={200}
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+            />
+            <button
+              className="studio-button secondary"
+              disabled={!name.trim() || evaluators.length >= 10}
+            >
+              <Plus size={17} />
+              Hinzufügen
+            </button>
+          </form>
+        </details>
+      )}
+      {business && (
+        <label className="field-label">
+          Bewertung erfassen für
+          <select value={person} onChange={(e) => setSelected(e.target.value)}>
+            {evaluators.map((e) => (
+              <option key={e.id} value={e.id}>
+                {e.name || "Unbenannt"}
+              </option>
+            ))}
+          </select>
+        </label>
+      )}
+      <div className="rating-progress">
+        <span>
+          {completed} von {total} Bewertungen
+          {business ? " für diese Person" : ""}
+        </span>
+        <strong>{Math.round((completed / Math.max(1, total)) * 100)} %</strong>
+      </div>
+      <div
+        className="table-scroll rating-table"
+        tabIndex={0}
+        aria-label="Bewertungstabelle, horizontal scrollbar"
+      >
+        <table>
+          <caption className="sr-only">
+            Bewertungen von 1 bis 10 für jede Alternative und jedes Kriterium
+          </caption>
+          <thead>
+            <tr>
+              <th scope="col">Kriterium</th>
+              {alternatives.map((a) => (
+                <th scope="col" key={a.id}>
+                  {a.name}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {criteria.map((c) => (
+              <tr key={c.id}>
+                <th scope="row">
+                  <span>{c.name}</span>
+                  <small>
+                    {(c.weight * 100).toFixed(1)} % Gewicht
+                    {c.isKnockout ? ` · K.O. unter ${c.minThreshold}` : ""}
+                  </small>
+                </th>
+                {alternatives.map((a) => {
+                  const r = ratings.find(
+                    (r) =>
+                      r.alternativeId === a.id &&
+                      r.criterionId === c.id &&
+                      r.evaluatorId === person,
+                  );
+                  return (
+                    <td key={a.id}>
+                      <select
+                        aria-label={`${a.name}: ${c.name}`}
+                        value={r?.score ?? ""}
+                        onChange={(e) =>
+                          setRating({
+                            ...r,
+                            alternativeId: a.id,
+                            criterionId: c.id,
+                            evaluatorId: person,
+                            score: Number(e.target.value),
+                          })
                         }
-                        onMouseLeave={() => setHoveredCell(null)}
                       >
-                        {isHovered ? (
-                          // Expanded rating buttons
-                          <div className="flex gap-0.5 justify-center">
-                            {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((score) => (
-                              <button
-                                key={score}
-                                onClick={() => handleRating(alt.id, criterion.id, score)}
-                                className={`h-8 w-6 rounded text-xs font-medium transition ${
-                                  rating === score
-                                    ? "bg-[rgb(var(--accent))] text-white"
-                                    : "bg-white/10 text-white/60 hover:bg-white/20"
-                                }`}
-                              >
-                                {score}
-                              </button>
-                            ))}
-                          </div>
-                        ) : (
-                          // Compact view
-                          <div
-                            className={`h-10 rounded-lg flex items-center justify-center cursor-pointer transition ${
-                              isFailed
-                                ? "bg-red-500/20 border border-red-500/30"
-                                : rating > 0
-                                ? "bg-[rgb(var(--accent))]/20"
-                                : "bg-white/10 hover:bg-white/15"
-                            }`}
-                          >
-                            {rating > 0 ? (
-                              <span
-                                className={`text-lg font-semibold ${
-                                  isFailed ? "text-red-400" : "text-[rgb(var(--accent))]"
-                                }`}
-                              >
-                                {rating}
-                              </span>
-                            ) : (
-                              <span className="text-white/30 text-sm">—</span>
-                            )}
-                          </div>
-                        )}
-                      </div>
-                    );
-                  })}
-                </div>
-              );
-            })}
-          </div>
-        </div>
+                        <option value="" disabled>
+                          Bewerten
+                        </option>
+                        {Array.from({ length: 10 }, (_, i) => (
+                          <option key={i} value={i + 1}>
+                            {i + 1}
+                          </option>
+                        ))}
+                      </select>
+                      {decision.packageLevel !== "basic" && (
+                        <details>
+                          <summary className="rating-note">Notiz</summary>
+                          <textarea
+                            aria-label={`Begründung ${a.name}: ${c.name}`}
+                            rows={2}
+                            maxLength={10000}
+                            value={r?.comment || ""}
+                            disabled={!r}
+                            placeholder={
+                              r ? "Begründung oder Quelle" : "Zuerst bewerten"
+                            }
+                            onChange={(e) =>
+                              r && setRating({ ...r, comment: e.target.value })
+                            }
+                          />
+                        </details>
+                      )}
+                    </td>
+                  );
+                })}
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
-
-      {/* Knockout warnings */}
       {knockoutFailures.length > 0 && (
-        <div className="rounded-xl border border-red-500/30 bg-red-500/10 p-4">
-          <div className="flex items-center gap-2 mb-2">
-            <div className="h-2 w-2 rounded-full bg-red-400" />
-            <span className="text-sm font-medium text-red-400">
-              {t.evaluationSetup.knockoutFailed}
-            </span>
-          </div>
-          <div className="space-y-1">
-            {knockoutFailures.map((failure) => {
-              const alt = alternatives.find((a) => a.id === failure.alternativeId);
-              const failedCritNames = failure.failedCriteria
-                .map((cId) => criteria.find((c) => c.id === cId)?.name)
-                .filter(Boolean);
-              return (
-                <div key={failure.alternativeId} className="text-sm text-white/70">
-                  <span className="font-medium">{alt?.name}</span>: {failedCritNames.join(", ")}
-                </div>
-              );
-            })}
+        <div className="notice warning">
+          <div>
+            <strong>K.O.-Kriterien unterschritten</strong>
+            <p>
+              {knockoutFailures
+                .map(
+                  (f) =>
+                    `${alternatives.find((a) => a.id === f.alternativeId)?.name}: ${f.failedCriteria.map((id) => criteria.find((c) => c.id === id)?.name).join(", ")}`,
+                )
+                .join("; ")}
+            </p>
+            <p>
+              Bei mehreren Bewertenden gilt ihr gewichteter Mittelwert.
+              Unvollständige Bewertungen können den Status noch verändern.
+            </p>
           </div>
         </div>
       )}
-
-      {/* Legend */}
-      <div className="flex items-center gap-6 text-xs text-white/40">
-        <div className="flex items-center gap-2">
-          <div className="h-4 w-8 rounded bg-white/10" />
-          <span>{t.evaluationSetup.legend.notRated}</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <div className="h-4 w-8 rounded bg-[rgb(var(--accent))]/20" />
-          <span>{t.evaluationSetup.legend.rated}</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <div className="h-4 w-8 rounded bg-red-500/20 border border-red-500/30" />
-          <span>{t.evaluationSetup.legend.knockoutFailed}</span>
-        </div>
-        <div className="ml-auto">{t.evaluationSetup.scale}</div>
-      </div>
-
-      {/* Validation */}
-      {!canProceedToNext && (
-        <div className="text-sm text-[rgb(var(--accent))]/80">
-          {t.evaluationSetup.validation}
-        </div>
-      )}
+      {business && <BusinessDetails />}
     </div>
   );
 }

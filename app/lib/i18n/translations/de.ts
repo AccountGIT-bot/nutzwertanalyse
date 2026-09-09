@@ -2,9 +2,10 @@ export const de = {
   // Meta
   meta: {
     title: "Nutzwertanalyse.com",
-    description: "Entscheidungen strukturiert treffen – mit Nutzwertanalyse. Kriterien definieren, gewichten, bewerten und dokumentieren.",
+    description:
+      "Entscheidungen strukturiert treffen – mit Nutzwertanalyse. Kriterien definieren, gewichten, bewerten und dokumentieren.",
   },
-  
+
   // Brand
   brand: {
     name: "Nutzwertanalyse",
@@ -13,12 +14,12 @@ export const de = {
     headerSubtitle: "Entscheidungen strukturiert dokumentieren",
     swissQuality: "Swiss Quality",
   },
-  
+
   // Construction Banner
   constructionBanner: {
     text: "Diese Website befindet sich noch im Aufbau – einige Funktionen sind in Entwicklung",
   },
-  
+
   // Landing Page
   landing: {
     headline: {
@@ -26,120 +27,210 @@ export const de = {
       part2: "Strukturiert.",
       part3: "Begründet.",
     },
-    description: "Beschreibe deine Entscheidung in eigenen Worten. Unsere KI analysiert deinen Text und erstellt automatisch passende Alternativen und Bewertungskriterien – keine Vorlage nötig, funktioniert mit jedem Thema.",
+    description:
+      "Beschreibe deine Entscheidung in eigenen Worten. Unsere KI analysiert deinen Text und erstellt automatisch passende Alternativen und Bewertungskriterien – keine Vorlage nötig, funktioniert mit jedem Thema.",
     searchPlaceholder: "Beschreibe deine Entscheidung...",
-    searchInputPlaceholder: "WELCHE ENTSCHEIDUNG SOLL HEUTE STRUKTURIERT WERDEN?",
+    searchInputPlaceholder:
+      "WELCHE ENTSCHEIDUNG SOLL HEUTE STRUKTURIERT WERDEN?",
     searchInputAriaLabel: "Entscheidung eingeben",
     startButton: "Start",
     startButtonLoading: "...",
-    searchHint: "Sofort starten – KI analysiert und strukturiert deine Eingabe automatisch",
+    searchHint:
+      "Sofort starten – KI analysiert und strukturiert deine Eingabe automatisch",
     orChooseTemplate: "Oder wähle eine Vorlage",
     footer: {
       principles: "Prinzipien",
-      principlesText: "Transparenz, Fairness, Nachvollziehbarkeit – klare Kriterien statt Bauchgefühl.",
+      principlesText:
+        "Transparenz, Fairness, Nachvollziehbarkeit – klare Kriterien statt Bauchgefühl.",
       framework: "Framework",
-      frameworkText: "Kriterien – Gewichtung – Bewertung – Sensitivität – dokumentiert & vergleichbar.",
+      frameworkText:
+        "Kriterien – Gewichtung – Bewertung – Sensitivität – dokumentiert & vergleichbar.",
       legal: "Rechtliches",
       imprint: "Impressum",
       privacy: "Datenschutz",
       terms: "AGB",
     },
   },
-  
+
   // Presets
   presets: {
     supplier: {
       label: "Lieferantenauswahl",
       hint: "Partner objektiv vergleichen",
-      titlePlaceholder: "z.B. Welcher Lieferant passt am besten zu unseren Anforderungen?",
-      descriptionPlaceholder: "Beschreiben Sie den Hintergrund: Warum suchen Sie einen neuen Lieferanten? Welche Produkte/Dienstleistungen werden benötigt?",
-      constraintsPlaceholder: "z.B. Budget max. CHF 50'000/Jahr, Lieferzeit max. 5 Tage, ISO-Zertifizierung erforderlich",
-      titleExamples: ["Welchen Verpackungslieferanten sollen wir wählen?", "Welcher IT-Dienstleister passt zu uns?"],
-      constraintsExamples: ["Mindestens 3 Jahre Markterfahrung", "Standort in der DACH-Region"],
+      titlePlaceholder:
+        "z.B. Welcher Lieferant passt am besten zu unseren Anforderungen?",
+      descriptionPlaceholder:
+        "Beschreiben Sie den Hintergrund: Warum suchen Sie einen neuen Lieferanten? Welche Produkte/Dienstleistungen werden benötigt?",
+      constraintsPlaceholder:
+        "z.B. Budget max. CHF 50'000/Jahr, Lieferzeit max. 5 Tage, ISO-Zertifizierung erforderlich",
+      titleExamples: [
+        "Welchen Verpackungslieferanten sollen wir wählen?",
+        "Welcher IT-Dienstleister passt zu uns?",
+      ],
+      constraintsExamples: [
+        "Mindestens 3 Jahre Markterfahrung",
+        "Standort in der DACH-Region",
+      ],
       alternativePlaceholders: ["Lieferant A", "Lieferant B", "Lieferant C"],
     },
     software: {
       label: "Softwarevergleich",
       hint: "Tools systematisch bewerten",
-      titlePlaceholder: "z.B. Welche Software passt am besten zu unserem Unternehmen?",
-      descriptionPlaceholder: "Beschreiben Sie den Anwendungsfall: Welche Prozesse soll die Software unterstützen? Wie viele Benutzer werden damit arbeiten?",
-      constraintsPlaceholder: "z.B. Budget max. CHF 500/Monat, Cloud-Lösung bevorzugt, DSGVO-konform",
-      titleExamples: ["Welches CRM-System sollen wir einführen?", "Auswahl einer neuen Buchhaltungssoftware"],
-      constraintsExamples: ["Integration mit bestehendem ERP", "Mobile App erforderlich"],
+      titlePlaceholder:
+        "z.B. Welche Software passt am besten zu unserem Unternehmen?",
+      descriptionPlaceholder:
+        "Beschreiben Sie den Anwendungsfall: Welche Prozesse soll die Software unterstützen? Wie viele Benutzer werden damit arbeiten?",
+      constraintsPlaceholder:
+        "z.B. Budget max. CHF 500/Monat, Cloud-Lösung bevorzugt, DSGVO-konform",
+      titleExamples: [
+        "Welches CRM-System sollen wir einführen?",
+        "Auswahl einer neuen Buchhaltungssoftware",
+      ],
+      constraintsExamples: [
+        "Integration mit bestehendem ERP",
+        "Mobile App erforderlich",
+      ],
       alternativePlaceholders: ["Software A", "Software B", "Software C"],
     },
     investment: {
       label: "Investitionsentscheid",
       hint: "Rendite & Risiken abwägen",
-      titlePlaceholder: "z.B. Welche Investition lohnt sich langfristig am meisten?",
-      descriptionPlaceholder: "Beschreiben Sie den strategischen Kontext: Welche Ziele verfolgen Sie? Welcher Zeithorizont ist relevant?",
-      constraintsPlaceholder: "z.B. Investitionsbudget max. CHF 2 Mio., Amortisation innerhalb 5 Jahren, min. 12% IRR",
-      titleExamples: ["In welches Projekt sollen wir investieren?", "Lohnt sich die Erweiterung der Produktionskapazität?"],
-      constraintsExamples: ["Eigenkapitalquote mindestens 30%", "Umsetzung bis Ende nächsten Jahres"],
-      alternativePlaceholders: ["Investition A", "Investition B", "Investition C"],
+      titlePlaceholder:
+        "z.B. Welche Investition lohnt sich langfristig am meisten?",
+      descriptionPlaceholder:
+        "Beschreiben Sie den strategischen Kontext: Welche Ziele verfolgen Sie? Welcher Zeithorizont ist relevant?",
+      constraintsPlaceholder:
+        "z.B. Investitionsbudget max. CHF 2 Mio., Amortisation innerhalb 5 Jahren, min. 12% IRR",
+      titleExamples: [
+        "In welches Projekt sollen wir investieren?",
+        "Lohnt sich die Erweiterung der Produktionskapazität?",
+      ],
+      constraintsExamples: [
+        "Eigenkapitalquote mindestens 30%",
+        "Umsetzung bis Ende nächsten Jahres",
+      ],
+      alternativePlaceholders: [
+        "Investition A",
+        "Investition B",
+        "Investition C",
+      ],
     },
     machines: {
       label: "Maschinenkauf",
       hint: "Leistung & Wirtschaftlichkeit",
-      titlePlaceholder: "z.B. Welche Maschine erfüllt unsere Anforderungen am besten?",
-      descriptionPlaceholder: "Beschreiben Sie den Einsatzzweck: Welche Produkte werden gefertigt? Welche Kapazität wird benötigt?",
-      constraintsPlaceholder: "z.B. Budget max. CHF 500'000, Stellfläche max. 50m², Stromversorgung 400V",
-      titleExamples: ["Welche Produktionsmaschine sollen wir anschaffen?", "Auswahl einer neuen CNC-Fräse"],
-      constraintsExamples: ["CE-Kennzeichnung erforderlich", "Schulung des Personals inklusive"],
+      titlePlaceholder:
+        "z.B. Welche Maschine erfüllt unsere Anforderungen am besten?",
+      descriptionPlaceholder:
+        "Beschreiben Sie den Einsatzzweck: Welche Produkte werden gefertigt? Welche Kapazität wird benötigt?",
+      constraintsPlaceholder:
+        "z.B. Budget max. CHF 500'000, Stellfläche max. 50m², Stromversorgung 400V",
+      titleExamples: [
+        "Welche Produktionsmaschine sollen wir anschaffen?",
+        "Auswahl einer neuen CNC-Fräse",
+      ],
+      constraintsExamples: [
+        "CE-Kennzeichnung erforderlich",
+        "Schulung des Personals inklusive",
+      ],
       alternativePlaceholders: ["Maschine A", "Maschine B", "Maschine C"],
     },
     vehicle: {
       label: "Fahrzeuganschaffung",
       hint: "Kosten & Nutzen optimieren",
-      titlePlaceholder: "z.B. Welches Fahrzeug passt am besten zu unserem Einsatzzweck?",
-      descriptionPlaceholder: "Beschreiben Sie den Einsatzzweck: Wie viele Kilometer pro Jahr? Welche Ladung/Personen?",
-      constraintsPlaceholder: "z.B. Budget max. CHF 60'000, Mindestreichweite 400km, Anhängerkupplung erforderlich",
-      titleExamples: ["Welches Firmenfahrzeug sollen wir anschaffen?", "Elektroauto oder Verbrenner für den Außendienst?"],
-      constraintsExamples: ["Mindestens 5 Sitzplätze", "Allradantrieb bevorzugt"],
+      titlePlaceholder:
+        "z.B. Welches Fahrzeug passt am besten zu unserem Einsatzzweck?",
+      descriptionPlaceholder:
+        "Beschreiben Sie den Einsatzzweck: Wie viele Kilometer pro Jahr? Welche Ladung/Personen?",
+      constraintsPlaceholder:
+        "z.B. Budget max. CHF 60'000, Mindestreichweite 400km, Anhängerkupplung erforderlich",
+      titleExamples: [
+        "Welches Firmenfahrzeug sollen wir anschaffen?",
+        "Elektroauto oder Verbrenner für den Aussendienst?",
+      ],
+      constraintsExamples: [
+        "Mindestens 5 Sitzplätze",
+        "Allradantrieb bevorzugt",
+      ],
       alternativePlaceholders: ["Fahrzeug A", "Fahrzeug B", "Fahrzeug C"],
     },
     employee: {
       label: "Mitarbeiterwahl",
       hint: "Kandidaten fair vergleichen",
-      titlePlaceholder: "z.B. Welche Kandidatin oder welcher Kandidat passt am besten?",
-      descriptionPlaceholder: "Beschreiben Sie die Position: Welche Aufgaben umfasst sie? Welche Qualifikationen sind wichtig?",
-      constraintsPlaceholder: "z.B. Gehaltsrahmen 80-100k, Startdatum spätestens Q2, Berufserfahrung mind. 5 Jahre",
-      titleExamples: ["Wen sollen wir für die Stelle als Projektleiter einstellen?", "Welcher Bewerber passt am besten ins Team?"],
-      constraintsExamples: ["Fließende Englischkenntnisse", "Führungserfahrung erforderlich"],
+      titlePlaceholder:
+        "z.B. Welche Kandidatin oder welcher Kandidat passt am besten?",
+      descriptionPlaceholder:
+        "Beschreiben Sie die Position: Welche Aufgaben umfasst sie? Welche Qualifikationen sind wichtig?",
+      constraintsPlaceholder:
+        "z.B. Gehaltsrahmen 80-100k, Startdatum spätestens Q2, Berufserfahrung mind. 5 Jahre",
+      titleExamples: [
+        "Wen sollen wir für die Stelle als Projektleiter einstellen?",
+        "Welcher Bewerber passt am besten ins Team?",
+      ],
+      constraintsExamples: [
+        "Fliessende Englischkenntnisse",
+        "Führungserfahrung erforderlich",
+      ],
       alternativePlaceholders: ["Kandidat A", "Kandidat B", "Kandidat C"],
     },
     realEstate: {
       label: "Immobilienbewertung",
       hint: "Objekte objektiv vergleichen",
-      titlePlaceholder: "z.B. Welche Immobilie passt am besten zu unseren Anforderungen?",
-      descriptionPlaceholder: "Beschreiben Sie den Zweck: Eigennutzung oder Investition? Welche Lage bevorzugen Sie?",
-      constraintsPlaceholder: "z.B. Budget max. CHF 1 Mio., mindestens 4 Zimmer, Nähe zu öffentlichen Verkehrsmitteln",
-      titleExamples: ["Welches Bürogebäude sollen wir mieten?", "In welche Immobilie investieren?"],
-      constraintsExamples: ["Zentrale Lage erforderlich", "Parkplätze vorhanden"],
+      titlePlaceholder:
+        "z.B. Welche Immobilie passt am besten zu unseren Anforderungen?",
+      descriptionPlaceholder:
+        "Beschreiben Sie den Zweck: Eigennutzung oder Investition? Welche Lage bevorzugen Sie?",
+      constraintsPlaceholder:
+        "z.B. Budget max. CHF 1 Mio., mindestens 4 Zimmer, Nähe zu öffentlichen Verkehrsmitteln",
+      titleExamples: [
+        "Welches Bürogebäude sollen wir mieten?",
+        "In welche Immobilie investieren?",
+      ],
+      constraintsExamples: [
+        "Zentrale Lage erforderlich",
+        "Parkplätze vorhanden",
+      ],
       alternativePlaceholders: ["Immobilie A", "Immobilie B", "Immobilie C"],
     },
     product: {
       label: "Produktvergleich",
       hint: "Produkte systematisch bewerten",
-      titlePlaceholder: "z.B. Welches Produkt bietet das beste Preis-Leistungs-Verhältnis?",
-      descriptionPlaceholder: "Beschreiben Sie den Verwendungszweck und die wichtigsten Anforderungen an das Produkt.",
-      constraintsPlaceholder: "z.B. Budget max. CHF 500, Garantie mindestens 2 Jahre, sofortige Verfügbarkeit",
-      titleExamples: ["Welchen Laptop sollen wir anschaffen?", "Welche Kamera erfüllt unsere Anforderungen?"],
-      constraintsExamples: ["Markenprodukt bevorzugt", "Guter Kundenservice wichtig"],
+      titlePlaceholder:
+        "z.B. Welches Produkt bietet das beste Preis-Leistungs-Verhältnis?",
+      descriptionPlaceholder:
+        "Beschreiben Sie den Verwendungszweck und die wichtigsten Anforderungen an das Produkt.",
+      constraintsPlaceholder:
+        "z.B. Budget max. CHF 500, Garantie mindestens 2 Jahre, sofortige Verfügbarkeit",
+      titleExamples: [
+        "Welchen Laptop sollen wir anschaffen?",
+        "Welche Kamera erfüllt unsere Anforderungen?",
+      ],
+      constraintsExamples: [
+        "Markenprodukt bevorzugt",
+        "Guter Kundenservice wichtig",
+      ],
       alternativePlaceholders: ["Produkt A", "Produkt B", "Produkt C"],
     },
     custom: {
       label: "Eigene Analyse",
       hint: "Flexibel für jede Entscheidung",
-      titlePlaceholder: "z.B. Welche Option ist die beste für unsere Situation?",
-      descriptionPlaceholder: "Beschreiben Sie den Hintergrund und das Ziel dieser Entscheidung...",
-      constraintsPlaceholder: "z.B. Budget, Zeitrahmen, technische Einschränkungen",
-      titleExamples: ["Welche Strategie sollen wir verfolgen?", "Welche Lösung passt am besten?"],
-      constraintsExamples: ["Innerhalb des aktuellen Budgets", "Umsetzung bis Jahresende"],
+      titlePlaceholder:
+        "z.B. Welche Option ist die beste für unsere Situation?",
+      descriptionPlaceholder:
+        "Beschreiben Sie den Hintergrund und das Ziel dieser Entscheidung...",
+      constraintsPlaceholder:
+        "z.B. Budget, Zeitrahmen, technische Einschränkungen",
+      titleExamples: [
+        "Welche Strategie sollen wir verfolgen?",
+        "Welche Lösung passt am besten?",
+      ],
+      constraintsExamples: [
+        "Innerhalb des aktuellen Budgets",
+        "Umsetzung bis Jahresende",
+      ],
       alternativePlaceholders: ["Option A", "Option B", "Option C"],
     },
   },
-  
+
   // Common
   common: {
     back: "Zurück",
@@ -148,7 +239,7 @@ export const de = {
     save: "Speichern",
     delete: "Löschen",
     edit: "Bearbeiten",
-    close: "Schließen",
+    close: "Schliessen",
     loading: "Lädt...",
     error: "Fehler",
     success: "Erfolgreich",
@@ -163,7 +254,7 @@ export const de = {
     examples: "Beispiele",
     optional: "optional",
   },
-  
+
   // Analysis Steps
   steps: {
     step: "Schritt",
@@ -175,43 +266,51 @@ export const de = {
     evaluation: "Bewertung",
     results: "Ergebnis",
   },
-  
+
   // Analysis Wizard
   wizard: {
     resetAnalysis: "Analyse zurücksetzen?",
-    resetConfirm: "Sind Sie sicher, dass Sie die Analyse zurücksetzen möchten? Alle eingegebenen Daten werden gelöscht.",
+    resetConfirm:
+      "Sind Sie sicher, dass Sie die Analyse zurücksetzen möchten? Alle eingegebenen Daten werden gelöscht.",
     reset: "Zurücksetzen",
-    draftFound: "Es wurde ein gespeicherter Entwurf gefunden. Möchten Sie diesen wiederherstellen?",
+    draftFound:
+      "Es wurde ein gespeicherter Entwurf gefunden. Möchten Sie diesen wiederherstellen?",
     restore: "Wiederherstellen",
     discard: "Verwerfen",
     goHome: "Zur Startseite",
-    goHomeConfirm: "Ihr Fortschritt wird automatisch gespeichert. Sie können später fortfahren.",
+    goHomeConfirm:
+      "Ihr Fortschritt wird automatisch gespeichert. Sie können später fortfahren.",
     goHomeButton: "Zur Startseite",
   },
-  
+
   // Decision Setup (Step 1)
   decisionSetup: {
     title: "Entscheidung definieren",
     titleBusiness: "Strategische Entscheidungsfrage",
     description: "Was möchten Sie entscheiden?",
-    descriptionAdvanced: "Definieren Sie die Entscheidung und relevante Randbedingungen.",
-    descriptionBusiness: "Formulieren Sie die strategische Fragestellung für eine auditfähige Dokumentation.",
+    descriptionAdvanced:
+      "Definieren Sie die Entscheidung und relevante Randbedingungen.",
+    descriptionBusiness:
+      "Formulieren Sie die Fragestellung so, dass andere Ihre Entscheidung nachvollziehen können.",
     decisionTitle: "Entscheidungstitel",
     strategicQuestion: "Strategische Fragestellung",
     placeholderBasic: "z.B. Welchen Lieferanten soll ich wählen?",
-    placeholderBusiness: "z.B. Welcher strategische Partner für die Marktexpansion?",
+    placeholderBusiness:
+      "z.B. Welcher strategische Partner für die Marktexpansion?",
     descriptionLabel: "Beschreibung / Kontext",
     constraintsLabel: "Randbedingungen & Einschränkungen",
-    documentationStandard: "Dokumentationsstandard",
-    documentationInfo: "Alle Eingaben werden vollständig dokumentiert und können später für Revisionen, Gremienentscheide oder Compliance-Nachweise verwendet werden.",
+    documentationStandard: "Nachvollziehbare Dokumentation",
+    documentationInfo:
+      "Bewertungen, Quellen und Begründungen lassen sich exportieren. Änderungen bleiben lokal bearbeitbar; es gibt keine unveränderbare Änderungshistorie.",
     validationError: "Bitte geben Sie einen Titel für die Entscheidung ein.",
   },
-  
+
   // Alternatives (Step 2)
   alternativesSetup: {
     title: "Alternativen definieren",
     description: "Welche Optionen stehen zur Auswahl?",
-    descriptionAdvanced: "Sie können auch Annahmen zu jeder Alternative dokumentieren.",
+    descriptionAdvanced:
+      "Sie können auch Annahmen zu jeder Alternative dokumentieren.",
     placeholder: "Name der Alternative...",
     shortDescription: "Kurze Beschreibung (optional)...",
     assumptions: "Annahmen & Voraussetzungen",
@@ -224,12 +323,14 @@ export const de = {
     countStatus: "{current} von {max} Alternativen",
     minRequired: "Mindestens {min} Alternativen erforderlich",
   },
-  
+
   // Criteria (Step 3)
   criteriaSetup: {
     title: "Kriterien festlegen",
-    description: "Definieren Sie die Kriterien, nach denen Sie die Alternativen bewerten möchten.",
-    descriptionAdvanced: "Legen Sie Kriterien fest und ordnen Sie diese bei Bedarf Kategorien zu.",
+    description:
+      "Definieren Sie die Kriterien, nach denen Sie die Alternativen bewerten möchten.",
+    descriptionAdvanced:
+      "Legen Sie Kriterien fest und ordnen Sie diese bei Bedarf Kategorien zu.",
     placeholder: "Name des Kriteriums...",
     selectCategory: "Kategorie wählen...",
     noCategory: "Keine Kategorie",
@@ -247,7 +348,7 @@ export const de = {
     countStatus: "{count} Kriterien",
     minRequired: "Mindestens 2 Kriterien erforderlich",
   },
-  
+
   // Weighting (Step 4)
   weightingSetup: {
     title: "Kriterien gewichten",
@@ -277,11 +378,12 @@ export const de = {
     moreImportant: "wichtiger",
     lessImportant: "weniger wichtig",
   },
-  
+
   // Evaluation (Step 5)
   evaluationSetup: {
     title: "Alternativen bewerten",
-    description: "Bewerten Sie jede Alternative für jedes Kriterium auf einer Skala von 1 bis 10.",
+    description:
+      "Bewerten Sie jede Alternative für jedes Kriterium auf einer Skala von 1 bis 10.",
     descriptionAdvanced: "und dokumentieren Sie Ihre Begründungen",
     evaluator: "Bewerter",
     progress: "Bewertungsfortschritt",
@@ -297,7 +399,7 @@ export const de = {
       knockoutFailed: "K.O. nicht bestanden",
     },
   },
-  
+
   // Results (Step 6)
   results: {
     title: "Analyse-Ergebnis & Entscheidungsempfehlung",
@@ -318,13 +420,14 @@ export const de = {
     criterion: "Kriterium",
     totalScore: "Gesamtscore",
     sensitivityAnalysis: "Sensitivitätsanalyse",
-    sensitivityDescription: "Zeigt, wie empfindlich das Ranking auf Änderungen der Gewichtung reagiert.",
+    sensitivityDescription:
+      "Zeigt, wie empfindlich das Ranking auf Änderungen der Gewichtung reagiert.",
     ahpConsistency: "AHP-Konsistenzprüfung",
     consistencyRatio: "Konsistenzratio (CR)",
     exportReport: "Report exportieren",
     exportBasic: "Kompakter Entscheidungsreport",
     exportAdvanced: "Vollständiger Analysebericht",
-    exportBusiness: "Executive Report mit Audit-Dokumentation",
+    exportBusiness: "Bericht mit Quellen und Bewertenden",
   },
 
   // Results View (legacy compatibility)
@@ -341,7 +444,8 @@ export const de = {
     normalized: "Normalisiert",
     knockoutExcluded: "Ausgeschlossen (K.O.)",
     sensitivity: "Sensitivitätsanalyse",
-    sensitivityDesc: "Zeigt, wie empfindlich das Ranking auf Änderungen der Gewichtung reagiert.",
+    sensitivityDesc:
+      "Zeigt, wie empfindlich das Ranking auf Änderungen der Gewichtung reagiert.",
     impact: "Einfluss auf Ranking",
     impactHigh: "Hoch",
     impactMedium: "Mittel",
@@ -349,10 +453,10 @@ export const de = {
     detailedAnalysis: "Detailanalyse",
     perCriterion: "Pro Kriterium",
   },
-  
+
   // Decision Suggestion
   suggestion: {
-    aiAnalysis: "KI-Analyse",
+    aiAnalysis: "Textvorschlag",
     interpretedAs: "Wir haben deine Eingabe interpretiert als:",
     editTitle: "Titel bearbeiten",
     alternatives: "Alternativen",
@@ -361,7 +465,7 @@ export const de = {
     startAnalysis: "Analyse starten",
     customize: "Anpassen",
   },
-  
+
   // Packages
   packages: {
     basic: "Basic",
@@ -372,18 +476,19 @@ export const de = {
     advancedDesc: "Erweiterte Analyse mit Kategorien und Sensitivität",
     businessDesc: "Professionelle Analyse für Unternehmen mit Compliance",
   },
-  
+
   // Package Selection Page
   packageSelect: {
     title: "Wähle die passende Tiefe für deine Analyse",
-    subtitle: "Der Ablauf bleibt gleich: Kriterien definieren, gewichten, bewerten, dokumentieren. Die Pakete unterscheiden sich in Tiefe, Methodik und Reportumfang.",
+    subtitle:
+      "Der Ablauf bleibt gleich: Kriterien definieren, gewichten, bewerten, dokumentieren. Die Pakete unterscheiden sich in Tiefe, Methodik und Reportumfang.",
     breadcrumb: "Pakete",
     headerSubtitle: "Modell wählen",
     headerSubtitle2: "gleiche Logik, andere Tiefe",
     startAnalysis: "Analyse starten",
     hint: "Hinweis: Theme-Vorschau wechselt beim Hover/Fokus — Auswahl bleibt gespeichert.",
     applicationArea: "Anwendungsbereich",
-    aiDetected: "KI-erkannt",
+    aiDetected: "Vorlagenvorschlag",
     login: "Login",
     backToSelection: "Zurück zur Paketauswahl",
     basic: {
@@ -423,7 +528,7 @@ export const de = {
       ],
     },
   },
-  
+
   // Report / PDF Export
   report: {
     exportPDF: "Export PDF",
@@ -447,7 +552,8 @@ export const de = {
     low: "Niedrig",
     detailedAnalysis: "Detailanalyse",
     methodology: "Methodik",
-    methodologyNotes: "Diese Analyse wurde mit der Nutzwertanalyse-Methode durchgeführt.",
+    methodologyNotes:
+      "Diese Analyse wurde mit der Nutzwertanalyse-Methode durchgeführt.",
     auditTrail: "Audit-Trail",
     riskAssessment: "Risikobewertung",
     knockoutCriteria: "K.O.-Kriterien",
@@ -467,22 +573,22 @@ export const de = {
       methodologyNotes: "Methodik-Hinweise",
     },
   },
-  
+
   // Info Buttons
   info: {
-    close: "Schließen",
+    close: "Schliessen",
     learnMore: "Mehr erfahren",
     tip: "Tipp",
     example: "Beispiel",
     why: "Warum?",
   },
-  
+
   // Language
   language: {
     switchLanguage: "Sprache wechseln",
     currentLanguage: "Aktuelle Sprache",
   },
-  
+
   // Categories
   categories: {
     economic: "Wirtschaftlichkeit",
@@ -491,7 +597,7 @@ export const de = {
     risk: "Risiko",
     other: "Sonstige",
   },
-  
+
   // Errors & Validation
   errors: {
     required: "Dieses Feld ist erforderlich.",
