@@ -1,497 +1,309 @@
 "use client";
-
-import { useEffect, useCallback, useMemo, useState } from "react";
-import { useRouter } from "next/navigation";
-import { useAnalysis } from "@/app/lib/nwa/analysis-context";
-import { getPresetIcon, getDomainIcon, getDomainLabel } from "@/app/lib/nwa/preset-icons";
+import { useEffect, useRef, useState } from "react";
+import {
+  ArrowLeft,
+  ArrowRight,
+  Download,
+  Upload,
+  RotateCcw,
+  Check,
+  HardDrive,
+  X,
+} from "lucide-react";
+import { useAnalysis } from "../../lib/nwa/analysis-context";
+import {
+  ANALYSIS_STEPS,
+  parseAnalysis,
+  stepIsValid,
+} from "../../lib/nwa/validation";
+import { downloadFile } from "../../lib/nwa/local-data";
+import type { AnalysisState } from "../../lib/nwa/types";
+import { useTranslations } from "../../lib/i18n";
 import { DecisionSetup } from "./DecisionSetup";
 import { AlternativesManager } from "./AlternativesManager";
 import { CriteriaManager } from "./CriteriaManager";
 import { WeightingModule } from "./WeightingModule";
 import { EvaluationMatrix } from "./EvaluationMatrix";
 import { ResultsDashboard } from "./ResultsDashboard";
-import { useTranslations } from "@/app/lib/i18n";
-import type { AnalysisStep } from "@/app/lib/nwa/types";
-import { Home } from "lucide-react";
-
-const STEP_IDS: AnalysisStep[] = ["decision", "alternatives", "criteria", "weighting", "evaluation", "results"];
 
 export function AnalysisWizard() {
-  const router = useRouter();
-  const { state, setStep, calculateResults, canProceedToNext, reset, saveDraft, hasDraft, loadDraft } = useAnalysis();
-  const { currentStep, decision } = state;
-  const [showResetConfirm, setShowResetConfirm] = useState(false);
-  const [showDraftPrompt, setShowDraftPrompt] = useState(false);
-  const [showHomeConfirm, setShowHomeConfirm] = useState(false);
-  const [draftChecked, setDraftChecked] = useState(false);
+  const {
+    state,
+    dispatch,
+    setStep,
+    saveDraft,
+    reset,
+    canProceedToNext,
+    storageStatus,
+  } = useAnalysis();
   const t = useTranslations();
-
-  // Dynamic steps with translations
-  const STEPS = useMemo(() => [
-    { id: "decision" as AnalysisStep, label: t.steps.decision },
-    { id: "alternatives" as AnalysisStep, label: t.steps.alternatives },
-    { id: "criteria" as AnalysisStep, label: t.steps.criteria },
-    { id: "weighting" as AnalysisStep, label: t.steps.weighting },
-    { id: "evaluation" as AnalysisStep, label: t.steps.evaluation },
-    { id: "results" as AnalysisStep, label: t.steps.results },
-  ], [t]);
-
-  const currentStepIndex = useMemo(
-    () => STEP_IDS.indexOf(currentStep),
-    [currentStep]
-  );
-
+  const index = ANALYSIS_STEPS.indexOf(state.currentStep);
+  const [message, setMessage] = useState("");
+  const [confirm, setConfirm] = useState<"reset" | "import" | null>(null);
+  const [imported, setImported] = useState<AnalysisState | null>(null);
+  const fileRef = useRef<HTMLInputElement>(null);
+  const dialogRef = useRef<HTMLDialogElement>(null);
+  const stageRef = useRef<HTMLDivElement>(null);
+  const previousStep = useRef(state.currentStep);
   useEffect(() => {
-    if (currentStep === "results") {
-      calculateResults();
-    }
-  }, [currentStep, calculateResults]);
-
+    const timer = setTimeout(() => saveDraft(), 450);
+    const flush = () => saveDraft();
+    const hidden = () => {
+      if (document.visibilityState === "hidden") flush();
+    };
+    window.addEventListener("pagehide", flush);
+    document.addEventListener("visibilitychange", hidden);
+    return () => {
+      clearTimeout(timer);
+      window.removeEventListener("pagehide", flush);
+      document.removeEventListener("visibilitychange", hidden);
+    };
+  }, [saveDraft]);
   useEffect(() => {
-    const timeoutId = setTimeout(() => {
-      saveDraft();
-    }, 2000);
-    return () => clearTimeout(timeoutId);
-  }, [state, saveDraft]);
-
+    if (previousStep.current !== state.currentStep) {
+      stageRef.current?.focus();
+      previousStep.current = state.currentStep;
+    }
+  }, [state.currentStep]);
   useEffect(() => {
-    if (!draftChecked && hasDraft && currentStep === "decision" && !decision.title) {
-      setShowDraftPrompt(true);
+    const dialog = dialogRef.current;
+    if (confirm && !dialog?.open) dialog?.showModal();
+    if (!confirm && dialog?.open) dialog.close();
+  }, [confirm]);
+  const labels = [
+    t.steps.decision,
+    t.steps.alternatives,
+    t.steps.criteria,
+    t.steps.weighting,
+    t.steps.evaluation,
+    t.steps.results,
+  ];
+  const components = [
+    <DecisionSetup key="decision" />,
+    <AlternativesManager key="alternatives" />,
+    <CriteriaManager key="criteria" />,
+    <WeightingModule key="weighting" />,
+    <EvaluationMatrix key="evaluation" />,
+    <ResultsDashboard key="results" />,
+  ];
+  function backup() {
+    downloadFile(
+      JSON.stringify(state, null, 2),
+      "DecisionStudio-Sicherung.json",
+      "application/json",
+    );
+    setMessage(
+      "Sicherung erstellt. Bewahre die Datei an einem sicheren Ort auf.",
+    );
+  }
+  async function importFile(file: File | undefined) {
+    if (!file) return;
+    try {
+      if (file.size > 2_000_000)
+        throw new Error("Die Datei ist zu gross (maximal 2 MB).");
+      const parsed = parseAnalysis(JSON.parse(await file.text()));
+      if (!parsed)
+        throw new Error(
+          "Die Datei enthält keine gültige DecisionStudio-Analyse.",
+        );
+      setImported(parsed);
+      setConfirm("import");
+    } catch (error) {
+      setMessage(
+        error instanceof Error
+          ? error.message
+          : "Die Datei konnte nicht gelesen werden.",
+      );
     }
-    setDraftChecked(true);
-  }, [draftChecked, hasDraft, currentStep, decision.title]);
-
-  const handleLoadDraft = useCallback(() => {
-    loadDraft();
-    setShowDraftPrompt(false);
-  }, [loadDraft]);
-
-  const handleDiscardDraft = useCallback(() => {
-    setShowDraftPrompt(false);
-    if (typeof window !== "undefined") {
-      try {
-        localStorage.removeItem("nwa_draft_state");
-      } catch {
-        /* ignore */
-      }
-    }
-  }, []);
-
-  const handleResetClick = useCallback(() => {
-    setShowResetConfirm(true);
-  }, []);
-
-  const handleConfirmReset = useCallback(() => {
-    reset();
-    setShowResetConfirm(false);
-  }, [reset]);
-
-  const handleCancelReset = useCallback(() => {
-    setShowResetConfirm(false);
-  }, []);
-
-  const handleHomeClick = useCallback(() => {
-    setShowHomeConfirm(true);
-  }, []);
-
-  const handleConfirmHome = useCallback(() => {
-    saveDraft();
-    setShowHomeConfirm(false);
-    router.push("/");
-  }, [saveDraft, router]);
-
-  const handleCancelHome = useCallback(() => {
-    setShowHomeConfirm(false);
-  }, []);
-
-  const goToStep = useCallback((step: AnalysisStep) => {
-    const targetIndex = STEPS.findIndex((s) => s.id === step);
-    if (targetIndex <= currentStepIndex) {
-      setStep(step);
-    }
-  }, [currentStepIndex, setStep]);
-
-  const goNext = useCallback(() => {
-    if (canProceedToNext && currentStepIndex < STEPS.length - 1) {
-      setStep(STEPS[currentStepIndex + 1].id);
-    }
-  }, [canProceedToNext, currentStepIndex, setStep]);
-
-  const goBack = useCallback(() => {
-    if (currentStepIndex > 0) {
-      setStep(STEPS[currentStepIndex - 1].id);
-    }
-  }, [currentStepIndex, setStep]);
-
-  const renderCurrentStep = useCallback(() => {
-    switch (currentStep) {
-      case "decision":
-        return <DecisionSetup />;
-      case "alternatives":
-        return <AlternativesManager />;
-      case "criteria":
-        return <CriteriaManager />;
-      case "weighting":
-        return <WeightingModule />;
-      case "evaluation":
-        return <EvaluationMatrix />;
-      case "results":
-        return <ResultsDashboard />;
-      default:
-        return null;
-    }
-  }, [currentStep]);
-
-  const hasAIContext = decision.aiInterpretation?.domain;
-  const ContextIconComponent = hasAIContext 
-    ? getDomainIcon(decision.aiInterpretation?.domain) 
-    : decision.preset 
-      ? getPresetIcon(decision.preset) 
-      : null;
-  const contextLabel = hasAIContext 
-    ? getDomainLabel(decision.aiInterpretation?.domain)
-    : null;
-
-  const packageLevelLabel = decision.packageLevel === "basic" 
-    ? "Basic" 
-    : decision.packageLevel === "advanced" 
-      ? "Advanced" 
-      : "Business";
-
+    if (fileRef.current) fileRef.current.value = "";
+  }
+  const hints: Record<string, string> = {
+    decision: "Gib deiner Entscheidung einen Titel.",
+    alternatives:
+      "Erfasse mindestens zwei benannte Alternativen (Basic: maximal 5, sonst 10).",
+    criteria:
+      "Erfasse mindestens zwei benannte Kriterien und gültige K.O.-Schwellen.",
+    weighting: state.weightingMethod.startsWith("ahp")
+      ? "Bestätige jeden paarweisen Vergleich, auch bei gleicher Wichtigkeit."
+      : state.weightingMethod === "percentage"
+        ? "Die Gewichte müssen zusammen 100 % ergeben."
+        : "Wähle für jedes Kriterium eine Wichtigkeit von 1 bis 5.",
+    evaluation:
+      "Bewerte jede Alternative bei jedem Kriterium. Im Business-Umfang gilt das für alle Bewertenden.",
+  };
   return (
-    <div className="wizard-root relative">
-      {/* ===== PARALLAX BACKGROUND ===== */}
-      <div className="fixed inset-0 -z-10 overflow-hidden">
-        {/* Base gradient */}
-        <div className="absolute inset-0 bg-gradient-to-br from-[#0a0a0a] via-[#111827] to-[#0f172a]" />
-        
-        {/* Parallax Layer 1 - Slowest */}
-        <div className="parallax-layer-1 absolute inset-0">
-          <div 
-            className="absolute w-[700px] h-[700px] rounded-full blur-[120px] opacity-15"
-            style={{
-              top: '-10%',
-              left: '-5%',
-              background: `radial-gradient(circle, rgb(var(--accent) / 0.5), transparent 70%)`,
-            }}
+    <main id="main-content" className="wizard-shell">
+      <div className="wizard-top">
+        <div>
+          <p className="eyebrow">
+            DEIN ENTSCHEIDUNGSRAUM / {state.decision.packageLevel.toUpperCase()}
+          </p>
+          <h1>{state.decision.title || "Neue Analyse"}</h1>
+        </div>
+        <div className="wizard-tools">
+          <button
+            onClick={backup}
+            title="Sicherung herunterladen"
+            aria-label="Sicherung herunterladen"
+          >
+            <Download size={19} />
+          </button>
+          <button
+            onClick={() => fileRef.current?.click()}
+            title="Sicherung importieren"
+            aria-label="Sicherung importieren"
+          >
+            <Upload size={19} />
+          </button>
+          <button
+            onClick={() => setConfirm("reset")}
+            title="Analyse zurücksetzen"
+            aria-label="Analyse zurücksetzen"
+          >
+            <RotateCcw size={18} />
+          </button>
+          <input
+            ref={fileRef}
+            type="file"
+            accept=".json,application/json"
+            hidden
+            onChange={(e) => importFile(e.target.files?.[0])}
           />
-          <div 
-            className="absolute w-[400px] h-[400px] rounded-full blur-[80px] opacity-10"
-            style={{
-              bottom: '5%',
-              right: '5%',
-              background: `radial-gradient(circle, rgb(var(--accent-2) / 0.4), transparent 70%)`,
-            }}
-          />
-        </div>
-
-        {/* Parallax Layer 2 - Medium */}
-        <div className="parallax-layer-2 absolute inset-0">
-          <div 
-            className="absolute w-[350px] h-[350px] rounded-full blur-[60px] opacity-20"
-            style={{
-              top: '30%',
-              right: '15%',
-              background: `radial-gradient(circle, rgb(var(--accent) / 0.5), transparent 60%)`,
-            }}
-          />
-        </div>
-
-        {/* Floating Particles */}
-        <div className="absolute inset-0 pointer-events-none overflow-hidden">
-          {[...Array(12)].map((_, i) => (
-            <div
-              key={`particle-${i}`}
-              className="absolute rounded-full"
-              style={{
-                width: `${2 + (i % 3)}px`,
-                height: `${2 + (i % 3)}px`,
-                left: `${8 + i * 8}%`,
-                top: `${10 + (i % 5) * 18}%`,
-                background: `rgba(255, 255, 255, ${0.08 + (i % 4) * 0.04})`,
-                animation: `particleFloat ${14 + i * 2}s ease-in-out infinite`,
-                animationDelay: `${i * -1.5}s`,
-              }}
-            />
-          ))}
-        </div>
-
-        {/* Grid pattern */}
-        <div 
-          className="absolute inset-0 opacity-[0.012]"
-          style={{
-            backgroundImage: `linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)`,
-            backgroundSize: '60px 60px',
-          }}
-        />
-
-        {/* Noise & Vignette */}
-        <div className="absolute inset-0 landing-grain opacity-[0.04]" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_0%,rgba(0,0,0,0.25)_100%)]" />
-      </div>
-
-      {showDraftPrompt && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-          <div className="bg-[#1a1a1a] border border-white/10 rounded-2xl p-6 max-w-md mx-4 shadow-2xl">
-            <h3 className="text-lg font-semibold text-white">{t.wizard.draftFound.split(".")[0]}</h3>
-            <p className="mt-2 text-sm text-white/60">
-              {t.wizard.draftFound}
-            </p>
-            <div className="mt-4 flex gap-3">
-              <button
-                onClick={handleDiscardDraft}
-                className="flex-1 px-4 py-2.5 rounded-xl text-sm font-medium text-white/70 bg-white/10 hover:bg-white/15 transition"
-              >
-                {t.wizard.discard}
-              </button>
-              <button
-                onClick={handleLoadDraft}
-                className="flex-1 px-4 py-2.5 rounded-xl text-sm font-semibold text-white transition"
-                style={{ background: "rgb(var(--accent))" }}
-              >
-                {t.wizard.restore}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {showResetConfirm && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-          <div className="bg-[#1a1a1a] border border-white/10 rounded-2xl p-6 max-w-md mx-4 shadow-2xl">
-            <h3 className="text-lg font-semibold text-white">{t.wizard.resetAnalysis}</h3>
-            <p className="mt-2 text-sm text-white/60">
-              {t.wizard.resetConfirm}
-            </p>
-            <div className="mt-4 flex gap-3">
-              <button
-                onClick={handleCancelReset}
-                className="flex-1 px-4 py-2.5 rounded-xl text-sm font-medium text-white/70 bg-white/10 hover:bg-white/15 transition"
-              >
-                {t.common.cancel}
-              </button>
-              <button
-                onClick={handleConfirmReset}
-                className="flex-1 px-4 py-2.5 rounded-xl text-sm font-semibold text-white bg-red-600 hover:bg-red-500 transition"
-              >
-                {t.wizard.reset}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {showHomeConfirm && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-          <div className="bg-[#1a1a1a] border border-white/10 rounded-2xl p-6 max-w-md mx-4 shadow-2xl">
-            <h3 className="text-lg font-semibold text-white">{t.wizard.goHome || "Zur Startseite"}</h3>
-            <p className="mt-2 text-sm text-white/60">
-              {t.wizard.goHomeConfirm || "Ihr Fortschritt wird automatisch gespeichert. Sie können später fortfahren."}
-            </p>
-            <div className="mt-4 flex gap-3">
-              <button
-                onClick={handleCancelHome}
-                className="flex-1 px-4 py-2.5 rounded-xl text-sm font-medium text-white/70 bg-white/10 hover:bg-white/15 transition"
-              >
-                {t.common.cancel}
-              </button>
-              <button
-                onClick={handleConfirmHome}
-                className="flex-1 px-4 py-2.5 rounded-xl text-sm font-semibold text-white transition"
-                style={{ background: "rgb(var(--accent))" }}
-              >
-                {t.wizard.goHomeButton || "Zur Startseite"}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      <div className="min-h-screen flex flex-col relative">
-        {/* Premium Step Navigation Header */}
-        <div className="border-b border-white/[0.06] bg-black/40 backdrop-blur-2xl sticky top-0 z-20">
-          <div className="mx-auto max-w-5xl px-5 sm:px-6 py-4">
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-3">
-                {ContextIconComponent ? (
-                  <div
-                    className="h-10 w-10 rounded-xl flex items-center justify-center transition-transform duration-300 hover:scale-105"
-                    style={{ 
-                      background: "rgb(var(--accent) / 0.12)", 
-                      color: "rgb(var(--accent))",
-                      boxShadow: "0 0 20px rgb(var(--accent) / 0.1)"
-                    }}
-                  >
-                    <ContextIconComponent size={20} />
-                  </div>
-                ) : (
-                  <div
-                    className="h-10 w-10 rounded-xl flex items-center justify-center text-sm font-bold"
-                    style={{ 
-                      background: "rgb(var(--accent) / 0.15)", 
-                      color: "rgb(var(--accent))",
-                      boxShadow: "0 0 20px rgb(var(--accent) / 0.1)"
-                    }}
-                  >
-                    {decision.packageLevel === "basic" ? "B" : decision.packageLevel === "advanced" ? "A" : "P"}
-                  </div>
-                )}
-                <div>
-                  <div className="text-sm font-semibold text-white truncate max-w-[200px] sm:max-w-none">
-                    {decision.title || t.decisionSetup.title}
-                  </div>
-                  <div className="text-xs text-white/45 flex items-center gap-1.5 mt-0.5">
-                    <span>{packageLevelLabel}</span>
-                    {contextLabel ? <span className="text-white/25">•</span> : null}
-                    {contextLabel ? <span>{contextLabel}</span> : null}
-                  </div>
-                </div>
-              </div>
-              <button
-                onClick={handleResetClick}
-                className="px-3.5 py-2 rounded-xl text-xs font-medium text-white/45 hover:text-white/70 hover:bg-white/[0.06] border border-transparent hover:border-white/[0.08] transition-all duration-200"
-                title={t.wizard.resetAnalysis}
-              >
-                {t.wizard.reset}
-              </button>
-            </div>
-
-            {/* Premium Progress Bar */}
-            <div className="mb-4">
-              <div className="h-1 rounded-full bg-white/[0.06] overflow-hidden">
-                <div
-                  className="h-full rounded-full transition-all duration-700 ease-out"
-                  style={{
-                    width: `${((currentStepIndex + 1) / STEPS.length) * 100}%`,
-                    background: "linear-gradient(90deg, rgb(var(--accent)), rgb(var(--accent) / 0.7))",
-                    boxShadow: "0 0 10px rgb(var(--accent) / 0.3)",
-                  }}
-                />
-              </div>
-            </div>
-
-            {/* Premium Step Navigation */}
-            <div className="flex items-center gap-2 overflow-x-auto pb-1 -mx-1 px-1">
-              {STEPS.map((step, index) => {
-                const isActive = currentStep === step.id;
-                const isCompleted = index < currentStepIndex;
-                const isAccessible = index <= currentStepIndex;
-
-                return (
-                  <div key={step.id} className="flex-1 min-w-0 flex items-center">
-                    <button
-                      onClick={() => goToStep(step.id)}
-                      disabled={!isAccessible}
-                      className={`flex items-center gap-2 transition-all duration-300 ${isAccessible ? "cursor-pointer" : "cursor-not-allowed opacity-60"}`}
-                    >
-                      <div
-                        className={`h-8 w-8 rounded-xl flex items-center justify-center text-sm font-semibold flex-shrink-0 transition-all duration-300 ${
-                          isActive
-                            ? "shadow-[0_0_15px_rgb(var(--accent)/0.3)]"
-                            : ""
-                        }`}
-                        style={{
-                          background: isActive 
-                            ? "rgb(var(--accent))" 
-                            : isCompleted 
-                              ? "rgb(var(--accent) / 0.2)" 
-                              : "rgb(255 255 255 / 0.06)",
-                          color: isActive 
-                            ? "white" 
-                            : isCompleted 
-                              ? "rgb(var(--accent))" 
-                              : "rgb(255 255 255 / 0.35)",
-                          border: isActive ? "none" : "1px solid rgb(255 255 255 / 0.06)",
-                        }}
-                      >
-                        {isCompleted ? (
-                          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                          </svg>
-                        ) : index + 1}
-                      </div>
-                      <span
-                        className={`text-xs sm:text-sm truncate hidden sm:block transition-colors duration-200 ${
-                          isActive ? "text-white font-semibold" : isCompleted ? "text-white/55" : "text-white/35"
-                        }`}
-                      >
-                        {step.label}
-                      </span>
-                    </button>
-                    {index < STEPS.length - 1 && (
-                      <div className="hidden sm:flex flex-1 items-center mx-3">
-                        <div 
-                          className="h-px w-full transition-all duration-500" 
-                          style={{ 
-                            background: isCompleted 
-                              ? "linear-gradient(90deg, rgb(var(--accent)), rgb(var(--accent) / 0.3))" 
-                              : "rgb(255 255 255 / 0.06)" 
-                          }}
-                        />
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        </div>
-
-        {/* Content Area */}
-        <div className="flex-1 mx-auto max-w-5xl w-full px-5 sm:px-6 py-8">
-          <div key={currentStep} className="animate-premium-fade-in-up">
-            {renderCurrentStep()}
-          </div>
-        </div>
-
-        {/* Premium Footer Navigation */}
-        <div className="border-t border-white/[0.06] bg-black/40 backdrop-blur-2xl sticky bottom-0 z-20">
-          <div className="mx-auto max-w-5xl px-5 sm:px-6 py-4">
-            <div className="flex items-center justify-between">
-              <button
-                onClick={goBack}
-                disabled={currentStepIndex === 0}
-                className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 ${
-                  currentStepIndex === 0 
-                    ? "text-white/25 cursor-not-allowed" 
-                    : "text-white/60 hover:text-white hover:bg-white/[0.06] border border-transparent hover:border-white/[0.08]"
-                }`}
-              >
-                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                </svg>
-                {t.common.back}
-              </button>
-              <div className="text-xs text-white/35 font-medium">
-                {t.steps.step} {currentStepIndex + 1} / {STEPS.length}
-              </div>
-              {currentStep !== "results" && (
-                <button
-                  onClick={goNext}
-                  disabled={!canProceedToNext}
-                  className={`flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-semibold transition-all duration-300 ${
-                    canProceedToNext 
-                      ? "hover:scale-[1.02] active:scale-[0.98]" 
-                      : "opacity-40 cursor-not-allowed"
-                  }`}
-                  style={{
-                    background: canProceedToNext 
-                      ? "linear-gradient(135deg, rgb(var(--accent)), rgb(var(--accent) / 0.8))" 
-                      : "rgb(var(--accent) / 0.3)",
-                    boxShadow: canProceedToNext ? "0 4px 15px rgb(var(--accent) / 0.25), inset 0 1px 0 rgb(255 255 255 / 0.1)" : "none",
-                    color: "white",
-                  }}
-                >
-                  {t.common.next}
-                  <svg className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                  </svg>
-                </button>
-              )}
-            </div>
-          </div>
         </div>
       </div>
-    </div>
+      <div className="save-status" role="status">
+        <HardDrive size={15} />
+        {storageStatus === "error"
+          ? "Speichern nicht möglich: Der Entwurf wurde in einem anderen Fenster geändert oder der Browser blockiert die Ablage. Bitte exportieren."
+          : storageStatus === "saved"
+            ? "Entwurf lokal gespeichert · nur auf diesem Gerät"
+            : "Lokaler Entwurf · gib einen Titel ein, um ihn zu speichern"}
+      </div>
+      {message && (
+        <div className="notice" role="status">
+          <span>{message}</span>
+          <button
+            onClick={() => setMessage("")}
+            aria-label="Hinweis schliessen"
+          >
+            <X size={17} />
+          </button>
+        </div>
+      )}
+      <div className="wizard-grid">
+        <nav className="wizard-steps" aria-label="Analyseschritte">
+          <ol>
+            {ANALYSIS_STEPS.map((step, i) => {
+              const accessible = ANALYSIS_STEPS.slice(0, i).every((s) =>
+                stepIsValid(state, s),
+              );
+              const complete = i < index && stepIsValid(state, step);
+              return (
+                <li key={step}>
+                  <button
+                    onClick={() => setStep(step)}
+                    disabled={!accessible}
+                    aria-current={i === index ? "step" : undefined}
+                  >
+                    <span className="step-number">
+                      {complete ? (
+                        <Check size={17} />
+                      ) : (
+                        String(i + 1).padStart(2, "0")
+                      )}
+                    </span>
+                    <span>{labels[i]}</span>
+                  </button>
+                </li>
+              );
+            })}
+          </ol>
+          <div className="workspace-note">
+            <strong>Deine Prioritäten zählen.</strong>
+            <p>
+              Nutze für alle Optionen denselben Massstab. Höhere Bewertungen
+              bedeuten immer eine bessere Eignung.
+            </p>
+          </div>
+        </nav>
+        <section className="wizard-stage">
+          <div ref={stageRef} tabIndex={-1} className="stage-content">
+            {components[index]}
+          </div>
+          <div className="wizard-next">
+            <button
+              className="studio-button secondary"
+              onClick={() => setStep(ANALYSIS_STEPS[index - 1])}
+              disabled={index === 0}
+            >
+              <ArrowLeft size={16} />
+              {t.common.back}
+            </button>
+            <span>{index + 1} / 6</span>
+            {index < 5 ? (
+              <button
+                className="studio-button"
+                onClick={() => setStep(ANALYSIS_STEPS[index + 1])}
+                disabled={!canProceedToNext}
+              >
+                {index === 4 ? "Auswerten" : t.common.next}
+                <ArrowRight size={17} />
+              </button>
+            ) : (
+              <button className="studio-button secondary" onClick={backup}>
+                <Download size={17} /> Sichern
+              </button>
+            )}
+          </div>
+          {!canProceedToNext && (
+            <p className="step-hint">{hints[state.currentStep]}</p>
+          )}
+        </section>
+      </div>
+      <dialog
+        ref={dialogRef}
+        className="studio-dialog"
+        onCancel={() => setConfirm(null)}
+        onClose={() => setConfirm(null)}
+        aria-labelledby="confirm-title"
+      >
+        <h2 id="confirm-title">
+          {confirm === "reset"
+            ? "Analyse zurücksetzen?"
+            : "Sicherung übernehmen?"}
+        </h2>
+        <p>
+          Die aktuelle Analyse wird ersetzt. Lade zuerst eine Sicherung
+          herunter, wenn du sie behalten möchtest.
+        </p>
+        <div className="action-row">
+          <button
+            className="studio-button secondary"
+            onClick={() => setConfirm(null)}
+            autoFocus
+          >
+            Abbrechen
+          </button>
+          <button className="studio-button secondary" onClick={backup}>
+            Sicherung laden
+          </button>
+          <button
+            className="studio-button"
+            onClick={() => {
+              if (confirm === "reset") {
+                reset();
+                setMessage("Analyse zurückgesetzt.");
+              } else if (imported) {
+                dispatch({ type: "LOAD_STATE", payload: imported });
+                setMessage("Analyse importiert.");
+              }
+              setConfirm(null);
+            }}
+          >
+            {confirm === "reset" ? "Zurücksetzen" : "Übernehmen"}
+          </button>
+        </div>
+      </dialog>
+    </main>
   );
 }

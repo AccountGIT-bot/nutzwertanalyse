@@ -6,6 +6,8 @@ import {
   useReducer,
   useCallback,
   useMemo,
+  useState,
+  useRef,
   type ReactNode,
 } from "react";
 import {
@@ -34,10 +36,20 @@ import {
   calculateRiskAdjustedScores,
   checkKnockoutCriteria,
 } from "./calculate";
-import { getTemplateByPreset, DEFAULT_CATEGORIES, getDefaultTemplate, DEFAULT_ALTERNATIVES } from "./templates";
+import {
+  getTemplateByPreset,
+  DEFAULT_CATEGORIES,
+  getDefaultTemplate,
+  DEFAULT_ALTERNATIVES,
+} from "./templates";
+
+import { parseAnalysis, stepIsValid, ANALYSIS_STEPS } from "./validation";
+import { DRAFT_KEY, readDraft } from "./local-data";
 
 // Initial state factory
-function createInitialState(packageLevel: PackageLevel = "basic"): AnalysisState {
+function createInitialState(
+  packageLevel: PackageLevel = "basic",
+): AnalysisState {
   return {
     decision: {
       id: generateId(),
@@ -52,9 +64,17 @@ function createInitialState(packageLevel: PackageLevel = "basic"): AnalysisState
     criteria: [],
     ratings: [],
     risks: [],
-    evaluators: packageLevel === "business" ? [{ id: generateId(), name: "Hauptbewerter", weight: 1 }] : [],
+    evaluators:
+      packageLevel === "business"
+        ? [{ id: generateId(), name: "Hauptbewerter", weight: 1 }]
+        : [],
     ahpComparisons: [],
-    weightingMethod: packageLevel === "basic" ? "simple" : packageLevel === "advanced" ? "percentage" : "ahp-full",
+    weightingMethod:
+      packageLevel === "basic"
+        ? "simple"
+        : packageLevel === "advanced"
+          ? "percentage"
+          : "ahp-full",
     results: [],
     sensitivityResults: [],
     currentStep: "decision",
@@ -83,7 +103,10 @@ type Action =
   | { type: "SET_AHP_COMPARISONS_BATCH"; payload: AHPComparison[] }
   | { type: "ADD_RISK"; payload: Omit<Risk, "id"> & { id?: string } }
   | { type: "UPDATE_RISK"; payload: Risk }
-  | { type: "REMOVE_RISK"; payload: { alternativeId: string; description: string } }
+  | {
+      type: "REMOVE_RISK";
+      payload: { alternativeId: string; description: string };
+    }
   | { type: "ADD_EVALUATOR"; payload: Omit<Evaluator, "id"> }
   | { type: "UPDATE_EVALUATOR"; payload: Evaluator }
   | { type: "REMOVE_EVALUATOR"; payload: string }
@@ -98,7 +121,35 @@ type Action =
   | { type: "DUPLICATE_CRITERION"; payload: string };
 
 // Reducer
-function analysisReducer(state: AnalysisState, action: Action): AnalysisState {
+export function analysisReducer(
+  state: AnalysisState,
+  action: Action,
+): AnalysisState {
+  const next = reduceAnalysis(state, action);
+  if (next === state) return state;
+  const weighted = next.weightingMethod.startsWith("ahp")
+    ? applyAHPWeights(next.criteria, next.ahpComparisons)
+    : { criteria: applySimpleWeights(next.criteria), consistency: undefined };
+  const normalized = {
+    ...next,
+    criteria: weighted.criteria,
+    ahpConsistency: weighted.consistency,
+    decision: {
+      ...next.decision,
+      updatedAt:
+        action.type === "LOAD_STATE" ? next.decision.updatedAt : new Date(),
+    },
+    ...(action.type !== "CALCULATE_RESULTS" && next.currentStep !== "results"
+      ? { results: [], sensitivityResults: [] }
+      : {}),
+  };
+  return normalized.currentStep === "results" &&
+    action.type !== "CALCULATE_RESULTS"
+    ? reduceAnalysis(normalized, { type: "CALCULATE_RESULTS" })
+    : normalized;
+}
+
+function reduceAnalysis(state: AnalysisState, action: Action): AnalysisState {
   switch (action.type) {
     case "SET_PACKAGE_LEVEL": {
       const newState = createInitialState(action.payload);
@@ -133,6 +184,11 @@ function analysisReducer(state: AnalysisState, action: Action): AnalysisState {
       };
 
     case "ADD_ALTERNATIVE":
+      if (
+        state.alternatives.length >=
+        (state.decision.packageLevel === "basic" ? 5 : 10)
+      )
+        return state;
       return {
         ...state,
         alternatives: [
@@ -145,7 +201,7 @@ function analysisReducer(state: AnalysisState, action: Action): AnalysisState {
       return {
         ...state,
         alternatives: state.alternatives.map((a) =>
-          a.id === action.payload.id ? action.payload : a
+          a.id === action.payload.id ? action.payload : a,
         ),
       };
 
@@ -153,16 +209,21 @@ function analysisReducer(state: AnalysisState, action: Action): AnalysisState {
       return {
         ...state,
         alternatives: state.alternatives.filter((a) => a.id !== action.payload),
-        ratings: state.ratings.filter((r) => r.alternativeId !== action.payload),
+        ratings: state.ratings.filter(
+          (r) => r.alternativeId !== action.payload,
+        ),
         risks: state.risks.filter((r) => r.alternativeId !== action.payload),
       };
 
     case "ADD_CRITERION": {
+      if (state.criteria.length >= 20) return state;
       const newCriterion: Criterion = {
         ...action.payload,
         id: generateId(),
         weight: 0,
-        rawWeight: action.payload.rawWeight ?? (state.decision.packageLevel === "basic" ? 3 : 10),
+        rawWeight:
+          action.payload.rawWeight ??
+          (state.decision.packageLevel === "basic" ? 3 : 10),
       };
       return {
         ...state,
@@ -174,7 +235,7 @@ function analysisReducer(state: AnalysisState, action: Action): AnalysisState {
       return {
         ...state,
         criteria: state.criteria.map((c) =>
-          c.id === action.payload.id ? action.payload : c
+          c.id === action.payload.id ? action.payload : c,
         ),
       };
 
@@ -184,12 +245,15 @@ function analysisReducer(state: AnalysisState, action: Action): AnalysisState {
         criteria: state.criteria.filter((c) => c.id !== action.payload),
         ratings: state.ratings.filter((r) => r.criterionId !== action.payload),
         ahpComparisons: state.ahpComparisons.filter(
-          (comp) => comp.criterionId1 !== action.payload && comp.criterionId2 !== action.payload
+          (comp) =>
+            comp.criterionId1 !== action.payload &&
+            comp.criterionId2 !== action.payload,
         ),
       };
 
     case "SET_CRITERIA_FROM_TEMPLATE": {
-      const template = getTemplateByPreset(action.payload) || getDefaultTemplate();
+      const template =
+        getTemplateByPreset(action.payload) || getDefaultTemplate();
       const defaultWeight = state.decision.packageLevel === "basic" ? 3 : 10;
       const newCriteria: Criterion[] = template.criteria.map((c) => ({
         ...c,
@@ -200,6 +264,8 @@ function analysisReducer(state: AnalysisState, action: Action): AnalysisState {
       return {
         ...state,
         criteria: newCriteria,
+        ratings: [],
+        ahpComparisons: [],
       };
     }
 
@@ -216,7 +282,7 @@ function analysisReducer(state: AnalysisState, action: Action): AnalysisState {
       return {
         ...state,
         categories: state.categories.map((c) =>
-          c.id === action.payload.id ? action.payload : c
+          c.id === action.payload.id ? action.payload : c,
         ),
       };
 
@@ -225,16 +291,22 @@ function analysisReducer(state: AnalysisState, action: Action): AnalysisState {
         ...state,
         categories: state.categories.filter((c) => c.id !== action.payload),
         criteria: state.criteria.map((c) =>
-          c.categoryId === action.payload ? { ...c, categoryId: undefined } : c
+          c.categoryId === action.payload ? { ...c, categoryId: undefined } : c,
         ),
       };
 
     case "SET_RATING": {
+      if (
+        !Number.isFinite(action.payload.score) ||
+        action.payload.score < 1 ||
+        action.payload.score > 10
+      )
+        return state;
       const existingIndex = state.ratings.findIndex(
         (r) =>
           r.alternativeId === action.payload.alternativeId &&
           r.criterionId === action.payload.criterionId &&
-          r.evaluatorId === action.payload.evaluatorId
+          r.evaluatorId === action.payload.evaluatorId,
       );
       if (existingIndex >= 0) {
         const newRatings = [...state.ratings];
@@ -248,7 +320,14 @@ function analysisReducer(state: AnalysisState, action: Action): AnalysisState {
       return { ...state, ratings: action.payload };
 
     case "SET_WEIGHTING_METHOD":
-      return { ...state, weightingMethod: action.payload };
+      return {
+        ...state,
+        weightingMethod: action.payload,
+        criteria: state.criteria.map((c) => ({
+          ...c,
+          rawWeight: action.payload === "simple" ? 3 : c.rawWeight,
+        })),
+      };
 
     case "SET_AHP_COMPARISON": {
       const existingIndex = state.ahpComparisons.findIndex(
@@ -256,14 +335,17 @@ function analysisReducer(state: AnalysisState, action: Action): AnalysisState {
           (c.criterionId1 === action.payload.criterionId1 &&
             c.criterionId2 === action.payload.criterionId2) ||
           (c.criterionId1 === action.payload.criterionId2 &&
-            c.criterionId2 === action.payload.criterionId1)
+            c.criterionId2 === action.payload.criterionId1),
       );
       if (existingIndex >= 0) {
         const newComparisons = [...state.ahpComparisons];
         newComparisons[existingIndex] = action.payload;
         return { ...state, ahpComparisons: newComparisons };
       }
-      return { ...state, ahpComparisons: [...state.ahpComparisons, action.payload] };
+      return {
+        ...state,
+        ahpComparisons: [...state.ahpComparisons, action.payload],
+      };
     }
 
     case "SET_AHP_COMPARISONS_BATCH":
@@ -272,7 +354,10 @@ function analysisReducer(state: AnalysisState, action: Action): AnalysisState {
     case "ADD_RISK":
       return {
         ...state,
-        risks: [...state.risks, { ...action.payload, id: action.payload.id || generateId() } as Risk],
+        risks: [
+          ...state.risks,
+          { ...action.payload, id: action.payload.id || generateId() } as Risk,
+        ],
       };
 
     case "UPDATE_RISK":
@@ -282,7 +367,7 @@ function analysisReducer(state: AnalysisState, action: Action): AnalysisState {
           r.alternativeId === action.payload.alternativeId &&
           r.description === action.payload.description
             ? action.payload
-            : r
+            : r,
         ),
       };
 
@@ -291,26 +376,33 @@ function analysisReducer(state: AnalysisState, action: Action): AnalysisState {
         ...state,
         risks: state.risks.filter(
           (r) =>
-            !(r.alternativeId === action.payload.alternativeId &&
-              r.description === action.payload.description)
+            !(
+              r.alternativeId === action.payload.alternativeId &&
+              r.description === action.payload.description
+            ),
         ),
       };
 
     case "ADD_EVALUATOR":
+      if (state.evaluators.length >= 10) return state;
       return {
         ...state,
-        evaluators: [...state.evaluators, { ...action.payload, id: generateId() }],
+        evaluators: [
+          ...state.evaluators,
+          { ...action.payload, id: generateId() },
+        ],
       };
 
     case "UPDATE_EVALUATOR":
       return {
         ...state,
         evaluators: state.evaluators.map((e) =>
-          e.id === action.payload.id ? action.payload : e
+          e.id === action.payload.id ? action.payload : e,
         ),
       };
 
     case "REMOVE_EVALUATOR":
+      if (state.evaluators.length <= 1) return state;
       return {
         ...state,
         evaluators: state.evaluators.filter((e) => e.id !== action.payload),
@@ -322,7 +414,10 @@ function analysisReducer(state: AnalysisState, action: Action): AnalysisState {
         ...state,
         decision: {
           ...state.decision,
-          scenarios: [...(state.decision.scenarios || []), { ...action.payload, id: generateId() }],
+          scenarios: [
+            ...(state.decision.scenarios || []),
+            { ...action.payload, id: generateId() },
+          ],
         },
       };
 
@@ -332,7 +427,7 @@ function analysisReducer(state: AnalysisState, action: Action): AnalysisState {
         decision: {
           ...state.decision,
           scenarios: (state.decision.scenarios || []).map((s) =>
-            s.id === action.payload.id ? action.payload : s
+            s.id === action.payload.id ? action.payload : s,
           ),
         },
       };
@@ -342,15 +437,27 @@ function analysisReducer(state: AnalysisState, action: Action): AnalysisState {
         ...state,
         decision: {
           ...state.decision,
-          scenarios: (state.decision.scenarios || []).filter((s) => s.id !== action.payload),
+          scenarios: (state.decision.scenarios || []).filter(
+            (s) => s.id !== action.payload,
+          ),
         },
-        alternatives: state.alternatives.filter((a) => a.scenarioId !== action.payload),
+        alternatives: state.alternatives.filter(
+          (a) => a.scenarioId !== action.payload,
+        ),
       };
 
-    case "SET_STEP":
+    case "SET_STEP": {
+      const index = ANALYSIS_STEPS.indexOf(action.payload);
+      if (
+        ANALYSIS_STEPS.slice(0, index).some((step) => !stepIsValid(state, step))
+      )
+        return state;
       return { ...state, currentStep: action.payload };
+    }
 
     case "CALCULATE_RESULTS": {
+      if (ANALYSIS_STEPS.slice(0, -1).some((step) => !stepIsValid(state, step)))
+        return { ...state, results: [], sensitivityResults: [] };
       // Apply weights based on method
       let weightedCriteria = state.criteria;
       let ahpConsistency = state.ahpConsistency;
@@ -364,7 +471,10 @@ function analysisReducer(state: AnalysisState, action: Action): AnalysisState {
           break;
         case "ahp-light":
         case "ahp-full":
-          const ahpResult = applyAHPWeights(state.criteria, state.ahpComparisons);
+          const ahpResult = applyAHPWeights(
+            state.criteria,
+            state.ahpComparisons,
+          );
           weightedCriteria = ahpResult.criteria;
           ahpConsistency = ahpResult.consistency;
           break;
@@ -375,7 +485,7 @@ function analysisReducer(state: AnalysisState, action: Action): AnalysisState {
         state.alternatives,
         weightedCriteria,
         state.ratings,
-        state.evaluators.length > 0 ? state.evaluators : undefined
+        state.evaluators.length > 0 ? state.evaluators : undefined,
       );
 
       // Add risk scores if risks exist
@@ -388,7 +498,7 @@ function analysisReducer(state: AnalysisState, action: Action): AnalysisState {
         state.alternatives,
         weightedCriteria,
         state.ratings,
-        state.evaluators.length > 0 ? state.evaluators : undefined
+        state.evaluators.length > 0 ? state.evaluators : undefined,
       );
 
       return {
@@ -400,39 +510,46 @@ function analysisReducer(state: AnalysisState, action: Action): AnalysisState {
       };
     }
 
-case "RESET":
-  return createInitialState(state.decision.packageLevel);
-  
-  case "LOAD_STATE":
-  return action.payload;
-  
-  case "DUPLICATE_ALTERNATIVE": {
-    const originalAlt = state.alternatives.find(a => a.id === action.payload);
-    if (!originalAlt) return state;
-    const newAlt: Alternative = {
-      ...originalAlt,
-      id: generateId(),
-      name: `${originalAlt.name} (Kopie)`,
-    };
-    return {
-      ...state,
-      alternatives: [...state.alternatives, newAlt],
-    };
-  }
-  
-  case "DUPLICATE_CRITERION": {
-    const originalCrit = state.criteria.find(c => c.id === action.payload);
-    if (!originalCrit) return state;
-    const newCrit: Criterion = {
-      ...originalCrit,
-      id: generateId(),
-      name: `${originalCrit.name} (Kopie)`,
-    };
-    return {
-      ...state,
-      criteria: [...state.criteria, newCrit],
-    };
-  }
+    case "RESET":
+      return createInitialState(state.decision.packageLevel);
+
+    case "LOAD_STATE":
+      return parseAnalysis(action.payload) || state;
+
+    case "DUPLICATE_ALTERNATIVE": {
+      const originalAlt = state.alternatives.find(
+        (a) => a.id === action.payload,
+      );
+      if (
+        !originalAlt ||
+        state.alternatives.length >=
+          (state.decision.packageLevel === "basic" ? 5 : 10)
+      )
+        return state;
+      const newAlt: Alternative = {
+        ...originalAlt,
+        id: generateId(),
+        name: `${originalAlt.name} (Kopie)`,
+      };
+      return {
+        ...state,
+        alternatives: [...state.alternatives, newAlt],
+      };
+    }
+
+    case "DUPLICATE_CRITERION": {
+      const originalCrit = state.criteria.find((c) => c.id === action.payload);
+      if (!originalCrit || state.criteria.length >= 20) return state;
+      const newCrit: Criterion = {
+        ...originalCrit,
+        id: generateId(),
+        name: `${originalCrit.name} (Kopie)`,
+      };
+      return {
+        ...state,
+        criteria: [...state.criteria, newCrit],
+      };
+    }
 
     default:
       return state;
@@ -461,17 +578,18 @@ interface AnalysisContextType {
   updateEvaluator: (evaluator: Evaluator) => void;
   removeEvaluator: (id: string) => void;
   setStep: (step: AnalysisStep) => void;
-calculateResults: () => void;
+  calculateResults: () => void;
   reset: () => void;
   duplicateAlternative: (id: string) => void;
   duplicateCriterion: (id: string) => void;
-  saveDraft: () => void;
+  saveDraft: () => boolean;
+  storageStatus: "idle" | "saved" | "error";
   loadDraft: () => boolean;
   hasDraft: boolean;
   // Computed values
   canProceedToNext: boolean;
   knockoutFailures: { alternativeId: string; failedCriteria: string[] }[];
-  }
+}
 
 const AnalysisContext = createContext<AnalysisContextType | null>(null);
 
@@ -482,16 +600,36 @@ export function AnalysisProvider({
   initialDecision,
   initialPreset,
   initialAIInterpretation,
+  initialState: restoredState,
 }: {
   children: ReactNode;
   initialPackageLevel?: PackageLevel;
   initialDecision?: string;
   initialPreset?: string;
   initialAIInterpretation?: AIDecisionInterpretation;
+  initialState?: AnalysisState;
 }) {
+  const [initialStorageSnapshot] = useState<string | null>(() => {
+    try {
+      return typeof window !== "undefined"
+        ? localStorage.getItem(DRAFT_KEY)
+        : null;
+    } catch {
+      return null;
+    }
+  });
+  const snapshot = useRef(initialStorageSnapshot);
+  const [storageStatus, setStorageStatus] = useState<
+    "idle" | "saved" | "error"
+  >("idle");
   const [state, dispatch] = useReducer(analysisReducer, null, () => {
+    if (restoredState) {
+      const valid = parseAnalysis(restoredState);
+      if (valid)
+        return analysisReducer(valid, { type: "LOAD_STATE", payload: valid });
+    }
     const initialState = createInitialState(initialPackageLevel);
-    
+
     // If we have an AI interpretation, apply its structured data
     if (initialAIInterpretation) {
       initialState.decision.title = initialAIInterpretation.title;
@@ -501,24 +639,28 @@ export function AnalysisProvider({
       }
       // Store the AI interpretation for reference
       initialState.decision.aiInterpretation = initialAIInterpretation;
-      
+
       // Add AI-suggested alternatives
-      initialState.alternatives = initialAIInterpretation.alternatives.map((alt, index) => ({
-        id: `ai-alt-${index}`,
-        name: alt.name,
-        description: alt.description || undefined,
-      }));
-      
+      initialState.alternatives = initialAIInterpretation.alternatives.map(
+        (alt, index) => ({
+          id: `ai-alt-${index}`,
+          name: alt.name,
+          description: alt.description || undefined,
+        }),
+      );
+
       // Add AI-suggested criteria
       const defaultWeight = initialPackageLevel === "basic" ? 3 : 10;
-      initialState.criteria = initialAIInterpretation.criteria.map((crit, index) => ({
-        id: `ai-crit-${index}`,
-        name: crit.name,
-        description: crit.description,
-        categoryId: crit.categoryId,
-        weight: 0,
-        rawWeight: defaultWeight,
-      }));
+      initialState.criteria = initialAIInterpretation.criteria.map(
+        (crit, index) => ({
+          id: `ai-crit-${index}`,
+          name: crit.name,
+          description: crit.description,
+          categoryId: crit.categoryId,
+          weight: 0,
+          rawWeight: defaultWeight,
+        }),
+      );
     } else {
       // Use traditional initialization
       if (initialDecision) {
@@ -526,7 +668,7 @@ export function AnalysisProvider({
       }
       if (initialPreset) {
         initialState.decision.preset = initialPreset;
-        
+
         // Add default alternatives for the preset if available
         const presetAlternatives = DEFAULT_ALTERNATIVES[initialPreset];
         if (presetAlternatives && presetAlternatives.length > 0) {
@@ -536,7 +678,7 @@ export function AnalysisProvider({
             description: alt.description,
           }));
         }
-        
+
         // Also auto-load criteria from template
         const template = getTemplateByPreset(initialPreset);
         if (template) {
@@ -552,8 +694,11 @@ export function AnalysisProvider({
         }
       }
     }
-    
-    return initialState;
+
+    return {
+      ...initialState,
+      criteria: applySimpleWeights(initialState.criteria),
+    };
   });
 
   // Helper actions
@@ -577,9 +722,12 @@ export function AnalysisProvider({
     dispatch({ type: "REMOVE_ALTERNATIVE", payload: id });
   }, []);
 
-  const addCriterion = useCallback((criterion: Omit<Criterion, "id" | "weight">) => {
-    dispatch({ type: "ADD_CRITERION", payload: criterion });
-  }, []);
+  const addCriterion = useCallback(
+    (criterion: Omit<Criterion, "id" | "weight">) => {
+      dispatch({ type: "ADD_CRITERION", payload: criterion });
+    },
+    [],
+  );
 
   const updateCriterion = useCallback((criterion: Criterion) => {
     dispatch({ type: "UPDATE_CRITERION", payload: criterion });
@@ -629,109 +777,73 @@ export function AnalysisProvider({
     dispatch({ type: "CALCULATE_RESULTS" });
   }, []);
 
-const reset = useCallback(() => {
+  const reset = useCallback(() => {
     dispatch({ type: "RESET" });
     // Also clear draft from localStorage
     if (typeof window !== "undefined") {
       try {
-        localStorage.removeItem("nwa_draft_state");
+        localStorage.removeItem(DRAFT_KEY);
+        snapshot.current = null;
+        setStorageStatus("idle");
       } catch {
         // Ignore localStorage errors
       }
     }
   }, []);
-  
+
   const duplicateAlternative = useCallback((id: string) => {
     dispatch({ type: "DUPLICATE_ALTERNATIVE", payload: id });
   }, []);
-  
+
   const duplicateCriterion = useCallback((id: string) => {
     dispatch({ type: "DUPLICATE_CRITERION", payload: id });
   }, []);
-  
-  // Local persistence - draft save/load
-  const saveDraft = useCallback(() => {
-    if (typeof window === "undefined") return;
-    try {
-      const stateToSave = {
-        ...state,
-        decision: {
-          ...state.decision,
-          updatedAt: new Date().toISOString(),
-        },
-      };
-      localStorage.setItem("nwa_draft_state", JSON.stringify(stateToSave));
-    } catch {
-      // Silent fail for localStorage errors (quota, private browsing)
-    }
-  }, [state]);
-  
-  const loadDraft = useCallback((): boolean => {
-    if (typeof window === "undefined") return false;
-    try {
-      const savedState = localStorage.getItem("nwa_draft_state");
-      if (savedState) {
-        const parsed = JSON.parse(savedState);
-        // Validate basic structure
-        if (parsed && parsed.decision && parsed.alternatives && parsed.criteria) {
-          dispatch({ type: "LOAD_STATE", payload: parsed });
-          return true;
-        }
-      }
-    } catch {
-      // Silent fail for parse errors
-    }
-    return false;
-  }, []);
-  
-  // Check if draft exists
-  const hasDraft = useMemo(() => {
-    if (typeof window === "undefined") return false;
-    try {
-      const savedState = localStorage.getItem("nwa_draft_state");
-      if (savedState) {
-        const parsed = JSON.parse(savedState);
-        return !!(parsed && parsed.decision && parsed.alternatives);
-      }
-    } catch {
-      // Ignore errors
-    }
-    return false;
-  }, []);
 
-  // Computed values
-  const canProceedToNext = useMemo(() => {
-    const { currentStep, decision, alternatives, criteria, ratings } = state;
-    
-    switch (currentStep) {
-      case "decision":
-        return decision.title.trim().length > 0;
-      case "alternatives":
-        const minAlts = decision.packageLevel === "basic" ? 2 : 2;
-        const maxAlts = decision.packageLevel === "basic" ? 5 : 10;
-        return alternatives.length >= minAlts && alternatives.length <= maxAlts;
-      case "criteria":
-        return criteria.length >= 2;
-      case "weighting":
-        const totalWeight = criteria.reduce((sum, c) => sum + c.rawWeight, 0);
-        return totalWeight > 0;
-      case "evaluation":
-        // Check if all alternatives have been rated for all criteria
-        const requiredRatings = alternatives.length * criteria.length;
-        const uniqueRatings = new Set(
-          ratings.map((r) => `${r.alternativeId}-${r.criterionId}`)
-        );
-        return uniqueRatings.size >= requiredRatings;
-      case "results":
-        return true;
-      default:
+  const saveDraft = useCallback((): boolean => {
+    if (typeof window === "undefined" || !state.decision.title.trim())
+      return false;
+    try {
+      if (localStorage.getItem(DRAFT_KEY) !== snapshot.current) {
+        setStorageStatus("error");
         return false;
+      }
+      const serialized = JSON.stringify(state);
+      localStorage.setItem(DRAFT_KEY, serialized);
+      snapshot.current = serialized;
+      setStorageStatus("saved");
+      return true;
+    } catch {
+      setStorageStatus("error");
+      return false;
     }
   }, [state]);
+  const loadDraft = useCallback(() => {
+    const draft = readDraft();
+    if (!draft) return false;
+    dispatch({ type: "LOAD_STATE", payload: draft });
+    return true;
+  }, []);
+  const hasDraft = useMemo(
+    () => typeof window !== "undefined" && !!readDraft(),
+    [],
+  );
+  const canProceedToNext = useMemo(
+    () =>
+      ANALYSIS_STEPS.slice(
+        0,
+        ANALYSIS_STEPS.indexOf(state.currentStep) + 1,
+      ).every((step) => stepIsValid(state, step)),
+    [state],
+  );
 
   const knockoutFailures = useMemo(() => {
-    return checkKnockoutCriteria(state.alternatives, state.criteria, state.ratings);
-  }, [state.alternatives, state.criteria, state.ratings]);
+    return checkKnockoutCriteria(
+      state.alternatives,
+      state.criteria,
+      state.ratings,
+      state.evaluators.length ? state.evaluators : undefined,
+    );
+  }, [state.alternatives, state.criteria, state.ratings, state.evaluators]);
 
   // Stable actions object - these callbacks never change due to useCallback
   const actions = useMemo(
@@ -752,33 +864,59 @@ const reset = useCallback(() => {
       addEvaluator,
       updateEvaluator,
       removeEvaluator,
-setStep,
-    calculateResults,
-    reset,
-    duplicateAlternative,
-    duplicateCriterion,
-    saveDraft,
-    loadDraft,
-  }),
-  [
-    setPackageLevel, setDecision, addAlternative, updateAlternative, removeAlternative,
-    addCriterion, updateCriterion, removeCriterion, setCriteriaFromTemplate,
-    setRating, setWeightingMethod, setAHPComparison, addRisk,
-    addEvaluator, updateEvaluator, removeEvaluator, setStep, calculateResults, reset,
-    duplicateAlternative, duplicateCriterion, saveDraft, loadDraft,
-  ]
+      setStep,
+      calculateResults,
+      reset,
+      duplicateAlternative,
+      duplicateCriterion,
+      saveDraft,
+      loadDraft,
+    }),
+    [
+      setPackageLevel,
+      setDecision,
+      addAlternative,
+      updateAlternative,
+      removeAlternative,
+      addCriterion,
+      updateCriterion,
+      removeCriterion,
+      setCriteriaFromTemplate,
+      setRating,
+      setWeightingMethod,
+      setAHPComparison,
+      addRisk,
+      addEvaluator,
+      updateEvaluator,
+      removeEvaluator,
+      setStep,
+      calculateResults,
+      reset,
+      duplicateAlternative,
+      duplicateCriterion,
+      saveDraft,
+      loadDraft,
+    ],
   );
 
-const value = useMemo(
+  const value = useMemo(
     () => ({
       state,
       dispatch,
       ...actions,
       hasDraft,
+      storageStatus,
       canProceedToNext,
       knockoutFailures,
     }),
-    [state, actions, hasDraft, canProceedToNext, knockoutFailures]
+    [
+      state,
+      actions,
+      hasDraft,
+      storageStatus,
+      canProceedToNext,
+      knockoutFailures,
+    ],
   );
 
   return (

@@ -100,6 +100,7 @@ export interface NwaResult {
   rank: number;
   criteriaScores: CriterionScore[];
   riskScore?: number;
+  excluded?: boolean;
 }
 
 export interface CriterionScore {
@@ -112,7 +113,7 @@ export interface CriterionScore {
 export interface SensitivityResult {
   criterionId: string;
   originalWeight: number;
-  criticalWeight: number; // Weight at which ranking changes
+  criticalWeight: number | null; // Weight at which ranking changes
   sensitivity: number; // How sensitive is ranking to this criterion
   impactOnRanking: "low" | "medium" | "high";
 }
@@ -127,7 +128,11 @@ export interface AHPConsistencyResult {
 }
 
 // Weighting Method
-export type WeightingMethod = "simple" | "percentage" | "ahp-light" | "ahp-full";
+export type WeightingMethod =
+  | "simple"
+  | "percentage"
+  | "ahp-light"
+  | "ahp-full";
 
 // Analysis State (main data model)
 export interface AnalysisState {
@@ -187,7 +192,17 @@ export interface AIInterpretedCriterion {
 export interface AIDecisionInterpretation {
   title: string;
   description: string;
-  domain: "supplier" | "software" | "investment" | "machines" | "vehicle" | "employee" | "personal" | "technology" | "service" | "other";
+  domain:
+    | "supplier"
+    | "software"
+    | "investment"
+    | "machines"
+    | "vehicle"
+    | "employee"
+    | "personal"
+    | "technology"
+    | "service"
+    | "other";
   alternatives: AIInterpretedAlternative[];
   criteria: AIInterpretedCriterion[];
   constraints: string | null;

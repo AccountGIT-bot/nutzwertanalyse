@@ -1,594 +1,135 @@
 "use client";
-
-import { useState, useCallback } from "react";
-import { useAnalysis } from "@/app/lib/nwa/analysis-context";
-import { getRecommendation } from "@/app/lib/nwa/calculate";
-import type { AnalysisState, ReportConfig } from "@/app/lib/nwa/types";
-
-const DEFAULT_REPORT_CONFIG: Record<string, ReportConfig> = {
-  basic: {
-    includeExecutiveSummary: true,
-    includeDetailedAnalysis: false,
-    includeSensitivityAnalysis: false,
-    includeRiskAssessment: false,
-    includeAuditTrail: false,
-    includeMethodologyNotes: false,
-  },
-  advanced: {
-    includeExecutiveSummary: true,
-    includeDetailedAnalysis: true,
-    includeSensitivityAnalysis: true,
-    includeRiskAssessment: false,
-    includeAuditTrail: false,
-    includeMethodologyNotes: true,
-  },
-  business: {
+import { useMemo, useRef, useState } from "react";
+import { FileSpreadsheet, Printer, Download } from "lucide-react";
+import { useAnalysis } from "../../lib/nwa/analysis-context";
+import { generateReportHTML, generateXlsx } from "../../lib/nwa/export";
+import { downloadFile } from "../../lib/nwa/local-data";
+import type { ReportConfig } from "../../lib/nwa/types";
+export function ReportGenerator() {
+  const { state } = useAnalysis();
+  const iframe = useRef<HTMLIFrameElement>(null);
+  const [show, setShow] = useState(false);
+  const [ready, setReady] = useState(false);
+  const [error, setError] = useState("");
+  const [config, setConfig] = useState<ReportConfig>({
     includeExecutiveSummary: true,
     includeDetailedAnalysis: true,
     includeSensitivityAnalysis: true,
     includeRiskAssessment: true,
     includeAuditTrail: true,
     includeMethodologyNotes: true,
-  },
-};
-
-function generateReportHTML(state: AnalysisState, config: ReportConfig): string {
-  const { decision, alternatives, criteria, results, sensitivityResults, ahpConsistency, knockoutFailures = [] } = state as AnalysisState & { knockoutFailures?: { alternativeId: string; failedCriteria: string[] }[] };
-  const recommendation = getRecommendation(results, alternatives);
-  const validResults = results.filter(
-    (r) => !knockoutFailures.some((f) => f.alternativeId === r.alternativeId)
-  );
-
-  const packageLabel = decision.packageLevel === "basic" ? "Basic" : decision.packageLevel === "advanced" ? "Advanced" : "Business";
-  const date = new Date().toLocaleDateString("de-CH", { 
-    year: "numeric", 
-    month: "long", 
-    day: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
   });
-
-  let html = `
-<!DOCTYPE html>
-<html lang="de">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Nutzwertanalyse - ${decision.title}</title>
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { 
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      line-height: 1.5;
-      color: #1a1a1a;
-      background: #fff;
-      padding: 28px 32px;
-      max-width: 850px;
-      margin: 0 auto;
-      font-size: 12px;
-    }
-    .header { 
-      display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
-      border-bottom: 2px solid #1a1a1a; 
-      padding-bottom: 16px; 
-      margin-bottom: 20px;
-    }
-    .header-left h1 { font-size: 20px; font-weight: 700; margin-bottom: 4px; }
-    .header-left .subtitle { color: #666; font-size: 11px; max-width: 400px; }
-    .header-right { text-align: right; font-size: 10px; color: #888; }
-    .header-right .badge { 
-      display: inline-block; 
-      padding: 3px 10px; 
-      border-radius: 3px; 
-      font-size: 9px; 
-      font-weight: 700; 
-      text-transform: uppercase;
-      background: #1a1a1a;
-      color: white;
-      margin-bottom: 6px;
-    }
-    .section { margin-bottom: 20px; page-break-inside: avoid; }
-    .section-title { 
-      font-size: 13px; 
-      font-weight: 700; 
-      margin-bottom: 10px;
-      padding-bottom: 4px;
-      border-bottom: 1px solid #ddd;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-    .recommendation-card {
-      background: #f8f9fa;
-      border-left: 4px solid #0066cc;
-      padding: 14px 16px;
-      margin-bottom: 16px;
-    }
-    .recommendation-card .label { font-size: 9px; color: #888; text-transform: uppercase; letter-spacing: 0.5px; }
-    .recommendation-card .winner { font-size: 18px; font-weight: 700; color: #0066cc; margin: 4px 0; }
-    .recommendation-card .reasoning { font-size: 11px; color: #555; }
-    .confidence { 
-      display: inline-flex; 
-      align-items: center; 
-      gap: 6px; 
-      margin-top: 8px;
-      font-size: 10px;
-      color: #888;
-      background: #fff;
-      padding: 4px 8px;
-      border-radius: 3px;
-    }
-    .confidence-dots { display: flex; gap: 3px; }
-    .confidence-dots span { width: 8px; height: 8px; border-radius: 50%; background: #ddd; }
-    .confidence-dots span.filled { background: #0066cc; }
-    table { width: 100%; border-collapse: collapse; font-size: 11px; }
-    th, td { padding: 8px 10px; text-align: left; border-bottom: 1px solid #eee; }
-    th { background: #f5f5f5; font-weight: 600; color: #555; font-size: 10px; text-transform: uppercase; }
-    .rank { 
-      display: inline-flex; 
-      align-items: center; 
-      justify-content: center;
-      width: 22px; 
-      height: 22px; 
-      border-radius: 4px; 
-      font-weight: 700;
-      font-size: 11px;
-    }
-    .rank-1 { background: #ffd700; color: #1a1a1a; }
-    .rank-2 { background: #c0c0c0; color: #1a1a1a; }
-    .rank-3 { background: #cd7f32; color: white; }
-    .rank-other { background: #eee; color: #888; }
-    .score { font-weight: 700; color: #0066cc; font-size: 13px; }
-    .score-bar { 
-      height: 4px; 
-      background: #eee; 
-      border-radius: 2px; 
-      overflow: hidden;
-      margin-top: 3px;
-      width: 80px;
-    }
-    .score-bar-fill { height: 100%; background: #0066cc; }
-    .knockout { color: #dc3545; }
-    .sens-badge {
-      display: inline-block;
-      padding: 2px 6px;
-      border-radius: 3px;
-      font-size: 9px;
-      font-weight: 600;
-    }
-    .sens-high { background: #ffebee; color: #c62828; }
-    .sens-medium { background: #fff8e1; color: #f57f17; }
-    .sens-low { background: #e8f5e9; color: #2e7d32; }
-    .consistency-box {
-      padding: 12px;
-      border-radius: 4px;
-      font-size: 11px;
-    }
-    .consistency-pass { background: #e8f5e9; border: 1px solid #4caf50; }
-    .consistency-fail { background: #fff8e1; border: 1px solid #ff9800; }
-    .footer {
-      margin-top: 24px;
-      padding-top: 12px;
-      border-top: 1px solid #eee;
-      font-size: 9px;
-      color: #aaa;
-      text-align: center;
-    }
-    .text-muted { color: #888; }
-    .text-small { font-size: 10px; }
-    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-    @media print {
-      body { padding: 16px; font-size: 11px; }
-      .section { page-break-inside: avoid; }
-    }
-  </style>
-</head>
-<body>
-  <div class="header">
-    <div class="header-left">
-      <h1>${decision.title || "Nutzwertanalyse"}</h1>
-      <p class="subtitle">${decision.description || ""}</p>
-    </div>
-    <div class="header-right">
-      <div class="badge">${packageLabel}</div>
-      <div>${date}</div>
-      <div>${alternatives.length} Alternativen · ${criteria.length} Kriterien</div>
-    </div>
-  </div>
-`;
-
-  // Executive Summary
-  if (config.includeExecutiveSummary) {
-    const confidenceFilled = recommendation.confidence === "high" ? 3 : recommendation.confidence === "medium" ? 2 : 1;
-    html += `
-  <div class="section">
-    <h2 class="section-title">Empfehlung</h2>
-    <div class="recommendation-card">
-      <div class="label">Empfohlene Alternative</div>
-      <div class="winner">${recommendation.recommended?.name || "Keine klare Empfehlung"}</div>
-      <div class="reasoning">${recommendation.reasoning}</div>
-      <div class="confidence">
-        <div class="confidence-dots">
-          ${[1, 2, 3].map((i) => `<span class="${i <= confidenceFilled ? "filled" : ""}"></span>`).join("")}
-        </div>
-        <span>Konfidenz: ${recommendation.confidence === "high" ? "Hoch" : recommendation.confidence === "medium" ? "Mittel" : "Niedrig"}</span>
-      </div>
-    </div>
-  </div>
-`;
-  }
-
-  // Ranking Results
-  html += `
-  <div class="section">
-    <h2 class="section-title">Ranking</h2>
-    <table>
-      <thead>
-        <tr>
-          <th style="width:50px">Rang</th>
-          <th>Alternative</th>
-          <th style="width:120px">Score</th>
-          <th style="width:60px">%</th>
-        </tr>
-      </thead>
-      <tbody>
-`;
-
-  const maxScore = validResults[0]?.totalScore || 1;
-  validResults.forEach((result) => {
-    const alt = alternatives.find((a) => a.id === result.alternativeId);
-    const rankClass = result.rank <= 3 ? `rank-${result.rank}` : "rank-other";
-    const barWidth = (result.totalScore / maxScore) * 100;
-    
-    html += `
-        <tr>
-          <td><span class="rank ${rankClass}">${result.rank}</span></td>
-          <td><strong>${alt?.name}</strong></td>
-          <td>
-            <span class="score">${result.totalScore.toFixed(2)}</span>
-            <div class="score-bar">
-              <div class="score-bar-fill" style="width: ${barWidth}%"></div>
-            </div>
-          </td>
-          <td>${result.normalizedScore.toFixed(0)}%</td>
-        </tr>
-`;
-  });
-
-  // Knocked out alternatives
-  if (knockoutFailures && knockoutFailures.length > 0) {
-    knockoutFailures.forEach((failure) => {
-      const alt = alternatives.find((a) => a.id === failure.alternativeId);
-      const failedCritNames = failure.failedCriteria
-        .map((cId: string) => criteria.find((c) => c.id === cId)?.name)
-        .filter(Boolean)
-        .join(", ");
-      
-      html += `
-        <tr>
-          <td><span class="rank rank-other">K.O.</span></td>
-          <td>
-            <strong class="knockout">${alt?.name}</strong>
-            <br><span class="text-small knockout">Nicht bestanden: ${failedCritNames}</span>
-          </td>
-          <td colspan="2" class="knockout">Ausgeschieden</td>
-        </tr>
-`;
-    });
-  }
-
-  html += `
-      </tbody>
-    </table>
-  </div>
-`;
-
-  // Detailed Analysis
-  if (config.includeDetailedAnalysis) {
-    html += `
-  <div class="section">
-    <h2 class="section-title">Detailanalyse nach Kriterien</h2>
-    <table>
-      <thead>
-        <tr>
-          <th>Kriterium</th>
-          <th>Gewicht</th>
-          ${validResults.slice(0, 5).map((r) => {
-            const alt = alternatives.find((a) => a.id === r.alternativeId);
-            return `<th>${alt?.name}</th>`;
-          }).join("")}
-        </tr>
-      </thead>
-      <tbody>
-`;
-
-    criteria.forEach((criterion) => {
-      html += `
-        <tr>
-          <td>
-            <strong>${criterion.name}</strong>
-            ${criterion.description ? `<br><span class="text-small text-muted">${criterion.description}</span>` : ""}
-          </td>
-          <td>${(criterion.weight * 100).toFixed(0)}%</td>
-`;
-
-      validResults.slice(0, 5).forEach((r) => {
-        const criterionScore = r.criteriaScores.find((cs) => cs.criterionId === criterion.id);
-        html += `<td>${criterionScore?.rawScore.toFixed(1) || "–"}</td>`;
-      });
-
-      html += `</tr>`;
-    });
-
-    html += `
-        <tr style="background: #f8f9fa; font-weight: 600;">
-          <td>Gesamtscore</td>
-          <td>100%</td>
-          ${validResults.slice(0, 5).map((r) => `<td class="score">${r.totalScore.toFixed(2)}</td>`).join("")}
-        </tr>
-      </tbody>
-    </table>
-  </div>
-`;
-  }
-
-  // Sensitivity Analysis
-  if (config.includeSensitivityAnalysis && sensitivityResults.length > 0) {
-    html += `
-  <div class="section">
-    <h2 class="section-title">Sensitivität</h2>
-    <table>
-      <thead>
-        <tr>
-          <th>Kriterium</th>
-          <th style="width:80px">Gewicht</th>
-          <th style="width:80px">Sensitivität</th>
-          <th style="width:80px">Einfluss</th>
-        </tr>
-      </thead>
-      <tbody>
-`;
-
-    sensitivityResults.forEach((sens) => {
-      const criterion = criteria.find((c) => c.id === sens.criterionId);
-      const badgeClass = sens.impactOnRanking === "high" ? "sens-high" : sens.impactOnRanking === "medium" ? "sens-medium" : "sens-low";
-      const label = sens.impactOnRanking === "high" ? "Hoch" : sens.impactOnRanking === "medium" ? "Mittel" : "Niedrig";
-      
-      html += `
-        <tr>
-          <td>${criterion?.name}</td>
-          <td>${(sens.originalWeight * 100).toFixed(0)}%</td>
-          <td>${(sens.sensitivity * 100).toFixed(0)}%</td>
-          <td><span class="sens-badge ${badgeClass}">${label}</span></td>
-        </tr>
-`;
-    });
-
-    html += `
-      </tbody>
-    </table>
-  </div>
-`;
-  }
-
-  // AHP Consistency (Business)
-  if (config.includeAuditTrail && ahpConsistency) {
-    const consistencyClass = ahpConsistency.isConsistent ? "consistency-pass" : "consistency-fail";
-    html += `
-  <div class="section">
-    <h2 class="section-title">AHP-Konsistenzprüfung</h2>
-    <div class="consistency-box ${consistencyClass}">
-      <strong>${ahpConsistency.isConsistent ? "Konsistent" : "Inkonsistent"}</strong>
-      <p style="margin-top: 8px;">${ahpConsistency.message}</p>
-      <p class="text-small text-muted" style="margin-top: 8px;">
-        Konsistenzratio (CR): ${(ahpConsistency.consistencyRatio * 100).toFixed(1)}%
-        ${ahpConsistency.consistencyRatio < 0.1 ? "(akzeptabel < 10%)" : "(sollte < 10% sein)"}
-      </p>
-    </div>
-  </div>
-`;
-  }
-
-  // Methodology Notes
-  if (config.includeMethodologyNotes) {
-    const weightingMethodLabel = state.weightingMethod === "simple" ? "Einfache Gewichtung (1-5 Skala)" :
-      state.weightingMethod === "percentage" ? "Prozentuale Gewichtung (100%)" :
-      state.weightingMethod === "ahp-light" ? "AHP Light (Paarweiser Vergleich)" :
-      "Vollständige AHP mit Konsistenzprüfung";
-    
-    html += `
-  <div class="section">
-    <h2 class="section-title">Methodik</h2>
-    <table>
-      <tbody>
-        <tr>
-          <td><strong>Analysemethode</strong></td>
-          <td>Nutzwertanalyse (Weighted Scoring Model)</td>
-        </tr>
-        <tr>
-          <td><strong>Gewichtungsmethode</strong></td>
-          <td>${weightingMethodLabel}</td>
-        </tr>
-        <tr>
-          <td><strong>Bewertungsskala</strong></td>
-          <td>1-10 (1 = sehr schlecht, 10 = sehr gut)</td>
-        </tr>
-        <tr>
-          <td><strong>Berechnungsformel</strong></td>
-          <td>Score = Σ (Kriteriengewicht × Alternativenbewertung)</td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-`;
-  }
-
-  // Footer
-  html += `
-  <div class="footer">
-    <p>Erstellt mit Nutzwertanalyse.com | ${date}</p>
-    <p>Diese Analyse dient als Entscheidungsunterstützung. Die finale Entscheidung liegt beim Anwender.</p>
-  </div>
-</body>
-</html>
-`;
-
-  return html;
-}
-
-export function ReportGenerator() {
-  const { state, knockoutFailures } = useAnalysis();
-  const { decision } = state;
-  const packageLevel = decision.packageLevel;
-
-  const [isGenerating, setIsGenerating] = useState(false);
-  const [config, setConfig] = useState<ReportConfig>(
-    DEFAULT_REPORT_CONFIG[packageLevel] || DEFAULT_REPORT_CONFIG.basic
+  const html = useMemo(
+    () => generateReportHTML(state, config),
+    [state, config],
   );
-
-  const handleExportPDF = useCallback(async () => {
-    setIsGenerating(true);
-    
+  const name = `DecisionStudio-${state.decision.title.replace(/[^\p{L}\p{N}_-]/gu, "-").slice(0, 70) || "Analyse"}`;
+  const options: { key: keyof ReportConfig; label: string }[] = [
+    { key: "includeExecutiveSummary", label: "Ergebnis & Rangliste" },
+    { key: "includeDetailedAnalysis", label: "Kriterien & Bewertungen" },
+    { key: "includeSensitivityAnalysis", label: "Sensitivität" },
+    { key: "includeRiskAssessment", label: "Risiken" },
+    { key: "includeAuditTrail", label: "Quellen & Bewertende" },
+    { key: "includeMethodologyNotes", label: "Methodik" },
+  ];
+  function excel() {
     try {
-      // Generate HTML report
-      const stateWithKnockouts = { ...state, knockoutFailures };
-      const html = generateReportHTML(stateWithKnockouts as AnalysisState & { knockoutFailures: { alternativeId: string; failedCriteria: string[] }[] }, config);
-      
-      // Create blob and download as HTML (can be opened in browser and printed as PDF)
-      const blob = new Blob([html], { type: "text/html;charset=utf-8" });
-      const url = URL.createObjectURL(blob);
-      
-      // Open in new window for printing
-      const printWindow = window.open(url, "_blank");
-      if (printWindow) {
-        printWindow.onload = () => {
-          // Auto-trigger print dialog
-          setTimeout(() => {
-            printWindow.print();
-          }, 500);
-        };
-      }
-      
-      // Also provide download option
-      const downloadLink = document.createElement("a");
-      downloadLink.href = url;
-      downloadLink.download = `Nutzwertanalyse_${decision.title?.replace(/[^a-zA-Z0-9]/g, "_") || "Report"}_${new Date().toISOString().split("T")[0]}.html`;
-      downloadLink.click();
-      
-      URL.revokeObjectURL(url);
+      downloadFile(
+        generateXlsx(state),
+        name + ".xlsx",
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      );
+      setError("");
     } catch {
-      // Report generation failed silently - user can retry
-    } finally {
-      setIsGenerating(false);
+      setError(
+        "Der Excel-Export konnte nicht erstellt werden. Bitte versuche es erneut.",
+      );
     }
-  }, [state, config, knockoutFailures, decision.title]);
-
-  const toggleConfig = (key: keyof ReportConfig) => {
-    setConfig((prev) => ({ ...prev, [key]: !prev[key] }));
-  };
-
+  }
   return (
-    <div className="space-y-6">
-      <div>
-        <h3 className="text-lg font-semibold text-white">Report exportieren</h3>
-        <p className="mt-1 text-sm text-white/50">
-          {packageLevel === "basic"
-            ? "Kompakter Entscheidungsreport"
-            : packageLevel === "advanced"
-            ? "Vollständiger Analysebericht"
-            : "Executive Report mit Audit-Dokumentation"}
+    <section className="export-panel">
+      <p className="eyebrow">DEIN ERGEBNIS ZUM MITNEHMEN</p>
+      <h3>Entscheidung dokumentieren.</h3>
+      <p className="muted">
+        Excel enthält alle Daten. Für den Druckbericht wählst du die gewünschten
+        Kapitel.
+      </p>
+      <div className="report-options">
+        {options.map((o) => (
+          <label key={o.key}>
+            <input
+              type="checkbox"
+              checked={config[o.key]}
+              onChange={() => {
+                setReady(false);
+                setConfig((c) => ({ ...c, [o.key]: !c[o.key] }));
+              }}
+            />
+            {o.label}
+          </label>
+        ))}
+      </div>
+      <div className="action-row">
+        <button className="studio-button" onClick={excel}>
+          <FileSpreadsheet size={18} />
+          Excel herunterladen
+        </button>
+        <button
+          className="studio-button secondary"
+          onClick={() => {
+            if (!show) setReady(false);
+            setShow(!show);
+          }}
+        >
+          <Printer size={18} />
+          {show ? "Bericht schliessen" : "Bericht öffnen"}
+        </button>
+        <button
+          className="studio-button secondary"
+          onClick={() =>
+            downloadFile(html, name + ".html", "text/html;charset=utf-8")
+          }
+        >
+          <Download size={17} />
+          HTML-Bericht
+        </button>
+      </div>
+      {error && (
+        <p className="notice warning" role="alert">
+          {error}
         </p>
-      </div>
-
-      {/* Config options */}
-      <div className="space-y-3">
-        <div className="text-sm font-medium text-white/70">Report-Inhalt</div>
-        
-        {[
-          { key: "includeExecutiveSummary", label: "Zusammenfassung & Empfehlung", always: true },
-          { key: "includeDetailedAnalysis", label: "Detailanalyse nach Kriterien", always: false },
-          { key: "includeSensitivityAnalysis", label: "Sensitivitätsanalyse", always: false },
-          { key: "includeRiskAssessment", label: "Risikobewertung", always: false },
-          { key: "includeAuditTrail", label: "AHP-Konsistenzprüfung", always: false },
-          { key: "includeMethodologyNotes", label: "Methodik-Dokumentation", always: false },
-        ].map(({ key, label, always }) => {
-          const isEnabled = config[key as keyof ReportConfig];
-          const isAvailable =
-            packageLevel === "business" ||
-            (packageLevel === "advanced" && !["includeRiskAssessment", "includeAuditTrail"].includes(key)) ||
-            (packageLevel === "basic" && always);
-
-          if (!isAvailable) return null;
-
-          return (
-            <label
-              key={key}
-              className={`flex items-center gap-3 p-3 rounded-lg cursor-pointer transition ${
-                isEnabled ? "bg-[rgb(var(--accent))]/10" : "bg-white/5"
-              }`}
+      )}
+      {show && (
+        <div className="report-preview">
+          <div className="action-row">
+            <button
+              className="studio-button"
+              disabled={!ready}
+              onClick={() => {
+                try {
+                  iframe.current?.contentWindow?.focus();
+                  iframe.current?.contentWindow?.print();
+                } catch {
+                  setError(
+                    "Öffne den heruntergeladenen HTML-Bericht und wähle dort Drucken.",
+                  );
+                }
+              }}
             >
-              <input
-                type="checkbox"
-                checked={isEnabled}
-                onChange={() => toggleConfig(key as keyof ReportConfig)}
-                className="rounded border-white/20 bg-white/5 text-[rgb(var(--accent))] focus:ring-[rgb(var(--accent))]/20"
-              />
-              <span className="text-sm text-white/70">{label}</span>
-            </label>
-          );
-        })}
-      </div>
-
-      {/* Export button */}
-      <button
-        data-export-pdf
-        onClick={handleExportPDF}
-        disabled={isGenerating}
-        className="w-full h-12 rounded-xl font-semibold transition disabled:opacity-50 flex items-center justify-center gap-2 hover:brightness-110"
-        style={{
-          background: `rgb(var(--accent))`,
-          color: "white",
-        }}
-      >
-        {isGenerating ? (
-          <>
-            <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
-              <circle
-                className="opacity-25"
-                cx="12"
-                cy="12"
-                r="10"
-                stroke="currentColor"
-                strokeWidth="4"
-                fill="none"
-              />
-              <path
-                className="opacity-75"
-                fill="currentColor"
-                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-              />
-            </svg>
-            Wird erstellt...
-          </>
-        ) : (
-          <>
-            <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-              />
-            </svg>
-            Report exportieren (PDF/HTML)
-          </>
-        )}
-      </button>
-
-      <div className="text-xs text-white/40 text-center">
-        Der Report wird als HTML-Datei generiert und kann direkt als PDF gedruckt werden.
-      </div>
-    </div>
+              <Printer size={18} />
+              Drucken / PDF
+            </button>
+            <p className="muted">Wähle im Druckdialog «Als PDF speichern».</p>
+          </div>
+          <iframe
+            ref={iframe}
+            title="Druckvorschau des Entscheidungsberichts"
+            sandbox="allow-same-origin allow-modals"
+            srcDoc={html}
+            onLoad={() => setReady(true)}
+          />
+        </div>
+      )}
+    </section>
   );
 }

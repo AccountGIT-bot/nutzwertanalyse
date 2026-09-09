@@ -1,8 +1,3 @@
-export const runtime = "nodejs";
-
-export async function GET() {
-  return Response.json({
-    ok: true,
-    ts: new Date().toISOString(),
-  });
+export function GET() {
+  return Response.json({ status: "ok", mode: "local" });
 }
