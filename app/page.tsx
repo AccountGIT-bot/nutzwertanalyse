@@ -51,8 +51,8 @@ const PRESET_CONFIG: Array<{
 const USP_FEATURES = [
   {
     icon: Brain,
-    title: "GPT-4 Powered",
-    description: "Modernste KI analysiert Ihre Eingabe und generiert automatisch passende Kriterien, Alternativen und Bewertungsrahmen.",
+    title: "Intelligente Vorschläge",
+    description: "Aus Ihrer Eingabe werden automatisch passende Kriterien, Alternativen und ein Bewertungsrahmen abgeleitet.",
     color: "168, 85, 247",
   },
   {
@@ -71,9 +71,9 @@ const USP_FEATURES = [
 
 // Trust badges
 const STATS = [
-  { value: "10k+", label: "Analysen erstellt" },
-  { value: "98%", label: "Zufriedenheit" },
-  { value: "50+", label: "Unternehmen" },
+  { value: "6", label: "Analyse-Vorlagen" },
+  { value: "AHP", label: "inkl. Konsistenzprüfung" },
+  { value: "0 €", label: "zum Starten" },
 ];
 
 export default function LandingPage() {
@@ -258,7 +258,7 @@ export default function LandingPage() {
           {/* Badge - Liquid Glass with AI indicator */}
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/[0.05] backdrop-blur-xl border border-white/[0.1] text-sm text-white/80 mb-8 shadow-lg shadow-black/5">
             <Brain className="w-4 h-4 text-blue-400" />
-            <span>Powered by GPT-4</span>
+            <span>Strukturierte Entscheidungsanalyse</span>
             <div className="w-1.5 h-1.5 rounded-full bg-gradient-to-r from-green-400 to-emerald-500 animate-pulse" />
           </div>
           
@@ -651,7 +651,7 @@ export default function LandingPage() {
               </div>
             </div>
             
-            <div className="text-white text-xl font-semibold mb-2">GPT-4 analysiert Ihre Anfrage</div>
+            <div className="text-white text-xl font-semibold mb-2">Ihre Anfrage wird analysiert</div>
             <div className="text-white/50 text-sm mb-4">Generiere Kriterien und Alternativen...</div>
             
             {/* Animated progress indicators */}
