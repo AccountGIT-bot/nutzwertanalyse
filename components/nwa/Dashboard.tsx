@@ -16,6 +16,8 @@ import { PageShell, Container } from "@/components/layout/PageShell";
 import { ProgressBar } from "@/components/ui/Controls";
 import { ConfirmDialog } from "@/components/ui/Dialog";
 import { useToast } from "@/components/ui/Toast";
+import { SmartStart } from "./SmartStart";
+import { PresetGrid } from "./PresetGrid";
 
 export function Dashboard() {
   const { t, tag } = useI18n();
@@ -94,6 +96,10 @@ export function Dashboard() {
           </div>
         </div>
 
+        <div className="mt-8">
+          <SmartStart />
+        </div>
+
         {!loading && !functional && (
           <div role="status" className="mt-6 flex flex-col gap-3 rounded-xl border border-warn/40 bg-warn-soft p-4 text-sm sm:flex-row sm:items-center sm:justify-between">
             <div className="flex gap-3">
@@ -132,7 +138,7 @@ export function Dashboard() {
         )}
 
         {entries.length === 0 ? (
-          <div className="card mt-8 flex flex-col items-center px-6 py-16 text-center">
+          <div className="card mt-6 flex flex-col items-center px-6 py-16 text-center">
             <FolderOpen className="h-10 w-10 text-ink-3" aria-hidden />
             <h2 className="mt-4 text-lg font-semibold">{t.dashboard.empty}</h2>
             <p className="mt-1 max-w-md text-sm text-ink-2">{t.dashboard.emptyText}</p>
@@ -161,6 +167,16 @@ export function Dashboard() {
             ))}
           </ul>
         )}
+
+        <section className="mt-12" aria-labelledby="presets-h">
+          <h2 id="presets-h" className="text-lg font-semibold">
+            {t.landing.presetsTitle}
+          </h2>
+          <p className="mt-1 text-sm text-ink-2">{t.landing.presetsLead}</p>
+          <div className="mt-4">
+            <PresetGrid />
+          </div>
+        </section>
 
         <ConfirmDialog
           open={confirm !== null}

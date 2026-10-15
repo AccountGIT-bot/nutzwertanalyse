@@ -69,6 +69,9 @@ export const fr: Translations = {
     language: "Langue",
   },
   nav: {
+    how: "Comment ça marche",
+    about: "À propos",
+    useCases: "Cas d’usage",
     home: "Accueil",
     app: "Mes analyses",
     method: "Méthode",
@@ -714,6 +717,109 @@ export const fr: Translations = {
         ],
       },
     ],
+  },
+  footer: {
+    visionLabel: "Vision",
+    vision: "Chaque décision importante est prise de manière traçable, équitable et justifiable – sans que les données ne quittent jamais votre appareil.",
+    missionLabel: "Mission",
+    mission: "Nous rendons la méthode éprouvée de l’analyse de la valeur d’utilité accessible à tous : gratuite, compréhensible, sobre en données et sans compte.",
+  },
+  landingExtra: {
+    includedTitle: "Ce qui est inclus",
+    includedLead: "Tout ce qu’une décision solide exige – et rien qui distrait.",
+    included: [
+      { title: "Parcours guidé en six étapes", text: "Décision, alternatives, critères, pondération, évaluation, résultat – chaque étape avec conseils et contrôle." },
+      { title: "Modèles pour les décisions typiques", text: "Dix catalogues de critères, du choix d’un fournisseur à l’offre d’emploi, adaptables à tout moment." },
+      { title: "Quatre méthodes de pondération", text: "Points, pourcentages, classement ou comparaison par paires AHP avec contrôle de cohérence." },
+      { title: "Critères éliminatoires et évaluation en équipe", text: "Vérifier les exigences impératives, faire évaluer plusieurs personnes, pondérer les voix." },
+      { title: "Sensibilité et robustesse", text: "Points de bascule par critère, curseurs « et si » et simulation Monte-Carlo." },
+      { title: "Rapport et export", text: "Rapport PDF, CSV pour Excel, Markdown, sauvegarde JSON et lien de partage sans serveur." },
+      { title: "Quatre langues, clair et sombre", text: "Allemand, anglais, français, italien ; accessible et utilisable sur mobile." },
+      { title: "Privacy by design", text: "Pas de compte, pas de cookies, pas de suivi. Tout reste dans le navigateur." },
+    ],
+    videoTitle: "Expliqué en 90 secondes",
+    videoText: "La vidéo explicative montre tout le parcours – de la question au rapport.",
+    videoCta: "Voir la vidéo",
+    useCasesTitle: "Cas d’usage typiques",
+    useCasesLead: "Pour les entreprises comme pour les décisions personnelles.",
+    allUseCases: "Tous les cas d’usage",
+    stepsCta: "Toutes les étapes en détail",
+  },
+  how: {
+    title: "Comment ça marche",
+    lead: "Ce qu’est l’analyse de la valeur d’utilité, à qui elle convient, comment se déroule le parcours et où restent vos données.",
+    videoTitle: "La vidéo explicative",
+    videoCaption: "Explication en motion graphics en 90 secondes, sans son, avec texte à l’écran.",
+    sections: [
+      {
+        h: "Qu’est-ce que c’est ?",
+        p: [
+          "L’analyse de la valeur d’utilité est une procédure de décision pour les situations à objectifs multiples : vous comparez des alternatives selon des critères pondérés et obtenez un classement justifiable.",
+          "L’application vous guide à travers la méthode, effectue tous les calculs et montre la stabilité du résultat.",
+        ],
+      },
+      {
+        h: "Pour qui ?",
+        p: [
+          "Pour les équipes qui choisissent un fournisseur, un logiciel ou un site. Pour les cadres qui doivent justifier un investissement ou une embauche. Et pour les particuliers face à une décision d’emploi, de logement ou d’achat.",
+        ],
+      },
+      {
+        h: "Comment ça se passe ?",
+        p: [
+          "1. Décrire la décision : question, objectif, contraintes.",
+          "2. Saisir les alternatives : toutes les options sérieusement envisagées.",
+          "3. Définir les critères : depuis un modèle ou soi-même, avec seuil éliminatoire en option.",
+          "4. Pondérer : points, pourcentages, classement ou comparaison par paires.",
+          "5. Évaluer : chaque alternative par critère, seul ou en équipe.",
+          "6. Lire le résultat : classement, contributions, sensibilité, robustesse – et exporter en rapport.",
+        ],
+      },
+      {
+        h: "Où restent les données ?",
+        p: [
+          "Dans votre navigateur. Aucun serveur ne stocke d’analyses ; rien n’est transmis. Avec votre consentement, l’application conserve les analyses dans le stockage local de votre appareil pour les retrouver à la prochaine visite. Export et suppression sont possibles à tout moment.",
+        ],
+      },
+      {
+        h: "Qu’est-ce que j’obtiens ?",
+        p: [
+          "Une recommandation traçable et motivée, des graphiques sur la composition du résultat, une analyse de sensibilité avec points de bascule, une simulation de robustesse et un rapport à imprimer, enregistrer en PDF ou exporter en CSV, Markdown et JSON.",
+        ],
+      },
+    ],
+    cta: "Essayer maintenant",
+    ctaSecondary: "La méthode en détail",
+  },
+  about: {
+    title: "À propos",
+    lead: "Pourquoi cette application existe et ce que nous défendons.",
+    vision: {
+      h: "Vision",
+      p: "Chaque décision importante est prise de manière traçable, équitable et justifiable – sans que les données ne quittent jamais votre appareil.",
+    },
+    mission: {
+      h: "Mission",
+      p: "Nous rendons la méthode éprouvée de l’analyse de la valeur d’utilité accessible à tous : gratuite, compréhensible, sobre en données et sans compte. Un outil qui structure les discussions au lieu de les remplacer.",
+    },
+    valuesTitle: "Valeurs",
+    values: [
+      { h: "Transparence", p: "Chaque chiffre du résultat remonte à une saisie. La méthodologie est documentée ouvertement." },
+      { h: "Sobriété des données", p: "Ce qui n’est pas collecté ne peut pas être perdu. D’où l’absence de backend et de comptes." },
+      { h: "Clarté", p: "Une interface calme, un langage simple, aucune distraction par des fonctions inutiles." },
+      { h: "Accessibilité", p: "Quatre langues, navigation au clavier, contrastes et usage mobile ne sont pas des options mais la norme." },
+    ],
+    storyTitle: "Origine",
+    story:
+      "L’application est née de la pratique : les décisions d’équipe échouaient rarement par manque d’informations, mais parce que critères et poids n’étaient jamais explicités. Un tableur aidait, mais il était fragile et opaque pour les tiers. C’est devenu un outil qui guide le processus, fait les calculs et explique le résultat.",
+    contactTitle: "Contact",
+    contact: "Questions, suggestions ou erreurs trouvées ? Les coordonnées figurent dans les mentions légales.",
+  },
+  useCases: {
+    title: "Cas d’usage",
+    lead: "Chaque modèle apporte un catalogue de critères éprouvé. Vous pouvez ajouter, supprimer ou renommer des critères.",
+    criteriaLabel: "Critères du modèle",
+    start: "Démarrer avec ce modèle",
   },
   errors: {
     notFoundTitle: "Page introuvable",

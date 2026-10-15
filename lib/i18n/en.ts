@@ -69,6 +69,9 @@ export const en: Translations = {
     language: "Language",
   },
   nav: {
+    how: "How it works",
+    about: "About",
+    useCases: "Use cases",
     home: "Home",
     app: "My analyses",
     method: "Method",
@@ -714,6 +717,109 @@ export const en: Translations = {
         ],
       },
     ],
+  },
+  footer: {
+    visionLabel: "Vision",
+    vision: "Every important decision is made in a traceable, fair and justifiable way – without data ever leaving your own device.",
+    missionLabel: "Mission",
+    mission: "We make the proven utility analysis method accessible to everyone: free, understandable, data-minimal and without an account.",
+  },
+  landingExtra: {
+    includedTitle: "What’s included",
+    includedLead: "Everything a sound decision needs – and nothing that distracts.",
+    included: [
+      { title: "Guided six-step flow", text: "Decision, alternatives, criteria, weighting, rating, result – each step with hints and validation." },
+      { title: "Templates for typical decisions", text: "Ten criteria sets from supplier selection to job offers, adjustable at any time." },
+      { title: "Four weighting methods", text: "Points, percentages, ranking or AHP pairwise comparison with consistency check." },
+      { title: "Knock-out criteria and team rating", text: "Check must-haves, let several people rate, weight their votes." },
+      { title: "Sensitivity and robustness", text: "Tipping points per criterion, what-if sliders and Monte-Carlo simulation." },
+      { title: "Report and export", text: "PDF report, CSV for Excel, Markdown, JSON backup and a serverless share link." },
+      { title: "Four languages, light and dark", text: "German, English, French, Italian; accessible and mobile-friendly." },
+      { title: "Privacy by design", text: "No accounts, no cookies, no tracking. Everything stays in the browser." },
+    ],
+    videoTitle: "Explained in 90 seconds",
+    videoText: "The explainer video shows the whole flow – from the question to the report.",
+    videoCta: "Watch the video",
+    useCasesTitle: "Typical use cases",
+    useCasesLead: "For companies as well as personal decisions.",
+    allUseCases: "All use cases",
+    stepsCta: "All steps in detail",
+  },
+  how: {
+    title: "How it works",
+    lead: "What utility analysis is, who it suits, how the flow looks and where your data stays.",
+    videoTitle: "The explainer video",
+    videoCaption: "Motion-graphics explanation in 90 seconds, silent, with on-screen text.",
+    sections: [
+      {
+        h: "What is it?",
+        p: [
+          "Utility analysis is a decision procedure for situations with several goals: you compare alternatives against weighted criteria and get a ranking that can be justified.",
+          "The app guides you through the method, does all the maths and shows how stable the result is.",
+        ],
+      },
+      {
+        h: "Who is it for?",
+        p: [
+          "For teams choosing a supplier, a software or a site. For managers who must justify an investment or a hire. And for individuals facing a job, housing or purchase decision.",
+        ],
+      },
+      {
+        h: "How does it work?",
+        p: [
+          "1. Describe the decision: question, goal, constraints.",
+          "2. Capture alternatives: every option seriously in the running.",
+          "3. Define criteria: from a template or your own, optionally with a knock-out threshold.",
+          "4. Weight: points, percentages, ranking or pairwise comparison.",
+          "5. Rate: each alternative per criterion, alone or as a team.",
+          "6. Read the result: ranking, contributions, sensitivity, robustness – and export it as a report.",
+        ],
+      },
+      {
+        h: "Where does the data stay?",
+        p: [
+          "In your browser. There is no server storing analyses; nothing is transmitted. With your consent the app keeps analyses in your device's local storage so they are still there on your next visit. Export and deletion are possible at any time.",
+        ],
+      },
+      {
+        h: "What do I get?",
+        p: [
+          "A traceable recommendation with reasoning, charts on how the result is composed, a sensitivity analysis with tipping points, a robustness simulation and a report you can print, save as PDF or export as CSV, Markdown and JSON.",
+        ],
+      },
+    ],
+    cta: "Try it now",
+    ctaSecondary: "Method in detail",
+  },
+  about: {
+    title: "About",
+    lead: "Why this application exists and what we stand for.",
+    vision: {
+      h: "Vision",
+      p: "Every important decision is made in a traceable, fair and justifiable way – without data ever leaving your own device.",
+    },
+    mission: {
+      h: "Mission",
+      p: "We make the proven utility analysis method accessible to everyone: free, understandable, data-minimal and without an account. A tool that structures discussions instead of replacing them.",
+    },
+    valuesTitle: "Values",
+    values: [
+      { h: "Transparency", p: "Every number in the result traces back to an input. The methodology is openly documented." },
+      { h: "Data minimisation", p: "What is not collected cannot be lost. That is why there is no backend and no accounts." },
+      { h: "Clarity", p: "A calm interface, plain language, no distraction by features nobody needs." },
+      { h: "Accessibility", p: "Four languages, keyboard operation, contrast and mobile use are not extras but standard." },
+    ],
+    storyTitle: "Origin",
+    story:
+      "The application grew out of practice: team decisions rarely failed for lack of information, but because criteria and weights were never made explicit. A spreadsheet helped, but it was error-prone and opaque to outsiders. That became a tool that guides the process, does the maths and explains the result.",
+    contactTitle: "Contact",
+    contact: "Questions, suggestions or bugs? You find the contact details in the legal notice.",
+  },
+  useCases: {
+    title: "Use cases",
+    lead: "Each template brings a proven criteria set. You can add, remove or rename criteria.",
+    criteriaLabel: "Criteria of the template",
+    start: "Start with this template",
   },
   errors: {
     notFoundTitle: "Page not found",

@@ -77,6 +77,9 @@ export const de = {
     language: "Sprache",
   },
   nav: {
+    how: "So funktioniert’s",
+    about: "Über uns",
+    useCases: "Anwendungsfälle",
     home: "Start",
     app: "Meine Analysen",
     method: "Methode",
@@ -726,6 +729,109 @@ export const de = {
         ],
       },
     ],
+  },
+  footer: {
+    visionLabel: "Vision",
+    vision: "Jede wichtige Entscheidung wird nachvollziehbar, fair und begründbar getroffen – ohne dass Daten das eigene Gerät verlassen müssen.",
+    missionLabel: "Mission",
+    mission: "Wir machen die bewährte Methode der Nutzwertanalyse für alle zugänglich: kostenlos, verständlich, datensparsam und ohne Konto.",
+  },
+  landingExtra: {
+    includedTitle: "Was dazugehört",
+    includedLead: "Alles, was eine saubere Entscheidung braucht – und nichts, was ablenkt.",
+    included: [
+      { title: "Geführter Ablauf in sechs Schritten", text: "Entscheidung, Alternativen, Kriterien, Gewichtung, Bewertung, Ergebnis – jeder Schritt mit Hinweisen und Prüfung." },
+      { title: "Vorlagen für typische Entscheidungen", text: "Zehn Kriterienkataloge von Lieferantenauswahl bis Jobangebot, jederzeit anpassbar." },
+      { title: "Vier Gewichtungsmethoden", text: "Punkte, Prozente, Rangfolge oder Paarvergleich nach AHP mit Konsistenzprüfung." },
+      { title: "K.-o.-Kriterien und Team-Bewertung", text: "Muss-Anforderungen prüfen, mehrere Personen bewerten lassen, Stimmen gewichten." },
+      { title: "Sensitivität und Robustheit", text: "Kipppunkte je Kriterium, Was-wäre-wenn-Regler und Monte-Carlo-Simulation." },
+      { title: "Bericht und Export", text: "PDF-Bericht, CSV für Excel, Markdown, JSON-Backup und Freigabe-Link ohne Server." },
+      { title: "Vier Sprachen, hell und dunkel", text: "Deutsch, Englisch, Französisch, Italienisch; barrierearm und mobil nutzbar." },
+      { title: "Privacy by Design", text: "Keine Konten, keine Cookies, kein Tracking. Alles bleibt im Browser." },
+    ],
+    videoTitle: "In 90 Sekunden erklärt",
+    videoText: "Das Erklärvideo zeigt den ganzen Ablauf – von der Fragestellung bis zum Bericht.",
+    videoCta: "Video ansehen",
+    useCasesTitle: "Typische Anwendungsfälle",
+    useCasesLead: "Für Unternehmen wie für private Entscheidungen.",
+    allUseCases: "Alle Anwendungsfälle",
+    stepsCta: "Alle Schritte im Detail",
+  },
+  how: {
+    title: "So funktioniert’s",
+    lead: "Was die Nutzwertanalyse ist, für wen sie sich eignet, wie der Ablauf aussieht und wo deine Daten bleiben.",
+    videoTitle: "Das Erklärvideo",
+    videoCaption: "Motion-Graphics-Erklärung in 90 Sekunden, ohne Ton, mit eingeblendetem Text.",
+    sections: [
+      {
+        h: "Was ist das?",
+        p: [
+          "Die Nutzwertanalyse ist ein Entscheidungsverfahren für Situationen mit mehreren Zielen: Du vergleichst Alternativen anhand gewichteter Kriterien und erhältst eine Rangliste, die sich begründen lässt.",
+          "Die App führt dich durch die Methode, rechnet alles aus und zeigt, wie stabil das Ergebnis ist.",
+        ],
+      },
+      {
+        h: "Für wen?",
+        p: [
+          "Für Teams, die einen Lieferanten, eine Software oder einen Standort wählen. Für Führungskräfte, die eine Investition oder eine Einstellung begründen müssen. Und für Privatpersonen, die vor einer Job-, Wohnungs- oder Kaufentscheidung stehen.",
+        ],
+      },
+      {
+        h: "Wie läuft es ab?",
+        p: [
+          "1. Entscheidung beschreiben: Frage, Ziel, Rahmenbedingungen.",
+          "2. Alternativen erfassen: alle Optionen, die ernsthaft infrage kommen.",
+          "3. Kriterien festlegen: aus einer Vorlage oder selbst definiert, optional mit K.-o.-Schwelle.",
+          "4. Gewichten: Punkte, Prozente, Rangfolge oder Paarvergleich.",
+          "5. Bewerten: jede Alternative je Kriterium, allein oder im Team.",
+          "6. Ergebnis lesen: Rangliste, Beiträge, Sensitivität, Robustheit – und als Bericht exportieren.",
+        ],
+      },
+      {
+        h: "Wo bleiben die Daten?",
+        p: [
+          "In deinem Browser. Es gibt keinen Server, der Analysen speichert; nichts wird übertragen. Mit deiner Einwilligung legt die App Analysen im lokalen Speicher deines Geräts ab, damit sie beim nächsten Besuch noch da sind. Export und Löschung sind jederzeit möglich.",
+        ],
+      },
+      {
+        h: "Was bekomme ich?",
+        p: [
+          "Eine nachvollziehbare Empfehlung mit Begründung, Diagramme zur Zusammensetzung des Ergebnisses, eine Sensitivitätsanalyse mit Kipppunkten, eine Robustheits-Simulation und einen Bericht, den du drucken, als PDF sichern oder als CSV, Markdown und JSON exportieren kannst.",
+        ],
+      },
+    ],
+    cta: "Jetzt ausprobieren",
+    ctaSecondary: "Methode im Detail",
+  },
+  about: {
+    title: "Über uns",
+    lead: "Warum es diese Anwendung gibt und wofür wir stehen.",
+    vision: {
+      h: "Vision",
+      p: "Jede wichtige Entscheidung wird nachvollziehbar, fair und begründbar getroffen – ohne dass Daten das eigene Gerät verlassen müssen.",
+    },
+    mission: {
+      h: "Mission",
+      p: "Wir machen die bewährte Methode der Nutzwertanalyse für alle zugänglich: kostenlos, verständlich, datensparsam und ohne Konto. Ein Werkzeug, das Diskussionen strukturiert statt sie zu ersetzen.",
+    },
+    valuesTitle: "Werte",
+    values: [
+      { h: "Transparenz", p: "Jede Zahl im Ergebnis lässt sich auf eine Eingabe zurückführen. Die Methodik ist offen dokumentiert." },
+      { h: "Datensparsamkeit", p: "Was nicht erhoben wird, kann nicht verloren gehen. Deshalb gibt es kein Backend und keine Konten." },
+      { h: "Klarheit", p: "Eine ruhige Oberfläche, verständliche Sprache, keine Ablenkung durch Funktionen, die niemand braucht." },
+      { h: "Zugänglichkeit", p: "Vier Sprachen, Tastaturbedienung, Kontraste und mobile Nutzung sind keine Extras, sondern Standard." },
+    ],
+    storyTitle: "Entstehung",
+    story:
+      "Die Anwendung ist aus der Praxis entstanden: Entscheidungen in Teams scheiterten selten an fehlenden Informationen, sondern daran, dass Kriterien und Gewichte nie explizit gemacht wurden. Eine Tabelle half, aber sie war fehleranfällig und für Aussenstehende nicht nachvollziehbar. Daraus wurde ein Werkzeug, das den Prozess führt, die Rechnung übernimmt und das Ergebnis erklärt.",
+    contactTitle: "Kontakt",
+    contact: "Fragen, Anregungen oder gefundene Fehler? Die Kontaktangaben findest du im Impressum.",
+  },
+  useCases: {
+    title: "Anwendungsfälle",
+    lead: "Jede Vorlage bringt einen bewährten Kriterienkatalog mit. Du kannst Kriterien ergänzen, streichen oder umbenennen.",
+    criteriaLabel: "Kriterien der Vorlage",
+    start: "Mit dieser Vorlage starten",
   },
   errors: {
     notFoundTitle: "Seite nicht gefunden",

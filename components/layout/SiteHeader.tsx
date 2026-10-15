@@ -16,9 +16,10 @@ export function SiteHeader({ minimal = false }: { minimal?: boolean }) {
   const [open, setOpen] = useState(false);
 
   const links = [
-    { href: "/app", label: t.nav.app },
+    { href: "/so-funktionierts", label: t.nav.how },
+    { href: "/anwendungsfaelle", label: t.nav.useCases },
     { href: "/methode", label: t.nav.method },
-    { href: "/faq", label: t.nav.faq },
+    { href: "/app", label: t.nav.app },
   ];
 
   return (

@@ -3,17 +3,6 @@ import type { PresetId } from "./parser";
 import { createAlternative, createAnalysis, createCriterion, DEFAULT_EVALUATOR_ID, percentFromPoints } from "./factory";
 import type { Analysis, Criterion } from "./types";
 
-export const PRESET_IMAGES: Record<string, string> = {
-  supplier: "/images/presets/lieferant.jpg",
-  software: "/images/presets/software.jpg",
-  investment: "/images/presets/investition.jpg",
-  machines: "/images/presets/standort.jpg",
-  vehicle: "/images/presets/auto.jpg",
-  employee: "/images/presets/mitarbeiter.jpg",
-  realEstate: "/images/presets/immobilien.jpg",
-  product: "/images/presets/produkt.jpg",
-};
-
 export function presetCriteria(t: Translations, presetId: string): Partial<Criterion>[] {
   const p = t.presets[presetId];
   if (!p) return [];

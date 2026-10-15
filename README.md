@@ -8,6 +8,7 @@ Kostenlose Web-App für die **Nutzwertanalyse** (Scoring-Modell): Alternativen d
 - **Vier Gewichtungsmethoden:** Punkte, Prozent, Rangfolge (ROC), Paarvergleich (AHP mit Konsistenzprüfung).
 - **Analysen:** K.-o.-Kriterien, mehrere Bewertende mit Stimmgewicht, Sensitivitätsanalyse (Kipppunkte), Was-wäre-wenn-Slider, Monte-Carlo-Robustheitssimulation.
 - **Export:** Druck-/PDF-Bericht, CSV (Excel), Markdown, JSON-Backup, Freigabe-Link (Daten im URL-Fragment, serverlos).
+- **Seiten:** Startseite, So funktioniert’s (mit Erklärvideo), Anwendungsfälle, Methode, Über uns (Vision, Mission, Werte), FAQ, Einstellungen.
 - **Rechtliches:** Impressum, Datenschutzerklärung (DSG + DSGVO), Nutzungsbedingungen, Cookie-/Speicherseite, Erklärung zur Barrierefreiheit, Consent-Dialog mit Kategorien.
 
 ## Entwicklung
@@ -42,6 +43,17 @@ lib/legal/           Rechtstexte DE/EN (strukturiert, aus `lib/site.ts` befüllt
 lib/consent/         Einwilligungs-Logik (Kategorien, Speicherung, Widerruf)
 tests/               Unit-Tests
 ```
+
+## Erklärvideo
+
+Das Video unter `public/video/` wird aus `tools/video/scene.html` (Motion Graphics, 1280×720, 92 s) gerendert – ohne externe Dienste und ohne Kosten:
+
+```bash
+cd tools/video && npm i playwright   # einmalig; Chromium muss vorhanden sein (CHROMIUM_PATH)
+node tools/video/render.mjs          # erzeugt explainer.mp4, explainer.webm, Poster und Untertitel (VTT, de/en/fr/it)
+```
+
+Texte der Untertitel stehen in `tools/video/subtitles.json`; die Szenen lassen sich direkt in `scene.html` anpassen.
 
 ## Datenschutz-Architektur
 

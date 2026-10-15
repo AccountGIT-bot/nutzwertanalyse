@@ -69,6 +69,9 @@ export const it: Translations = {
     language: "Lingua",
   },
   nav: {
+    how: "Come funziona",
+    about: "Chi siamo",
+    useCases: "Casi d’uso",
     home: "Home",
     app: "Le mie analisi",
     method: "Metodo",
@@ -714,6 +717,109 @@ export const it: Translations = {
         ],
       },
     ],
+  },
+  footer: {
+    visionLabel: "Visione",
+    vision: "Ogni decisione importante viene presa in modo tracciabile, equo e motivabile – senza che i dati lascino mai il proprio dispositivo.",
+    missionLabel: "Missione",
+    mission: "Rendiamo il metodo collaudato dell’analisi del valore d’utilità accessibile a tutti: gratuito, comprensibile, parsimonioso con i dati e senza account.",
+  },
+  landingExtra: {
+    includedTitle: "Cosa è incluso",
+    includedLead: "Tutto ciò che serve a una decisione solida – e niente che distragga.",
+    included: [
+      { title: "Percorso guidato in sei passi", text: "Decisione, alternative, criteri, ponderazione, valutazione, risultato – ogni passo con suggerimenti e verifica." },
+      { title: "Modelli per decisioni tipiche", text: "Dieci cataloghi di criteri, dalla scelta del fornitore all’offerta di lavoro, sempre modificabili." },
+      { title: "Quattro metodi di ponderazione", text: "Punti, percentuali, classifica o confronto a coppie AHP con verifica di coerenza." },
+      { title: "Criteri eliminatori e valutazione di gruppo", text: "Verificare i requisiti imprescindibili, far valutare più persone, ponderare i voti." },
+      { title: "Sensibilità e robustezza", text: "Punti di ribaltamento per criterio, cursori «cosa succede se» e simulazione Monte-Carlo." },
+      { title: "Rapporto ed esportazione", text: "Rapporto PDF, CSV per Excel, Markdown, backup JSON e link di condivisione senza server." },
+      { title: "Quattro lingue, chiaro e scuro", text: "Tedesco, inglese, francese, italiano; accessibile e utilizzabile da mobile." },
+      { title: "Privacy by design", text: "Nessun account, nessun cookie, nessun tracciamento. Tutto resta nel browser." },
+    ],
+    videoTitle: "Spiegato in 90 secondi",
+    videoText: "Il video esplicativo mostra l’intero percorso – dalla domanda al rapporto.",
+    videoCta: "Guarda il video",
+    useCasesTitle: "Casi d’uso tipici",
+    useCasesLead: "Per le aziende come per le decisioni personali.",
+    allUseCases: "Tutti i casi d’uso",
+    stepsCta: "Tutti i passi nel dettaglio",
+  },
+  how: {
+    title: "Come funziona",
+    lead: "Cos’è l’analisi del valore d’utilità, a chi è adatta, come si svolge il percorso e dove restano i tuoi dati.",
+    videoTitle: "Il video esplicativo",
+    videoCaption: "Spiegazione in motion graphics in 90 secondi, senza audio, con testo a schermo.",
+    sections: [
+      {
+        h: "Cos’è?",
+        p: [
+          "L’analisi del valore d’utilità è una procedura decisionale per situazioni con più obiettivi: confronti le alternative in base a criteri ponderati e ottieni una classifica motivabile.",
+          "L’app ti guida attraverso il metodo, esegue tutti i calcoli e mostra quanto è stabile il risultato.",
+        ],
+      },
+      {
+        h: "Per chi?",
+        p: [
+          "Per i team che scelgono un fornitore, un software o una sede. Per i dirigenti che devono motivare un investimento o un’assunzione. E per i privati davanti a una decisione di lavoro, abitazione o acquisto.",
+        ],
+      },
+      {
+        h: "Come si svolge?",
+        p: [
+          "1. Descrivere la decisione: domanda, obiettivo, vincoli.",
+          "2. Registrare le alternative: tutte le opzioni seriamente in gioco.",
+          "3. Definire i criteri: da un modello o da sé, con soglia eliminatoria opzionale.",
+          "4. Ponderare: punti, percentuali, classifica o confronto a coppie.",
+          "5. Valutare: ogni alternativa per criterio, da soli o in gruppo.",
+          "6. Leggere il risultato: classifica, contributi, sensibilità, robustezza – ed esportare come rapporto.",
+        ],
+      },
+      {
+        h: "Dove restano i dati?",
+        p: [
+          "Nel tuo browser. Non esiste un server che memorizza le analisi; nulla viene trasmesso. Con il tuo consenso l’app conserva le analisi nella memoria locale del dispositivo, così sono ancora disponibili alla prossima visita. Esportazione ed eliminazione sono sempre possibili.",
+        ],
+      },
+      {
+        h: "Cosa ottengo?",
+        p: [
+          "Una raccomandazione tracciabile e motivata, grafici sulla composizione del risultato, un’analisi di sensibilità con punti di ribaltamento, una simulazione di robustezza e un rapporto da stampare, salvare come PDF o esportare in CSV, Markdown e JSON.",
+        ],
+      },
+    ],
+    cta: "Prova subito",
+    ctaSecondary: "Il metodo nel dettaglio",
+  },
+  about: {
+    title: "Chi siamo",
+    lead: "Perché esiste questa applicazione e per cosa ci impegniamo.",
+    vision: {
+      h: "Visione",
+      p: "Ogni decisione importante viene presa in modo tracciabile, equo e motivabile – senza che i dati lascino mai il proprio dispositivo.",
+    },
+    mission: {
+      h: "Missione",
+      p: "Rendiamo il metodo collaudato dell’analisi del valore d’utilità accessibile a tutti: gratuito, comprensibile, parsimonioso con i dati e senza account. Uno strumento che struttura le discussioni invece di sostituirle.",
+    },
+    valuesTitle: "Valori",
+    values: [
+      { h: "Trasparenza", p: "Ogni numero del risultato è riconducibile a un input. La metodologia è documentata apertamente." },
+      { h: "Minimizzazione dei dati", p: "Ciò che non viene raccolto non può andare perso. Per questo non ci sono backend né account." },
+      { h: "Chiarezza", p: "Un’interfaccia tranquilla, un linguaggio semplice, nessuna distrazione da funzioni inutili." },
+      { h: "Accessibilità", p: "Quattro lingue, uso da tastiera, contrasti e uso mobile non sono extra ma standard." },
+    ],
+    storyTitle: "Origine",
+    story:
+      "L’applicazione nasce dalla pratica: le decisioni di gruppo fallivano raramente per mancanza di informazioni, ma perché criteri e pesi non venivano mai esplicitati. Un foglio di calcolo aiutava, ma era fragile e opaco per gli esterni. Ne è nato uno strumento che guida il processo, fa i calcoli e spiega il risultato.",
+    contactTitle: "Contatto",
+    contact: "Domande, suggerimenti o errori? I recapiti si trovano nelle note legali.",
+  },
+  useCases: {
+    title: "Casi d’uso",
+    lead: "Ogni modello include un catalogo di criteri collaudato. Puoi aggiungere, eliminare o rinominare i criteri.",
+    criteriaLabel: "Criteri del modello",
+    start: "Inizia con questo modello",
   },
   errors: {
     notFoundTitle: "Pagina non trovata",
