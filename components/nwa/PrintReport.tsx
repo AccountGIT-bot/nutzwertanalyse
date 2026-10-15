@@ -22,9 +22,14 @@ export function PrintReport({ analysis }: { analysis: Analysis }) {
   const now = new Date().toISOString();
 
   useEffect(() => {
+    const previous = document.documentElement.getAttribute("data-theme");
     document.documentElement.setAttribute("data-theme", "light");
     const h = window.setTimeout(() => window.print(), 600);
-    return () => window.clearTimeout(h);
+    return () => {
+      window.clearTimeout(h);
+      if (previous) document.documentElement.setAttribute("data-theme", previous);
+      else document.documentElement.removeAttribute("data-theme");
+    };
   }, []);
 
   const notes: { alt: string; crit: string; ev: string; note: string }[] = [];

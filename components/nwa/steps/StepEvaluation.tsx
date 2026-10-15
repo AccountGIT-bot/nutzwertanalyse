@@ -29,7 +29,7 @@ export function StepEvaluation() {
     return { done: d, total: alts.length * crits.length };
   }, [alts, crits, ratings]);
 
-  const setScore = (altId: string, critId: string, score: number | undefined) => dispatch({ type: "setRating", evaluatorId: ev.id, altId, critId, score });
+  const setScore = (altId: string, critId: string, score: number | undefined) => dispatch({ type: "setRating", evaluatorId: ev.id, altId, critId, score: score ?? null });
   const legend = t.evaluation.scaleLegend[scale] ?? [];
 
   if (!ev) return null;

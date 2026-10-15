@@ -32,7 +32,7 @@ type Action =
   | { type: "addEvaluator"; name: string }
   | { type: "updateEvaluator"; id: Id; patch: Partial<Evaluator> }
   | { type: "removeEvaluator"; id: Id }
-  | { type: "setRating"; evaluatorId: Id; altId: Id; critId: Id; score?: number; note?: string }
+  | { type: "setRating"; evaluatorId: Id; altId: Id; critId: Id; score?: number | null; note?: string }
   | { type: "fillRatings"; evaluatorId: Id; score: number }
   | { type: "clearRatings"; evaluatorId: Id }
   | { type: "applyWeights"; weights: Record<Id, number> }
@@ -195,13 +195,10 @@ function reduceAnalysis(a: Analysis, action: Action): Analysis {
       const byAlt = { ...(a.ratings[action.evaluatorId] ?? {}) };
       const byCrit = { ...(byAlt[action.altId] ?? {}) };
       const prev = byCrit[action.critId] ?? {};
-      byCrit[action.critId] = {
-        score: action.score === undefined ? prev.score : action.score,
-        note: action.note === undefined ? prev.note : action.note,
-      };
-      if ("score" in action && action.score === undefined && !("note" in action)) {
-        byCrit[action.critId] = { ...prev, score: undefined };
-      }
+      // score: undefined = unverändert, null = löschen, Zahl = setzen
+      const score = action.score === undefined ? prev.score : action.score === null ? undefined : action.score;
+      const note = action.note === undefined ? prev.note : action.note;
+      byCrit[action.critId] = { score, note };
       byAlt[action.altId] = byCrit;
       return { ...a, ratings: { ...a.ratings, [action.evaluatorId]: byAlt } };
     }
@@ -265,6 +262,20 @@ function reducer(state: HistoryState, action: Action): HistoryState {
   };
 }
 
+/** Analyse ohne jegliche Nutzereingabe (wird beim Verlassen automatisch verworfen) */
+export function isPristine(a: Analysis): boolean {
+  return (
+    a.title.trim() === "" &&
+    a.description.trim() === "" &&
+    a.goal.trim() === "" &&
+    a.constraints.trim() === "" &&
+    a.conclusion.trim() === "" &&
+    a.alternatives.every((x) => x.name.trim() === "") &&
+    a.criteria.every((x) => x.name.trim() === "") &&
+    Object.keys(a.ratings).length === 0
+  );
+}
+
 /* ---------------- Context ---------------- */
 
 interface StoreValue {
@@ -280,22 +291,28 @@ export function AnalysisProvider({ initial, children }: { initial: Analysis; chi
   const [state, dispatch] = useReducer(reducer, { present: initial, past: [], future: [] });
   const lastSaved = useRef<Analysis>(initial);
 
-  // Autosave (entprellt) in die Bibliothek
+  const latest = useRef(state.present);
+
+  // Autosave (entprellt) in die Bibliothek – nie eine bereits gelöschte Analyse wiederbeleben
   useEffect(() => {
+    latest.current = state.present;
     if (state.present === lastSaved.current) return;
     const h = window.setTimeout(() => {
+      if (!library.get(state.present.id)) return;
       library.save(state.present);
       lastSaved.current = state.present;
     }, 400);
     return () => window.clearTimeout(h);
   }, [state.present]);
 
-  // Beim Verlassen sofort sichern
+  // Beim Verlassen sofort sichern; unberührte leere Analysen werden beim Schliessen des Editors verworfen
   useEffect(() => {
     const flush = () => {
-      if (state.present !== lastSaved.current) {
-        library.save(state.present);
-        lastSaved.current = state.present;
+      const current = latest.current;
+      if (!library.get(current.id)) return;
+      if (current !== lastSaved.current) {
+        library.save(current);
+        lastSaved.current = current;
       }
     };
     window.addEventListener("pagehide", flush);
@@ -303,9 +320,14 @@ export function AnalysisProvider({ initial, children }: { initial: Analysis; chi
     return () => {
       window.removeEventListener("pagehide", flush);
       window.removeEventListener("beforeunload", flush);
+      const current = latest.current;
+      if (library.get(current.id) && isPristine(current)) {
+        library.remove(current.id);
+        return;
+      }
       flush();
     };
-  }, [state.present]);
+  }, []);
 
   const value = useMemo<StoreValue>(
     () => ({ analysis: state.present, dispatch, canUndo: state.past.length > 0, canRedo: state.future.length > 0 }),

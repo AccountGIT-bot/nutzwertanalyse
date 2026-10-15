@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useI18n } from "@/lib/i18n";
 import { library } from "@/lib/nwa/library";
 import { analysisFromPreset } from "@/lib/nwa/presets";
@@ -21,9 +21,12 @@ export function AnalysisEditor() {
   const preset = params.get("preset") ?? undefined;
   const print = params.get("print") === "1";
   const [analysis, setAnalysis] = useState<Analysis | null | undefined>(undefined);
+  const created = useRef(false);
 
   useEffect(() => {
     if (isNew) {
+      if (created.current) return;
+      created.current = true;
       const a = analysisFromPreset(t, { presetId: preset, selfName: t.decision.self });
       library.save(a);
       router.replace(`/app/analyse?id=${encodeURIComponent(a.id)}`);
