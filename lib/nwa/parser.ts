@@ -94,6 +94,8 @@ const KEYWORDS: Record<Exclude<PresetId, "custom">, string[]> = {
 };
 
 const SPLIT_PATTERNS: RegExp[] = [
+  // "Welches CRM: HubSpot, Pipedrive oder Salesforce?" → Teil nach dem Doppelpunkt
+  /^[^:]{2,80}:\s*(.+)$/,
   /\b(?:zwischen|between|entre|tra|fra)\s+(.+)$/i,
   /^(?:soll(?:te)?\s+ich|sollen\s+wir|should\s+(?:i|we)|dois-je|devrais-je|dovrei|welche[rsn]?|which|quel(?:le)?|quale)\s+(.+)$/i,
 ];

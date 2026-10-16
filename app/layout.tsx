@@ -53,6 +53,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="de" suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
+        <noscript>
+          <style>{`.reveal{opacity:1!important;transform:none!important}`}</style>
+        </noscript>
       </head>
       <body>
         <Providers>{children}</Providers>

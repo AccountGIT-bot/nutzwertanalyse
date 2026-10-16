@@ -24,6 +24,10 @@ npm run build && npm start
 
 Stack: Next.js 16 (App Router), React 19, Tailwind CSS 4, TypeScript. Keine weiteren Laufzeit-Abhängigkeiten ausser `lucide-react` (Icons) und `clsx`.
 
+## Branches und Freigabe
+
+Entwicklung erfolgt auf `dev`, freigegebene Veröffentlichungen auf `main`. Zusammengehörige Änderungen werden fertiggestellt, geprüft und gebündelt gepusht. Vor jedem Merge einer Release-PR nach `main` ist Liams ausdrückliche Freigabe erforderlich; kein Auto-Merge und kein direkter Entwicklungs-Push auf `main`. Details: [Entwicklungsablauf](docs/DEVELOPMENT_WORKFLOW.md), Regeln für Mitwirkende: [AGENTS.md](AGENTS.md), freigegebene Versionen: [Änderungsprotokoll](CHANGELOG.md), Sicherheitshinweise: [SECURITY.md](SECURITY.md).
+
 ## Vor dem Produktivbetrieb (Pflicht)
 
 1. **Betreiberangaben eintragen** in `lib/site.ts` (`operator`): Name, Adresse, E-Mail, Telefon, UID, vertretungsberechtigte Person, Gerichtsstand. Solange Platzhalter in eckigen Klammern stehen, zeigen die Rechtsseiten einen gelben Hinweis.
