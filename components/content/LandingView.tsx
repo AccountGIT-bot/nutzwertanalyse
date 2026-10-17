@@ -14,8 +14,10 @@ import { StepsTimeline } from "@/components/content/landing/StepsTimeline";
 import { SectionNav } from "@/components/content/landing/SectionNav";
 import { StatStrip } from "@/components/content/landing/StatStrip";
 import { DataFlow } from "@/components/content/landing/DataFlow";
+import { ExpertiseSection } from "@/components/content/landing/ExpertiseSection";
+import { VoicesSection } from "@/components/content/landing/VoicesSection";
 
-const SECTION_IDS = ["hero", "funktionen", "ablauf", "video", "anwendungsfaelle", "datenschutz"];
+const SECTION_IDS = ["hero", "funktionen", "ablauf", "vertrauen", "video", "anwendungsfaelle", "stimmen", "datenschutz"];
 
 export function LandingView() {
   const t = useT();
@@ -110,6 +112,11 @@ export function LandingView() {
         </Container>
       </section>
 
+      {/* Vertrauen: Text links, Bild rechts mit Verlauf */}
+      <section id="vertrauen" className="border-b border-line scroll-mt-20" aria-labelledby="expertise-h">
+        <ExpertiseSection />
+      </section>
+
       {/* Video */}
       <section id="video" className="py-16 scroll-mt-20 sm:py-24" aria-labelledby="video-h">
         <Container className="grid items-center gap-10 lg:grid-cols-[1fr_1.3fr]">
@@ -162,6 +169,11 @@ export function LandingView() {
             })}
           </ul>
         </Container>
+      </section>
+
+      {/* Stimmen: vollflächiger, weichgezeichneter Hintergrund */}
+      <section id="stimmen" className="scroll-mt-20" aria-labelledby="voices-h">
+        <VoicesSection />
       </section>
 
       {/* Datenschutz + CTA */}
