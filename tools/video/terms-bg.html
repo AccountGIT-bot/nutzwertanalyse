@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8" />
+<title>Nutzwertanalyse – Hintergrundschleife Nutzungsbedingungen</title>
+<style>
+  html, body { margin: 0; width: 1280px; height: 720px; overflow: hidden; background: #f1f3f1; }
+  canvas { display: block; width: 1280px; height: 720px; }
+</style>
+</head>
+<body>
+<canvas id="c" width="1280" height="720"></canvas>
+<script>
+  // Nahtlose Schleife: alle Bewegungen sind periodisch in PERIOD Sekunden.
+  const PERIOD = 12;
+  const W = 1280, H = 720;
+  const ctx = document.getElementById("c").getContext("2d");
+  const TAU = Math.PI * 2;
+  const petrol = (a) => `rgba(11, 93, 90, ${a})`;
+  const gold = (a) => `rgba(184, 134, 43, ${a})`;
+  const ink = (a) => `rgba(26, 28, 30, ${a})`;
+
+  // Deterministische Pseudozufallswerte
+  let seed = 7;
+  const rnd = () => { seed = (seed * 16807) % 2147483647; return (seed - 1) / 2147483646; };
+  const bokeh = Array.from({ length: 9 }, (_, i) => ({ x: rnd() * W, y: rnd() * H, r: 120 + rnd() * 220, phase: rnd() * TAU, k: 1 + Math.floor(rnd() * 2), gold: i % 3 === 0 }));
+  const rows = 6, cols = 11, tile = 84, gap = 14;
+  const gridW = cols * tile + (cols - 1) * gap, gridH = rows * tile + (rows - 1) * gap;
+  const gx = (W - gridW) / 2 + 60, gy = (H - gridH) / 2 + 20;
+  const tilePhase = Array.from({ length: rows * cols }, () => rnd() * TAU);
+  const weights = Array.from({ length: 5 }, () => ({ base: 0.35 + rnd() * 0.45, amp: 0.08 + rnd() * 0.12, phase: rnd() * TAU, k: 1 + Math.floor(rnd() * 2) }));
+
+  function draw(t) {
+    const u = (t % PERIOD) / PERIOD; // 0..1
+    // Grund: heller Verlauf mit leichtem Petrol-Hauch
+    const g = ctx.createLinearGradient(0, 0, W, H);
+    g.addColorStop(0, "#f4f5f2");
+    g.addColorStop(0.55, "#edf2f0");
+    g.addColorStop(1, "#e6efec");
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, W, H);
+
+    // Bokeh-Kreise, langsam atmend und driftend
+    for (const b of bokeh) {
+      const dx = Math.sin(u * TAU * b.k + b.phase) * 40;
+      const dy = Math.cos(u * TAU * b.k + b.phase) * 28;
+      const r = b.r * (1 + 0.08 * Math.sin(u * TAU + b.phase));
+      const rg = ctx.createRadialGradient(b.x + dx, b.y + dy, 0, b.x + dx, b.y + dy, r);
+      rg.addColorStop(0, b.gold ? gold(0.16) : petrol(0.14));
+      rg.addColorStop(1, b.gold ? gold(0) : petrol(0));
+      ctx.fillStyle = rg;
+      ctx.beginPath();
+      ctx.arc(b.x + dx, b.y + dy, r, 0, TAU);
+      ctx.fill();
+    }
+
+    // Matrix: Kacheln pulsieren, eine goldene Zeile wandert periodisch
+    const activeRow = (u * rows) % rows;
+    for (let r = 0; r < rows; r++) {
+      for (let c = 0; c < cols; c++) {
+        const i = r * cols + c;
+        const pulse = 0.5 + 0.5 * Math.sin(u * TAU * 2 + tilePhase[i]);
+        // Abstand zur wandernden Goldzeile (zyklisch)
+        let d = Math.abs(r - activeRow);
+        d = Math.min(d, rows - d);
+        const goldMix = Math.max(0, 1 - d / 1.2);
+        const x = gx + c * (tile + gap), y = gy + r * (tile + gap);
+        const a = 0.07 + pulse * 0.1;
+        ctx.fillStyle = goldMix > 0 ? gold(0.12 + goldMix * 0.22) : petrol(a);
+        roundRect(x, y, tile, tile, 18);
+        ctx.fill();
+      }
+    }
+
+    // Gewichtsbalken links, atmen langsam
+    const bx = 90, by = 190, bw = 300;
+    weights.forEach((w, i) => {
+      const y = by + i * 70;
+      ctx.fillStyle = ink(0.06);
+      roundRect(bx, y, bw, 16, 8);
+      ctx.fill();
+      const len = bw * Math.min(1, Math.max(0.15, w.base + w.amp * Math.sin(u * TAU * w.k + w.phase)));
+      ctx.fillStyle = i === 1 ? gold(0.55) : petrol(0.45);
+      roundRect(bx, y, len, 16, 8);
+      ctx.fill();
+    });
+
+    // Feine Verbindungslinie, die als Welle durchläuft
+    ctx.strokeStyle = petrol(0.18);
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    for (let x = 0; x <= W; x += 8) {
+      const y = 600 + Math.sin((x / W) * TAU * 1.5 + u * TAU) * 22 + Math.sin((x / W) * TAU * 3 - u * TAU * 2) * 10;
+      x === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+    }
+    ctx.stroke();
+  }
+
+  function roundRect(x, y, w, h, r) {
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.arcTo(x + w, y, x + w, y + h, r);
+    ctx.arcTo(x + w, y + h, x, y + h, r);
+    ctx.arcTo(x, y + h, x, y, r);
+    ctx.arcTo(x, y, x + w, y, r);
+    ctx.closePath();
+  }
+
+  const start = performance.now();
+  function frame(now) {
+    draw((now - start) / 1000);
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+  window.__drawAt = (t) => draw(t);
+</script>
+</body>
+</html>

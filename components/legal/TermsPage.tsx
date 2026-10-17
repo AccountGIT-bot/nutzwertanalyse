@@ -146,10 +146,20 @@ export function TermsPage() {
           </Container>
         </section>
 
-        {/* Das Wichtigste: weisse Karte auf Papier */}
-        <section id="terms-summary" aria-labelledby="terms-summary-h" className="paper scroll-mt-28 border-b border-line">
-          <Container className="py-12 sm:py-16">
-            <div className="card mx-auto max-w-4xl p-6 sm:p-10">
+        {/* Das Wichtigste: weisse Karte auf weichgezeichneter Videoschleife */}
+        <section id="terms-summary" aria-labelledby="terms-summary-h" className="relative isolate scroll-mt-28 overflow-hidden border-b border-line">
+          <div className="no-print absolute inset-0" aria-hidden>
+            {/* Poster liegt immer darunter; bei «Bewegung reduzieren» wird nur das Video ausgeblendet */}
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/video/terms-bg-poster.jpg" alt="" className="h-full w-full object-cover" loading="lazy" decoding="async" />
+            <video className="terms-video absolute inset-0 h-full w-full object-cover" autoPlay muted loop playsInline preload="metadata" poster="/video/terms-bg-poster.jpg" tabIndex={-1}>
+              <source src="/video/terms-bg.webm" type="video/webm" />
+              <source src="/video/terms-bg.mp4" type="video/mp4" />
+            </video>
+            <div className="terms-video-veil absolute inset-0" />
+          </div>
+          <Container className="relative py-12 sm:py-16">
+            <div className="card mx-auto max-w-4xl p-6 shadow-lg sm:p-10">
               <h2 id="terms-summary-h" className="text-2xl font-bold tracking-tight sm:text-3xl">
                 {labels.summaryTitle}
               </h2>
