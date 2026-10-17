@@ -745,7 +745,7 @@ export const de = {
     clauses: "{{n}} Klauseln",
     limits: "{{n}} markierte Einschränkungen",
     law: "Schweizer Recht · EU-Verbraucherschutz vorbehalten",
-    summaryTitle: "Das Wichtigste in 60 Sekunden",
+    summaryTitle: "Auf einen Blick",
     summaryNote: "Die Übersicht erklärt, verbindlich sind die Klauseln. Weichen sie voneinander ab, gilt das für dich Günstigere (Ziff. 14.2).",
     legendTitle: "So liest du diese Bedingungen",
     legendIntro: "Gelb hinterlegte Klauseln schränken deine Rechte ein.",

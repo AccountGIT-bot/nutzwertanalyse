@@ -733,7 +733,7 @@ export const it: Translations = {
     clauses: "{{n}} clausole",
     limits: "{{n}} restrizioni segnalate",
     law: "Diritto svizzero · tutela dei consumatori UE riservata",
-    summaryTitle: "L’essenziale in 60 secondi",
+    summaryTitle: "In breve",
     summaryNote: "La panoramica spiega, fanno fede le clausole. In caso di differenze vale la versione più favorevole per te (cifra 14.2).",
     legendTitle: "Come leggere queste condizioni",
     legendIntro: "Le clausole evidenziate in giallo limitano i tuoi diritti.",

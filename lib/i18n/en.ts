@@ -733,7 +733,7 @@ export const en: Translations = {
     clauses: "{{n}} clauses",
     limits: "{{n}} marked restrictions",
     law: "Swiss law · EU consumer protection reserved",
-    summaryTitle: "The essentials in 60 seconds",
+    summaryTitle: "At a glance",
     summaryNote: "The overview explains; the clauses are binding. If they differ, whichever is more favourable to you applies (section 14.2).",
     legendTitle: "How to read these terms",
     legendIntro: "Clauses highlighted in yellow restrict your rights.",

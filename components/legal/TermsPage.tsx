@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { AlertTriangle, ArrowRight, Check, Languages, Link2, Scale, ShieldCheck } from "lucide-react";
+import { AlertTriangle, ArrowRight, Check, Clock, FileText, Languages, Link2, Scale, ShieldCheck } from "lucide-react";
 import { translations, useI18n } from "@/lib/i18n";
 import { legalDe } from "@/lib/legal/de";
 import { legalEn } from "@/lib/legal/en";
@@ -11,6 +11,7 @@ import { clauseId, type TermsClause, type TermsDoc, type TermsTag } from "@/lib/
 import { operatorHasPlaceholders } from "@/lib/site";
 import { cn, fmt } from "@/lib/utils";
 import { PageShell, Container } from "@/components/layout/PageShell";
+import { Reveal } from "@/components/ui/Reveal";
 import { LegalBlockView, LegalNav, RichText } from "./LegalPage";
 
 /** Ungefähre Lesezeit der verbindlichen Texte (200 Wörter pro Minute). */
@@ -29,6 +30,32 @@ function SummaryIcon({ tag }: { tag: TermsTag }) {
   if (tag === "limit") return <AlertTriangle className="h-4 w-4 text-warn" aria-hidden />;
   if (tag === "promise") return <ShieldCheck className="h-4 w-4 text-primary" aria-hidden />;
   return <Check className="h-4 w-4 text-primary" aria-hidden />;
+}
+
+/**
+ * Waage-Video als Bühne des Titelbereichs. Mobil ein Streifen unter dem Text,
+ * ab lg die rechte Seite mit Verlauf in die Seitenfarbe. Poster liegt immer darunter;
+ * bei «Bewegung reduzieren» wird nur das Video ausgeblendet.
+ */
+function TermsStage() {
+  const pos = "lg:object-[20%_50%]";
+  return (
+    <div className="no-print relative aspect-[4/3] overflow-hidden sm:aspect-[16/9] lg:absolute lg:inset-y-0 lg:right-0 lg:aspect-auto lg:w-[60%] xl:w-[64%]" aria-hidden>
+      <div className="terms-hero-media absolute inset-0">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src="/video/terms-bg-poster.jpg" alt="" className={cn("absolute inset-0 h-full w-full object-cover", pos)} decoding="async" />
+        <video className={cn("terms-video absolute inset-0 h-full w-full object-cover", pos)} autoPlay muted loop playsInline preload="metadata" poster="/video/terms-bg-poster.jpg" tabIndex={-1}>
+          <source src="/video/terms-bg.webm" type="video/webm" />
+          <source src="/video/terms-bg.mp4" type="video/mp4" />
+        </video>
+      </div>
+      <div className="terms-video-veil absolute inset-0" />
+      <div className="terms-grain absolute inset-0" />
+      <div className="absolute inset-x-0 top-0 h-20 bg-gradient-to-b from-bg to-transparent lg:h-24" />
+      <div className="absolute inset-0 hidden bg-gradient-to-r from-bg from-[6%] via-bg/75 via-[22%] to-transparent to-[38%] lg:block" />
+      <div className="absolute inset-x-0 bottom-0 hidden h-24 bg-gradient-to-t from-bg to-transparent lg:block" />
+    </div>
+  );
 }
 
 function Clause({ c, labels }: { c: TermsClause; labels: Labels }) {
@@ -111,86 +138,81 @@ export function TermsPage() {
   return (
     <PageShell>
       <div className="terms-page" lang={docLang}>
-        {/* Kopf, weiss, viel Luft */}
-        <section className="border-b border-line">
-          <Container className="py-14 sm:py-20">
-            <div className="max-w-3xl">
-              <p className="inline-flex items-center gap-2 text-sm font-semibold text-primary">
-                <Scale className="h-4 w-4" aria-hidden />
-                {labels.law}
-              </p>
-              <h1 className="mt-4 text-[2rem] font-bold leading-tight tracking-tight [overflow-wrap:anywhere] sm:text-5xl">{doc.title}</h1>
-              <p className="mt-5 text-lg leading-relaxed text-ink-2">{doc.lead}</p>
-              <p className="mt-6 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-ink-3">
-                <span>{fmt(labels.version, { n: doc.version, date: formatDay(doc.date, tag) })}</span>
-                <span aria-hidden>·</span>
-                <span>{fmt(labels.readingTime, { min: minutes })}</span>
-                <span aria-hidden>·</span>
-                <span>{fmt(labels.limits, { n: limitCount })}</span>
-                <span className="no-print" aria-hidden>
-                  ·
-                </span>
-                <button type="button" className="no-print inline-flex items-center gap-1 font-medium text-primary hover:underline" onClick={() => setOverride(docLang === "de" ? "en" : "de")}>
-                  <Languages className="h-3.5 w-3.5" aria-hidden />
-                  {docLang === "de" ? labels.showEnglish : labels.showGerman}
-                </button>
-              </p>
-              {docLang === "de" && (locale === "fr" || locale === "it") && <p className="mt-2 text-sm text-ink-3">{translations[locale].termsPage.translationNote}</p>}
-              {operatorHasPlaceholders() && (
-                <div role="alert" className="mt-8 flex gap-3 rounded-xl border border-warn/40 bg-warn-soft px-4 py-3 text-sm text-ink">
-                  <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-warn" aria-hidden />
-                  <span>{legal.placeholderWarning}</span>
-                </div>
-              )}
+        {/* Titelbereich: Text links, Waage-Video rechts mit Verlauf in die Seitenfarbe; mobil liegt das Video unter dem Text */}
+        <section className="relative isolate overflow-hidden border-b border-line">
+          <Container className="relative z-10">
+            <div className="grid py-14 sm:py-20 lg:min-h-[600px] lg:grid-cols-[minmax(0,38rem)_1fr] lg:items-center lg:py-24">
+              <Reveal>
+                <p className="inline-flex items-center gap-2 text-sm font-semibold text-primary">
+                  <Scale className="h-4 w-4" aria-hidden />
+                  {labels.law}
+                </p>
+                <h1 className="mt-4 text-[2rem] font-bold leading-[1.05] tracking-tight [overflow-wrap:anywhere] sm:text-5xl lg:text-[3.4rem]">{doc.title}</h1>
+                <p className="mt-5 max-w-xl text-lg leading-relaxed text-ink-2">{doc.lead}</p>
+                <ul className="mt-8 flex flex-wrap gap-2 text-sm">
+                  <li className="terms-chip">
+                    <FileText className="h-3.5 w-3.5" aria-hidden />
+                    {fmt(labels.version, { n: doc.version, date: formatDay(doc.date, tag) })}
+                  </li>
+                  <li className="terms-chip">
+                    <Clock className="h-3.5 w-3.5" aria-hidden />
+                    {fmt(labels.readingTime, { min: minutes })}
+                  </li>
+                  <li className="terms-chip terms-chip-warn">
+                    <AlertTriangle className="h-3.5 w-3.5" aria-hidden />
+                    {fmt(labels.limits, { n: limitCount })}
+                  </li>
+                  <li className="no-print">
+                    <button type="button" className="terms-chip terms-chip-action" onClick={() => setOverride(docLang === "de" ? "en" : "de")}>
+                      <Languages className="h-3.5 w-3.5" aria-hidden />
+                      {docLang === "de" ? labels.showEnglish : labels.showGerman}
+                    </button>
+                  </li>
+                </ul>
+                {docLang === "de" && (locale === "fr" || locale === "it") && <p className="mt-3 text-sm text-ink-3">{translations[locale].termsPage.translationNote}</p>}
+                {operatorHasPlaceholders() && (
+                  <div role="alert" className="mt-8 flex max-w-xl gap-3 rounded-xl border border-warn/40 bg-warn-soft px-4 py-3 text-sm text-ink">
+                    <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-warn" aria-hidden />
+                    <span>{legal.placeholderWarning}</span>
+                  </div>
+                )}
+              </Reveal>
             </div>
           </Container>
+          <TermsStage />
         </section>
 
-        {/* Das Wichtigste: weisse Karte auf weichgezeichneter Videoschleife */}
-        <section id="terms-summary" aria-labelledby="terms-summary-h" className="relative isolate scroll-mt-28 overflow-hidden border-b border-line">
-          <div className="no-print absolute inset-0" aria-hidden>
-            {/* Poster liegt immer darunter; bei «Bewegung reduzieren» wird nur das Video ausgeblendet.
-                Ab xl rückt die Bühne nach rechts und läuft links in die Seitenfarbe aus, damit die Waage neben der Karte sichtbar bleibt. */}
-            <div className="absolute inset-0 xl:left-[30%]">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/video/terms-bg-poster.jpg" alt="" className="h-full w-full object-cover xl:object-[15%_50%]" loading="lazy" decoding="async" />
-              <video className="terms-video absolute inset-0 h-full w-full object-cover xl:object-[15%_50%]" autoPlay muted loop playsInline preload="metadata" poster="/video/terms-bg-poster.jpg" tabIndex={-1}>
-                <source src="/video/terms-bg.webm" type="video/webm" />
-                <source src="/video/terms-bg.mp4" type="video/mp4" />
-              </video>
-              <div className="absolute inset-y-0 left-0 hidden w-[45%] bg-gradient-to-r from-bg to-transparent xl:block" />
-            </div>
-            <div className="terms-video-veil absolute inset-0" />
-          </div>
-          <Container className="relative py-12 sm:py-16">
-            <div className="card mx-auto max-w-4xl p-6 shadow-lg sm:p-10 xl:mx-0 xl:max-w-3xl">
-              <h2 id="terms-summary-h" className="text-2xl font-bold tracking-tight sm:text-3xl">
+        {/* Auf einen Blick: acht Kernpunkte als ruhige Reihe auf Papier */}
+        <section id="terms-summary" aria-labelledby="terms-summary-h" className="paper scroll-mt-28 border-b border-line">
+          <Container className="py-12 sm:py-16">
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-baseline sm:justify-between sm:gap-8">
+              <h2 id="terms-summary-h" className="shrink-0 text-xs font-semibold uppercase tracking-[0.12em] text-ink-3">
                 {labels.summaryTitle}
               </h2>
-              <ul className="mt-6 grid gap-x-10 gap-y-6 sm:grid-cols-2">
-                {doc.summary.map((s) => (
-                  <li key={s.text} className="flex gap-3">
-                    <span className={cn("mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full", s.tag === "limit" ? "bg-warn-soft" : "bg-primary-soft")}>
-                      <SummaryIcon tag={s.tag} />
-                    </span>
-                    <div className="min-w-0 leading-snug">
-                      <p className="text-ink">{s.text}</p>
-                      <p className="mt-1.5 flex flex-wrap gap-x-3 text-sm">
-                        {s.refs.map((r) => (
-                          <a key={r} href={`#${clauseId(r)}`} className="inline-flex items-center gap-0.5 font-medium text-primary underline-offset-4 hover:underline">
-                            {fmt(labels.clause, { n: r })}
-                            <ArrowRight className="h-3 w-3" aria-hidden />
-                          </a>
-                        ))}
-                      </p>
-                    </div>
-                  </li>
-                ))}
-              </ul>
-              <p className="mt-8 border-t border-line pt-5 text-sm leading-relaxed text-ink-3">
+              <p className="max-w-2xl text-sm leading-relaxed text-ink-3 sm:text-right">
                 {labels.summaryNote} {labels.legendIntro}
               </p>
             </div>
+            <ul className="mt-8 grid gap-x-8 gap-y-8 sm:grid-cols-2 lg:grid-cols-4">
+              {doc.summary.map((s, i) => (
+                <Reveal key={s.text} as="li" delay={Math.min(i, 3) * 70} className="flex gap-3 lg:flex-col">
+                  <span className={cn("mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-full", s.tag === "limit" ? "bg-warn-soft" : "bg-primary-soft")}>
+                    <SummaryIcon tag={s.tag} />
+                  </span>
+                  <div className="min-w-0 leading-snug">
+                    <p className="text-[0.95rem] text-ink">{s.text}</p>
+                    <p className="mt-2 flex flex-wrap gap-x-3 text-sm">
+                      {s.refs.map((r) => (
+                        <a key={r} href={`#${clauseId(r)}`} className="inline-flex items-center gap-0.5 font-medium text-primary underline-offset-4 hover:underline">
+                          {fmt(labels.clause, { n: r })}
+                          <ArrowRight className="h-3 w-3" aria-hidden />
+                        </a>
+                      ))}
+                    </p>
+                  </div>
+                </Reveal>
+              ))}
+            </ul>
           </Container>
         </section>
 

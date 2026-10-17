@@ -733,7 +733,7 @@ export const fr: Translations = {
     clauses: "{{n}} clauses",
     limits: "{{n}} restrictions signalées",
     law: "Droit suisse · protection des consommateurs de l’UE réservée",
-    summaryTitle: "L’essentiel en 60 secondes",
+    summaryTitle: "En bref",
     summaryNote: "L’aperçu explique, les clauses font foi. En cas d’écart, la version la plus favorable pour vous s’applique (ch. 14.2).",
     legendTitle: "Comment lire ces conditions",
     legendIntro: "Les clauses surlignées en jaune restreignent vos droits.",
