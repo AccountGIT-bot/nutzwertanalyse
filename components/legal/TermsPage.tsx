@@ -149,17 +149,21 @@ export function TermsPage() {
         {/* Das Wichtigste: weisse Karte auf weichgezeichneter Videoschleife */}
         <section id="terms-summary" aria-labelledby="terms-summary-h" className="relative isolate scroll-mt-28 overflow-hidden border-b border-line">
           <div className="no-print absolute inset-0" aria-hidden>
-            {/* Poster liegt immer darunter; bei «Bewegung reduzieren» wird nur das Video ausgeblendet */}
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/video/terms-bg-poster.jpg" alt="" className="h-full w-full object-cover" loading="lazy" decoding="async" />
-            <video className="terms-video absolute inset-0 h-full w-full object-cover" autoPlay muted loop playsInline preload="metadata" poster="/video/terms-bg-poster.jpg" tabIndex={-1}>
-              <source src="/video/terms-bg.webm" type="video/webm" />
-              <source src="/video/terms-bg.mp4" type="video/mp4" />
-            </video>
+            {/* Poster liegt immer darunter; bei «Bewegung reduzieren» wird nur das Video ausgeblendet.
+                Ab xl rückt die Bühne nach rechts und läuft links in die Seitenfarbe aus, damit die Waage neben der Karte sichtbar bleibt. */}
+            <div className="absolute inset-0 xl:left-[30%]">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/video/terms-bg-poster.jpg" alt="" className="h-full w-full object-cover xl:object-[15%_50%]" loading="lazy" decoding="async" />
+              <video className="terms-video absolute inset-0 h-full w-full object-cover xl:object-[15%_50%]" autoPlay muted loop playsInline preload="metadata" poster="/video/terms-bg-poster.jpg" tabIndex={-1}>
+                <source src="/video/terms-bg.webm" type="video/webm" />
+                <source src="/video/terms-bg.mp4" type="video/mp4" />
+              </video>
+              <div className="absolute inset-y-0 left-0 hidden w-[45%] bg-gradient-to-r from-bg to-transparent xl:block" />
+            </div>
             <div className="terms-video-veil absolute inset-0" />
           </div>
           <Container className="relative py-12 sm:py-16">
-            <div className="card mx-auto max-w-4xl p-6 shadow-lg sm:p-10">
+            <div className="card mx-auto max-w-4xl p-6 shadow-lg sm:p-10 xl:mx-0 xl:max-w-3xl">
               <h2 id="terms-summary-h" className="text-2xl font-bold tracking-tight sm:text-3xl">
                 {labels.summaryTitle}
               </h2>
