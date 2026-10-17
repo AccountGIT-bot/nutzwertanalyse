@@ -28,7 +28,7 @@ Für die beiden dauerhaften Branches `dev` und `main` reguläre PR-Merges verwen
 
 ## Einmalige Einrichtung (16.10.2026)
 
-Der Neubau der Anwendung entstand auf dem Themenbranch `claude/dazzling-allen-sykizw`. `dev` wurde aus diesem Stand angelegt; die erste Release-PR `dev` → `main` ersetzt die bisherige v0-/Prototyp-Historie auf `main` durch den geprüften Neubau. Ältere Themenbranches (`v0/*`, `codex/*`, `claude/*`) bleiben bis zu einer ausdrücklichen Bereinigung durch Liam bestehen.
+Der Neubau der Anwendung entstand auf dem Themenbranch `claude/dazzling-allen-sykizw`. `dev` wurde aus diesem Stand angelegt; die erste Release-PR `dev` → `main` ([#29](https://github.com/AccountGIT-bot/nutzwertanalyse/pull/29), gemergt am 17.10.2026 nach Liams Freigabe) ersetzte die bisherige v0-/Prototyp-Historie auf `main` durch den geprüften Neubau. Ältere Themenbranches (`v0/*`, `codex/*`, `claude/*`) bleiben bis zu einer ausdrücklichen Bereinigung durch Liam bestehen.
 
 ## Geltungsbereich der Absicherung
 

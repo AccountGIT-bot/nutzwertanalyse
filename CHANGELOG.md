@@ -2,9 +2,9 @@
 
 Alle freigegebenen Veröffentlichungen von Nutzwertanalyse. Entwicklung auf `dev`, Freigabe nach `main` nur mit ausdrücklicher Zustimmung von Liam (siehe `docs/DEVELOPMENT_WORKFLOW.md`).
 
-## 2.0.0 – in Vorbereitung
+## 2.0.0 – 17.10.2026
 
-Release-PR: `dev` → `main`. Noch nicht freigegeben.
+Release-PR: [#29](https://github.com/AccountGIT-bot/nutzwertanalyse/pull/29). Freigegeben von Liam am 17.10.2026, Merge-Commit `6723641`.
 
 ### Anwendung
 - Vollständiger Neubau als Web-App ohne Backend, Login, API-Schlüssel und laufende Kosten. Alle Berechnungen, Speicherungen und Exporte laufen im Browser.
