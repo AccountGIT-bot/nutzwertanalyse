@@ -14,8 +14,38 @@ const BINDING_NOTE: Record<string, string> = {
   it: "Fa fede la versione tedesca di questi testi legali. Una traduzione inglese è disponibile qui sotto.",
 };
 
+/** "2026-10-17" oder "2026-10-17.2" (Revision am selben Tag) lesbar formatieren. */
+export function formatLegalVersion(v: string, localeTag: string): string {
+  const m = /^(\d{4})-(\d{2})-(\d{2})(?:\.(\d+))?$/.exec(v);
+  if (!m) return v;
+  const date = new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3])).toLocaleDateString(localeTag, { day: "numeric", month: "long", year: "numeric" });
+  return m[4] ? `${date} (${m[4]})` : date;
+}
+
+/** Links zu allen Rechtstexten, unten auf jeder Rechtsseite. */
+export function LegalNav() {
+  const { t } = useI18n();
+  return (
+    <nav aria-label={t.nav.legal} className="no-print mt-10 flex flex-wrap gap-2 border-t border-line pt-6 text-sm">
+      {(
+        [
+          ["/impressum", t.nav.imprint],
+          ["/datenschutz", t.nav.privacy],
+          ["/agb", t.nav.terms],
+          ["/cookies", t.nav.cookies],
+          ["/barrierefreiheit", t.nav.accessibility],
+        ] as const
+      ).map(([href, label]) => (
+        <Link key={href} href={href} className="badge hover:bg-surface-3">
+          {label}
+        </Link>
+      ))}
+    </nav>
+  );
+}
+
 /** Rendert Text mit einfachen Markdown-Links [Text](url) */
-function RichText({ text }: { text: string }) {
+export function RichText({ text }: { text: string }) {
   const parts: React.ReactNode[] = [];
   const re = /\[([^\]]+)\]\(([^)]+)\)/g;
   let last = 0;
@@ -43,7 +73,7 @@ function RichText({ text }: { text: string }) {
   return <>{parts}</>;
 }
 
-function Block({ b }: { b: LegalBlock }) {
+export function LegalBlockView({ b }: { b: LegalBlock }) {
   switch (b.type) {
     case "h2":
       return <h2>{b.text}</h2>;
@@ -96,7 +126,7 @@ function Block({ b }: { b: LegalBlock }) {
 }
 
 export function LegalPage({ docKey }: { docKey: LegalKey }) {
-  const { locale, t } = useI18n();
+  const { locale, tag } = useI18n();
   const set = locale === "en" ? legalEn : legalDe;
   const doc = set.docs[docKey];
   const note = locale === "de" ? null : locale === "en" ? legalEn.bindingNote : BINDING_NOTE[locale];
@@ -110,7 +140,7 @@ export function LegalPage({ docKey }: { docKey: LegalKey }) {
             <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">{doc.title}</h1>
             {doc.intro && <p className="mt-3 text-base">{doc.intro}</p>}
             <p className="mt-3 text-xs text-ink-3">
-              {locale === "en" ? "Last updated" : locale === "fr" ? "Dernière mise à jour" : locale === "it" ? "Ultimo aggiornamento" : "Stand"}: {doc.updated}
+              {locale === "en" ? "Last updated" : locale === "fr" ? "Dernière mise à jour" : locale === "it" ? "Ultimo aggiornamento" : "Stand"}: {formatLegalVersion(doc.updated, tag)}
             </p>
             {note && <p className="mt-3 rounded-lg border border-line bg-surface-2 px-3 py-2 text-xs text-ink-2">{note}</p>}
           </header>
@@ -121,23 +151,9 @@ export function LegalPage({ docKey }: { docKey: LegalKey }) {
             </div>
           )}
           {doc.blocks.map((b, i) => (
-            <Block key={i} b={b} />
+            <LegalBlockView key={i} b={b} />
           ))}
-          <nav aria-label={t.nav.legal} className="mt-10 flex flex-wrap gap-2 border-t border-line pt-6 text-sm">
-            {(
-              [
-                ["/impressum", t.nav.imprint],
-                ["/datenschutz", t.nav.privacy],
-                ["/agb", t.nav.terms],
-                ["/cookies", t.nav.cookies],
-                ["/barrierefreiheit", t.nav.accessibility],
-              ] as const
-            ).map(([href, label]) => (
-              <Link key={href} href={href} className="badge hover:bg-surface-3">
-                {label}
-              </Link>
-            ))}
-          </nav>
+          <LegalNav />
         </article>
       </Container>
     </PageShell>

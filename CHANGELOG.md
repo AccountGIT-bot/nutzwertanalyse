@@ -2,9 +2,22 @@
 
 Alle freigegebenen Veröffentlichungen von Nutzwertanalyse. Entwicklung auf `dev`, Freigabe nach `main` nur mit ausdrücklicher Zustimmung von Liam (siehe `docs/DEVELOPMENT_WORKFLOW.md`).
 
+## 2.2.0 – 17.10.2026
+
+Release-PR: [#32](https://github.com/AccountGIT-bot/nutzwertanalyse/pull/32). Freigabe über die Release-Karte ausstehend.
+
+- Nutzungsbedingungen neu geschrieben (`lib/legal/terms-de.ts` verbindlich, `terms-en.ts` als Übersetzung mit identischer Struktur): 14 Klauseln mit Kurzfassung, Markierung (Einschränkung, Recht, Pflicht, Zusage, Information) und Rechtsgrundlage; neue Gewährleistungsklausel 9.2; Fassungsgeschichte mit Archiv der Fassung 1 im Wortlaut; Schweizer Recht mit Vorbehalt des zwingenden Verbraucherschutzes am Wohnsitz. `legalVersion` auf `2026-10-17.2`. Strukturgleichheit DE/EN, fortlaufende Nummerierung, Verweise der Übersicht und Querverweise werden durch `tests/terms.test.ts` geprüft.
+- Seite `/agb` neu gestaltet: Titelbereich mit HD-Video «Waage» (selbst gehostet, 1920×1080, nahtlose 20-Sekunden-Schleife, feines Korn, sanfte Einblendung; nur Poster bei «Bewegung reduzieren», im Druck ausgeblendet), Meta-Chips (Fassung, Lesezeit, markierte Einschränkungen); die Dokumentsprache folgt der Sprachwahl der Seite (Englisch zeigt die Übersetzung mit Hinweis, Französisch und Italienisch das deutsche Original mit Hinweis), Reihe «Auf einen Blick» mit acht Kernpunkten und Verweisen auf die Ziffern, Inhaltsverzeichnis, gelb hervorgehobene Einschränkungen, Rechtsgrundlagen aufklappbar, Druckansicht mit ausgeschriebenen Rechtsgrundlagen.
+- Hinweis auf die Nutzungsbedingungen im Schritt «Entscheidung».
+- Startseite: Das Bild der Sektion «Vertrauen» wird während der Einblendung beschnitten; der weisse Balken am linken Rand ist behoben.
+- Arbeitsregeln: Release-Karte als Freigabeschritt (drei Schaltflächen, Doppelklick innerhalb von 10 Sekunden, gespeicherter Zeitstempel), Pflegeregeln für die Nutzungsbedingungen, `legalVersion` als Datum mit Revision.
+- `package.json` von 2.1.0 auf 2.2.0.
+- Prüfbericht `docs/QA_2026-10-17.md`: Tests, Lint, Typecheck, Build; Chromium bei 390, 1024, 1366 und 1920 px, hell und dunkel, reduzierte Bewegung, Druck.
+- Offen: rechtliche Prüfung der Nutzungsbedingungen durch eine Fachperson; Betreiberangaben in `lib/site.ts` sind Platzhalter.
+
 ## 2.1.0 – 17.10.2026
 
-Release-PR: [#31](https://github.com/AccountGIT-bot/nutzwertanalyse/pull/31). Freigabe durch Liam: ausstehend (wird nach dem Merge mit Datum und Merge-Commit ergänzt).
+Release-PR: [#31](https://github.com/AccountGIT-bot/nutzwertanalyse/pull/31). Freigegeben von Liam am 17.10.2026 in zwei Schritten (drei Schaltflächen, zweite Bestätigung), Merge-Commit `5e7352e`.
 
 - Neue Startseiten-Sektion «Vertrauen»: Text links, cinematisches Bild rechts mit Verlauf in die Seitenfarbe (hell und dunkel), schwebende Kennzahl «100 % im Browser berechnet» mit Zählanimation und sich zeichnendem Ring; mobil mit Bild unter dem Text.
 - Neue Startseiten-Sektion «Stimmen»: vollflächiger, vorab weichgezeichneter Hintergrund mit langsamer Kamerafahrt, helle Karte mit Feedback-Aufruf und Karussell aus klar gekennzeichneten Beispielstimmen, vier Argumente mit Haken. Keine behaupteten Bewertungen; der Feedback-Button erscheint erst mit befüllter Betreiber-E-Mail in `lib/site.ts`.
