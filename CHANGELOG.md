@@ -2,6 +2,13 @@
 
 Alle freigegebenen Veröffentlichungen von Nutzwertanalyse. Entwicklung auf `dev`, Freigabe nach `main` nur mit ausdrücklicher Zustimmung von Liam (siehe `docs/DEVELOPMENT_WORKFLOW.md`).
 
+## 2.0.1 – in Vorbereitung
+
+Release-PR: `dev` → `main`. Noch nicht freigegeben.
+
+- Button «Analyse starten» am Ende der Methodenseite war unlesbar (Linkfarbe des Textblocks überschrieb die Buttonfarbe); Link-Regel auf Fliesstext eingegrenzt.
+- Serverseitige Funktion (Open-Graph-Bild) auf die Vercel-Region Frankfurt festgelegt; Hosting-Abschnitt der Datenschutzerklärung (DE/EN) beschreibt CDN-Auslieferung, EU-Funktionen und mögliche US-Übermittlung präzise. `legalVersion` 2026-10-17.
+
 ## 2.0.0 – 17.10.2026
 
 Release-PR: [#29](https://github.com/AccountGIT-bot/nutzwertanalyse/pull/29). Freigegeben von Liam am 17.10.2026, Merge-Commit `6723641`.

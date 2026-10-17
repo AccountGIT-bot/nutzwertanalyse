@@ -400,7 +400,7 @@ select.input {
   padding-left: 1.3rem;
   margin: 0.5rem 0;
 }
-.prose-legal a {
+.prose-legal a:not(.btn):not(.badge) {
   color: var(--primary);
   text-decoration: underline;
   text-underline-offset: 3px;
