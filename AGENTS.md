@@ -20,3 +20,4 @@ Diese Regeln übernehmen Liams Arbeitsweise aus dem GARAGO-Repository (Stand 13.
 - Vor jedem Push: `npm test`, `npm run lint`, `npm run typecheck`, `npm run build`. Für UI-Änderungen eine Browserprüfung (Desktop und 390 px) und die Druckansicht; Ergebnisse und Grenzen in `docs/QA_<datum>.md` festhalten.
 - Ein grünes Deployment ist keine Geräte- oder Browserabnahme. Ungeprüftes Verhalten ehrlich benennen.
 - Übersetzungen typsicher in `lib/i18n/` pflegen; `de.ts` ist die Referenz, alle vier Sprachen werden gemeinsam ergänzt.
+- Jede Release-PR nach `main` trägt eine neue Versionsnummer: `npm version <nummer> --no-git-tag-version` (einzige Quelle `package.json`, von dort gelesen für Einstellungsseite und JSON-LD) und den gleich nummerierten Eintrag im `CHANGELOG.md`. Keine Versionsnummern mehr hart kodieren.

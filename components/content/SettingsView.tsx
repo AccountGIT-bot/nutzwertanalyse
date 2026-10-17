@@ -3,6 +3,7 @@
 import { useState, useSyncExternalStore } from "react";
 import { Download, Trash2, ShieldCheck, Globe, SunMoon, Database } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
+import { appVersion } from "@/lib/site";
 import { localeNames, locales, type Locale } from "@/lib/i18n/config";
 import { useTheme, type ThemePref } from "@/lib/theme/ThemeProvider";
 import { useConsent } from "@/lib/consent/ConsentProvider";
@@ -14,8 +15,6 @@ import { PageShell, Container } from "@/components/layout/PageShell";
 import { SegmentedControl } from "@/components/ui/Controls";
 import { ConfirmDialog } from "@/components/ui/Dialog";
 import { useToast } from "@/components/ui/Toast";
-
-const APP_VERSION = "2.0.0";
 
 export function SettingsView() {
   const { t, locale, setLocale, tag } = useI18n();
@@ -119,7 +118,7 @@ export function SettingsView() {
         </section>
 
         <section className="mt-4 px-1 text-xs text-ink-3" aria-label={t.settings.about}>
-          {fmt(t.settings.aboutText, { version: APP_VERSION })}
+          {fmt(t.settings.aboutText, { version: appVersion })}
         </section>
 
         <ConfirmDialog

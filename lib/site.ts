@@ -6,6 +6,11 @@
  * zur verantwortlichen Stelle nach DSG und DSGVO). Werte in eckigen Klammern
  * werden auf den Rechtsseiten automatisch als "noch auszufüllen" markiert.
  */
+import pkg from "../package.json";
+
+/** Anwendungsversion, einzige Quelle ist `package.json` (CHANGELOG führt dieselbe Nummer). */
+export const appVersion: string = pkg.version;
+
 export const site = {
   name: "Nutzwertanalyse",
   domain: "nutzwertanalyse.com",
