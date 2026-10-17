@@ -73,6 +73,10 @@ export const termsDe: TermsDoc = {
           n: "2.5",
           text: "Ein Freigabe-Link enthält die ganze Analyse komprimiert im Teil der Adresse nach dem #-Zeichen. Dieser Teil wird von Browsern nicht an Server übertragen, und wir speichern Freigabe-Links nicht.",
         },
+        {
+          n: "2.6",
+          text: "Die Website enthält einzelne Links auf fremde Websites, etwa zu den Datenschutzhinweisen des Hosting-Anbieters oder zu Aufsichtsbehörden. Für deren Inhalte sind die jeweiligen Betreiber verantwortlich; wir prüfen sie beim Setzen des Links, nicht laufend.",
+        },
       ],
       basis: "Leistungsbeschreibung; zur Datenbearbeitung siehe Datenschutzerklärung Ziff. 4 bis 7",
     },
@@ -145,7 +149,7 @@ export const termsDe: TermsDoc = {
           text: "Freigabe-Links und Exportdateien enthalten die vollständige Analyse. Teile sie nur mit Personen, die die Inhalte sehen dürfen. Wer einen Link besitzt, kann die Analyse öffnen; zurückziehen lässt sich ein geteilter Link technisch nicht.",
         },
       ],
-      basis: "Art. 5 lit. j DSG und Art. 4 Nr. 7 DSGVO (verantwortliche Person), Art. 328b OR (Daten im Arbeitsverhältnis), Art. 3 GlG (Verbot der Diskriminierung aufgrund des Geschlechts im Erwerbsleben)",
+      basis: "Art. 5 lit. j DSG und Art. 4 Nr. 7 DSGVO (verantwortliche Person), Art. 328 und 328b OR (Persönlichkeitsschutz und Daten im Arbeitsverhältnis), Art. 3 GlG (Verbot der Diskriminierung aufgrund des Geschlechts im Erwerbsleben), Richtlinien 2000/43/EG und 2000/78/EG (Gleichbehandlung in der EU)",
     },
     {
       n: 6,
@@ -208,7 +212,7 @@ export const termsDe: TermsDoc = {
             "Keine Werbung und kein Tracking: keine Werbung, keine Analyse- oder Tracking-Werkzeuge, keine Cookies.",
             "Kein Datenverkauf: Wir verkaufen, vermieten oder tauschen keine Daten.",
             "Keine Inhalte auf Servern: Inhalte deiner Analysen werden nicht an uns übertragen.",
-            "Vorankündigung: Änderungen dieser Bedingungen zu deinem Nachteil und eine Einstellung der Anwendung kündigen wir mindestens 30 Tage vorher auf dieser Seite an (Ziff. 9.3 und 12.2).",
+            "Vorankündigung: Änderungen dieser Bedingungen zu deinem Nachteil und eine Einstellung der Anwendung kündigen wir mindestens 30 Tage vorher auf dieser Seite an (Ziff. 9.4 und 12.2).",
           ],
         },
         { n: "8.2", text: "Halten wir eine Zusage nicht ein, stehen dir die gesetzlichen Rechte bei Vertragsverletzungen zu." },
@@ -217,9 +221,9 @@ export const termsDe: TermsDoc = {
     },
     {
       n: 9,
-      title: "Verfügbarkeit, Weiterentwicklung und Einstellung",
+      title: "Verfügbarkeit, Gewährleistung und Einstellung",
       tags: ["limit"],
-      short: "Wir garantieren keine ständige Verfügbarkeit und dürfen Funktionen ändern, wenn es sachlich begründet ist. Wird die Anwendung eingestellt, erfährst du es 30 Tage vorher.",
+      short: "Wir garantieren weder ständige Verfügbarkeit noch Fehlerfreiheit und dürfen Funktionen ändern, wenn es sachlich begründet ist. Wird die Anwendung eingestellt, erfährst du es 30 Tage vorher.",
       items: [
         {
           n: "9.1",
@@ -227,18 +231,22 @@ export const termsDe: TermsDoc = {
         },
         {
           n: "9.2",
-          text: "Wir dürfen die Anwendung weiterentwickeln und Funktionen ändern oder entfernen, wenn dafür ein sachlicher Grund besteht, etwa technische Entwicklung, Sicherheit oder eine Rechtsänderung, und wenn die Änderung für dich zumutbar ist. Wir achten darauf, dass ältere JSON-Exporte importierbar bleiben.",
+          text: `Wir stellen die Anwendung in der jeweils aktuellen Fassung bereit. Weil sie unentgeltlich ist, sichern wir weder Fehlerfreiheit noch die Eignung für einen bestimmten Zweck zu. Erkannte Fehler beheben wir im Rahmen der Weiterentwicklung; Hinweise nehmen wir unter ${o.email} entgegen. Die Haftung richtet sich nach Ziff. 10.`,
         },
         {
           n: "9.3",
-          text: "Wir dürfen die Anwendung einstellen. Wir kündigen dies mindestens 30 Tage vorher auf der Website an, damit du deine Analysen exportieren kannst. Ist ein sofortiges Abschalten aus rechtlichen oder zwingenden Sicherheitsgründen nötig, informieren wir so früh wie möglich.",
+          text: "Wir dürfen die Anwendung weiterentwickeln und Funktionen ändern oder entfernen, wenn dafür ein sachlicher Grund besteht, etwa technische Entwicklung, Sicherheit oder eine Rechtsänderung, und wenn die Änderung für dich zumutbar ist. Wir achten darauf, dass ältere JSON-Exporte importierbar bleiben.",
         },
         {
           n: "9.4",
+          text: "Wir dürfen die Anwendung einstellen. Wir kündigen dies mindestens 30 Tage vorher auf der Website an, damit du deine Analysen exportieren kannst. Ist ein sofortiges Abschalten aus rechtlichen oder zwingenden Sicherheitsgründen nötig, informieren wir so früh wie möglich.",
+        },
+        {
+          n: "9.5",
           text: `Support leisten wir freiwillig. Anfragen an ${o.email} beantworten wir in der Regel innert zehn Arbeitstagen.`,
         },
       ],
-      basis: "Art. 8 UWG (keine missbräuchliche Benachteiligung), Anhang Nr. 1 Bst. k Richtlinie 93/13/EWG (keine Leistungsänderung ohne triftigen Grund)",
+      basis: "Art. 99 Abs. 2 OR (milderes Haftungsmass bei unentgeltlichen Geschäften), Art. 8 UWG (keine missbräuchliche Benachteiligung), Anhang Nr. 1 Bst. k Richtlinie 93/13/EWG (keine Leistungsänderung ohne triftigen Grund)",
     },
     {
       n: 10,
@@ -356,7 +364,8 @@ export const termsDe: TermsDoc = {
       note: "Vollständig neu geschrieben. Keine Änderung stellt dich gegenüber Fassung 1 schlechter.",
       changes: [
         "Neuer Aufbau: Übersicht, Kurzfassung je Klausel, markierte Einschränkungen und Rechtsgrundlagen.",
-        "Neu: verbindliche Zusagen (Ziff. 8) und 30 Tage Vorankündigung bei nachteiligen Änderungen und vor einer Einstellung (Ziff. 9.3, 12.2).",
+        "Neu: verbindliche Zusagen (Ziff. 8) und 30 Tage Vorankündigung bei nachteiligen Änderungen und vor einer Einstellung (Ziff. 9.4, 12.2).",
+        "Neu: Gewährleistung ausdrücklich geregelt (Ziff. 9.2) und Hinweis zu fremden Links (Ziff. 2.6).",
         "Neu: Offenlegung von KI-Bildern und Beispielstimmen auf der Startseite (Ziff. 11).",
         "Präzisiert: Personendaten Dritter und faire Kriterien bei Personalentscheiden (Ziff. 5), Gerichtsstand für Verbraucherinnen und Verbraucher (Ziff. 13).",
         "Haftung: Personenschäden und Produkthaftung jetzt ausdrücklich vorbehalten (Ziff. 10.1).",

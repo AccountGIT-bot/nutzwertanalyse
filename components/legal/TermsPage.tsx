@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { AlertTriangle, ArrowRight, Check, Languages, Link2, Scale, ShieldCheck } from "lucide-react";
-import { useI18n } from "@/lib/i18n";
+import { translations, useI18n } from "@/lib/i18n";
 import { legalDe } from "@/lib/legal/de";
 import { legalEn } from "@/lib/legal/en";
 import { termsDe } from "@/lib/legal/terms-de";
@@ -31,14 +31,14 @@ function SummaryIcon({ tag }: { tag: TermsTag }) {
   return <Check className="h-4 w-4 text-primary" aria-hidden />;
 }
 
-function Clause({ c, labels }: { c: TermsClause; labels: ReturnType<typeof useLabels> }) {
+function Clause({ c, labels }: { c: TermsClause; labels: Labels }) {
   const limit = c.tags.includes("limit");
   const id = clauseId(c.n);
   return (
-    <article id={id} aria-labelledby={`${id}-h`} className={cn("terms-clause scroll-mt-24", limit ? "terms-clause-limit rounded-2xl px-5 py-5 sm:px-7 sm:py-6" : "border-t border-line pt-8")}>
+    <article id={id} aria-labelledby={`${id}-h`} className={cn("terms-clause scroll-mt-28", limit ? "terms-clause-limit rounded-2xl px-6 py-6 sm:px-8 sm:py-8" : "border-t border-line pt-10")}>
       <header className="flex flex-wrap items-start justify-between gap-x-4 gap-y-2">
         <h2 id={`${id}-h`} className="text-xl font-bold tracking-tight text-ink sm:text-2xl">
-          <a href={`#${id}`} className="terms-anchor group inline-flex items-baseline gap-2" aria-label={fmt(labels.clauseLink, { n: c.n })}>
+          <a href={`#${id}`} className="group inline-flex items-baseline gap-2" aria-label={fmt(labels.clauseLink, { n: c.n })}>
             <span className="tabular-nums text-ink-3">{c.n}.</span>
             <span>{c.title}</span>
             <Link2 className="h-4 w-4 self-center text-ink-3 opacity-0 transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100" aria-hidden />
@@ -52,11 +52,11 @@ function Clause({ c, labels }: { c: TermsClause; labels: ReturnType<typeof useLa
         )}
       </header>
 
-      <p className="mt-3 text-base font-medium leading-relaxed text-ink">
+      <p className="mt-4 text-base font-medium leading-relaxed text-ink sm:text-[1.05rem]">
         <span className="text-primary">{labels.short}:</span> {c.short}
       </p>
 
-      <ol className="mt-5 grid gap-3">
+      <ol className="mt-6 grid gap-4">
         {c.items.map((it) => (
           <li key={it.n} className="grid grid-cols-[2.5rem_minmax(0,1fr)] gap-x-2">
             <span className="pt-0.5 text-sm tabular-nums text-ink-3">{it.n}</span>
@@ -81,7 +81,7 @@ function Clause({ c, labels }: { c: TermsClause; labels: ReturnType<typeof useLa
 
       {c.basis && (
         <>
-          <details className="no-print mt-4 text-xs text-ink-3">
+          <details className="no-print mt-5 text-xs text-ink-3">
             <summary className="cursor-pointer select-none font-medium text-ink-2 hover:text-primary">{labels.basis}</summary>
             <p className="mt-1.5 leading-relaxed">{c.basis}</p>
           </details>
@@ -94,16 +94,15 @@ function Clause({ c, labels }: { c: TermsClause; labels: ReturnType<typeof useLa
   );
 }
 
-function useLabels() {
-  return useI18n().t.termsPage;
-}
+type Labels = (typeof translations)["de"]["termsPage"];
 
 export function TermsPage() {
   const { locale, tag } = useI18n();
-  const labels = useLabels();
   const [override, setOverride] = useState<"de" | "en" | null>(null);
 
   const docLang = override ?? (locale === "en" ? "en" : "de");
+  /* Beschriftungen folgen der Dokumentsprache; Datum dem Zahlenformat der Oberfläche. */
+  const labels = translations[docLang].termsPage;
   const doc = docLang === "en" ? termsEn : termsDe;
   const legal = docLang === "en" ? legalEn : legalDe;
   const minutes = useMemo(() => readingMinutes(doc), [doc]);
@@ -111,9 +110,78 @@ export function TermsPage() {
 
   return (
     <PageShell>
-      <div className="terms-page">
-        <Container className="terms-layout grid gap-x-12 py-10 sm:py-14 lg:grid-cols-[13rem_minmax(0,1fr)]">
-          {/* Inhaltsverzeichnis, Desktop */}
+      <div className="terms-page" lang={docLang}>
+        {/* Kopf, weiss, viel Luft */}
+        <section className="border-b border-line">
+          <Container className="py-14 sm:py-20">
+            <div className="max-w-3xl">
+              <p className="inline-flex items-center gap-2 text-sm font-semibold text-primary">
+                <Scale className="h-4 w-4" aria-hidden />
+                {labels.law}
+              </p>
+              <h1 className="mt-4 text-[2rem] font-bold leading-tight tracking-tight [overflow-wrap:anywhere] sm:text-5xl">{doc.title}</h1>
+              <p className="mt-5 text-lg leading-relaxed text-ink-2">{doc.lead}</p>
+              <p className="mt-6 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-ink-3">
+                <span>{fmt(labels.version, { n: doc.version, date: formatDay(doc.date, tag) })}</span>
+                <span aria-hidden>·</span>
+                <span>{fmt(labels.readingTime, { min: minutes })}</span>
+                <span aria-hidden>·</span>
+                <span>{fmt(labels.limits, { n: limitCount })}</span>
+                <span className="no-print" aria-hidden>
+                  ·
+                </span>
+                <button type="button" className="no-print inline-flex items-center gap-1 font-medium text-primary hover:underline" onClick={() => setOverride(docLang === "de" ? "en" : "de")}>
+                  <Languages className="h-3.5 w-3.5" aria-hidden />
+                  {docLang === "de" ? labels.showEnglish : labels.showGerman}
+                </button>
+              </p>
+              {docLang === "de" && (locale === "fr" || locale === "it") && <p className="mt-2 text-sm text-ink-3">{translations[locale].termsPage.translationNote}</p>}
+              {operatorHasPlaceholders() && (
+                <div role="alert" className="mt-8 flex gap-3 rounded-xl border border-warn/40 bg-warn-soft px-4 py-3 text-sm text-ink">
+                  <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-warn" aria-hidden />
+                  <span>{legal.placeholderWarning}</span>
+                </div>
+              )}
+            </div>
+          </Container>
+        </section>
+
+        {/* Das Wichtigste: weisse Karte auf Papier */}
+        <section id="terms-summary" aria-labelledby="terms-summary-h" className="paper scroll-mt-28 border-b border-line">
+          <Container className="py-12 sm:py-16">
+            <div className="card mx-auto max-w-4xl p-6 sm:p-10">
+              <h2 id="terms-summary-h" className="text-2xl font-bold tracking-tight sm:text-3xl">
+                {labels.summaryTitle}
+              </h2>
+              <ul className="mt-6 grid gap-x-10 gap-y-6 sm:grid-cols-2">
+                {doc.summary.map((s) => (
+                  <li key={s.text} className="flex gap-3">
+                    <span className={cn("mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full", s.tag === "limit" ? "bg-warn-soft" : "bg-primary-soft")}>
+                      <SummaryIcon tag={s.tag} />
+                    </span>
+                    <div className="min-w-0 leading-snug">
+                      <p className="text-ink">{s.text}</p>
+                      <p className="mt-1.5 flex flex-wrap gap-x-3 text-sm">
+                        {s.refs.map((r) => (
+                          <a key={r} href={`#${clauseId(r)}`} className="inline-flex items-center gap-0.5 font-medium text-primary underline-offset-4 hover:underline">
+                            {fmt(labels.clause, { n: r })}
+                            <ArrowRight className="h-3 w-3" aria-hidden />
+                          </a>
+                        ))}
+                      </p>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+              <p className="mt-8 border-t border-line pt-5 text-sm leading-relaxed text-ink-3">
+                {labels.summaryNote} {labels.legendIntro}
+              </p>
+            </div>
+          </Container>
+        </section>
+
+        {/* Klauseln, weiss, mit Inhaltsverzeichnis */}
+        <Container className="terms-layout grid gap-x-12 py-14 sm:py-20 lg:grid-cols-[13rem_minmax(0,1fr)]">
           <aside className="no-print hidden lg:block">
             <nav aria-label={labels.toc} className="sticky top-24">
               <p className="text-xs font-semibold uppercase tracking-[0.1em] text-ink-3">{labels.toc}</p>
@@ -137,85 +205,23 @@ export function TermsPage() {
           </aside>
 
           <div className="min-w-0 max-w-3xl">
-            {/* Kopf */}
-            <header>
-              <p className="inline-flex items-center gap-2 text-sm font-semibold text-primary">
-                <Scale className="h-4 w-4" aria-hidden />
-                {labels.law}
-              </p>
-              <h1 className="mt-3 text-[2rem] font-bold leading-tight tracking-tight [overflow-wrap:anywhere] sm:text-5xl">{doc.title}</h1>
-              <p className="mt-4 text-lg leading-relaxed text-ink-2">{doc.lead}</p>
-              <p className="mt-4 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-ink-3">
-                <span>{fmt(labels.version, { n: doc.version, date: formatDay(doc.date, tag) })}</span>
-                <span aria-hidden>·</span>
-                <span>{fmt(labels.readingTime, { min: minutes })}</span>
-                <span aria-hidden>·</span>
-                <span>{fmt(labels.limits, { n: limitCount })}</span>
-                <span className="no-print" aria-hidden>
-                  ·
-                </span>
-                <button type="button" className="no-print inline-flex items-center gap-1 font-medium text-primary hover:underline" onClick={() => setOverride(docLang === "de" ? "en" : "de")}>
-                  <Languages className="h-3.5 w-3.5" aria-hidden />
-                  {docLang === "de" ? labels.showEnglish : labels.showGerman}
-                </button>
-              </p>
-              {labels.translationNote && docLang === "de" && <p className="mt-2 text-sm text-ink-3">{labels.translationNote}</p>}
-              {operatorHasPlaceholders() && (
-                <div role="alert" className="mt-6 flex gap-3 rounded-xl border border-warn/40 bg-warn-soft px-4 py-3 text-sm text-ink">
-                  <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-warn" aria-hidden />
-                  <span>{legal.placeholderWarning}</span>
-                </div>
-              )}
-            </header>
-
-            {/* Das Wichtigste */}
-            <section id="terms-summary" aria-labelledby="terms-summary-h" className="card mt-10 scroll-mt-24 p-5 sm:p-7">
-              <h2 id="terms-summary-h" className="text-xl font-bold tracking-tight sm:text-2xl">
-                {labels.summaryTitle}
-              </h2>
-              <ul className="mt-4 grid gap-x-8 gap-y-4 sm:grid-cols-2">
-                {doc.summary.map((s) => (
-                  <li key={s.text} className="flex gap-3">
-                    <span className={cn("mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full", s.tag === "limit" ? "bg-warn-soft" : "bg-primary-soft")}>
-                      <SummaryIcon tag={s.tag} />
-                    </span>
-                    <div className="min-w-0 text-[0.95rem] leading-snug">
-                      <p className="text-ink">{s.text}</p>
-                      <p className="mt-1 flex flex-wrap gap-x-3 text-sm">
-                        {s.refs.map((r) => (
-                          <a key={r} href={`#${clauseId(r)}`} className="inline-flex items-center gap-0.5 font-medium text-primary underline-offset-4 hover:underline">
-                            {fmt(labels.clause, { n: r })}
-                            <ArrowRight className="h-3 w-3" aria-hidden />
-                          </a>
-                        ))}
-                      </p>
-                    </div>
-                  </li>
-                ))}
-              </ul>
-              <p className="mt-5 border-t border-line pt-4 text-sm text-ink-3">
-                {labels.summaryNote} {labels.legendIntro}
-              </p>
-            </section>
-
-            {/* Klauseln */}
-            <div className="mt-12 grid gap-8">
+            <div className="grid gap-10">
               {doc.clauses.map((c) => (
                 <Clause key={c.n} c={c} labels={labels} />
               ))}
             </div>
 
             {/* Fassungen */}
-            <section aria-labelledby="terms-history-h" className="mt-14 border-t border-line pt-8">
+            <section aria-labelledby="terms-history-h" className="mt-16 border-t border-line pt-10">
               <h2 id="terms-history-h" className="text-xl font-bold tracking-tight">
                 {labels.historyTitle}
               </h2>
-              <ol className="mt-4 grid gap-3">
+              <ol className="mt-5 grid gap-3">
                 {doc.history.map((h) => {
                   const archived = doc.archive.find((a) => a.version === h.version);
                   return (
                     <li key={h.version} className="text-sm">
-                      <details className="group rounded-xl border border-line bg-surface px-4 py-3">
+                      <details className="rounded-xl border border-line bg-surface px-4 py-3">
                         <summary className="flex cursor-pointer flex-wrap items-center gap-2 font-medium text-ink">
                           {fmt(labels.version, { n: h.version, date: formatDay(h.date, tag) })}
                           {h.version === doc.version && <span className="badge badge-good">{labels.current}</span>}

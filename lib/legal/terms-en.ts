@@ -68,6 +68,10 @@ export const termsEn: TermsDoc = {
           n: "2.5",
           text: "A share link contains the entire analysis in compressed form in the part of the address after the # sign. Browsers do not send this part to servers, and we do not store share links.",
         },
+        {
+          n: "2.6",
+          text: "The website contains a few links to third-party websites, for example to the hosting provider's privacy notice or to supervisory authorities. Their operators are responsible for that content; we check it when we set the link, not continuously.",
+        },
       ],
       basis: "Description of service; for data processing see privacy policy sections 4 to 7",
     },
@@ -131,7 +135,7 @@ export const termsEn: TermsDoc = {
           text: "Share links and export files contain the complete analysis. Share them only with people who may see the content. Anyone who has a link can open the analysis; a shared link cannot technically be withdrawn.",
         },
       ],
-      basis: "Art. 5 lit. j FADP and Art. 4 no. 7 GDPR (controller), Art. 328b Swiss Code of Obligations (data in employment), Art. 3 Gender Equality Act (no discrimination on grounds of sex at work)",
+      basis: "Art. 5 lit. j FADP and Art. 4 no. 7 GDPR (controller), Art. 328 and 328b Swiss Code of Obligations (protection of personality and data in employment), Art. 3 Gender Equality Act (no discrimination on grounds of sex at work), Directives 2000/43/EC and 2000/78/EC (equal treatment in the EU)",
     },
     {
       n: 6,
@@ -191,7 +195,7 @@ export const termsEn: TermsDoc = {
             "No ads and no tracking: no advertising, no analytics or tracking tools, no cookies.",
             "No selling of data: we do not sell, rent or trade any data.",
             "No content on servers: the content of your analyses is not transmitted to us.",
-            "Advance notice: we announce changes to these terms to your disadvantage and a shutdown of the application at least 30 days in advance on this page (sections 9.3 and 12.2).",
+            "Advance notice: we announce changes to these terms to your disadvantage and a shutdown of the application at least 30 days in advance on this page (sections 9.4 and 12.2).",
           ],
         },
         { n: "8.2", text: "If we break a commitment, you have the statutory rights for breach of contract." },
@@ -200,9 +204,9 @@ export const termsEn: TermsDoc = {
     },
     {
       n: 9,
-      title: "Availability, development and shutdown",
+      title: "Availability, warranty and shutdown",
       tags: ["limit"],
-      short: "We do not guarantee constant availability and may change features for objective reasons. If the application is shut down, you will know 30 days in advance.",
+      short: "We guarantee neither constant availability nor freedom from errors and may change features for objective reasons. If the application is shut down, you will know 30 days in advance.",
       items: [
         {
           n: "9.1",
@@ -210,15 +214,19 @@ export const termsEn: TermsDoc = {
         },
         {
           n: "9.2",
-          text: "We may develop the application further and change or remove features if there is an objective reason, such as technical development, security or a change in the law, and if the change is reasonable for you. We take care that older JSON exports remain importable.",
+          text: `We provide the application in its current version. Because it is free of charge, we warrant neither freedom from errors nor fitness for a particular purpose. We fix known errors as part of further development; reports are welcome at ${o.email}. Liability is governed by section 10.`,
         },
         {
           n: "9.3",
+          text: "We may develop the application further and change or remove features if there is an objective reason, such as technical development, security or a change in the law, and if the change is reasonable for you. We take care that older JSON exports remain importable.",
+        },
+        {
+          n: "9.4",
           text: "We may shut the application down. We announce this at least 30 days in advance on the website so that you can export your analyses. If an immediate shutdown is necessary for legal or compelling security reasons, we inform you as early as possible.",
         },
-        { n: "9.4", text: `Support is voluntary. We usually answer enquiries to ${o.email} within ten working days.` },
+        { n: "9.5", text: `Support is voluntary. We usually answer enquiries to ${o.email} within ten working days.` },
       ],
-      basis: "Art. 8 Unfair Competition Act (no abusive disadvantage), Annex no. 1 lit. k Directive 93/13/EEC (no change of service without valid reason)",
+      basis: "Art. 99 para. 2 Swiss Code of Obligations (milder standard of liability for gratuitous transactions), Art. 8 Unfair Competition Act (no abusive disadvantage), Annex no. 1 lit. k Directive 93/13/EEC (no change of service without valid reason)",
     },
     {
       n: 10,
@@ -315,7 +323,8 @@ export const termsEn: TermsDoc = {
       note: "Completely rewritten. No change puts you in a worse position than version 1.",
       changes: [
         "New structure: overview, short version for every clause, marked restrictions and legal bases.",
-        "New: binding commitments (section 8) and 30 days' notice of disadvantageous changes and before a shutdown (sections 9.3, 12.2).",
+        "New: binding commitments (section 8) and 30 days' notice of disadvantageous changes and before a shutdown (sections 9.4, 12.2).",
+        "New: warranty expressly regulated (section 9.2) and note on third-party links (section 2.6).",
         "New: disclosure of AI images and example voices on the home page (section 11).",
         "Clarified: third-party personal data and fair criteria in hiring decisions (section 5), jurisdiction for consumers (section 13).",
         "Liability: personal injury and product liability now expressly reserved (section 10.1).",
