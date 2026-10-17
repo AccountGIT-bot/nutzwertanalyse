@@ -86,7 +86,7 @@ export function ExpertiseSection() {
   return (
     <div ref={ref} className="relative isolate overflow-hidden">
       {/* Desktop: Bild als Hintergrund der rechten Seite */}
-      <div className="absolute inset-y-0 right-0 hidden w-[68%] lg:block" aria-hidden>
+      <div className="absolute inset-y-0 right-0 hidden w-[68%] overflow-hidden lg:block" aria-hidden>
         <Image src="/images/landing/desk.webp" alt="" fill sizes="(min-width: 1024px) 68vw, 100vw" placeholder="blur" blurDataURL={DESK_BLUR} className={cn("expertise-img object-cover object-[62%_center]", seen && "is-on")} />
         <div className="absolute inset-0 bg-gradient-to-r from-bg from-[12%] via-bg/80 via-[38%] to-transparent to-[72%]" />
         <div className="absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-bg to-transparent" />
@@ -129,7 +129,7 @@ export function ExpertiseSection() {
 
         {/* Mobil/Tablet: Bild mit Badge unter dem Text */}
         <div className="relative -mx-4 mb-16 overflow-hidden sm:-mx-6 sm:mb-24 lg:hidden">
-          <div className="relative aspect-[16/10]">
+          <div className="relative aspect-[16/10] overflow-hidden">
             <Image src="/images/landing/desk.webp" alt={x.imageAlt} fill sizes="100vw" placeholder="blur" blurDataURL={DESK_BLUR} className="object-cover object-[65%_center]" />
             <div className="absolute inset-x-0 top-0 h-20 bg-gradient-to-b from-bg to-transparent" />
             <div className="absolute inset-0 flex items-center justify-start pl-6 sm:pl-10">
