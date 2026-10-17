@@ -4,7 +4,7 @@ Alle freigegebenen Veröffentlichungen von Nutzwertanalyse. Entwicklung auf `dev
 
 ## 2.1.0 – 17.10.2026
 
-Release-PR: [#31](https://github.com/AccountGIT-bot/nutzwertanalyse/pull/31). Freigabe durch Liam: ausstehend (wird nach dem Merge mit Datum und Merge-Commit ergänzt).
+Release-PR: [#31](https://github.com/AccountGIT-bot/nutzwertanalyse/pull/31). Freigegeben von Liam am 17.10.2026 in zwei Schritten (drei Schaltflächen, zweite Bestätigung), Merge-Commit `5e7352e`.
 
 - Neue Startseiten-Sektion «Vertrauen»: Text links, cinematisches Bild rechts mit Verlauf in die Seitenfarbe (hell und dunkel), schwebende Kennzahl «100 % im Browser berechnet» mit Zählanimation und sich zeichnendem Ring; mobil mit Bild unter dem Text.
 - Neue Startseiten-Sektion «Stimmen»: vollflächiger, vorab weichgezeichneter Hintergrund mit langsamer Kamerafahrt, helle Karte mit Feedback-Aufruf und Karussell aus klar gekennzeichneten Beispielstimmen, vier Argumente mit Haken. Keine behaupteten Bewertungen; der Feedback-Button erscheint erst mit befüllter Betreiber-E-Mail in `lib/site.ts`.
