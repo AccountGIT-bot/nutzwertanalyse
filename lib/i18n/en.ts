@@ -725,6 +725,17 @@ export const en: Translations = {
     mission: "We make the proven utility analysis method accessible to everyone: free, understandable, data-minimal and without an account.",
   },
   landingExtra: {
+    sectionNav: ["Overview", "Features", "Flow", "Video", "Use cases", "Privacy"],
+    stats: [
+      { value: 6, suffix: "", label: "steps to a decision" },
+      { value: 4, suffix: "", label: "weighting methods" },
+      { value: 10, suffix: "", label: "templates" },
+      { value: 0, suffix: "", label: "servers holding your data" },
+    ],
+    tourHint: "Keep scrolling – each feature is shown on the left.",
+    flowBrowser: "Your browser",
+    flowServer: "Server",
+    flowBlocked: "no transfer",
     includedTitle: "What’s included",
     includedLead: "Everything a sound decision needs – and nothing that distracts.",
     included: [

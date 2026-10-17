@@ -104,7 +104,7 @@ export const legalEn: LegalSet = {
         },
         {
           type: "p",
-          text: `The host is based in the USA and operates a global content delivery network; delivery usually takes place via server locations in Europe. A transfer of technical access data to the USA cannot be ruled out. It takes place on the basis of the Swiss-U.S. Data Privacy Framework or the EU-U.S. Data Privacy Framework, insofar as the host is certified, and additionally on the basis of the EU Commission's standard contractual clauses (Art. 16 para. 2 lit. d FADP; Art. 46 para. 2 lit. c GDPR). Host's privacy notice: [${h.privacyUrl}](${h.privacyUrl}).`,
+          text: `The host is based in the USA. Static pages are delivered via a global content delivery network; server-side functions (only the generation of the social-media preview image) run in the Frankfurt (EU) region. A transfer of technical access data to the USA can nevertheless not be ruled out, for example for logs and network operation. It takes place on the basis of the Swiss-U.S. Data Privacy Framework or the EU-U.S. Data Privacy Framework, insofar as the host is certified, and additionally on the basis of the EU Commission's standard contractual clauses (Art. 16 para. 2 lit. d FADP; Art. 46 para. 2 lit. c GDPR). Host's privacy notice: [${h.privacyUrl}](${h.privacyUrl}).`,
         },
         { type: "h2", text: "5. Local storage in the browser (localStorage)" },
         {

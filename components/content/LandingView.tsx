@@ -9,14 +9,25 @@ import { HeroVisual } from "@/components/illustrations/HeroVisual";
 import { PRESET_ILLUSTRATIONS } from "@/components/illustrations/Presets";
 import { Reveal } from "@/components/ui/Reveal";
 import { ExplainerVideo } from "@/components/content/ExplainerVideo";
+import { FeatureTour } from "@/components/content/landing/FeatureTour";
+import { StepsTimeline } from "@/components/content/landing/StepsTimeline";
+import { SectionNav } from "@/components/content/landing/SectionNav";
+import { StatStrip } from "@/components/content/landing/StatStrip";
+import { DataFlow } from "@/components/content/landing/DataFlow";
+
+const SECTION_IDS = ["hero", "funktionen", "ablauf", "video", "anwendungsfaelle", "datenschutz"];
 
 export function LandingView() {
   const t = useT();
   const x = t.landingExtra;
+  const sections = SECTION_IDS.map((id, i) => ({ id, label: x.sectionNav[i] }));
+
   return (
     <PageShell>
+      <SectionNav sections={sections} />
+
       {/* Hero */}
-      <section className="border-b border-line">
+      <section id="hero" className="border-b border-line scroll-mt-20">
         <Container className="grid items-center gap-12 py-16 sm:py-24 lg:grid-cols-[1.05fr_1fr]">
           <div className="fade-up">
             <p className="text-sm font-semibold text-primary">{t.landing.eyebrow}</p>
@@ -56,8 +67,15 @@ export function LandingView() {
         </Container>
       </section>
 
-      {/* Was dazugehört */}
-      <section className="py-16 sm:py-24" aria-labelledby="included-h">
+      {/* Kennzahlen */}
+      <section className="paper border-b border-line" aria-label={x.includedTitle}>
+        <Container className="py-10 sm:py-12">
+          <StatStrip />
+        </Container>
+      </section>
+
+      {/* Funktionen: Scroll-Tour */}
+      <section id="funktionen" className="py-16 scroll-mt-20 sm:py-24" aria-labelledby="included-h">
         <Container>
           <Reveal className="max-w-2xl">
             <h2 id="included-h" className="text-3xl font-bold tracking-tight sm:text-4xl">
@@ -65,22 +83,14 @@ export function LandingView() {
             </h2>
             <p className="mt-3 text-ink-2">{x.includedLead}</p>
           </Reveal>
-          <ol className="mt-10 grid gap-x-10 gap-y-8 sm:grid-cols-2">
-            {x.included.map((item, i) => (
-              <Reveal key={item.title} as="li" delay={i * 50} className="flex gap-4 border-t border-line pt-5">
-                <span className="w-8 shrink-0 text-sm font-semibold tabular text-primary">{String(i + 1).padStart(2, "0")}</span>
-                <div>
-                  <h3 className="text-base font-semibold">{item.title}</h3>
-                  <p className="mt-1 text-sm leading-relaxed text-ink-2">{item.text}</p>
-                </div>
-              </Reveal>
-            ))}
-          </ol>
+          <div className="mt-12">
+            <FeatureTour />
+          </div>
         </Container>
       </section>
 
-      {/* Ablauf */}
-      <section className="paper border-y border-line py-16 sm:py-24" aria-labelledby="how-h">
+      {/* Ablauf: Timeline */}
+      <section id="ablauf" className="paper border-y border-line py-16 scroll-mt-20 sm:py-24" aria-labelledby="how-h">
         <Container>
           <Reveal className="max-w-2xl">
             <h2 id="how-h" className="text-3xl font-bold tracking-tight sm:text-4xl">
@@ -88,16 +98,10 @@ export function LandingView() {
             </h2>
             <p className="mt-3 text-ink-2">{t.landing.howLead}</p>
           </Reveal>
-          <ol className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {t.landing.how.map((s, i) => (
-              <Reveal key={s.title} as="li" delay={i * 60} className="card p-5">
-                <span className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-sm font-bold text-primary-ink">{i + 1}</span>
-                <h3 className="mt-4 text-base font-semibold">{s.title}</h3>
-                <p className="mt-1.5 text-sm leading-relaxed text-ink-2">{s.text}</p>
-              </Reveal>
-            ))}
-          </ol>
-          <Reveal className="mt-8">
+          <div className="mt-12">
+            <StepsTimeline />
+          </div>
+          <Reveal className="mt-10">
             <Link href="/so-funktionierts" className="btn btn-secondary">
               {x.stepsCta}
               <ArrowRight className="h-4 w-4" aria-hidden />
@@ -107,7 +111,7 @@ export function LandingView() {
       </section>
 
       {/* Video */}
-      <section className="py-16 sm:py-24" aria-labelledby="video-h">
+      <section id="video" className="py-16 scroll-mt-20 sm:py-24" aria-labelledby="video-h">
         <Container className="grid items-center gap-10 lg:grid-cols-[1fr_1.3fr]">
           <Reveal>
             <h2 id="video-h" className="text-3xl font-bold tracking-tight sm:text-4xl">
@@ -126,7 +130,7 @@ export function LandingView() {
       </section>
 
       {/* Anwendungsfälle */}
-      <section className="paper border-y border-line py-16 sm:py-24" aria-labelledby="usecases-h">
+      <section id="anwendungsfaelle" className="paper border-y border-line py-16 scroll-mt-20 sm:py-24" aria-labelledby="usecases-h">
         <Container>
           <Reveal className="flex flex-wrap items-end justify-between gap-4">
             <div className="max-w-2xl">
@@ -145,7 +149,10 @@ export function LandingView() {
               const Ill = PRESET_ILLUSTRATIONS[id];
               return (
                 <Reveal key={id} as="li" delay={i * 40}>
-                  <Link href={`/app/analyse?new=1&preset=${id}`} className="card group flex h-full flex-col p-4 transition-colors hover:border-primary">
+                  <Link
+                    href={`/app/analyse?new=1&preset=${id}`}
+                    className="usecase-card card group flex h-full flex-col p-4 transition-all duration-300 hover:-translate-y-1 hover:border-primary hover:shadow-md"
+                  >
                     <Ill className="h-auto w-full" />
                     <span className="mt-3 text-sm font-semibold group-hover:text-primary">{t.presets[id].label}</span>
                     <span className="text-xs text-ink-3">{t.presets[id].hint}</span>
@@ -158,8 +165,8 @@ export function LandingView() {
       </section>
 
       {/* Datenschutz + CTA */}
-      <section className="py-16 sm:py-24" aria-labelledby="privacy-h">
-        <Container className="grid items-start gap-10 lg:grid-cols-2">
+      <section id="datenschutz" className="py-16 scroll-mt-20 sm:py-24" aria-labelledby="privacy-h">
+        <Container className="grid items-center gap-10 lg:grid-cols-2">
           <Reveal>
             <div className="flex items-center gap-2 text-sm font-semibold text-primary">
               <ShieldCheck className="h-4 w-4" aria-hidden />
@@ -178,15 +185,20 @@ export function LandingView() {
               ))}
             </ul>
           </Reveal>
-          <Reveal delay={100} className="rounded-2xl border border-line bg-surface p-8">
-            <h3 className="text-2xl font-bold tracking-tight">{t.landing.finalTitle}</h3>
-            <p className="mt-2 text-ink-2">{t.landing.finalText}</p>
-            <div className="mt-6 flex flex-wrap gap-3">
-              <Link href="/app/analyse?new=1" className="btn btn-primary btn-lg">
+          <Reveal delay={100}>
+            <DataFlow />
+          </Reveal>
+        </Container>
+        <Container className="mt-16">
+          <Reveal className="rounded-3xl bg-primary px-6 py-12 text-center text-primary-ink sm:px-12">
+            <h2 className="text-2xl font-bold tracking-tight sm:text-3xl">{t.landing.finalTitle}</h2>
+            <p className="mt-2 opacity-90">{t.landing.finalText}</p>
+            <div className="mt-6 flex flex-wrap justify-center gap-3">
+              <Link href="/app/analyse?new=1" className="btn btn-lg bg-white text-primary-strong hover:bg-white/90">
                 {t.landing.ctaPrimary}
                 <ArrowRight className="h-5 w-5" aria-hidden />
               </Link>
-              <Link href="/faq" className="btn btn-ghost btn-lg">
+              <Link href="/faq" className="btn btn-lg border border-white/30 text-primary-ink hover:bg-white/10">
                 {t.nav.faq}
               </Link>
             </div>

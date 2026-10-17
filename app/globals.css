@@ -214,8 +214,16 @@ body {
   font-weight: 600;
   transition: top 0.15s;
 }
-.skip-link:focus {
+/* Nur bei Tastaturfokus zeigen. Next.js setzt nach jedem Seitenwechsel den
+   Fokus programmatisch auf das erste Element der Seite (diesen Link); nach
+   einem Mausklick ist das kein :focus-visible und der Link bleibt verborgen. */
+.skip-link:focus-visible {
   top: 1rem;
+}
+@supports not selector(:focus-visible) {
+  .skip-link:focus {
+    top: 1rem;
+  }
 }
 
 @layer components {
@@ -400,7 +408,7 @@ select.input {
   padding-left: 1.3rem;
   margin: 0.5rem 0;
 }
-.prose-legal a {
+.prose-legal a:not(.btn):not(.badge) {
   color: var(--primary);
   text-decoration: underline;
   text-underline-offset: 3px;
@@ -596,6 +604,120 @@ input[type="range"].slider:focus-visible::-webkit-slider-thumb {
 }
 .paper {
   background: var(--surface-2);
+}
+
+
+/* Geführte Startseite */
+@keyframes float-y {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+@keyframes draw-x {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+@keyframes draw-y {
+  from {
+    transform: scaleY(0);
+  }
+  to {
+    transform: scaleY(1);
+  }
+}
+@keyframes travel {
+  0% {
+    offset-distance: 0%;
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    offset-distance: 100%;
+    opacity: 0;
+  }
+}
+@keyframes blink {
+  0%,
+  100% {
+    opacity: 0.25;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+.tour-item {
+  transition: opacity 0.4s ease, transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s;
+  opacity: 0.55;
+}
+.tour-item[data-active="true"] {
+  opacity: 1;
+  transform: translateX(6px);
+  border-color: var(--primary);
+}
+@media (prefers-reduced-motion: reduce) {
+  .tour-item,
+  .tour-item[data-active="true"] {
+    opacity: 1;
+    transform: none;
+  }
+}
+.tour-visual-enter {
+  animation: pop 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.timeline-line {
+  transform-origin: left center;
+  animation: draw-x 1.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation-play-state: paused;
+}
+.timeline-line-v {
+  transform-origin: top center;
+  animation: draw-y 1.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation-play-state: paused;
+}
+[data-revealed="true"] .timeline-line,
+[data-revealed="true"] .timeline-line-v {
+  animation-play-state: running;
+}
+.usecase-card:hover svg {
+  animation: float-y 2.4s ease-in-out infinite;
+}
+.flow-dot {
+  offset-path: path("M48 108 C 110 80, 190 196, 252 168");
+  animation: travel 2.6s linear infinite;
+}
+.flow-dot:nth-child(2) {
+  animation-delay: 0.9s;
+}
+.flow-dot:nth-child(3) {
+  animation-delay: 1.8s;
+}
+.flow-blocked {
+  animation: blink 1.6s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .flow-dot,
+  .flow-blocked,
+  .usecase-card:hover svg {
+    animation: none;
+  }
+  .timeline-line,
+  .timeline-line-v {
+    animation: none;
+    transform: none;
+  }
 }
 
 /* =====================================================================

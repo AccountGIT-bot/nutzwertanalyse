@@ -725,6 +725,17 @@ export const it: Translations = {
     mission: "Rendiamo il metodo collaudato dell’analisi del valore d’utilità accessibile a tutti: gratuito, comprensibile, parsimonioso con i dati e senza account.",
   },
   landingExtra: {
+    sectionNav: ["Panoramica", "Funzioni", "Percorso", "Video", "Casi d’uso", "Protezione dei dati"],
+    stats: [
+      { value: 6, suffix: "", label: "passi fino alla decisione" },
+      { value: 4, suffix: "", label: "metodi di ponderazione" },
+      { value: 10, suffix: "", label: "modelli" },
+      { value: 0, suffix: "", label: "server che conservano i tuoi dati" },
+    ],
+    tourHint: "Continua a scorrere – ogni funzione viene mostrata a sinistra.",
+    flowBrowser: "Il tuo browser",
+    flowServer: "Server",
+    flowBlocked: "nessuna trasmissione",
     includedTitle: "Cosa è incluso",
     includedLead: "Tutto ciò che serve a una decisione solida – e niente che distragga.",
     included: [

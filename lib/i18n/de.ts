@@ -737,6 +737,17 @@ export const de = {
     mission: "Wir machen die bewährte Methode der Nutzwertanalyse für alle zugänglich: kostenlos, verständlich, datensparsam und ohne Konto.",
   },
   landingExtra: {
+    sectionNav: ["Überblick", "Funktionen", "Ablauf", "Video", "Anwendungsfälle", "Datenschutz"],
+    stats: [
+      { value: 6, suffix: "", label: "Schritte bis zur Entscheidung" },
+      { value: 4, suffix: "", label: "Gewichtungsmethoden" },
+      { value: 10, suffix: "", label: "Vorlagen" },
+      { value: 0, suffix: "", label: "Server, auf denen deine Daten liegen" },
+    ],
+    tourHint: "Scrolle weiter – jede Funktion wird links gezeigt.",
+    flowBrowser: "Dein Browser",
+    flowServer: "Server",
+    flowBlocked: "keine Übertragung",
     includedTitle: "Was dazugehört",
     includedLead: "Alles, was eine saubere Entscheidung braucht – und nichts, was ablenkt.",
     included: [

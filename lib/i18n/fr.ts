@@ -725,6 +725,17 @@ export const fr: Translations = {
     mission: "Nous rendons la méthode éprouvée de l’analyse de la valeur d’utilité accessible à tous : gratuite, compréhensible, sobre en données et sans compte.",
   },
   landingExtra: {
+    sectionNav: ["Aperçu", "Fonctions", "Déroulement", "Vidéo", "Cas d’usage", "Protection des données"],
+    stats: [
+      { value: 6, suffix: "", label: "étapes jusqu’à la décision" },
+      { value: 4, suffix: "", label: "méthodes de pondération" },
+      { value: 10, suffix: "", label: "modèles" },
+      { value: 0, suffix: "", label: "serveur hébergeant vos données" },
+    ],
+    tourHint: "Continuez à faire défiler – chaque fonction est illustrée à gauche.",
+    flowBrowser: "Votre navigateur",
+    flowServer: "Serveur",
+    flowBlocked: "aucune transmission",
     includedTitle: "Ce qui est inclus",
     includedLead: "Tout ce qu’une décision solide exige – et rien qui distrait.",
     included: [

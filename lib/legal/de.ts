@@ -104,7 +104,7 @@ export const legalDe: LegalSet = {
         },
         {
           type: "p",
-          text: `Der Hoster hat seinen Sitz in den USA und betreibt ein weltweites Content-Delivery-Netzwerk; die Auslieferung erfolgt in der Regel über Serverstandorte in Europa. Eine Übermittlung technischer Zugriffsdaten in die USA kann nicht ausgeschlossen werden. Sie erfolgt auf Grundlage des Swiss-U.S. Data Privacy Framework bzw. des EU-U.S. Data Privacy Framework, soweit der Hoster zertifiziert ist, sowie ergänzend auf Grundlage der Standardvertragsklauseln der EU-Kommission (Art. 16 Abs. 2 lit. d DSG; Art. 46 Abs. 2 lit. c DSGVO). Datenschutzhinweise des Hosters: [${h.privacyUrl}](${h.privacyUrl}).`,
+          text: `Der Hoster hat seinen Sitz in den USA. Die statischen Seiten werden über ein weltweites Content-Delivery-Netzwerk ausgeliefert, serverseitige Funktionen (einzig die Erzeugung des Vorschaubilds für soziale Netzwerke) laufen in der Region Frankfurt (EU). Eine Übermittlung technischer Zugriffsdaten in die USA kann dennoch nicht ausgeschlossen werden, etwa für Logs und Netzwerkbetrieb. Sie erfolgt auf Grundlage des Swiss-U.S. Data Privacy Framework bzw. des EU-U.S. Data Privacy Framework, soweit der Hoster zertifiziert ist, sowie ergänzend auf Grundlage der Standardvertragsklauseln der EU-Kommission (Art. 16 Abs. 2 lit. d DSG; Art. 46 Abs. 2 lit. c DSGVO). Datenschutzhinweise des Hosters: [${h.privacyUrl}](${h.privacyUrl}).`,
         },
         { type: "h2", text: "5. Lokale Speicherung im Browser (localStorage)" },
         {
