@@ -5,7 +5,7 @@ Diese Regeln übernehmen Liams Arbeitsweise aus dem GARAGO-Repository (Stand 13.
 ## Branches und Freigabe
 
 - `dev` ist der gemeinsame Entwicklungs- und Integrationsbranch, `main` trägt ausschliesslich freigegebene Veröffentlichungen. Details: `docs/DEVELOPMENT_WORKFLOW.md`.
-- Vor **jedem Merge nach `main`** die konkrete PR, die Prüfungen und die offenen Grenzen vorlegen und Liams ausdrückliche Freigabe für genau diesen Merge einholen. Eine bereits erteilte Freigabe für diesen konkreten Merge genügt; nicht zweimal fragen. Eine Bitte, weiterzuarbeiten oder zu pushen, ist keine Merge-Freigabe.
+- Vor **jedem Merge nach `main`** die konkrete PR, die Prüfungen und die offenen Grenzen vorlegen und Liams ausdrückliche Freigabe für genau diesen Merge einholen. Die Freigabe wird als Auswahlfrage mit drei Schaltflächen gestellt («Freigeben: jetzt nach main mergen», «Noch nicht: weiter auf dev», «Ablehnen: Paket zurückstellen»); bei «Freigeben» folgt eine zweite Bestätigungsfrage mit PR-Nummer und Zielbranch («Doppelklick»). Erst nach beiden Antworten wird gemergt. Eine so erteilte Freigabe für diesen konkreten Merge genügt; nicht ein drittes Mal fragen. Eine Bitte, weiterzuarbeiten oder zu pushen, ist keine Merge-Freigabe.
 - Kein Auto-Merge, kein direkter Entwicklungs-Push auf `main`. Alles vor der Freigabe-Anfrage fertigstellen und prüfen.
 - Zusammengehörige Änderungen zu sinnvollen lokalen Commits bündeln und einmal pushen, wenn das Arbeitspaket prüfbar ist, ein Push ausdrücklich gewünscht wird oder eine dauerhafte Übergabe nötig ist. Keine Pushes nach jeder Kleinigkeit, keine leeren Commits für Deployments.
 - `dev` wiederverwenden. Kurze Themenbranches nur bei echter Parallelarbeit oder riskanten Experimenten, nicht für jede kleine Anfrage. Bevorzugt eine Release-PR von `dev` nach `main` je fertigem Paket.
@@ -20,3 +20,4 @@ Diese Regeln übernehmen Liams Arbeitsweise aus dem GARAGO-Repository (Stand 13.
 - Vor jedem Push: `npm test`, `npm run lint`, `npm run typecheck`, `npm run build`. Für UI-Änderungen eine Browserprüfung (Desktop und 390 px) und die Druckansicht; Ergebnisse und Grenzen in `docs/QA_<datum>.md` festhalten.
 - Ein grünes Deployment ist keine Geräte- oder Browserabnahme. Ungeprüftes Verhalten ehrlich benennen.
 - Übersetzungen typsicher in `lib/i18n/` pflegen; `de.ts` ist die Referenz, alle vier Sprachen werden gemeinsam ergänzt.
+- Jede Release-PR nach `main` trägt eine neue Versionsnummer: `npm version <nummer> --no-git-tag-version` (einzige Quelle `package.json`, von dort gelesen für Einstellungsseite und JSON-LD) und den gleich nummerierten Eintrag im `CHANGELOG.md`. Keine Versionsnummern mehr hart kodieren.

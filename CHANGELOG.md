@@ -2,9 +2,20 @@
 
 Alle freigegebenen Veröffentlichungen von Nutzwertanalyse. Entwicklung auf `dev`, Freigabe nach `main` nur mit ausdrücklicher Zustimmung von Liam (siehe `docs/DEVELOPMENT_WORKFLOW.md`).
 
-## 2.0.1 – in Vorbereitung
+## 2.1.0 – 17.10.2026
 
-Release-PR: `dev` → `main`. Noch nicht freigegeben.
+Release-PR: [#31](https://github.com/AccountGIT-bot/nutzwertanalyse/pull/31). Freigabe durch Liam: ausstehend (wird nach dem Merge mit Datum und Merge-Commit ergänzt).
+
+- Neue Startseiten-Sektion «Vertrauen»: Text links, cinematisches Bild rechts mit Verlauf in die Seitenfarbe (hell und dunkel), schwebende Kennzahl «100 % im Browser berechnet» mit Zählanimation und sich zeichnendem Ring; mobil mit Bild unter dem Text.
+- Neue Startseiten-Sektion «Stimmen»: vollflächiger, vorab weichgezeichneter Hintergrund mit langsamer Kamerafahrt, helle Karte mit Feedback-Aufruf und Karussell aus klar gekennzeichneten Beispielstimmen, vier Argumente mit Haken. Keine behaupteten Bewertungen; der Feedback-Button erscheint erst mit befüllter Betreiber-E-Mail in `lib/site.ts`.
+- Abschnittsnavigation der Startseite mit acht Einträgen; Übersetzungen in Deutsch, Englisch, Französisch, Italienisch.
+- Versionsnummer wird aus `package.json` gelesen (Einstellungsseite, JSON-LD `softwareVersion`); keine hart kodierte Version mehr. `package.json` von 2.0.0 auf 2.1.0.
+- Arbeitsregeln: Versionsschritt je Release-PR, Freigabe nach `main` in zwei Schritten (drei Schaltflächen, zweite Bestätigung), Branch-Bereinigung vom 17.10.2026 dokumentiert.
+- Prüfbericht `docs/QA_2026-10-17.md`: Tests, Lint, Typecheck, Build, Chromium 1280 px und 390 px, hell/dunkel, reduzierte Bewegung, Druck.
+
+## 2.0.1 – 17.10.2026
+
+Release-PR: [#30](https://github.com/AccountGIT-bot/nutzwertanalyse/pull/30). Freigegeben von Liam am 17.10.2026, Merge-Commit `e626259`.
 
 - Button «Analyse starten» am Ende der Methodenseite war unlesbar (Linkfarbe des Textblocks überschrieb die Buttonfarbe); Link-Regel auf Fliesstext eingegrenzt.
 - Serverseitige Funktion (Open-Graph-Bild) auf die Vercel-Region Frankfurt festgelegt; Hosting-Abschnitt der Datenschutzerklärung (DE/EN) beschreibt CDN-Auslieferung, EU-Funktionen und mögliche US-Übermittlung präzise. `legalVersion` 2026-10-17.

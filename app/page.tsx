@@ -1,5 +1,5 @@
 import { LandingView } from "@/components/content/LandingView";
-import { site } from "@/lib/site";
+import { appVersion, site } from "@/lib/site";
 
 export default function Page() {
   const jsonLd = {
@@ -9,6 +9,7 @@ export default function Page() {
     url: site.url,
     applicationCategory: "BusinessApplication",
     operatingSystem: "Web",
+    softwareVersion: appVersion,
     offers: { "@type": "Offer", price: "0", priceCurrency: "CHF" },
     description:
       "Kostenloses Online-Tool für die Nutzwertanalyse: Alternativen definieren, Kriterien gewichten, bewerten, Sensitivität prüfen und als PDF exportieren. Ohne Konto, ohne Tracking.",

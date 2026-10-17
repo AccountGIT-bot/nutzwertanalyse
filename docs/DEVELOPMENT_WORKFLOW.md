@@ -17,8 +17,8 @@ Ein Push auf `dev` ist keine Freigabe für `main`. Vor **jedem Merge nach `main`
 2. Zusammengehörige Korrekturen lokal fertigstellen. Kleine Folgeanpassungen am selben Ergebnis zusammen erledigen.
 3. Passend zum Risiko prüfen: `npm test`, `npm run lint`, `npm run typecheck`, `npm run build`; für UI-Änderungen zusätzlich eine Darstellungsprüfung im Browser (Desktop und 390 px) sowie die Druckansicht.
 4. Einen verständlich benannten Commit je abgeschlossenem Arbeitspaket erstellen. Einmal pushen, wenn das Paket prüfbar ist, ein expliziter Push gewünscht wird oder eine dauerhafte Übergabe nötig ist. Keine Pushes nach jedem Textsatz, keine leeren Deployment-Commits.
-5. Für eine fertig geprüfte Veröffentlichung eine gemeinsame PR `dev` → `main` erstellen oder aktualisieren und den Eintrag im `CHANGELOG.md` ergänzen.
-6. Konkrete Freigabe einholen, erst dann mergen. Anschliessend Deployment-Status und Produktionsstand prüfen. `dev` wieder mit `main` synchronisieren.
+5. Für eine fertig geprüfte Veröffentlichung eine gemeinsame PR `dev` → `main` erstellen oder aktualisieren. Dazu gehört immer der Versionsschritt: `npm version <neue Nummer> --no-git-tag-version` (aktualisiert `package.json` und `package-lock.json`; die Einstellungsseite und das JSON-LD lesen die Nummer von dort) sowie der gleich nummerierte Eintrag im `CHANGELOG.md`. Versionsnummer und Changelog-Eintrag müssen vor der Freigabe-Anfrage im PR enthalten sein.
+6. Konkrete Freigabe einholen, erst dann mergen. Die Freigabe läuft in zwei Schritten: zuerst eine Auswahlfrage mit drei Schaltflächen («Freigeben: jetzt nach main mergen», «Noch nicht: weiter auf dev», «Ablehnen: Paket zurückstellen»), bei «Freigeben» eine zweite Bestätigungsfrage mit PR-Nummer und Zielbranch. Nur zwei zustimmende Antworten lösen den Merge aus. Anschliessend Deployment-Status und Produktionsstand prüfen. `dev` wieder mit `main` synchronisieren.
 
 Kurze Themenbranches sind für echte parallele Arbeit oder riskante Experimente erlaubt und gehen zuerst nach `dev`. Sie sind keine dauerhafte dritte Ebene.
 
@@ -28,7 +28,7 @@ Für die beiden dauerhaften Branches `dev` und `main` reguläre PR-Merges verwen
 
 ## Einmalige Einrichtung (16.10.2026)
 
-Der Neubau der Anwendung entstand auf dem Themenbranch `claude/dazzling-allen-sykizw`. `dev` wurde aus diesem Stand angelegt; die erste Release-PR `dev` → `main` ([#29](https://github.com/AccountGIT-bot/nutzwertanalyse/pull/29), gemergt am 17.10.2026 nach Liams Freigabe) ersetzte die bisherige v0-/Prototyp-Historie auf `main` durch den geprüften Neubau. Ältere Themenbranches (`v0/*`, `codex/*`, `claude/*`) bleiben bis zu einer ausdrücklichen Bereinigung durch Liam bestehen.
+Der Neubau der Anwendung entstand auf dem Themenbranch `claude/dazzling-allen-sykizw`. `dev` wurde aus diesem Stand angelegt; die erste Release-PR `dev` → `main` ([#29](https://github.com/AccountGIT-bot/nutzwertanalyse/pull/29), gemergt am 17.10.2026 nach Liams Freigabe) ersetzte die bisherige v0-/Prototyp-Historie auf `main` durch den geprüften Neubau. Die älteren Themenbranches (`v0/*`, `codex/*`, `claude/*`) hat Liam am 17.10.2026 in GitHub gelöscht und die überholte PR [#28](https://github.com/AccountGIT-bot/nutzwertanalyse/pull/28) geschlossen; seither bestehen nur noch `dev` und `main`. Der Neubau-Stand bleibt über die Merge-Commits von #29 und #30 auf `main` wiederherstellbar.
 
 ## Geltungsbereich der Absicherung
 
