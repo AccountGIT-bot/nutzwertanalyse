@@ -16,21 +16,30 @@ export function FeatureTour() {
   const refs = useRef<(HTMLLIElement | null)[]>([]);
 
   useEffect(() => {
-    if (typeof IntersectionObserver === "undefined") return;
-    const io = new IntersectionObserver(
-      (entries) => {
-        // Der Eintrag, der die Mitte des Viewports am besten trifft, wird aktiv
-        let best: { i: number; ratio: number } | null = null;
-        for (const e of entries) {
-          const i = Number((e.target as HTMLElement).dataset.index);
-          if (e.isIntersecting && (!best || e.intersectionRatio > best.ratio)) best = { i, ratio: e.intersectionRatio };
-        }
-        if (best) setActive(best.i);
-      },
-      { rootMargin: "-40% 0px -45% 0px", threshold: [0, 0.25, 0.5, 0.75, 1] },
-    );
-    refs.current.forEach((el) => el && io.observe(el));
-    return () => io.disconnect();
+    // Aktiv ist der letzte Eintrag, dessen Oberkante die Bildschirmmitte
+    // erreicht hat. Rein positionsbasiert: Jede Scrollposition ergibt genau
+    // einen Eintrag, beim langsamen Scrollen wird keiner übersprungen.
+    let raf = 0;
+    const update = () => {
+      raf = 0;
+      const line = window.innerHeight * 0.5;
+      let idx = 0;
+      refs.current.forEach((el, i) => {
+        if (el && el.getBoundingClientRect().top <= line) idx = i;
+      });
+      setActive(idx);
+    };
+    const schedule = () => {
+      if (!raf) raf = requestAnimationFrame(update);
+    };
+    schedule();
+    window.addEventListener("scroll", schedule, { passive: true });
+    window.addEventListener("resize", schedule);
+    return () => {
+      if (raf) cancelAnimationFrame(raf);
+      window.removeEventListener("scroll", schedule);
+      window.removeEventListener("resize", schedule);
+    };
   }, []);
 
   return (

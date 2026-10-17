@@ -9,6 +9,7 @@ Release-PR: `dev` → `main`. Noch nicht freigegeben.
 - Button «Analyse starten» am Ende der Methodenseite war unlesbar (Linkfarbe des Textblocks überschrieb die Buttonfarbe); Link-Regel auf Fliesstext eingegrenzt.
 - Serverseitige Funktion (Open-Graph-Bild) auf die Vercel-Region Frankfurt festgelegt; Hosting-Abschnitt der Datenschutzerklärung (DE/EN) beschreibt CDN-Auslieferung, EU-Funktionen und mögliche US-Übermittlung präzise. `legalVersion` 2026-10-17.
 - Geführte Startseite unterhalb des Hero: Kennzahlenband mit Zähl-Animation, Scroll-Tour «Was dazugehört» mit mitlaufender Visualisierung pro Funktion, sechsstufiger Ablauf als sich zeichnende Timeline, Abschnittsnavigation am rechten Rand (Desktop) und animiertes Datenschutz-Schema (Daten bleiben im Browser, Serverweg blockiert). Alle Animationen respektieren `prefers-reduced-motion`; ohne JavaScript bleiben die Inhalte sichtbar.
+- Scroll-Tour «Was dazugehört»: Der aktive Eintrag wird jetzt aus der Scrollposition bestimmt statt aus Sichtbarkeitsereignissen. Beim langsamen Scrollen springt der Zähler nicht mehr hin und her und überspringt keine Nummer.
 
 ## 2.0.0 – 17.10.2026
 
