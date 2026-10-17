@@ -39,3 +39,7 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Render-Werkzeuge (lokal: cd tools/video && npm i playwright)
+/tools/video/node_modules
+/tools/video/.tmp
