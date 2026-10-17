@@ -1,8 +1,12 @@
 import type { Metadata } from "next";
-import { LegalPage } from "@/components/legal/LegalPage";
+import { TermsPage } from "@/components/legal/TermsPage";
 
-export const metadata: Metadata = { title: "Nutzungsbedingungen", robots: { index: true, follow: true } };
+export const metadata: Metadata = {
+  title: "Nutzungsbedingungen",
+  description: "Nutzungsbedingungen in Klartext: Kurzfassung je Klausel, markierte Einschränkungen, Rechtsgrundlagen und alle Fassungen. Schweizer Recht, EU-Verbraucherschutz vorbehalten.",
+  robots: { index: true, follow: true },
+};
 
 export default function Page() {
-  return <LegalPage docKey="terms" />;
+  return <TermsPage />;
 }

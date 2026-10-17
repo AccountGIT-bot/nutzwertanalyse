@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { Plus, Trash2, Lightbulb } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import { useAnalysis } from "@/lib/nwa/store";
@@ -143,6 +144,13 @@ export function StepDecision() {
             </ul>
           </div>
         </Tip>
+        <p className="px-1 text-xs leading-relaxed text-ink-3">
+          {t.decision.termsHintBefore}
+          <Link href="/agb" className="font-medium text-primary underline underline-offset-2">
+            {t.decision.termsHintLink}
+          </Link>
+          {t.decision.termsHintAfter}
+        </p>
       </aside>
 
       <ConfirmDialog

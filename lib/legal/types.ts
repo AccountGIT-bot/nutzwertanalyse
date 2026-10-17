@@ -13,7 +13,7 @@ export interface LegalDoc {
   blocks: LegalBlock[];
 }
 
-export type LegalKey = "imprint" | "privacy" | "terms" | "cookies" | "accessibility";
+export type LegalKey = "imprint" | "privacy" | "cookies" | "accessibility";
 
 export interface LegalSet {
   bindingNote: string;
