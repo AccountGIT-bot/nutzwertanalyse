@@ -214,8 +214,16 @@ body {
   font-weight: 600;
   transition: top 0.15s;
 }
-.skip-link:focus {
+/* Nur bei Tastaturfokus zeigen. Next.js setzt nach jedem Seitenwechsel den
+   Fokus programmatisch auf das erste Element der Seite (diesen Link); nach
+   einem Mausklick ist das kein :focus-visible und der Link bleibt verborgen. */
+.skip-link:focus-visible {
   top: 1rem;
+}
+@supports not selector(:focus-visible) {
+  .skip-link:focus {
+    top: 1rem;
+  }
 }
 
 @layer components {
