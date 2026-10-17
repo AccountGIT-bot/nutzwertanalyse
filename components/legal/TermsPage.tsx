@@ -45,12 +45,14 @@ function TermsStage() {
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src="/video/terms-bg-poster.jpg" alt="" className={cn("absolute inset-0 h-full w-full object-cover", pos)} decoding="async" />
         <video className={cn("terms-video absolute inset-0 h-full w-full object-cover", pos)} autoPlay muted loop playsInline preload="metadata" poster="/video/terms-bg-poster.jpg" tabIndex={-1}>
-          <source src="/video/terms-bg.webm" type="video/webm" />
-          <source src="/video/terms-bg.mp4" type="video/mp4" />
+          {/* Scharfe 1080p-Fassung ab Tablet-Breite, 720p für kleine Bildschirme; Browser ohne media-Auswertung nehmen die erste abspielbare Quelle */}
+          <source src="/video/terms-bg.webm" type="video/webm" media="(min-width: 1024px)" />
+          <source src="/video/terms-bg.mp4" type="video/mp4" media="(min-width: 1024px)" />
+          <source src="/video/terms-bg-720.webm" type="video/webm" />
+          <source src="/video/terms-bg-720.mp4" type="video/mp4" />
         </video>
       </div>
       <div className="terms-video-veil absolute inset-0" />
-      <div className="terms-grain absolute inset-0" />
       <div className="absolute inset-x-0 top-0 h-20 bg-gradient-to-b from-bg to-transparent lg:h-24" />
       <div className="absolute inset-0 hidden bg-gradient-to-r from-bg from-[6%] via-bg/75 via-[22%] to-transparent to-[38%] lg:block" />
       <div className="absolute inset-x-0 bottom-0 hidden h-24 bg-gradient-to-t from-bg to-transparent lg:block" />
