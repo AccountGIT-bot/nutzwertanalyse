@@ -766,6 +766,7 @@ input[type="range"].slider:focus-visible::-webkit-slider-thumb {
 .expertise-img {
   transform: scale(1.06);
   transition: transform 1.8s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: transform;
 }
 .expertise-img.is-on {
   transform: scale(1);
@@ -996,14 +997,6 @@ input[type="range"].slider:focus-visible::-webkit-slider-thumb {
   border-color: color-mix(in srgb, var(--warn) 35%, transparent);
   background: var(--warn-soft);
   color: var(--warn);
-}
-.terms-chip-action {
-  color: var(--primary);
-  font-weight: 600;
-  cursor: pointer;
-}
-.terms-chip-action:hover {
-  background: var(--primary-soft);
 }
 @media (prefers-reduced-motion: reduce) {
   .terms-video {

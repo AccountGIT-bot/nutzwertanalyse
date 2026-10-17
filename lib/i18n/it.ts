@@ -752,8 +752,6 @@ export const it: Translations = {
     current: "attuale",
     showArchive: "Mostra la versione {{n}} per intero",
     translationNote: "Queste condizioni sono redatte in tedesco, versione che fa fede. È disponibile una traduzione inglese.",
-    showEnglish: "Leggi la traduzione inglese",
-    showGerman: "Mostra l’originale tedesco",
   },
   landingExtra: {
     sectionNav: ["Panoramica", "Funzioni", "Percorso", "Fiducia", "Video", "Casi d’uso", "Voci", "Protezione dei dati"],

@@ -764,8 +764,6 @@ export const de = {
     current: "aktuell",
     showArchive: "Fassung {{n}} im Wortlaut anzeigen",
     translationNote: "",
-    showEnglish: "English translation",
-    showGerman: "Deutsches Original anzeigen",
   },
   landingExtra: {
     sectionNav: ["Überblick", "Funktionen", "Ablauf", "Vertrauen", "Video", "Anwendungsfälle", "Stimmen", "Datenschutz"],

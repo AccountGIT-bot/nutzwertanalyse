@@ -1,7 +1,7 @@
 "use client";
 
-import { useMemo, useState } from "react";
-import { AlertTriangle, ArrowRight, Check, Clock, FileText, Languages, Link2, Scale, ShieldCheck } from "lucide-react";
+import { useMemo } from "react";
+import { AlertTriangle, ArrowRight, Check, Clock, FileText, Link2, Scale, ShieldCheck } from "lucide-react";
 import { translations, useI18n } from "@/lib/i18n";
 import { legalDe } from "@/lib/legal/de";
 import { legalEn } from "@/lib/legal/en";
@@ -125,11 +125,12 @@ type Labels = (typeof translations)["de"]["termsPage"];
 
 export function TermsPage() {
   const { locale, tag } = useI18n();
-  const [override, setOverride] = useState<"de" | "en" | null>(null);
 
-  const docLang = override ?? (locale === "en" ? "en" : "de");
+  /* Die Dokumentsprache folgt der Sprachwahl der Seite: Englisch zeigt die Übersetzung, alle anderen das verbindliche deutsche Original. */
+  const docLang = locale === "en" ? "en" : "de";
   /* Beschriftungen folgen der Dokumentsprache; Datum dem Zahlenformat der Oberfläche. */
   const labels = translations[docLang].termsPage;
+  const translationNote = docLang === "en" ? labels.translationNote : locale === "fr" || locale === "it" ? translations[locale].termsPage.translationNote : "";
   const doc = docLang === "en" ? termsEn : termsDe;
   const legal = docLang === "en" ? legalEn : legalDe;
   const minutes = useMemo(() => readingMinutes(doc), [doc]);
@@ -162,14 +163,8 @@ export function TermsPage() {
                     <AlertTriangle className="h-3.5 w-3.5" aria-hidden />
                     {fmt(labels.limits, { n: limitCount })}
                   </li>
-                  <li className="no-print">
-                    <button type="button" className="terms-chip terms-chip-action" onClick={() => setOverride(docLang === "de" ? "en" : "de")}>
-                      <Languages className="h-3.5 w-3.5" aria-hidden />
-                      {docLang === "de" ? labels.showEnglish : labels.showGerman}
-                    </button>
-                  </li>
                 </ul>
-                {docLang === "de" && (locale === "fr" || locale === "it") && <p className="mt-3 text-sm text-ink-3">{translations[locale].termsPage.translationNote}</p>}
+                {translationNote && <p className="mt-3 max-w-xl text-sm text-ink-3">{translationNote}</p>}
                 {operatorHasPlaceholders() && (
                   <div role="alert" className="mt-8 flex max-w-xl gap-3 rounded-xl border border-warn/40 bg-warn-soft px-4 py-3 text-sm text-ink">
                     <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-warn" aria-hidden />

@@ -752,8 +752,6 @@ export const en: Translations = {
     current: "current",
     showArchive: "Show version {{n}} in full",
     translationNote: "This is a translation. The German version is legally binding.",
-    showEnglish: "Read the English translation",
-    showGerman: "Show German original",
   },
   landingExtra: {
     sectionNav: ["Overview", "Features", "Flow", "Trust", "Video", "Use cases", "Voices", "Privacy"],

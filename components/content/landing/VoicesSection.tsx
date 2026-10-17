@@ -97,7 +97,7 @@ export function VoicesSection() {
     <div ref={ref} className="voices relative isolate overflow-hidden bg-[#0e1b1e] text-white">
       {/* Hintergrund: vorab weichgezeichnetes Bild, langsame Kamerafahrt, dunkler Schleier */}
       <div className="absolute inset-0 no-print" aria-hidden>
-        <Image src="/images/landing/meeting-blur.webp" alt="" fill sizes="100vw" placeholder="blur" blurDataURL={MEETING_BLUR} className={cn("voices-bg object-cover", seen && "is-on")} />
+        <Image src="/images/landing/meeting-blur.webp" alt="" fill sizes="100vw" placeholder={MEETING_BLUR} className={cn("voices-bg object-cover", seen && "is-on")} />
         <div className="absolute inset-0 bg-[#07141a]/20" />
         <div className="absolute inset-0 bg-gradient-to-b from-[#07141a]/65 via-transparent to-[#07141a]/80" />
         <div className="voices-glow absolute left-1/2 top-[38%] h-[60vmin] w-[60vmin] -translate-x-1/2 -translate-y-1/2 rounded-full" />
