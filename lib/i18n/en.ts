@@ -736,7 +736,7 @@ export const en: Translations = {
     summaryTitle: "The essentials in 60 seconds",
     summaryNote: "The overview explains; the clauses are binding. If they differ, whichever is more favourable to you applies (section 14.2).",
     legendTitle: "How to read these terms",
-    legendIntro: "Every clause carries a label. Clauses that restrict your rights are highlighted in yellow.",
+    legendIntro: "Clauses highlighted in yellow restrict your rights.",
     whyMarked: "Why? Swiss law requires unusual clauses to be specially highlighted (unusualness rule). We mark every restriction, including the usual ones.",
     tags: { limit: "Restriction", right: "Your right", duty: "Your duty", promise: "Our commitment", info: "Information" },
     tagHelp: { limit: "restricts your rights", right: "what you may do or demand", duty: "what you need to observe", promise: "what we commit to", info: "how something works" },

@@ -736,7 +736,7 @@ export const fr: Translations = {
     summaryTitle: "L’essentiel en 60 secondes",
     summaryNote: "L’aperçu explique, les clauses font foi. En cas d’écart, la version la plus favorable pour vous s’applique (ch. 14.2).",
     legendTitle: "Comment lire ces conditions",
-    legendIntro: "Chaque clause porte un marquage. Les clauses qui restreignent vos droits sont surlignées en jaune.",
+    legendIntro: "Les clauses surlignées en jaune restreignent vos droits.",
     whyMarked: "Pourquoi ? Le droit suisse exige que les clauses insolites soient mises en évidence (règle de l’insolite). Nous signalons chaque restriction, même les plus usuelles.",
     tags: { limit: "Restriction", right: "Votre droit", duty: "Votre obligation", promise: "Notre engagement", info: "Information" },
     tagHelp: { limit: "restreint vos droits", right: "ce que vous pouvez faire ou exiger", duty: "ce que vous devez respecter", promise: "ce à quoi nous nous engageons", info: "comment quelque chose fonctionne" },

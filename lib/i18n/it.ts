@@ -736,7 +736,7 @@ export const it: Translations = {
     summaryTitle: "L’essenziale in 60 secondi",
     summaryNote: "La panoramica spiega, fanno fede le clausole. In caso di differenze vale la versione più favorevole per te (cifra 14.2).",
     legendTitle: "Come leggere queste condizioni",
-    legendIntro: "Ogni clausola ha un contrassegno. Le clausole che limitano i tuoi diritti sono evidenziate in giallo.",
+    legendIntro: "Le clausole evidenziate in giallo limitano i tuoi diritti.",
     whyMarked: "Perché? Il diritto svizzero esige che le clausole insolite siano messe in evidenza (regola dell’insolito). Noi segnaliamo ogni restrizione, anche quelle usuali.",
     tags: { limit: "Restrizione", right: "Tuo diritto", duty: "Tuo obbligo", promise: "Nostro impegno", info: "Informazione" },
     tagHelp: { limit: "limita i tuoi diritti", right: "cosa puoi fare o pretendere", duty: "cosa devi rispettare", promise: "a cosa ci impegniamo", info: "come funziona qualcosa" },

@@ -748,7 +748,7 @@ export const de = {
     summaryTitle: "Das Wichtigste in 60 Sekunden",
     summaryNote: "Die Übersicht erklärt, verbindlich sind die Klauseln. Weichen sie voneinander ab, gilt das für dich Günstigere (Ziff. 14.2).",
     legendTitle: "So liest du diese Bedingungen",
-    legendIntro: "Jede Klausel trägt eine Markierung. Klauseln, die deine Rechte einschränken, sind gelb hinterlegt.",
+    legendIntro: "Gelb hinterlegte Klauseln schränken deine Rechte ein.",
     whyMarked: "Warum? Das Schweizer Recht verlangt, dass ungewöhnliche Klauseln besonders hervorgehoben werden (Ungewöhnlichkeitsregel). Wir markieren jede Einschränkung, auch die gewöhnlichen.",
     tags: { limit: "Einschränkung", right: "Dein Recht", duty: "Deine Pflicht", promise: "Unsere Zusage", info: "Information" },
     tagHelp: { limit: "schränkt deine Rechte ein", right: "was du darfst oder verlangen kannst", duty: "was du beachten musst", promise: "wozu wir uns verpflichten", info: "wie etwas funktioniert" },
