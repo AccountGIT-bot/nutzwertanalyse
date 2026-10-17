@@ -2,6 +2,14 @@
 
 Alle freigegebenen Veröffentlichungen von Nutzwertanalyse. Entwicklung auf `dev`, Freigabe nach `main` nur mit ausdrücklicher Zustimmung von Liam (siehe `docs/DEVELOPMENT_WORKFLOW.md`).
 
+## 2.2.1 – 17.10.2026
+
+Release-PR: [#33](https://github.com/AccountGIT-bot/nutzwertanalyse/pull/33). Freigabe über die Release-Karte ausstehend.
+
+- Nutzungsbedingungen, Titelbereich: Das Waage-Video läuft scharf statt weichgezeichnet. Gleicher Clip wie in 2.2.0, aus dem unbearbeiteten 1080p-Material neu encodiert als nahtlose 20-Sekunden-Schleife: 1920×1080 ab 1024 px (`terms-bg.mp4` 3.4 MB, `terms-bg.webm` 1.0 MB), 1280×720 darunter (`terms-bg-720.mp4` 1.1 MB, `terms-bg-720.webm` 0.6 MB), Poster aus dem ersten Frame; Quellenwahl über das `media`-Attribut der `<source>`-Elemente. Das Filmkorn der weichgezeichneten Fassung ist entfernt. Kein 4K: Der Clip liegt nativ in 1080p vor, ein KI-Upscale würde Details erfinden und das Ladegewicht vervielfachen.
+- `package.json` von 2.2.0 auf 2.2.1.
+- Prüfbericht `docs/QA_2026-10-17.md`: Encode, Quellenwahl, SHA-256-Verifikation, Chromium bei 390, 1366 und 1920 px, hell und dunkel, reduzierte Bewegung, Druck.
+
 ## 2.2.0 – 17.10.2026
 
 Release-PR: [#32](https://github.com/AccountGIT-bot/nutzwertanalyse/pull/32). Freigegeben von Liam am 17.10.2026 über die Release-Karte (Doppelklick, 21:26 UTC) und nach zwei Nachbesserungen im Chat für Head `06cdcb2` bestätigt, Merge-Commit `e2a317d`.
