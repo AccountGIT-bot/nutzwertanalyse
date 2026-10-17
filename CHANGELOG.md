@@ -4,7 +4,7 @@ Alle freigegebenen Veröffentlichungen von Nutzwertanalyse. Entwicklung auf `dev
 
 ## 2.2.0 – 17.10.2026
 
-Release-PR: [#32](https://github.com/AccountGIT-bot/nutzwertanalyse/pull/32). Freigabe über die Release-Karte ausstehend.
+Release-PR: [#32](https://github.com/AccountGIT-bot/nutzwertanalyse/pull/32). Freigegeben von Liam am 17.10.2026 über die Release-Karte (Doppelklick, 21:26 UTC) und nach zwei Nachbesserungen im Chat für Head `06cdcb2` bestätigt, Merge-Commit `e2a317d`.
 
 - Nutzungsbedingungen neu geschrieben (`lib/legal/terms-de.ts` verbindlich, `terms-en.ts` als Übersetzung mit identischer Struktur): 14 Klauseln mit Kurzfassung, Markierung (Einschränkung, Recht, Pflicht, Zusage, Information) und Rechtsgrundlage; neue Gewährleistungsklausel 9.2; Fassungsgeschichte mit Archiv der Fassung 1 im Wortlaut; Schweizer Recht mit Vorbehalt des zwingenden Verbraucherschutzes am Wohnsitz. `legalVersion` auf `2026-10-17.2`. Strukturgleichheit DE/EN, fortlaufende Nummerierung, Verweise der Übersicht und Querverweise werden durch `tests/terms.test.ts` geprüft.
 - Seite `/agb` neu gestaltet: Titelbereich mit HD-Video «Waage» (selbst gehostet, 1920×1080, nahtlose 20-Sekunden-Schleife, feines Korn, sanfte Einblendung; nur Poster bei «Bewegung reduzieren», im Druck ausgeblendet), Meta-Chips (Fassung, Lesezeit, markierte Einschränkungen); die Dokumentsprache folgt der Sprachwahl der Seite (Englisch zeigt die Übersetzung mit Hinweis, Französisch und Italienisch das deutsche Original mit Hinweis), Reihe «Auf einen Blick» mit acht Kernpunkten und Verweisen auf die Ziffern, Inhaltsverzeichnis, gelb hervorgehobene Einschränkungen, Rechtsgrundlagen aufklappbar, Druckansicht mit ausgeschriebenen Rechtsgrundlagen.
