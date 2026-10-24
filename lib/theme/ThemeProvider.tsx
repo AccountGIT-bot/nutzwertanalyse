@@ -5,8 +5,11 @@ import { readConsent } from "@/lib/consent/consent";
 import { createClientStore } from "@/lib/clientStore";
 
 export type ThemePref = "light" | "dark" | "system";
-/** Kurzer visueller Hinweis auf dem Theme-Knopf: pulsieren (Hinweis offen) oder bestätigen (gerade gewechselt). */
-export type ThemeCue = "none" | "pulse" | "confirm";
+/** Visueller Zustand des Theme-Knopfs: pulsieren (Hinweis offen) oder umfärben (Wechsel läuft). */
+export type ThemeCue = "none" | "pulse" | "morph";
+/** Dauer, in der sich zuerst der Knopf umfärbt, bevor die Seite folgt; danach klingt die Füllung ab. */
+const MORPH_MS = 450;
+const MORPH_SETTLE_MS = 350;
 export const THEME_KEY = "nwa.theme";
 
 const THEME_COLORS = { light: "#f6f7f7", dark: "#0b1211" } as const;
@@ -17,8 +20,14 @@ interface ThemeValue {
   /** true, sobald die Nutzerin / der Nutzer das Design selbst gewählt hat (gespeichert oder in dieser Sitzung). */
   chosen: boolean;
   cue: ThemeCue;
+  /** Ziel eines laufenden Wechsels, solange sich der Knopf umfärbt und die Seite noch nicht gefolgt ist. */
+  pending: ThemePref | null;
+  /** Sofort umschalten (z. B. Einstellungen). */
   setPref: (p: ThemePref) => void;
+  /** Mit Effekt umschalten: zuerst färbt sich der Knopf, dann folgt die Seite. */
+  requestPref: (p: ThemePref) => void;
   setCue: (c: ThemeCue) => void;
+  resolveFor: (p: ThemePref) => "light" | "dark";
 }
 
 const ThemeContext = createContext<ThemeValue | null>(null);
@@ -65,13 +74,12 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   const systemDark = useSyncExternalStore(systemDarkStore.subscribe, systemDarkStore.get, systemDarkStore.getServer);
   const resolved: "light" | "dark" = pref === "system" ? (systemDark ? "dark" : "light") : pref;
   const [cue, setCueState] = useState<ThemeCue>("none");
+  const [pending, setPending] = useState<ThemePref | null>(null);
 
   const setPref = useCallback((p: ThemePref) => {
     prefStore.set(p);
     chosenStore.set(true);
     applyTheme(p);
-    /* Wechsel während des Hinweises: aus dem Pulsieren wird eine kurze Bestätigung */
-    setCueState((c) => (c === "pulse" ? "confirm" : c));
     try {
       if (readConsent()?.functional) window.localStorage.setItem(THEME_KEY, p);
     } catch {
@@ -79,14 +87,36 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
-  const setCue = useCallback((c: ThemeCue) => setCueState(c), []);
+  const requestPref = useCallback(
+    (p: ThemePref) => {
+      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+        setPref(p);
+        setCueState("none");
+        return;
+      }
+      setPending(p);
+      setCueState("morph");
+    },
+    [setPref],
+  );
 
-  /* Bestätigung klingt von selbst ab */
+  /* Zuerst färbt sich der Knopf, dann folgt die Seite, dann klingt die Füllung ab */
   useEffect(() => {
-    if (cue !== "confirm") return;
-    const id = window.setTimeout(() => setCueState("none"), 1200);
-    return () => window.clearTimeout(id);
-  }, [cue]);
+    if (pending === null) return;
+    const target = pending;
+    const t1 = window.setTimeout(() => setPref(target), MORPH_MS);
+    const t2 = window.setTimeout(() => {
+      setPending(null);
+      setCueState("none");
+    }, MORPH_MS + MORPH_SETTLE_MS);
+    return () => {
+      window.clearTimeout(t1);
+      window.clearTimeout(t2);
+    };
+  }, [pending, setPref]);
+
+  const setCue = useCallback((c: ThemeCue) => setCueState(c), []);
+  const resolveFor = useCallback((p: ThemePref): "light" | "dark" => (p === "system" ? (systemDark ? "dark" : "light") : p), [systemDark]);
 
   /* Browser-Chrome (theme-color) folgt dem tatsächlichen Design, nicht der Systemeinstellung */
   useEffect(() => {
@@ -96,7 +126,10 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     });
   }, [resolved]);
 
-  const value = useMemo(() => ({ pref, resolved, chosen, cue, setPref, setCue }), [pref, resolved, chosen, cue, setPref, setCue]);
+  const value = useMemo(
+    () => ({ pref, resolved, chosen, cue, pending, setPref, requestPref, setCue, resolveFor }),
+    [pref, resolved, chosen, cue, pending, setPref, requestPref, setCue, resolveFor],
+  );
   return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;
 }
 

@@ -119,21 +119,24 @@ function LocaleMenu({ locale, setLocale, label }: { locale: Locale; setLocale: (
 }
 
 function ThemeButton() {
-  const { pref, cue, setPref } = useTheme();
+  const { pref, cue, pending, requestPref, resolveFor } = useTheme();
   const { t } = useI18n();
   const order: ThemePref[] = ["light", "dark", "system"];
   const next = order[(order.indexOf(pref) + 1) % order.length];
-  const Icon = pref === "dark" ? Moon : pref === "light" ? Sun : Monitor;
+  /* Während des Wechsels zeigt der Knopf bereits das Ziel: Symbol und Füllung in der Zielfarbe */
+  const shown = pending ?? pref;
+  const Icon = shown === "dark" ? Moon : shown === "light" ? Sun : Monitor;
+  const morph = cue === "morph" && pending !== null;
   return (
     <button
       type="button"
       data-theme-toggle
-      className={cn("btn btn-ghost btn-icon", cue === "pulse" && "theme-cue-pulse", cue === "confirm" && "theme-cue-confirm")}
-      onClick={() => setPref(next)}
+      className={cn("btn btn-ghost btn-icon", cue === "pulse" && "theme-cue-pulse", morph && (resolveFor(pending) === "dark" ? "theme-cue-morph theme-cue-morph-dark" : "theme-cue-morph theme-cue-morph-light"))}
+      onClick={() => requestPref(next)}
       aria-label={`${t.common.toggleTheme}: ${t.theme[pref]}`}
       title={t.theme[pref]}
     >
-      <Icon className="h-5 w-5" aria-hidden />
+      <Icon key={shown} className="h-5 w-5" aria-hidden />
     </button>
   );
 }

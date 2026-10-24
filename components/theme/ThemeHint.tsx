@@ -51,7 +51,7 @@ function measureAnchor(): number | null {
  * Solange er offen ist, pulsiert der Theme-Knopf; ein Wechsel bestätigt kurz.
  */
 export function ThemeHint() {
-  const { resolved, chosen, setPref, setCue } = useTheme();
+  const { resolved, chosen, requestPref, setCue } = useTheme();
   const { consent, loading } = useConsent();
   const { t } = useI18n();
   const [open, setOpen] = useState(false);
@@ -115,35 +115,33 @@ export function ThemeHint() {
     markDismissed();
   };
   const tryDark = () => {
+    setOpen(false);
     markDismissed();
-    setPref("dark");
+    requestPref("dark");
   };
   const arrowRight = anchorRight === null ? 64 : Math.max(14, anchorRight - BOX_RIGHT_PX - 7);
 
   return (
-    <div role="status" aria-live="polite" className="theme-hint no-print fixed right-3 top-[4.5rem] z-[70] w-[min(22rem,calc(100vw-1.5rem))]">
+    <div role="status" aria-live="polite" className="theme-hint no-print fixed right-3 top-[4.25rem] z-[70] w-[min(17.5rem,calc(100vw-1.5rem))]">
       <div className="theme-hint-arrow" style={{ right: arrowRight }} aria-hidden />
-      <div className="rounded-2xl border border-line bg-surface p-4 shadow-lg">
-        <div className="flex items-start gap-3">
-          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-primary-soft text-primary">
-            <Moon className="h-4 w-4" aria-hidden />
-          </span>
-          <div className="min-w-0 flex-1">
-            <p className="text-sm font-semibold text-ink">{t.themeHint.title}</p>
-            <p className="mt-1 text-sm leading-relaxed text-ink-2">{t.themeHint.text}</p>
-            <div className="mt-3 flex flex-wrap gap-2">
-              <button type="button" className="btn btn-primary btn-sm" onClick={tryDark}>
-                {t.themeHint.tryIt}
-              </button>
-              <button type="button" className="btn btn-ghost btn-sm" onClick={dismiss}>
-                {t.themeHint.dismiss}
-              </button>
-            </div>
+      <div className="flex items-start gap-2.5 rounded-xl border border-line bg-surface py-2.5 pl-3 pr-1.5 shadow-lg">
+        <Moon className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden />
+        <div className="min-w-0 flex-1 text-sm">
+          <p className="leading-snug text-ink">
+            <span className="font-semibold">{t.themeHint.title}</span> {t.themeHint.text}
+          </p>
+          <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1">
+            <button type="button" className="btn btn-primary btn-sm" onClick={tryDark}>
+              {t.themeHint.tryIt}
+            </button>
+            <button type="button" className="text-sm font-medium text-ink-3 hover:text-ink" onClick={dismiss}>
+              {t.themeHint.dismiss}
+            </button>
           </div>
-          <button type="button" className="btn btn-ghost btn-icon -mr-2 -mt-2" aria-label={t.themeHint.close} onClick={dismiss}>
-            <X className="h-4 w-4" aria-hidden />
-          </button>
         </div>
+        <button type="button" className="btn btn-ghost btn-icon -mt-1 h-7 w-7 !p-1" aria-label={t.themeHint.close} onClick={dismiss}>
+          <X className="h-3.5 w-3.5" aria-hidden />
+        </button>
       </div>
     </div>
   );

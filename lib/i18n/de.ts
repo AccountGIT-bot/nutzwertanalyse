@@ -105,8 +105,8 @@ export const de = {
   },
   themeHint: {
     title: "Lieber dunkel?",
-    text: "Du kannst die Seite auch im Dunkelmodus nutzen. Der Knopf oben rechts wechselt zwischen Hell, Dunkel und Systemeinstellung.",
-    tryIt: "Dunkelmodus ausprobieren",
+    text: "Die Seite gibt es auch im Dunkelmodus.",
+    tryIt: "Ausprobieren",
     dismiss: "Nein danke",
     close: "Hinweis schliessen",
   },

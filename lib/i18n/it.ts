@@ -93,8 +93,8 @@ export const it: Translations = {
   theme: { light: "Chiaro", dark: "Scuro", system: "Sistema" },
   themeHint: {
     title: "Preferisci lo scuro?",
-    text: "Puoi usare il sito anche in modalità scura. Il pulsante in alto a destra passa tra chiaro, scuro e impostazione di sistema.",
-    tryIt: "Prova la modalità scura",
+    text: "Il sito esiste anche in modalità scura.",
+    tryIt: "Prova",
     dismiss: "No, grazie",
     close: "Chiudi il suggerimento",
   },

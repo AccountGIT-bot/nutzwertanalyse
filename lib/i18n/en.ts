@@ -93,8 +93,8 @@ export const en: Translations = {
   theme: { light: "Light", dark: "Dark", system: "System" },
   themeHint: {
     title: "Prefer dark?",
-    text: "You can also use the site in dark mode. The button at the top right switches between light, dark and your system setting.",
-    tryIt: "Try dark mode",
+    text: "The site also comes in dark mode.",
+    tryIt: "Try it",
     dismiss: "No thanks",
     close: "Close hint",
   },
