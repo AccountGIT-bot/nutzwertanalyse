@@ -1017,3 +1017,102 @@ input[type="range"].slider:focus-visible::-webkit-slider-thumb {
     box-shadow: none;
   }
 }
+
+/* =====================================================================
+   Hinweis auf den Dunkelmodus und Effekte auf dem Theme-Knopf
+   ===================================================================== */
+@keyframes theme-hint-in {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.theme-hint {
+  animation: theme-hint-in 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.theme-hint-arrow {
+  position: absolute;
+  top: -7px;
+  width: 14px;
+  height: 14px;
+  transform: rotate(45deg);
+  background: var(--surface);
+  border-left: 1px solid var(--line);
+  border-top: 1px solid var(--line);
+}
+@keyframes theme-pulse {
+  0% {
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--primary) 55%, transparent);
+  }
+  70% {
+    box-shadow: 0 0 0 12px transparent;
+  }
+  100% {
+    box-shadow: 0 0 0 0 transparent;
+  }
+}
+.theme-cue-pulse {
+  color: var(--primary);
+  background: var(--primary-soft);
+  animation: theme-pulse 1.4s ease-out 3;
+}
+/* Wechsel: Der Knopf füllt sich zuerst in der Zielfarbe (Kreis von der Mitte), das Symbol dreht herein; die Seite folgt danach. */
+.theme-cue-morph {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+}
+.theme-cue-morph::before {
+  content: "";
+  position: absolute;
+  inset: -45%;
+  border-radius: 50%;
+  background: var(--morph-bg);
+  transform: scale(0);
+  animation: theme-fill 0.45s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+  z-index: -1;
+}
+.theme-cue-morph > svg {
+  color: var(--morph-fg);
+  animation: theme-icon-in 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+.theme-cue-morph-dark {
+  --morph-bg: #121416;
+  --morph-fg: #eceff1;
+}
+.theme-cue-morph-light {
+  --morph-bg: #ffffff;
+  --morph-fg: #1a1c1e;
+  box-shadow: inset 0 0 0 1px #e4e2dc;
+}
+@keyframes theme-fill {
+  to {
+    transform: scale(1);
+  }
+}
+@keyframes theme-icon-in {
+  0% {
+    transform: rotate(-90deg) scale(0.5);
+    opacity: 0;
+  }
+  100% {
+    transform: none;
+    opacity: 1;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .theme-hint,
+  .theme-cue-pulse,
+  .theme-cue-morph::before,
+  .theme-cue-morph > svg {
+    animation: none;
+  }
+  .theme-cue-pulse {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+  }
+}

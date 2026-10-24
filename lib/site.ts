@@ -16,7 +16,7 @@ export const site = {
   domain: "nutzwertanalyse.com",
   url: "https://nutzwertanalyse.com",
   /** Version der Rechtstexte: Datum, bei mehreren Änderungen am selben Tag mit Revision (".2") */
-  legalVersion: "2026-10-17.2",
+  legalVersion: "2026-10-24",
   consentVersion: 2,
   operator: {
     name: "[Firmenname / Name des Betreibers]",

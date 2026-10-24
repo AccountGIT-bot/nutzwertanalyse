@@ -195,6 +195,7 @@ export const legalDe: LegalSet = {
             ["nwa.analysis.<id>", "Je eine gespeicherte Analyse (vollständiger Inhalt)", "Funktional", "bis zur Löschung"],
             ["nwa.locale", "Gewählte Sprache", "Funktional", "bis zur Löschung"],
             ["nwa.theme", "Gewähltes Design (hell/dunkel)", "Funktional", "bis zur Löschung"],
+            ["nwa.themeHint", "Merker, dass der Hinweis auf den Dunkelmodus gezeigt wurde", "Funktional", "bis zur Löschung"],
           ],
         },
         {

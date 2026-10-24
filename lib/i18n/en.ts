@@ -91,6 +91,13 @@ export const en: Translations = {
     openSource: "Source code",
   },
   theme: { light: "Light", dark: "Dark", system: "System" },
+  themeHint: {
+    title: "Prefer dark?",
+    text: "The site also comes in dark mode.",
+    tryIt: "Try it",
+    dismiss: "No thanks",
+    close: "Close hint",
+  },
   landing: {
     eyebrow: "Free · No account · Your data stays with you",
     h1a: "Decisions.",

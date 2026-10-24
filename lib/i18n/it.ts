@@ -91,6 +91,13 @@ export const it: Translations = {
     openSource: "Codice sorgente",
   },
   theme: { light: "Chiaro", dark: "Scuro", system: "Sistema" },
+  themeHint: {
+    title: "Preferisci lo scuro?",
+    text: "Il sito esiste anche in modalità scura.",
+    tryIt: "Prova",
+    dismiss: "No, grazie",
+    close: "Chiudi il suggerimento",
+  },
   landing: {
     eyebrow: "Gratuito · Senza account · I dati restano con te",
     h1a: "Decisioni.",

@@ -2,9 +2,20 @@
 
 Alle freigegebenen Veröffentlichungen von Nutzwertanalyse. Entwicklung auf `dev`, Freigabe nach `main` nur mit ausdrücklicher Zustimmung von Liam (siehe `docs/DEVELOPMENT_WORKFLOW.md`).
 
+## 2.3.0 – 24.10.2026
+
+Release-PR: [#34](https://github.com/AccountGIT-bot/nutzwertanalyse/pull/34). Freigabe über die Release-Karte ausstehend.
+
+- Standarddesign Hell: Die Seite startet hell, unabhängig von der Betriebssystem-Einstellung. «System» gilt nur, wenn es ausdrücklich gewählt wurde; Reihenfolge des Knopfs im Kopf: Hell → Dunkel → System. Das Skript vor dem ersten Paint setzt `data-theme="light"`, sofern keine gespeicherte Wahl vorliegt; `theme-color` folgt dem tatsächlichen Design.
+- Hinweis auf den Dunkelmodus: Nach drei Minuten auf der Website erscheint eine kompakte Karte unter dem Kopf mit Pfeil auf den Theme-Knopf («Lieber dunkel? Die Seite gibt es auch im Dunkelmodus.», «Ausprobieren», «Nein danke»), nur wenn das Design nicht selbst gewählt wurde, die Seite hell ist, der Tab sichtbar ist und die Speicherfrage beantwortet wurde. Solange der Hinweis offen ist, pulsiert der Knopf.
+- Wechsel in zwei Schritten: Beim Klick füllt sich zuerst der Knopf in der Zielfarbe (Symbol dreht herein), nach 450 ms folgt die Seite, dann klingt die Füllung ab. Bei «Bewegung reduzieren» sofortiger Wechsel ohne Animation.
+- Speicherung: Merker `nwa.themeHint` nur mit Einwilligung «Funktional»; auf `/cookies` (DE/EN) eingetragen, `legalVersion` auf `2026-10-24`. Texte in Deutsch, Englisch, Französisch, Italienisch.
+- `package.json` von 2.2.1 auf 2.3.0.
+- Prüfbericht `docs/QA_2026-10-24.md`: Tests, Lint, Typecheck, Build; Chromium mit verstellter Uhr bei 1366 und 390 px, zweistufiger Wechsel gemessen, reduzierte Bewegung, Reload-Verhalten.
+
 ## 2.2.1 – 17.10.2026
 
-Release-PR: [#33](https://github.com/AccountGIT-bot/nutzwertanalyse/pull/33). Freigabe über die Release-Karte ausstehend.
+Release-PR: [#33](https://github.com/AccountGIT-bot/nutzwertanalyse/pull/33). Freigegeben von Liam am 18.10.2026 über die Release-Karte (Doppelklick, 14:51 UTC) und im Chat bestätigt, Merge-Commit `e25d404`.
 
 - Nutzungsbedingungen, Titelbereich: Das Waage-Video läuft scharf statt weichgezeichnet. Gleicher Clip wie in 2.2.0, aus dem unbearbeiteten 1080p-Material neu encodiert als nahtlose 20-Sekunden-Schleife: 1920×1080 ab 1024 px (`terms-bg.mp4` 3.4 MB, `terms-bg.webm` 1.0 MB), 1280×720 darunter (`terms-bg-720.mp4` 1.1 MB, `terms-bg-720.webm` 0.6 MB), Poster aus dem ersten Frame; Quellenwahl über das `media`-Attribut der `<source>`-Elemente. Das Filmkorn der weichgezeichneten Fassung ist entfernt. Kein 4K: Der Clip liegt nativ in 1080p vor, ein KI-Upscale würde Details erfinden und das Ladegewicht vervielfachen.
 - `package.json` von 2.2.0 auf 2.2.1.
