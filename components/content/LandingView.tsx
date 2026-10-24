@@ -16,6 +16,7 @@ import { StatStrip } from "@/components/content/landing/StatStrip";
 import { DataFlow } from "@/components/content/landing/DataFlow";
 import { ExpertiseSection } from "@/components/content/landing/ExpertiseSection";
 import { VoicesSection } from "@/components/content/landing/VoicesSection";
+import { HeroStage } from "@/components/content/landing/HeroStage";
 
 const SECTION_IDS = ["hero", "funktionen", "ablauf", "vertrauen", "video", "anwendungsfaelle", "stimmen", "datenschutz"];
 
@@ -28,9 +29,9 @@ export function LandingView() {
     <PageShell>
       <SectionNav sections={sections} />
 
-      {/* Hero */}
-      <section id="hero" className="border-b border-line scroll-mt-20">
-        <Container className="grid items-center gap-12 py-16 sm:py-24 lg:grid-cols-[1.05fr_1fr]">
+      {/* Hero: Text links, animierte Matrix als Karte über einem cinematischen Clip (ab lg) */}
+      <section id="hero" className="relative isolate overflow-hidden border-b border-line scroll-mt-20">
+        <Container className="relative z-10 grid items-center gap-12 py-16 sm:py-24 lg:min-h-[640px] lg:grid-cols-[1.05fr_1fr]">
           <div className="fade-up">
             <p className="text-sm font-semibold text-primary">{t.landing.eyebrow}</p>
             <h1 className="mt-4 text-4xl font-bold leading-[1.08] tracking-tight sm:text-5xl lg:text-6xl">
@@ -56,7 +57,7 @@ export function LandingView() {
               ))}
             </ul>
           </div>
-          <div className="fade-up" style={{ animationDelay: "120ms" }}>
+          <div className="hero-card fade-up lg:justify-self-end" style={{ animationDelay: "120ms" }}>
             <HeroVisual
               labels={{
                 criteria: t.presets.software.criteria.slice(0, 3).map((c) => c.name),
@@ -67,6 +68,7 @@ export function LandingView() {
             />
           </div>
         </Container>
+        <HeroStage />
       </section>
 
       {/* Kennzahlen */}
