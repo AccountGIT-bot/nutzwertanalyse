@@ -1017,3 +1017,73 @@ input[type="range"].slider:focus-visible::-webkit-slider-thumb {
     box-shadow: none;
   }
 }
+
+/* =====================================================================
+   Hinweis auf den Dunkelmodus und Effekte auf dem Theme-Knopf
+   ===================================================================== */
+@keyframes theme-hint-in {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.theme-hint {
+  animation: theme-hint-in 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.theme-hint-arrow {
+  position: absolute;
+  top: -7px;
+  width: 14px;
+  height: 14px;
+  transform: rotate(45deg);
+  background: var(--surface);
+  border-left: 1px solid var(--line);
+  border-top: 1px solid var(--line);
+}
+@keyframes theme-pulse {
+  0% {
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--primary) 55%, transparent);
+  }
+  70% {
+    box-shadow: 0 0 0 12px transparent;
+  }
+  100% {
+    box-shadow: 0 0 0 0 transparent;
+  }
+}
+.theme-cue-pulse {
+  color: var(--primary);
+  background: var(--primary-soft);
+  animation: theme-pulse 1.4s ease-out 3;
+}
+@keyframes theme-confirm {
+  0% {
+    transform: scale(1);
+  }
+  35% {
+    transform: scale(1.25) rotate(-12deg);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+.theme-cue-confirm {
+  color: var(--primary);
+  background: var(--primary-soft);
+  animation: theme-confirm 0.9s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+@media (prefers-reduced-motion: reduce) {
+  .theme-hint,
+  .theme-cue-pulse,
+  .theme-cue-confirm {
+    animation: none;
+  }
+  .theme-cue-pulse {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+  }
+}

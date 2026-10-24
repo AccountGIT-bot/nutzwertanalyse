@@ -195,6 +195,7 @@ export const legalEn: LegalSet = {
             ["nwa.analysis.<id>", "One saved analysis each (complete content)", "Functional", "until deleted"],
             ["nwa.locale", "Selected language", "Functional", "until deleted"],
             ["nwa.theme", "Selected theme (light/dark)", "Functional", "until deleted"],
+            ["nwa.themeHint", "Marker that the dark-mode hint has been shown", "Functional", "until deleted"],
           ],
         },
         {

@@ -5,6 +5,7 @@ import { I18nProvider } from "@/lib/i18n";
 import { ConsentProvider } from "@/lib/consent/ConsentProvider";
 import { ThemeProvider } from "@/lib/theme/ThemeProvider";
 import { ConsentBanner } from "@/components/consent/ConsentBanner";
+import { ThemeHint } from "@/components/theme/ThemeHint";
 import { ToastProvider } from "@/components/ui/Toast";
 
 export function Providers({ children }: { children: ReactNode }) {
@@ -15,6 +16,7 @@ export function Providers({ children }: { children: ReactNode }) {
           <ToastProvider>
             {children}
             <ConsentBanner />
+            <ThemeHint />
           </ToastProvider>
         </I18nProvider>
       </ConsentProvider>

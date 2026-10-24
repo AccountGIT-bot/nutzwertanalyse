@@ -91,6 +91,13 @@ export const en: Translations = {
     openSource: "Source code",
   },
   theme: { light: "Light", dark: "Dark", system: "System" },
+  themeHint: {
+    title: "Prefer dark?",
+    text: "You can also use the site in dark mode. The button at the top right switches between light, dark and your system setting.",
+    tryIt: "Try dark mode",
+    dismiss: "No thanks",
+    close: "Close hint",
+  },
   landing: {
     eyebrow: "Free · No account · Your data stays with you",
     h1a: "Decisions.",

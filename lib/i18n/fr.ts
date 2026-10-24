@@ -91,6 +91,13 @@ export const fr: Translations = {
     openSource: "Code source",
   },
   theme: { light: "Clair", dark: "Sombre", system: "Système" },
+  themeHint: {
+    title: "Plutôt sombre ?",
+    text: "Vous pouvez aussi utiliser le site en mode sombre. Le bouton en haut à droite passe du clair au sombre ou au réglage du système.",
+    tryIt: "Essayer le mode sombre",
+    dismiss: "Non merci",
+    close: "Fermer l’indication",
+  },
   landing: {
     eyebrow: "Gratuit · Sans compte · Vos données restent chez vous",
     h1a: "Décisions.",

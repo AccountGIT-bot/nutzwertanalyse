@@ -103,6 +103,13 @@ export const de = {
     dark: "Dunkel",
     system: "System",
   },
+  themeHint: {
+    title: "Lieber dunkel?",
+    text: "Du kannst die Seite auch im Dunkelmodus nutzen. Der Knopf oben rechts wechselt zwischen Hell, Dunkel und Systemeinstellung.",
+    tryIt: "Dunkelmodus ausprobieren",
+    dismiss: "Nein danke",
+    close: "Hinweis schliessen",
+  },
   landing: {
     eyebrow: "Kostenlos · Ohne Konto · Daten bleiben bei dir",
     h1a: "Entscheidungen.",

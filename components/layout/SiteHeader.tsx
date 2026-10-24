@@ -119,13 +119,20 @@ function LocaleMenu({ locale, setLocale, label }: { locale: Locale; setLocale: (
 }
 
 function ThemeButton() {
-  const { pref, setPref } = useTheme();
+  const { pref, cue, setPref } = useTheme();
   const { t } = useI18n();
-  const order: ThemePref[] = ["system", "light", "dark"];
+  const order: ThemePref[] = ["light", "dark", "system"];
   const next = order[(order.indexOf(pref) + 1) % order.length];
   const Icon = pref === "dark" ? Moon : pref === "light" ? Sun : Monitor;
   return (
-    <button type="button" className="btn btn-ghost btn-icon" onClick={() => setPref(next)} aria-label={`${t.common.toggleTheme}: ${t.theme[pref]}`} title={t.theme[pref]}>
+    <button
+      type="button"
+      data-theme-toggle
+      className={cn("btn btn-ghost btn-icon", cue === "pulse" && "theme-cue-pulse", cue === "confirm" && "theme-cue-confirm")}
+      onClick={() => setPref(next)}
+      aria-label={`${t.common.toggleTheme}: ${t.theme[pref]}`}
+      title={t.theme[pref]}
+    >
       <Icon className="h-5 w-5" aria-hidden />
     </button>
   );
