@@ -4,7 +4,7 @@ Alle freigegebenen Veröffentlichungen von Nutzwertanalyse. Entwicklung auf `dev
 
 ## 2.3.0 – 24.10.2026
 
-Release-PR: [#34](https://github.com/AccountGIT-bot/nutzwertanalyse/pull/34). Freigabe über die Release-Karte ausstehend.
+Release-PR: [#34](https://github.com/AccountGIT-bot/nutzwertanalyse/pull/34). Freigegeben von Liam am 24.10.2026 über die Release-Karte (Doppelklick, 18:07 UTC) und im Chat bestätigt, Merge-Commit `4430aa3`.
 
 - Standarddesign Hell: Die Seite startet hell, unabhängig von der Betriebssystem-Einstellung. «System» gilt nur, wenn es ausdrücklich gewählt wurde; Reihenfolge des Knopfs im Kopf: Hell → Dunkel → System. Das Skript vor dem ersten Paint setzt `data-theme="light"`, sofern keine gespeicherte Wahl vorliegt; `theme-color` folgt dem tatsächlichen Design.
 - Hinweis auf den Dunkelmodus: Nach drei Minuten auf der Website erscheint eine kompakte Karte unter dem Kopf mit Pfeil auf den Theme-Knopf («Lieber dunkel? Die Seite gibt es auch im Dunkelmodus.», «Ausprobieren», «Nein danke»), nur wenn das Design nicht selbst gewählt wurde, die Seite hell ist, der Tab sichtbar ist und die Speicherfrage beantwortet wurde. Solange der Hinweis offen ist, pulsiert der Knopf.
