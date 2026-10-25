@@ -4,7 +4,7 @@ Alle freigegebenen Veröffentlichungen von Nutzwertanalyse. Entwicklung auf `dev
 
 ## 2.5.0 – 25.10.2026
 
-Release-PR: [#36](https://github.com/AccountGIT-bot/nutzwertanalyse/pull/36). Freigabe durch Liam ausstehend.
+Release-PR: [#36](https://github.com/AccountGIT-bot/nutzwertanalyse/pull/36). Freigegeben von Liam am 25.10.2026 über die Release-Karte (Doppelklick, 14:07 UTC) und im Chat bestätigt, Merge-Commit `2437aa8`.
 
 - Druckbericht neu aufgebaut (`components/nwa/PrintReport.tsx`): Deckblatt auf Seite 1 mit Titel, Datum, Bewertenden, Kennzahlen (Alternativen, Kriterien, Gewichtungsmethode, Skala, Vollständigkeit), Empfehlung im Rahmen mit Vorsprung, Konfidenz und Robustheits-Satz, «Rangliste auf einen Blick» und Inhaltsverzeichnis. Danach nummerierte Abschnitte im Fluss: Ausgangslage und Ziel, Rangliste mit Beiträgen, Stärkenprofil (grösseres Radar, Kategorietabelle mit Alternativen als Zeilen und Bestwert je Kategorie fett), Bewertungsmatrix (Bestwert je Kriterium fett), Sensitivitätsanalyse, Robustheits-Simulation als Tabelle mit Siegquoten-Balken, Begründungen je Alternative gruppiert (Rang und Nutzwert in der Kopfzeile), Fazit & Entscheid. Titel bleiben beim ersten Block, Diagramme und kurze Tabellen werden nicht geteilt, Tabellenköpfe wiederholen sich.
 - Querformat ab fünf Alternativen: Die Bewertungsmatrix liegt auf einer Querformatseite und wandert als letzter Abschnitt ans Ende; Nummerierung und Inhaltsverzeichnis folgen der tatsächlichen Reihenfolge.
