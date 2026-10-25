@@ -4,7 +4,7 @@ Alle freigegebenen Veröffentlichungen von Nutzwertanalyse. Entwicklung auf `dev
 
 ## 2.4.0 – 25.10.2026
 
-Release-PR: [#35](https://github.com/AccountGIT-bot/nutzwertanalyse/pull/35). Freigabe über die Release-Karte ausstehend.
+Release-PR: [#35](https://github.com/AccountGIT-bot/nutzwertanalyse/pull/35). Freigegeben von Liam am 25.10.2026 über die Release-Karte (Doppelklick, 07:04 UTC) und im Chat bestätigt, Merge-Commit `05d3339`.
 
 - Bewertung geführt: Neue Standardansicht mit einem Kriterium pro Schritt (Beschreibung, Skalenlegende, alle Alternativen untereinander, grosse 1–10-Reihe mit gefülltem Wert und getönten darunterliegenden Werten, Begründung inline, Fortschrittspunkte je Kriterium, «Vorheriges/Nächstes Kriterium», am Ende «Zum Ergebnis», Sprung zum ersten offenen Kriterium). «Matrix» bleibt als Übersicht mit kompakter Einzeilen-Skala und scrollt in der Karte.
 - Ergebnis in vier Reitern: Überblick, Stärken & Details, Robustheit & Sensitivität, Fazit & Bericht; Lesehilfe unter der Empfehlung; bei unvollständiger Bewertung auffälliger Hinweis mit «Bewertung fortsetzen». Druckbericht unverändert vollständig.
