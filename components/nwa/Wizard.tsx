@@ -3,7 +3,18 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
-import { ArrowLeft, ArrowRight, Check, ChevronLeft, Undo2, Redo2, Trash2, Cloud, CloudOff, AlertCircle } from "lucide-react";
+import {
+  ArrowLeft,
+  ArrowRight,
+  Check,
+  ChevronLeft,
+  Undo2,
+  Redo2,
+  Trash2,
+  Cloud,
+  CloudOff,
+  AlertCircle,
+} from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import { useAnalysis, useUndoShortcuts } from "@/lib/nwa/store";
 import { isStepComplete } from "@/lib/nwa/calc";
@@ -31,7 +42,13 @@ export function Wizard() {
 
   const step = analysis.step;
   const index = STEPS.indexOf(step);
-  const complete = useMemo(() => Object.fromEntries(STEPS.map((s) => [s, isStepComplete(analysis, s)])) as Record<Step, boolean>, [analysis]);
+  const complete = useMemo(
+    () =>
+      Object.fromEntries(
+        STEPS.map((s) => [s, isStepComplete(analysis, s)]),
+      ) as Record<Step, boolean>,
+    [analysis],
+  );
 
   const go = (s: Step) => {
     setShowIncomplete(false);
@@ -71,59 +88,155 @@ export function Wizard() {
       <div className="border-b border-line bg-surface">
         <Container className="flex flex-wrap items-center gap-2 py-2.5">
           <Link href="/app" className="btn btn-ghost btn-sm">
-            <ChevronLeft className="h-4 w-4" aria-hidden /> {t.wizard.backToList}
+            <ChevronLeft className="h-4 w-4" aria-hidden />{" "}
+            {t.wizard.backToList}
           </Link>
-          <div className="min-w-0 flex-1 truncate text-sm font-semibold" title={analysis.title}>
+          <div
+            className="min-w-0 flex-1 truncate text-sm font-semibold"
+            title={analysis.title}
+          >
             {analysis.title || t.common.untitled}
           </div>
-          <span className={cn("hidden items-center gap-1 text-xs sm:inline-flex", functional ? "text-ink-3" : "text-warn")} title={functional ? t.wizard.savedLocal : t.wizard.unsaved}>
-            {functional ? <Cloud className="h-3.5 w-3.5" aria-hidden /> : <CloudOff className="h-3.5 w-3.5" aria-hidden />}
+          <span
+            className={cn(
+              "hidden items-center gap-1 text-xs sm:inline-flex",
+              functional ? "text-ink-3" : "text-warn",
+            )}
+            title={functional ? t.wizard.savedLocal : t.wizard.unsaved}
+          >
+            {functional ? (
+              <Cloud className="h-3.5 w-3.5" aria-hidden />
+            ) : (
+              <CloudOff className="h-3.5 w-3.5" aria-hidden />
+            )}
             {functional ? t.wizard.savedLocal : t.wizard.unsaved}
           </span>
           <div className="flex items-center gap-1">
-            <button type="button" className="btn btn-ghost btn-icon" onClick={() => dispatch({ type: "undo" })} disabled={!canUndo} aria-label={t.common.undo} title={`${t.common.undo} (Ctrl+Z)`}>
+            <button
+              type="button"
+              className="btn btn-ghost btn-icon"
+              onClick={() => dispatch({ type: "undo" })}
+              disabled={!canUndo}
+              aria-label={t.common.undo}
+              title={`${t.common.undo} (Ctrl+Z)`}
+            >
               <Undo2 className="h-4 w-4" aria-hidden />
             </button>
-            <button type="button" className="btn btn-ghost btn-icon" onClick={() => dispatch({ type: "redo" })} disabled={!canRedo} aria-label={t.common.redo} title={`${t.common.redo} (Ctrl+Shift+Z)`}>
+            <button
+              type="button"
+              className="btn btn-ghost btn-icon"
+              onClick={() => dispatch({ type: "redo" })}
+              disabled={!canRedo}
+              aria-label={t.common.redo}
+              title={`${t.common.redo} (Ctrl+Shift+Z)`}
+            >
               <Redo2 className="h-4 w-4" aria-hidden />
             </button>
-            <button type="button" className="btn btn-ghost btn-icon text-bad" onClick={() => setConfirmDelete(true)} aria-label={t.wizard.deleteAnalysis} title={t.wizard.deleteAnalysis}>
+            <button
+              type="button"
+              className="btn btn-ghost btn-icon text-bad"
+              onClick={() => setConfirmDelete(true)}
+              aria-label={t.wizard.deleteAnalysis}
+              title={t.wizard.deleteAnalysis}
+            >
               <Trash2 className="h-4 w-4" aria-hidden />
             </button>
           </div>
         </Container>
       </div>
 
-      {/* Stepper */}
-      <Container className="pt-6">
-        <nav aria-label={fmt(t.wizard.stepOf, { current: index + 1, total: STEPS.length })}>
-          <ol className="-mx-4 flex gap-1.5 overflow-x-auto px-4 pb-2 sm:mx-0 sm:gap-2 sm:px-0">
+      {/* Stepper: kompakt mit Fortschrittsbalken auf kleinen Bildschirmen, Karten ab sm */}
+      <Container className="pt-5 sm:pt-6">
+        <nav
+          aria-label={fmt(t.wizard.stepOf, {
+            current: index + 1,
+            total: STEPS.length,
+          })}
+        >
+          <div className="sm:hidden">
+            <div className="flex items-baseline justify-between gap-3">
+              <span className="text-base font-semibold">
+                {t.steps[step].label}
+              </span>
+              <span className="shrink-0 text-xs text-ink-3">
+                {fmt(t.wizard.stepOf, {
+                  current: index + 1,
+                  total: STEPS.length,
+                })}
+              </span>
+            </div>
+            <ol className="mt-2 flex gap-1">
+              {STEPS.map((s, i) => (
+                <li key={s} className="flex-1">
+                  <button
+                    type="button"
+                    onClick={() => go(s)}
+                    aria-current={s === step ? "step" : undefined}
+                    aria-label={`${i + 1}. ${t.steps[s].label}`}
+                    className={cn(
+                      "block h-2 w-full rounded-full transition-colors",
+                      i < index
+                        ? complete[s]
+                          ? "bg-good"
+                          : "bg-warn/70"
+                        : s === step
+                          ? "bg-primary"
+                          : "bg-surface-3",
+                    )}
+                  />
+                </li>
+              ))}
+            </ol>
+            <p className="mt-1.5 text-xs text-ink-3">
+              {t.steps[step].description}
+            </p>
+          </div>
+          <ol className="hidden gap-2 sm:flex">
             {STEPS.map((s, i) => {
               const active = s === step;
               const done = complete[s] && i < index;
               return (
-                <li key={s} className="min-w-[132px] flex-1 sm:min-w-0">
+                <li key={s} className="min-w-0 flex-1">
                   <button
                     type="button"
                     onClick={() => go(s)}
                     aria-current={active ? "step" : undefined}
                     className={cn(
                       "flex w-full flex-col gap-1.5 rounded-xl border px-2 py-2 text-left transition-colors sm:px-3",
-                      active ? "border-primary bg-primary-soft/60" : "border-line bg-surface hover:bg-surface-2",
+                      active
+                        ? "border-primary bg-primary-soft/60"
+                        : "border-line bg-surface hover:bg-surface-2",
                     )}
                   >
                     <span className="flex items-center gap-1.5">
                       <span
                         className={cn(
                           "flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[11px] font-bold",
-                          done ? "bg-good text-white" : active ? "bg-primary text-primary-ink" : "bg-surface-3 text-ink-2",
+                          done
+                            ? "bg-good text-white"
+                            : active
+                              ? "bg-primary text-primary-ink"
+                              : "bg-surface-3 text-ink-2",
                         )}
                       >
-                        {done ? <Check className="h-3 w-3" aria-hidden /> : i + 1}
+                        {done ? (
+                          <Check className="h-3 w-3" aria-hidden />
+                        ) : (
+                          i + 1
+                        )}
                       </span>
-                      <span className={cn("truncate text-xs font-semibold sm:text-sm", active ? "text-ink" : "text-ink-2")}>{t.steps[s].short}</span>
+                      <span
+                        className={cn(
+                          "truncate text-xs font-semibold sm:text-sm",
+                          active ? "text-ink" : "text-ink-2",
+                        )}
+                      >
+                        {t.steps[s].short}
+                      </span>
                     </span>
-                    <span className="hidden truncate text-[11px] text-ink-3 lg:block">{t.steps[s].description}</span>
+                    <span className="hidden truncate text-[11px] text-ink-3 lg:block">
+                      {t.steps[s].description}
+                    </span>
                   </button>
                 </li>
               );
@@ -147,24 +260,64 @@ export function Wizard() {
       {/* Navigation unten (sticky) */}
       <div className="no-print fixed inset-x-0 bottom-0 z-30 border-t border-line bg-surface/90 backdrop-blur">
         <Container className="flex items-center justify-between gap-3 py-3">
-          <button type="button" className="btn btn-secondary" onClick={back} disabled={index === 0}>
+          <button
+            type="button"
+            className="btn btn-secondary"
+            onClick={back}
+            disabled={index === 0}
+          >
             <ArrowLeft className="h-4 w-4" aria-hidden /> {t.common.back}
           </button>
-          <div className="hidden text-xs text-ink-3 md:block">
-            {fmt(t.wizard.stepOf, { current: index + 1, total: STEPS.length })} · {t.wizard.keyboardHint}
+          {/* Bereitschaft des aktuellen Schritts, immer sichtbar; Tastaturtipp im Tooltip */}
+          <div
+            className="hidden min-w-0 items-center gap-2 text-xs md:flex"
+            title={t.wizard.keyboardHint}
+          >
+            <span className="shrink-0 text-ink-3">
+              {fmt(t.wizard.stepOf, {
+                current: index + 1,
+                total: STEPS.length,
+              })}
+            </span>
+            {index < STEPS.length - 1 && (
+              <>
+                <span className="text-ink-3" aria-hidden>
+                  ·
+                </span>
+                {complete[step] ? (
+                  <span className="inline-flex items-center gap-1.5 font-medium text-good">
+                    <Check className="h-3.5 w-3.5" aria-hidden />{" "}
+                    {t.wizard.ready}
+                  </span>
+                ) : (
+                  <span className="inline-flex min-w-0 items-center gap-1.5 text-warn">
+                    <AlertCircle className="h-3.5 w-3.5 shrink-0" aria-hidden />
+                    <span className="truncate">
+                      {t.wizard.openTasks}: {t.wizard.missing[step]}
+                    </span>
+                  </span>
+                )}
+              </>
+            )}
           </div>
           {showIncomplete && !complete[step] ? (
             <div className="flex items-center gap-2" role="alert">
               <span className="hidden items-center gap-1 text-xs text-warn sm:inline-flex">
-                <AlertCircle className="h-3.5 w-3.5" aria-hidden /> {t.wizard.missing[step]}
+                <AlertCircle className="h-3.5 w-3.5" aria-hidden />{" "}
+                {t.wizard.missing[step]}
               </span>
-              <button type="button" className="btn btn-secondary" onClick={() => go(STEPS[index + 1])}>
+              <button
+                type="button"
+                className="btn btn-secondary"
+                onClick={() => go(STEPS[index + 1])}
+              >
                 {t.wizard.continueAnyway}
               </button>
             </div>
           ) : index < STEPS.length - 1 ? (
             <button type="button" className="btn btn-primary" onClick={next}>
-              {index === STEPS.length - 2 ? t.wizard.toResults : t.common.next} <ArrowRight className="h-4 w-4" aria-hidden />
+              {index === STEPS.length - 2 ? t.wizard.toResults : t.common.next}{" "}
+              <ArrowRight className="h-4 w-4" aria-hidden />
             </button>
           ) : (
             <Link href="/app" className="btn btn-primary">
@@ -192,11 +345,21 @@ export function Wizard() {
 }
 
 /** Gemeinsamer Kopf eines Schritts */
-export function StepHeader({ title, lead, children }: { title: string; lead?: string; children?: React.ReactNode }) {
+export function StepHeader({
+  title,
+  lead,
+  children,
+}: {
+  title: string;
+  lead?: string;
+  children?: React.ReactNode;
+}) {
   return (
     <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
       <div>
-        <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">{title}</h1>
+        <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">
+          {title}
+        </h1>
         {lead && <p className="mt-1 max-w-2xl text-sm text-ink-2">{lead}</p>}
       </div>
       {children && <div className="flex flex-wrap gap-2">{children}</div>}

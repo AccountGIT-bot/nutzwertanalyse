@@ -524,6 +524,61 @@ input[type="range"].slider:focus-visible::-webkit-slider-thumb {
   border-color: var(--primary);
   color: var(--primary-ink);
 }
+/* Skala als Reihe: Werte unterhalb der Wahl leicht getönt, damit die Zeile wie ein Balken lesbar ist */
+.score-row {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 2px;
+}
+.score-btn.is-below {
+  background: var(--primary-soft);
+  border-color: transparent;
+  color: var(--primary);
+}
+.score-btn-sm {
+  min-width: 1.55rem;
+  height: 1.75rem;
+  border-radius: 6px;
+  font-size: 11px;
+}
+.score-btn-lg {
+  min-width: 2.4rem;
+  height: 2.5rem;
+  flex: 1 1 0;
+  font-size: 0.9rem;
+}
+@media (max-width: 420px) {
+  .score-btn-lg {
+    min-width: 1.9rem;
+    height: 2.25rem;
+    font-size: 0.8rem;
+  }
+}
+/* Reiter im Ergebnis */
+.rtabs {
+  display: flex;
+  gap: 0.25rem;
+  overflow-x: auto;
+  border-bottom: 1px solid var(--line);
+  scrollbar-width: none;
+}
+.rtab {
+  margin-bottom: -1px;
+  border-bottom: 2px solid transparent;
+  padding: 0.65rem 0.9rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--ink-2);
+  white-space: nowrap;
+  transition: color 0.15s, border-color 0.15s;
+}
+.rtab:hover {
+  color: var(--ink);
+}
+.rtab[aria-selected="true"] {
+  color: var(--primary);
+  border-color: var(--primary);
+}
 
 
 .tabular {
@@ -1114,5 +1169,32 @@ input[type="range"].slider:focus-visible::-webkit-slider-thumb {
   .theme-cue-pulse {
     outline: 2px solid var(--primary);
     outline-offset: 2px;
+  }
+}
+
+/* Hintergrund-Bühne (Hero): Einblendung, Schleier, Karte mit Tiefenschatten */
+.stage-media {
+  animation: terms-hero-in 1.8s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.stage-veil {
+  background: color-mix(in srgb, var(--bg) 8%, transparent);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .stage-veil {
+    background: color-mix(in srgb, var(--bg) 62%, transparent);
+  }
+}
+:root[data-theme="dark"] .stage-veil {
+  background: color-mix(in srgb, var(--bg) 62%, transparent);
+}
+.hero-card svg {
+  filter: drop-shadow(0 28px 48px rgb(10 30 30 / 0.16));
+}
+@media (prefers-reduced-motion: reduce) {
+  .stage-video {
+    display: none;
+  }
+  .stage-media {
+    animation: none;
   }
 }
