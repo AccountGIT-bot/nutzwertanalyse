@@ -808,11 +808,78 @@ input[type="range"].slider:focus-visible::-webkit-slider-thumb {
     color: inherit;
   }
   @page {
-    margin: 16mm 14mm;
+    margin: 16mm 14mm 22mm;
+  }
+  @page landscape {
+    size: landscape;
+    margin: 14mm 14mm 20mm;
+  }
+  .print-landscape {
+    page: landscape;
   }
 }
 .print-only {
   display: none;
+}
+
+/* Druckbericht: Deckblatt, nummerierte Abschnitte, Fusszeile über @page-Randboxen (im Bericht gesetzt) */
+.report-h2 {
+  display: flex;
+  align-items: baseline;
+  gap: 0.6rem;
+  font-size: 1.125rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+.report-num {
+  display: inline-flex;
+  min-width: 1.6rem;
+  height: 1.6rem;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  background: #000;
+  color: #fff;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+.report-section {
+  margin-top: 2.5rem;
+}
+.report-section + .report-section {
+  padding-top: 1.75rem;
+  border-top: 1px solid #e5e5e5;
+}
+.report-notes-group {
+  break-inside: avoid;
+}
+@media print {
+  .report {
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+  .report-cover {
+    break-after: page;
+  }
+  .report-section {
+    margin-top: 2rem;
+    padding-top: 0 !important;
+    border-top: 0 !important;
+  }
+  .report-h2,
+  .report-lead {
+    break-after: avoid;
+  }
+  .report-block,
+  .report-keep {
+    break-inside: avoid;
+  }
+  .report thead {
+    display: table-header-group;
+  }
+  .report tr {
+    break-inside: avoid;
+  }
 }
 
 /* =====================================================================

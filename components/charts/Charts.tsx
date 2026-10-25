@@ -16,6 +16,45 @@ export function seriesColor(i: number): string {
   return SERIES[i % SERIES.length];
 }
 
+/** Bricht lange Beschriftungen wortweise auf höchstens `maxLines` Zeilen um; Überlänge wird mit «…» gekürzt. */
+export function wrapLabel(label: string, maxChars: number, maxLines = 2): string[] {
+  const words = label.trim().split(/\s+/).filter(Boolean);
+  const lines: string[] = [];
+  let current = "";
+  for (const word of words) {
+    const next = current ? `${current} ${word}` : word;
+    if (next.length <= maxChars || !current) current = next;
+    else {
+      lines.push(current);
+      current = word;
+    }
+  }
+  if (current) lines.push(current);
+  const clip = (l: string) => (l.length > maxChars ? `${l.slice(0, maxChars - 1).trimEnd()}…` : l);
+  if (lines.length > maxLines) {
+    const kept = lines.slice(0, maxLines).map(clip);
+    const last = kept[maxLines - 1];
+    kept[maxLines - 1] = last.endsWith("…") ? last : `${last.slice(0, Math.max(0, maxChars - 1)).trimEnd()}…`;
+    return kept;
+  }
+  return lines.map(clip);
+}
+
+/** Mehrzeilige SVG-Beschriftung, vertikal um `y` zentriert. */
+function SvgLabel({ x, y, lines, fontSize, anchor = "end", className }: { x: number; y: number; lines: string[]; fontSize: number; anchor?: "start" | "middle" | "end"; className?: string }) {
+  const lineH = fontSize * 1.2;
+  const y0 = y - ((lines.length - 1) * lineH) / 2;
+  return (
+    <text x={x} y={y0} fontSize={fontSize} fill="currentColor" textAnchor={anchor} dominantBaseline="middle" className={className}>
+      {lines.map((l, i) => (
+        <tspan key={i} x={x} dy={i === 0 ? 0 : lineH}>
+          {l}
+        </tspan>
+      ))}
+    </text>
+  );
+}
+
 /* ---------------- Tooltip-Helfer ---------------- */
 
 function useTip() {
@@ -83,9 +122,7 @@ export function HBarChart({ data, max = 100, ariaLabel, height }: { data: BarDat
               onMouseLeave={hide}
             >
               <rect x={labelW} y={y - 4} width={width - labelW - 56} height={barH + 8} fill="transparent" />
-              <text x={labelW - 10} y={y + barH / 2 + 4} fontSize={12} fill="currentColor" textAnchor="end" className={cn(d.muted && "opacity-50")}>
-                {d.label.length > 24 ? d.label.slice(0, 23) + "…" : d.label}
-              </text>
+              <SvgLabel x={labelW - 10} y={y + barH / 2} lines={wrapLabel(d.label, 26)} fontSize={11.5} className={cn(d.muted && "opacity-50")} />
               <path
                 d={`M${labelW},${y} h${Math.max(0, w - 4)} a4,4 0 0 1 4,4 v${barH - 8} a4,4 0 0 1 -4,4 h${-Math.max(0, w - 4)} z`}
                 fill={d.muted ? "var(--chart-axis)" : "var(--primary)"}
@@ -146,9 +183,7 @@ export function StackedBarChart({
             const total = r.segments.reduce((s, seg) => s + seg.value, 0);
             return (
               <g key={i} className={cn(r.muted && "opacity-50")}>
-                <text x={labelW - 10} y={y + 16} fontSize={12} fill="currentColor" textAnchor="end">
-                  {r.label.length > 24 ? r.label.slice(0, 23) + "…" : r.label}
-                </text>
+                <SvgLabel x={labelW - 10} y={y + 11} lines={wrapLabel(r.label, 26)} fontSize={11.5} />
                 {r.segments.map((seg, j) => {
                   const w = (plotW * seg.value) / max;
                   const sx = x;
@@ -206,14 +241,19 @@ export function RadarChart({
   series,
   max,
   ariaLabel,
+  className,
 }: {
   axes: string[];
   series: { label: string; values: number[] }[];
   max: number;
   ariaLabel: string;
+  /** Breite des Diagramms (Standard max-w-md), z. B. max-w-lg im Druckbericht */
+  className?: string;
 }) {
+  /* Breiter als hoch, damit seitliche Beschriftungen Platz haben */
+  const width = 520;
   const size = 420;
-  const cx = size / 2;
+  const cx = width / 2;
   const cy = size / 2;
   const r = size / 2 - 64;
   const n = axes.length;
@@ -228,7 +268,7 @@ export function RadarChart({
   const shown = series.slice(0, 6);
   return (
     <div className="w-full">
-      <svg viewBox={`0 0 ${size} ${size}`} role="img" aria-labelledby={id} className="mx-auto w-full max-w-md overflow-visible text-ink">
+      <svg viewBox={`0 0 ${width} ${size}`} role="img" aria-labelledby={id} className={cn("mx-auto w-full overflow-visible text-ink", className ?? "max-w-md")}>
         <title id={id}>{ariaLabel}</title>
         {[0.25, 0.5, 0.75, 1].map((f) => (
           <polygon
@@ -241,13 +281,19 @@ export function RadarChart({
         ))}
         {axes.map((a, i) => {
           const [x, y] = point(i, max);
-          const [lx, ly] = point(i, max * 1.18);
+          const ang = (Math.PI * 2 * i) / n - Math.PI / 2;
+          const cos = Math.cos(ang);
+          const sin = Math.sin(ang);
+          /* Seitliche Beschriftungen beginnen bzw. enden neben der Achse, obere und untere stehen zentriert darüber/darunter */
+          const anchor = cos > 0.3 ? "start" : cos < -0.3 ? "end" : "middle";
+          const lines = wrapLabel(a, 20);
+          const gap = anchor === "middle" ? 12 + lines.length * 6 : 10;
+          const lx = cx + (r + gap) * cos;
+          const ly = cy + (r + gap) * sin;
           return (
             <g key={i}>
               <line x1={cx} y1={cy} x2={x} y2={y} stroke="var(--chart-grid)" strokeWidth={1} />
-              <text x={lx} y={ly} fontSize={11} fill="currentColor" textAnchor="middle" dominantBaseline="middle">
-                {a.length > 18 ? a.slice(0, 17) + "…" : a}
-              </text>
+              <SvgLabel x={lx} y={ly} lines={lines} fontSize={11} anchor={anchor} />
             </g>
           );
         })}
@@ -315,9 +361,7 @@ export function SensitivityBars({
         const xf = r.flip === null ? null : labelW + plotW * r.flip;
         return (
           <g key={i}>
-            <text x={labelW - 10} y={y + 14} fontSize={12} fill="currentColor" textAnchor="end">
-              {r.label.length > 24 ? r.label.slice(0, 23) + "…" : r.label}
-            </text>
+            <SvgLabel x={labelW - 10} y={y + 10} lines={wrapLabel(r.label, 26)} fontSize={11.5} />
             <line x1={labelW} x2={labelW + plotW} y1={y + 10} y2={y + 10} stroke="var(--chart-axis)" strokeWidth={2} strokeLinecap="round" />
             {xf !== null && (
               <line x1={Math.min(xc, xf)} x2={Math.max(xc, xf)} y1={y + 10} y2={y + 10} stroke={colorFor(r.impact)} strokeWidth={6} strokeLinecap="round" opacity={0.8} />
