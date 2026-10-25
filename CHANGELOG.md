@@ -2,6 +2,17 @@
 
 Alle freigegebenen Veröffentlichungen von Nutzwertanalyse. Entwicklung auf `dev`, Freigabe nach `main` nur mit ausdrücklicher Zustimmung von Liam (siehe `docs/DEVELOPMENT_WORKFLOW.md`).
 
+## 2.4.0 – 25.10.2026
+
+Release-PR: [#35](https://github.com/AccountGIT-bot/nutzwertanalyse/pull/35). Freigabe über die Release-Karte ausstehend.
+
+- Bewertung geführt: Neue Standardansicht mit einem Kriterium pro Schritt (Beschreibung, Skalenlegende, alle Alternativen untereinander, grosse 1–10-Reihe mit gefülltem Wert und getönten darunterliegenden Werten, Begründung inline, Fortschrittspunkte je Kriterium, «Vorheriges/Nächstes Kriterium», am Ende «Zum Ergebnis», Sprung zum ersten offenen Kriterium). «Matrix» bleibt als Übersicht mit kompakter Einzeilen-Skala und scrollt in der Karte.
+- Ergebnis in vier Reitern: Überblick, Stärken & Details, Robustheit & Sensitivität, Fazit & Bericht; Lesehilfe unter der Empfehlung; bei unvollständiger Bewertung auffälliger Hinweis mit «Bewertung fortsetzen». Druckbericht unverändert vollständig.
+- Assistent: kompakter Fortschrittskopf unter 640 px statt scrollender Karten; untere Leiste zeigt dauerhaft «Bereit für den nächsten Schritt» oder «Noch offen: …». Hinweis zu den Nutzungsbedingungen in Schritt 1 lautet «Kurz und klar erklärt.»
+- Startseite: Hero mit cinematischem Clip «Glasstelen» (Higgsfield, Kling 3.0 pro, 1920×1080) hinter der Ergebnis-Karte ab 1024 px, Verlauf in die Seitenfarbe, Karte mit Tiefenschatten; bis zur Übertragung der Videodateien zeigt die Bühne das Poster.
+- Texte in Deutsch, Englisch, Französisch, Italienisch. `package.json` von 2.3.0 auf 2.4.0.
+- Prüfbericht `docs/QA_2026-10-24.md` (Nachtrag): Bestandsaufnahme aller Schritte, Prüfungen bei 1366 und 390 px, Startseite hell und dunkel.
+
 ## 2.3.0 – 24.10.2026
 
 Release-PR: [#34](https://github.com/AccountGIT-bot/nutzwertanalyse/pull/34). Freigegeben von Liam am 24.10.2026 über die Release-Karte (Doppelklick, 18:07 UTC) und im Chat bestätigt, Merge-Commit `4430aa3`.
