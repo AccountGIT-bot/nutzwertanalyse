@@ -43,7 +43,7 @@ export function StepResults() {
     [analysis, results],
   );
   const robust: RobustnessResult = useMemo(
-    () => robustness(analysis, results, { runs: 1000 }),
+    () => robustness(analysis, results, { runs: 1000, seed: 1 }),
     [analysis, results],
   );
   const [whatIf, setWhatIf] = useState<Record<string, number> | null>(null);

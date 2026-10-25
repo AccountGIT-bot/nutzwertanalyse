@@ -2,9 +2,21 @@
 
 Alle freigegebenen Veröffentlichungen von Nutzwertanalyse. Entwicklung auf `dev`, Freigabe nach `main` nur mit ausdrücklicher Zustimmung von Liam (siehe `docs/DEVELOPMENT_WORKFLOW.md`).
 
+## 2.5.0 – 25.10.2026
+
+Release-PR: [#36](https://github.com/AccountGIT-bot/nutzwertanalyse/pull/36). Freigabe durch Liam ausstehend.
+
+- Druckbericht neu aufgebaut (`components/nwa/PrintReport.tsx`): Deckblatt auf Seite 1 mit Titel, Datum, Bewertenden, Kennzahlen (Alternativen, Kriterien, Gewichtungsmethode, Skala, Vollständigkeit), Empfehlung im Rahmen mit Vorsprung, Konfidenz und Robustheits-Satz, «Rangliste auf einen Blick» und Inhaltsverzeichnis. Danach nummerierte Abschnitte im Fluss: Ausgangslage und Ziel, Rangliste mit Beiträgen, Stärkenprofil (grösseres Radar, Kategorietabelle mit Alternativen als Zeilen und Bestwert je Kategorie fett), Bewertungsmatrix (Bestwert je Kriterium fett), Sensitivitätsanalyse, Robustheits-Simulation als Tabelle mit Siegquoten-Balken, Begründungen je Alternative gruppiert (Rang und Nutzwert in der Kopfzeile), Fazit & Entscheid. Titel bleiben beim ersten Block, Diagramme und kurze Tabellen werden nicht geteilt, Tabellenköpfe wiederholen sich.
+- Querformat ab fünf Alternativen: Die Bewertungsmatrix liegt auf einer Querformatseite und wandert als letzter Abschnitt ans Ende; Nummerierung und Inhaltsverzeichnis folgen der tatsächlichen Reihenfolge.
+- Fusszeile auf jeder Seite ausser dem Deckblatt: links Titel und Datum, rechts «Seite x von y · nutzwertanalyse.com», gesetzt über `@page`-Randboxen (Chrome, Edge); Firefox und Safari nutzen weiterhin die Kopf-/Fusszeilen des Browsers. Der Drucktipp nennt das.
+- Robustheit: App und Bericht rechnen mit 1000 Durchläufen und festem Startwert; die Siegquoten sind auf Bildschirm und Papier identisch.
+- Diagramme in App und Bericht: lange Beschriftungen brechen auf zwei Zeilen um statt abgeschnitten zu werden; Radar breiter mit Beschriftungen neben den Achsen.
+- Texte in Deutsch, Englisch, Französisch, Italienisch. `package.json` von 2.4.0 auf 2.5.0.
+- Prüfbericht `docs/QA_2026-10-25.md`: Tests, Lint, Typecheck, Build; Randbox-Test in Chromium 141; Beispielbericht mit 4 Alternativen (7 Seiten) und mit 6 Alternativen (8 Seiten, Querformat-Anhang), alle Seiten gesichtet; App-Reiter «Stärken & Details» bei 1366 px hell/dunkel und 390 px.
+
 ## 2.4.0 – 25.10.2026
 
-Release-PR: [#35](https://github.com/AccountGIT-bot/nutzwertanalyse/pull/35). Freigabe über die Release-Karte ausstehend.
+Release-PR: [#35](https://github.com/AccountGIT-bot/nutzwertanalyse/pull/35). Freigegeben von Liam am 25.10.2026 über die Release-Karte (Doppelklick, 07:04 UTC) und im Chat bestätigt, Merge-Commit `05d3339`.
 
 - Bewertung geführt: Neue Standardansicht mit einem Kriterium pro Schritt (Beschreibung, Skalenlegende, alle Alternativen untereinander, grosse 1–10-Reihe mit gefülltem Wert und getönten darunterliegenden Werten, Begründung inline, Fortschrittspunkte je Kriterium, «Vorheriges/Nächstes Kriterium», am Ende «Zum Ergebnis», Sprung zum ersten offenen Kriterium). «Matrix» bleibt als Übersicht mit kompakter Einzeilen-Skala und scrollt in der Karte.
 - Ergebnis in vier Reitern: Überblick, Stärken & Details, Robustheit & Sensitivität, Fazit & Bericht; Lesehilfe unter der Empfehlung; bei unvollständiger Bewertung auffälliger Hinweis mit «Bewertung fortsetzen». Druckbericht unverändert vollständig.
