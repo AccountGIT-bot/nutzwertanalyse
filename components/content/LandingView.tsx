@@ -31,7 +31,7 @@ export function LandingView() {
 
       {/* Hero: Text links, animierte Matrix als Karte über einem cinematischen Clip (ab lg) */}
       <section id="hero" className="relative isolate overflow-hidden border-b border-line scroll-mt-20">
-        <Container className="relative z-10 grid items-center gap-12 py-16 sm:py-24 lg:min-h-[640px] lg:grid-cols-[1.05fr_1fr]">
+        <Container className="relative z-10 grid grid-cols-1 items-center gap-12 py-16 sm:py-24 lg:min-h-[640px] lg:grid-cols-[1.05fr_minmax(0,1fr)]">
           <div className="fade-up">
             <p className="text-sm font-semibold text-primary">{t.landing.eyebrow}</p>
             <h1 className="mt-4 text-4xl font-bold leading-[1.08] tracking-tight sm:text-5xl lg:text-6xl">
@@ -121,7 +121,7 @@ export function LandingView() {
 
       {/* Video */}
       <section id="video" className="py-16 scroll-mt-20 sm:py-24" aria-labelledby="video-h">
-        <Container className="grid items-center gap-10 lg:grid-cols-[1fr_1.3fr]">
+        <Container className="grid grid-cols-1 items-center gap-10 lg:grid-cols-[minmax(0,1fr)_1.3fr]">
           <Reveal>
             <h2 id="video-h" className="text-3xl font-bold tracking-tight sm:text-4xl">
               {x.videoTitle}
@@ -153,7 +153,7 @@ export function LandingView() {
               <ArrowRight className="h-4 w-4" aria-hidden />
             </Link>
           </Reveal>
-          <ul className="mt-10 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+          <ul className="mt-10 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-5">
             {PRESET_IDS.map((id, i) => {
               const Ill = PRESET_ILLUSTRATIONS[id];
               return (
@@ -180,7 +180,7 @@ export function LandingView() {
 
       {/* Datenschutz + CTA */}
       <section id="datenschutz" className="py-16 scroll-mt-20 sm:py-24" aria-labelledby="privacy-h">
-        <Container className="grid items-center gap-10 lg:grid-cols-2">
+        <Container className="grid grid-cols-1 items-center gap-10 lg:grid-cols-2">
           <Reveal>
             <div className="flex items-center gap-2 text-sm font-semibold text-primary">
               <ShieldCheck className="h-4 w-4" aria-hidden />
@@ -190,7 +190,7 @@ export function LandingView() {
               {t.landing.privacyTitle}
             </h2>
             <p className="mt-3 leading-relaxed text-ink-2">{t.landing.privacyText}</p>
-            <ul className="mt-5 grid gap-2 sm:grid-cols-2">
+            <ul className="mt-5 grid grid-cols-1 gap-2 sm:grid-cols-2">
               {t.landing.privacyPoints.map((p) => (
                 <li key={p} className="flex items-center gap-2 text-sm">
                   <Check className="h-4 w-4 shrink-0 text-primary" aria-hidden />

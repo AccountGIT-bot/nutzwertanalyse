@@ -32,10 +32,10 @@ export function StepDecision() {
   };
 
   return (
-    <div className="grid gap-6 lg:grid-cols-[1fr_320px]">
+    <div className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_320px]">
       <div className="card p-5 sm:p-6">
         <StepHeader title={t.steps.decision.label} lead={t.steps.decision.description} />
-        <div className="grid gap-5">
+        <div className="grid grid-cols-1 gap-5">
           <Field label={t.decision.title} required>
             {(id) => (
               <TextInput
@@ -59,7 +59,7 @@ export function StepDecision() {
               />
             )}
           </Field>
-          <div className="grid gap-5 sm:grid-cols-2">
+          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
             <Field label={t.decision.goal} optional={t.common.optional}>
               {(id) => <TextArea id={id} value={analysis.goal} onChange={(e) => dispatch({ type: "patch", patch: { goal: e.target.value } })} placeholder={t.decision.goalPlaceholder} maxLength={2000} />}
             </Field>

@@ -79,7 +79,7 @@ export function SettingsView() {
           <h2 id="s-storage" className="flex items-center gap-2 text-base font-semibold">
             <Database className="h-4 w-4 text-primary" aria-hidden /> {t.settings.storage}
           </h2>
-          <dl className="mt-3 grid gap-2 text-sm sm:grid-cols-2">
+          <dl className="mt-3 grid grid-cols-1 gap-2 text-sm sm:grid-cols-2">
             <div className="rounded-lg bg-surface-2 px-3 py-2">
               <dt className="text-xs text-ink-3">{t.settings.storageStatus}</dt>
               <dd className="font-medium">{functional ? t.settings.storageOn : t.settings.storageOff}</dd>
@@ -95,7 +95,7 @@ export function SettingsView() {
             <button type="button" className="btn btn-secondary" onClick={exportAll} disabled={entries.length === 0}>
               <Download className="h-4 w-4" aria-hidden /> {t.settings.exportAll}
             </button>
-            <button type="button" className="btn btn-danger" onClick={() => setConfirm("deleteAll")} disabled={entries.length === 0}>
+            <button type="button" className="btn btn-danger whitespace-normal" onClick={() => setConfirm("deleteAll")} disabled={entries.length === 0}>
               <Trash2 className="h-4 w-4" aria-hidden /> {t.settings.deleteAll}
             </button>
           </div>
@@ -111,7 +111,7 @@ export function SettingsView() {
             <button type="button" className="btn btn-secondary" onClick={openDialog}>
               {t.consent.settings}
             </button>
-            <button type="button" className="btn btn-danger" onClick={() => setConfirm("revoke")}>
+            <button type="button" className="btn btn-danger whitespace-normal" onClick={() => setConfirm("revoke")}>
               {t.consent.revoke}
             </button>
           </div>

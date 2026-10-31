@@ -21,13 +21,13 @@ export function StepWeighting() {
   const crits = analysis.criteria;
 
   return (
-    <div className="grid gap-6 lg:grid-cols-[1fr_320px]">
+    <div className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_320px]">
       <div className="card p-5 sm:p-6">
         <StepHeader title={t.weighting.title} lead={t.weighting.lead} />
 
         <fieldset>
           <legend className="text-sm font-semibold">{t.weighting.method}</legend>
-          <div className="mt-2 grid gap-2 sm:grid-cols-2">
+          <div className="mt-2 grid grid-cols-1 gap-2 sm:grid-cols-2">
             {METHODS.map((m) => (
               <label
                 key={m}
@@ -244,7 +244,7 @@ function PairwiseEditor() {
       </div>
       <div className="rounded-xl border border-line bg-surface-2/40 p-4">
         <p className="text-center text-sm font-medium">{fmt(t.weighting.pairwiseQuestion, { a: a.name || "A", b: b.name || "B" })}</p>
-        <div className="mt-3 grid grid-cols-[1fr_auto_1fr] items-center gap-2 text-xs font-semibold">
+        <div className="mt-3 grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-2 text-xs font-semibold">
           <span className="truncate text-right text-primary">A · {a.name}</span>
           <span className="text-ink-3">vs.</span>
           <span className="truncate text-accent">B · {b.name}</span>
@@ -281,7 +281,7 @@ function PairwiseEditor() {
           </button>
         </div>
       </div>
-      <ol className="mt-4 grid gap-1 sm:grid-cols-2">
+      <ol className="mt-4 grid grid-cols-1 gap-1 sm:grid-cols-2">
         {pairs.map(([i, j], k) => {
           const set = `${crits[i].id}|${crits[j].id}` in analysis.pairwise || `${crits[j].id}|${crits[i].id}` in analysis.pairwise;
           return (

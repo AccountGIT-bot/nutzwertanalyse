@@ -11,7 +11,7 @@ const HERO_VIDEO_READY = false; // auf true setzen, sobald public/video/hero-bg.
 export function HeroStage() {
   const pos = "object-[38%_50%]";
   return (
-    <div className="no-print absolute inset-y-0 right-0 hidden w-[64%] lg:block" aria-hidden>
+    <div className="no-print absolute inset-y-0 right-0 hidden w-[64%] overflow-hidden lg:block" aria-hidden>
       <div className="stage-media absolute inset-0">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src="/video/hero-bg-poster.jpg" alt="" className={`absolute inset-0 h-full w-full object-cover ${pos}`} decoding="async" fetchPriority="high" />

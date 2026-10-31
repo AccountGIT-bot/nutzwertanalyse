@@ -85,7 +85,7 @@ function Clause({ c, labels }: { c: TermsClause; labels: Labels }) {
         <span className="text-primary">{labels.short}:</span> {c.short}
       </p>
 
-      <ol className="mt-6 grid gap-4">
+      <ol className="mt-6 grid grid-cols-1 gap-4">
         {c.items.map((it) => (
           <li key={it.n} className="grid grid-cols-[2.5rem_minmax(0,1fr)] gap-x-2">
             <span className="pt-0.5 text-sm tabular-nums text-ink-3">{it.n}</span>
@@ -144,7 +144,7 @@ export function TermsPage() {
         {/* Titelbereich: Text links, Waage-Video rechts mit Verlauf in die Seitenfarbe; mobil liegt das Video unter dem Text */}
         <section className="relative isolate overflow-hidden border-b border-line">
           <Container className="relative z-10">
-            <div className="grid py-14 sm:py-20 lg:min-h-[600px] lg:grid-cols-[minmax(0,38rem)_1fr] lg:items-center lg:py-24">
+            <div className="grid grid-cols-1 py-14 sm:py-20 lg:min-h-[600px] lg:grid-cols-[minmax(0,38rem)_minmax(0,1fr)] lg:items-center lg:py-24">
               <Reveal>
                 <p className="inline-flex items-center gap-2 text-sm font-semibold text-primary">
                   <Scale className="h-4 w-4" aria-hidden />
@@ -190,7 +190,7 @@ export function TermsPage() {
                 {labels.summaryNote} {labels.legendIntro}
               </p>
             </div>
-            <ul className="mt-8 grid gap-x-8 gap-y-8 sm:grid-cols-2 lg:grid-cols-4">
+            <ul className="mt-8 grid grid-cols-1 gap-x-8 gap-y-8 sm:grid-cols-2 lg:grid-cols-4">
               {doc.summary.map((s, i) => (
                 <Reveal key={s.text} as="li" delay={Math.min(i, 3) * 70} className="flex gap-3 lg:flex-col">
                   <span className={cn("mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-full", s.tag === "limit" ? "bg-warn-soft" : "bg-primary-soft")}>
@@ -214,7 +214,7 @@ export function TermsPage() {
         </section>
 
         {/* Klauseln, weiss, mit Inhaltsverzeichnis */}
-        <Container className="terms-layout grid gap-x-12 py-14 sm:py-20 lg:grid-cols-[13rem_minmax(0,1fr)]">
+        <Container className="terms-layout grid grid-cols-1 gap-x-12 py-14 sm:py-20 lg:grid-cols-[13rem_minmax(0,1fr)]">
           <aside className="no-print hidden lg:block">
             <nav aria-label={labels.toc} className="sticky top-24">
               <p className="text-xs font-semibold uppercase tracking-[0.1em] text-ink-3">{labels.toc}</p>
@@ -249,7 +249,7 @@ export function TermsPage() {
               <h2 id="terms-history-h" className="text-xl font-bold tracking-tight">
                 {labels.historyTitle}
               </h2>
-              <ol className="mt-5 grid gap-3">
+              <ol className="mt-5 grid grid-cols-1 gap-3">
                 {doc.history.map((h) => {
                   const archived = doc.archive.find((a) => a.version === h.version);
                   return (

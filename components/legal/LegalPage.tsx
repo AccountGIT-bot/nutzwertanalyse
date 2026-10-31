@@ -1,5 +1,6 @@
 "use client";
 
+import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { AlertTriangle } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
@@ -99,6 +100,7 @@ export function LegalBlockView({ b }: { b: LegalBlock }) {
       );
     case "table":
       return (
+        <div className={cn("legal-table", !b.head.some((x) => x) && "legal-table-kv")}>
         <table>
           {b.head.some((x) => x) && (
             <thead>
@@ -121,6 +123,7 @@ export function LegalBlockView({ b }: { b: LegalBlock }) {
             ))}
           </tbody>
         </table>
+        </div>
       );
   }
 }

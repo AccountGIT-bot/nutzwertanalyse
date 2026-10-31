@@ -22,7 +22,7 @@ export function StepCriteria() {
   const scale = analysis.settings.scale;
 
   return (
-    <div className="grid gap-6 lg:grid-cols-[1fr_320px]">
+    <div className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_320px]">
       <div className="card p-5 sm:p-6">
         <StepHeader title={t.criteria.title} lead={t.criteria.lead}>
           <button type="button" className="btn btn-secondary" onClick={() => setTemplateOpen(true)}>
@@ -39,7 +39,7 @@ export function StepCriteria() {
           <ol className="space-y-3">
             {crits.map((c, i) => (
               <li key={c.id} className="rounded-xl border border-line bg-surface-2/40 p-3 sm:p-4">
-                <div className="grid gap-2 sm:grid-cols-[1fr_1.2fr_180px]">
+                <div className="grid grid-cols-1 gap-2 sm:grid-cols-[minmax(0,1fr)_1.2fr_180px]">
                   <div>
                     <label className="sr-only" htmlFor={`crit-name-${c.id}`}>
                       {t.common.name}

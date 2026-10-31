@@ -13,7 +13,7 @@ export function SiteFooter() {
 
   return (
     <footer className="no-print border-t border-line bg-surface">
-      <div className="mx-auto grid max-w-7xl gap-10 px-4 py-12 sm:px-6 md:grid-cols-4">
+      <div className="mx-auto grid grid-cols-1 max-w-7xl gap-10 px-4 py-12 sm:px-6 md:grid-cols-4">
         <div className="md:col-span-2">
           <div className="text-base font-bold tracking-tight">
             Nutzwert<span className="text-primary">analyse</span>

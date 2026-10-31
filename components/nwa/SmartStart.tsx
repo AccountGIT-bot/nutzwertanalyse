@@ -91,7 +91,7 @@ export function SmartStart() {
               <X className="h-4 w-4" aria-hidden />
             </button>
           </div>
-          <div className="mt-3 grid gap-3 sm:grid-cols-2">
+          <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
             <div className="flex flex-col gap-1">
               <label htmlFor="smart-title" className="text-xs font-medium text-ink-2">
                 {t.smart.titleLabel}

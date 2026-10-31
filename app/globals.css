@@ -419,6 +419,17 @@ select.input {
   margin: 0.75rem 0;
   font-size: 0.9rem;
 }
+/* Breite Tabellen scrollen im Rahmen statt die Seite zu verbreitern; Schlüssel-Wert-Tabellen brechen lange Werte (E-Mail, Platzhalter) um */
+.legal-table {
+  overflow-x: auto;
+  margin: 0.75rem 0;
+}
+.legal-table table {
+  margin: 0;
+}
+.legal-table-kv td {
+  overflow-wrap: anywhere;
+}
 .prose-legal th,
 .prose-legal td {
   text-align: left;
@@ -549,7 +560,8 @@ input[type="range"].slider:focus-visible::-webkit-slider-thumb {
 }
 @media (max-width: 420px) {
   .score-btn-lg {
-    min-width: 1.9rem;
+    min-width: 0;
+    padding: 0 0.1rem;
     height: 2.25rem;
     font-size: 0.8rem;
   }

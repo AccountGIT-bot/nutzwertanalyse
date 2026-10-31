@@ -251,7 +251,7 @@ export function StepResults() {
         id="rpanel-overview"
         aria-labelledby="rtab-overview"
         hidden={tab !== "overview"}
-        className="grid gap-6 lg:grid-cols-2"
+        className="grid grid-cols-1 gap-6 lg:grid-cols-2"
       >
         {/* Rangliste */}
         <section className="card p-5" aria-labelledby="rank-h">
@@ -356,7 +356,7 @@ export function StepResults() {
         id="rpanel-details"
         aria-labelledby="rtab-details"
         hidden={tab !== "details"}
-        className="grid gap-6 lg:grid-cols-2"
+        className="grid grid-cols-1 gap-6 lg:grid-cols-2"
       >
         {/* Profil */}
         {analysis.criteria.length >= 3 && (
@@ -562,7 +562,7 @@ export function StepResults() {
               {t.results.sensitivityNone}
             </p>
           ) : (
-            <div className="mt-4 grid gap-6 lg:grid-cols-[1.2fr_1fr]">
+            <div className="mt-4 grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)]">
               <SensitivityBars
                 rows={sens.map((s) => ({
                   label: critName(s.criterionId),
@@ -573,59 +573,63 @@ export function StepResults() {
                 ariaLabel={t.results.sensitivity}
                 robustLabel={t.results.robust}
               />
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="text-left text-xs text-ink-3">
-                    <th className="py-1 pr-2 font-medium">
-                      {t.common.criterion}
-                    </th>
-                    <th className="py-1 pr-2 text-right font-medium">
-                      {t.results.currentWeight}
-                    </th>
-                    <th className="py-1 pr-2 text-right font-medium">
-                      {t.results.flipWeight}
-                    </th>
-                    <th className="py-1 pr-2 font-medium">
-                      {t.results.flipTo}
-                    </th>
-                    <th className="py-1 text-right font-medium">
-                      {t.common.status}
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {sens.map((s) => (
-                    <tr key={s.criterionId} className="border-t border-line">
-                      <td className="py-1.5 pr-2">{critName(s.criterionId)}</td>
-                      <td className="whitespace-nowrap py-1.5 pr-2 text-right tabular">
-                        {formatNumber(s.currentWeight * 100, tag, 1)} %
-                      </td>
-                      <td className="whitespace-nowrap py-1.5 pr-2 text-right tabular">
-                        {s.flipWeight === null
-                          ? "–"
-                          : `${formatNumber(s.flipWeight * 100, tag, 1)} %`}
-                      </td>
-                      <td className="py-1.5 pr-2">
-                        {s.flipToId ? altName(s.flipToId) : "–"}
-                      </td>
-                      <td className="py-1.5 text-right">
-                        <span
-                          className={cn(
-                            "badge",
-                            s.impact === "high"
-                              ? "badge-bad"
-                              : s.impact === "medium"
-                                ? "badge-warn"
-                                : "badge-good",
-                          )}
-                        >
-                          {t.results.impact[s.impact]}
-                        </span>
-                      </td>
+              <div className="overflow-x-auto">
+                <table className="w-full min-w-[420px] text-sm">
+                  <thead>
+                    <tr className="text-left text-xs text-ink-3">
+                      <th className="py-1 pr-2 font-medium">
+                        {t.common.criterion}
+                      </th>
+                      <th className="py-1 pr-2 text-right font-medium">
+                        {t.results.currentWeight}
+                      </th>
+                      <th className="py-1 pr-2 text-right font-medium">
+                        {t.results.flipWeight}
+                      </th>
+                      <th className="py-1 pr-2 font-medium">
+                        {t.results.flipTo}
+                      </th>
+                      <th className="py-1 text-right font-medium">
+                        {t.common.status}
+                      </th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody>
+                    {sens.map((s) => (
+                      <tr key={s.criterionId} className="border-t border-line">
+                        <td className="py-1.5 pr-2">
+                          {critName(s.criterionId)}
+                        </td>
+                        <td className="whitespace-nowrap py-1.5 pr-2 text-right tabular">
+                          {formatNumber(s.currentWeight * 100, tag, 1)} %
+                        </td>
+                        <td className="whitespace-nowrap py-1.5 pr-2 text-right tabular">
+                          {s.flipWeight === null
+                            ? "–"
+                            : `${formatNumber(s.flipWeight * 100, tag, 1)} %`}
+                        </td>
+                        <td className="py-1.5 pr-2">
+                          {s.flipToId ? altName(s.flipToId) : "–"}
+                        </td>
+                        <td className="py-1.5 text-right">
+                          <span
+                            className={cn(
+                              "badge",
+                              s.impact === "high"
+                                ? "badge-bad"
+                                : s.impact === "medium"
+                                  ? "badge-warn"
+                                  : "badge-good",
+                            )}
+                          >
+                            {t.results.impact[s.impact]}
+                          </span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </div>
           )}
         </section>
@@ -642,7 +646,7 @@ export function StepResults() {
                   {t.results.whatIfLead}
                 </p>
               </div>
-              <div className="flex gap-2">
+              <div className="flex flex-wrap gap-2">
                 <button
                   type="button"
                   className="btn btn-ghost btn-sm"
@@ -666,7 +670,7 @@ export function StepResults() {
                 </button>
               </div>
             </div>
-            <ul className="mt-4 grid gap-3 sm:grid-cols-2">
+            <ul className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
               {analysis.criteria.map((c) => {
                 const base = results.weights[c.id] ?? 0;
                 const v = whatIf ? whatIf[c.id] : base;
@@ -723,7 +727,7 @@ export function StepResults() {
             {fmt(t.results.robustnessLead, { runs: robust.runs || 1000 })}
           </p>
           {robust.runs > 0 ? (
-            <div className="mt-4 grid gap-4 lg:grid-cols-2">
+            <div className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-2">
               <HBarChart
                 data={validAlts
                   .map((a) => ({
@@ -789,7 +793,7 @@ export function StepResults() {
         id="rpanel-report"
         aria-labelledby="rtab-report"
         hidden={tab !== "report"}
-        className="grid gap-6 lg:grid-cols-[1fr_380px]"
+        className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_380px]"
       >
         <section className="card p-5" aria-labelledby="concl-h">
           <h2 id="concl-h" className="text-base font-semibold">

@@ -20,7 +20,7 @@ export function AboutView() {
       </section>
 
       <section className="paper border-b border-line py-12 sm:py-16">
-        <Container narrow className="grid gap-6 sm:grid-cols-2">
+        <Container narrow className="grid grid-cols-1 gap-6 sm:grid-cols-2">
           <Reveal className="card p-6">
             <Eye className="h-6 w-6 text-primary" aria-hidden />
             <h2 className="mt-4 text-xl font-bold">{a.vision.h}</h2>
@@ -42,7 +42,7 @@ export function AboutView() {
               {a.valuesTitle}
             </h2>
           </Reveal>
-          <ul className="mt-6 grid gap-x-10 gap-y-6 sm:grid-cols-2">
+          <ul className="mt-6 grid grid-cols-1 gap-x-10 gap-y-6 sm:grid-cols-2">
             {a.values.map((v, i) => (
               <Reveal key={v.h} as="li" delay={i * 50} className="border-t border-line pt-4">
                 <h3 className="font-semibold">{v.h}</h3>

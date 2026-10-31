@@ -19,7 +19,7 @@ export function StepsTimeline() {
       <div className="absolute bottom-6 left-6 top-6 w-0.5 bg-surface-3 lg:hidden" aria-hidden>
         <div className="timeline-line-v h-full w-full bg-primary" />
       </div>
-      <ol className="relative grid gap-8 lg:grid-cols-6 lg:gap-4">
+      <ol className="relative grid grid-cols-1 gap-8 lg:grid-cols-6 lg:gap-4">
         {t.landing.how.map((s, i) => {
           const Icon = ICONS[i];
           return (
