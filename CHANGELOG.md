@@ -4,7 +4,7 @@ Alle freigegebenen Veröffentlichungen von Nutzwertanalyse, neueste zuoberst. En
 
 ## 2.6.0 – 31.10.2026
 
-Release-PR: [#37](https://github.com/AccountGIT-bot/nutzwertanalyse/pull/37). Freigegeben von Liam am 31.10.2026 im Chat («danach mergen») nach Vorlage von PR, Prüfungen und Grenzen, Merge-Commit `5e13bc4`, Tag `v2.6.0`.
+Release-PR: [#37](https://github.com/AccountGIT-bot/nutzwertanalyse/pull/37). Freigegeben von Liam am 31.10.2026 im Chat («danach mergen») nach Vorlage von PR, Prüfungen und Grenzen sowie über die Release-Karte (Doppelklick, 14:45 UTC), Merge-Commit `5e13bc4`, Tag `v2.6.0`.
 
 - Startseite, Hero: Der helle bzw. graue Balken links vom Hintergrund während der Einblendung ist behoben; die skalierende Einblendung wird auf die Bühne beschnitten, der Verlauf deckt den Rand jederzeit.
 - Kein horizontales Scrollen mehr auf dem Handy (390 px): «Meine Analysen», Einstellungen, Datenschutz, Cookies & Speicher, Impressum, Schritt «Bewertung» sowie die Ergebnis-Reiter «Stärken & Details» und «Robustheit & Sensitivität». Ursache waren Raster ohne explizite Spalte, deren Auto-Spur auf die Inhaltsbreite wuchs; alle responsiven Raster tragen nun eine begrenzte Basisspalte. Dazu: 1–10-Knöpfe der geführten Bewertung schrumpfen auf schmalen Bildschirmen, Tabellen der Rechtstexte scrollen im Rahmen (Impressum bricht lange Werte um), lange Knopftexte und die Was-wäre-wenn-Knopfzeile brechen um, die Sensitivitätstabelle scrollt in der Karte.
