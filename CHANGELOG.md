@@ -2,6 +2,12 @@
 
 Alle freigegebenen Veröffentlichungen von Nutzwertanalyse, neueste zuoberst. Entwicklung auf `dev`, Freigabe nach `main` nur mit ausdrücklicher Zustimmung von Liam. Versionsnummern folgen Semantic Versioning (`MAJOR.MINOR.PATCH`), jede Fassung nennt Datum, Release-PR, Freigabe, Merge-Commit und Tag `vX.Y.Z`; Regeln und Checkliste in `docs/DEVELOPMENT_WORKFLOW.md`, Abschnitt «Versionierung und Releases». `tests/version.test.ts` prüft, dass `package.json` und der oberste Eintrag dieselbe Nummer tragen.
 
+## 2.6.1 – 31.10.2026
+
+Release-PR: [#38](https://github.com/AccountGIT-bot/nutzwertanalyse/pull/38). Freigabe durch Liam ausstehend.
+
+- Release-Tags automatisch: Die GitHub Action «Release-Tags» (`.github/workflows/release-tags.yml`) setzt nach jedem Merge nach `main` die Tags `vX.Y.Z` auf die im Changelog genannten Merge-Commits und trägt beim ersten Lauf `v2.0.0` bis `v2.6.0` nach. Kein Secret, kein lokaler Rechner nötig. Keine sichtbare Änderung an der Website.
+- `package.json` von 2.6.0 auf 2.6.1.
 ## 2.6.0 – 31.10.2026
 
 Release-PR: [#37](https://github.com/AccountGIT-bot/nutzwertanalyse/pull/37). Freigegeben von Liam am 31.10.2026 im Chat («danach mergen») nach Vorlage von PR, Prüfungen und Grenzen sowie über die Release-Karte (Doppelklick, 14:45 UTC), Merge-Commit `5e13bc4`, Tag `v2.6.0`.

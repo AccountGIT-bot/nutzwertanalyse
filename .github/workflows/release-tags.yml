@@ -1,0 +1,26 @@
+# Setzt nach jedem Merge nach main die Tags vX.Y.Z auf die im CHANGELOG genannten Merge-Commits
+# (scripts/release-tags.mjs). Läuft auch von Hand über «Run workflow». Kein Secret nötig: GITHUB_TOKEN genügt.
+name: Release-Tags
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  tags:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: main
+      - name: Git-Identität
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+      - name: Tags anlegen und pushen
+        run: node scripts/release-tags.mjs --push
