@@ -2,9 +2,18 @@
 
 Alle freigegebenen Veröffentlichungen von Nutzwertanalyse, neueste zuoberst. Entwicklung auf `dev`, Freigabe nach `main` nur mit ausdrücklicher Zustimmung von Liam. Versionsnummern folgen Semantic Versioning (`MAJOR.MINOR.PATCH`), jede Fassung nennt Datum, Release-PR, Freigabe, Merge-Commit und Tag `vX.Y.Z`; Regeln und Checkliste in `docs/DEVELOPMENT_WORKFLOW.md`, Abschnitt «Versionierung und Releases». `tests/version.test.ts` prüft, dass `package.json` und der oberste Eintrag dieselbe Nummer tragen.
 
+## 2.7.0 – 31.10.2026
+
+Release-PR: [#39](https://github.com/AccountGIT-bot/nutzwertanalyse/pull/39). Freigabe durch Liam ausstehend.
+
+- Neues Logo «Gewicht × Bewertung»: drei Balken auf petrolfarbener Kachel, Breite = Gewicht, Höhe = Bewertung, Fläche = Nutzwert; die grösste Fläche ist golden und steht für die Empfehlung. Ersetzt das detailreiche Rasterlogo (Sechseck, Kompass, Pfeil), das unter 48 px verschwamm. Als Vektor (`public/logo.svg`, `components/brand/LogoMark.tsx`) scharf in jeder Grösse, in hell und dunkel identisch.
+- Eingesetzt im Kopf und neu in der Fusszeile, als Favicon (`favicon.ico` 16/32/48 px und SVG), als App-Icons 192/512 px, maskierbares Icon und Apple-Touch-Icon sowie im Teilen-Bild (Open Graph). Farbe des Browser-Rahmens im Manifest auf das Markenpetrol `#0b5d5a` vereinheitlicht. Icons reproduzierbar mit `scripts/brand-icons.mjs`.
+- `package.json` von 2.6.1 auf 2.7.0.
+- Prüfbericht `docs/QA_2026-10-31.md` (Nachtrag Logo).
+
 ## 2.6.1 – 31.10.2026
 
-Release-PR: [#38](https://github.com/AccountGIT-bot/nutzwertanalyse/pull/38). Freigabe durch Liam ausstehend.
+Release-PR: [#38](https://github.com/AccountGIT-bot/nutzwertanalyse/pull/38). Freigegeben von Liam am 31.10.2026 über die Release-Karte (Doppelklick, 14:57 UTC), Merge-Commit `6e4376f`, Tag `v2.6.1`. Erster Lauf der Action am 31.10.2026 erfolgreich: Tags `v2.0.0` bis `v2.6.0` bei GitHub angelegt.
 
 - Release-Tags automatisch: Die GitHub Action «Release-Tags» (`.github/workflows/release-tags.yml`) setzt nach jedem Merge nach `main` die Tags `vX.Y.Z` auf die im Changelog genannten Merge-Commits und trägt beim ersten Lauf `v2.0.0` bis `v2.6.0` nach. Kein Secret, kein lokaler Rechner nötig. Keine sichtbare Änderung an der Website.
 - `package.json` von 2.6.0 auf 2.6.1.
