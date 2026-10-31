@@ -43,7 +43,7 @@ export function FeatureTour() {
   }, []);
 
   return (
-    <div className="grid gap-10 lg:grid-cols-[1fr_1.1fr] lg:gap-16">
+    <div className="grid grid-cols-1 gap-10 lg:grid-cols-[minmax(0,1fr)_1.1fr] lg:gap-16">
       <div className="hidden lg:block">
         <div className="sticky top-28">
           <div className="card overflow-hidden p-6" aria-hidden>

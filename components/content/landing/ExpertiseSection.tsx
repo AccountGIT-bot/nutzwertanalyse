@@ -99,7 +99,7 @@ export function ExpertiseSection() {
       </div>
 
       <div className="relative mx-auto w-full max-w-7xl px-4 sm:px-6">
-        <div className="grid gap-12 py-16 sm:py-24 lg:min-h-[640px] lg:grid-cols-[minmax(0,32rem)_1fr] lg:items-center lg:py-28">
+        <div className="grid grid-cols-1 gap-12 py-16 sm:py-24 lg:min-h-[640px] lg:grid-cols-[minmax(0,32rem)_minmax(0,1fr)] lg:items-center lg:py-28">
           <Reveal>
             <p className="text-sm font-semibold text-primary">{x.eyebrow}</p>
             <h2 id="expertise-h" className="mt-3 text-3xl font-bold leading-[1.1] tracking-tight sm:text-4xl lg:text-5xl">

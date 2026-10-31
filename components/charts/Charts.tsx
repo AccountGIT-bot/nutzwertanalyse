@@ -7,7 +7,7 @@
  * Hover-Tooltip je Marke, Tabellenansicht in der Ergebnisseite.
  */
 
-import { useId, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
 
 export const SERIES = ["var(--series-1)", "var(--series-2)", "var(--series-3)", "var(--series-4)", "var(--series-5)", "var(--series-6)", "var(--series-7)", "var(--series-8)"];
@@ -18,7 +18,20 @@ export function seriesColor(i: number): string {
 
 /** Bricht lange Beschriftungen wortweise auf höchstens `maxLines` Zeilen um; Überlänge wird mit «…» gekürzt. */
 export function wrapLabel(label: string, maxChars: number, maxLines = 2): string[] {
-  const words = label.trim().split(/\s+/).filter(Boolean);
+  /* Überlange Einzelwörter (z. B. «Alltagstauglichkeit») werden mit Trennstrich geteilt statt abgeschnitten */
+  const words = label
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean)
+    .flatMap((w) => {
+      if (w.length <= maxChars) return [w];
+      const parts: string[] = [];
+      for (let i = 0; i < w.length; i += maxChars - 1) {
+        const piece = w.slice(i, i + maxChars - 1);
+        parts.push(i + maxChars - 1 < w.length ? `${piece}-` : piece);
+      }
+      return parts;
+    });
   const lines: string[] = [];
   let current = "";
   for (const word of words) {
@@ -55,6 +68,35 @@ function SvgLabel({ x, y, lines, fontSize, anchor = "end", className }: { x: num
   );
 }
 
+/* ---------------- Breitenmessung: unter 440 px wechseln die Diagramme in den kompakten Modus ---------------- */
+
+const COMPACT_BELOW = 440;
+
+/** Misst die Breite des Containers; 0, solange noch nicht gemessen (Server, erster Frame). */
+function useWidth<T extends HTMLElement>(): [React.RefObject<T | null>, number] {
+  const ref = useRef<T>(null);
+  const [w, setW] = useState(0);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    setW(el.getBoundingClientRect().width);
+    if (typeof ResizeObserver === "undefined") return;
+    const ro = new ResizeObserver((entries) => {
+      for (const e of entries) setW(e.contentRect.width);
+    });
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+  return [ref, w];
+}
+
+/** Kompakt: Beschriftung über dem Balken, Zeichenfläche in CSS-Pixeln statt skaliert. */
+function useCompact(): [React.RefObject<HTMLDivElement | null>, boolean, number] {
+  const [ref, w] = useWidth<HTMLDivElement>();
+  const compact = w > 0 && w < COMPACT_BELOW;
+  return [ref, compact, compact ? Math.max(240, Math.round(w)) : 600];
+}
+
 /* ---------------- Tooltip-Helfer ---------------- */
 
 function useTip() {
@@ -86,18 +128,21 @@ export interface BarDatum {
 }
 
 export function HBarChart({ data, max = 100, ariaLabel, height }: { data: BarDatum[]; max?: number; ariaLabel: string; height?: number }) {
-  const width = 600;
-  const rowH = 34;
-  const labelW = 170;
+  const [ref, compact, width] = useCompact();
+  const rowH = compact ? 50 : 34;
+  const labelW = compact ? 0 : 170;
+  const valueW = 56;
+  const plotW = width - labelW - valueW;
+  const barH = compact ? 14 : 20;
   const h = height ?? data.length * rowH + 8;
   const { tip, show, hide } = useTip();
   const id = useId();
   return (
-    <div className="relative w-full">
+    <div ref={ref} className="relative w-full">
       <svg viewBox={`0 0 ${width} ${h}`} role="img" aria-labelledby={id} className="w-full overflow-visible text-ink">
         <title id={id}>{ariaLabel}</title>
         {[0, 25, 50, 75, 100].map((g) => {
-          const x = labelW + ((width - labelW - 56) * g) / 100;
+          const x = labelW + (plotW * g) / 100;
           return (
             <g key={g}>
               <line x1={x} x2={x} y1={0} y2={h - 8} stroke="var(--chart-grid)" strokeWidth={1} />
@@ -108,9 +153,8 @@ export function HBarChart({ data, max = 100, ariaLabel, height }: { data: BarDat
           );
         })}
         {data.map((d, i) => {
-          const y = i * rowH + 6;
-          const w = Math.max(0, ((width - labelW - 56) * d.value) / max);
-          const barH = 20;
+          const y = i * rowH + (compact ? 26 : 6);
+          const w = Math.max(0, (plotW * d.value) / max);
           const text = d.valueLabel ?? String(Math.round(d.value));
           return (
             <g
@@ -121,8 +165,14 @@ export function HBarChart({ data, max = 100, ariaLabel, height }: { data: BarDat
               }}
               onMouseLeave={hide}
             >
-              <rect x={labelW} y={y - 4} width={width - labelW - 56} height={barH + 8} fill="transparent" />
-              <SvgLabel x={labelW - 10} y={y + barH / 2} lines={wrapLabel(d.label, 26)} fontSize={11.5} className={cn(d.muted && "opacity-50")} />
+              <rect x={labelW} y={y - 4} width={plotW} height={barH + 8} fill="transparent" />
+              {compact ? (
+                <text x={0} y={i * rowH + 12} fontSize={12} fill="currentColor" dominantBaseline="middle" className={cn(d.muted && "opacity-50")}>
+                  {wrapLabel(d.label, Math.floor(width / 7), 1)[0]}
+                </text>
+              ) : (
+                <SvgLabel x={labelW - 10} y={y + barH / 2} lines={wrapLabel(d.label, 26)} fontSize={11.5} className={cn(d.muted && "opacity-50")} />
+              )}
               <path
                 d={`M${labelW},${y} h${Math.max(0, w - 4)} a4,4 0 0 1 4,4 v${barH - 8} a4,4 0 0 1 -4,4 h${-Math.max(0, w - 4)} z`}
                 fill={d.muted ? "var(--chart-axis)" : "var(--primary)"}
@@ -161,9 +211,10 @@ export function StackedBarChart({
   ariaLabel: string;
   formatValue?: (v: number) => string;
 }) {
-  const width = 600;
-  const rowH = 36;
-  const labelW = 170;
+  const [ref, compact, width] = useCompact();
+  const rowH = compact ? 52 : 36;
+  const labelW = compact ? 0 : 170;
+  const barH = compact ? 16 : 22;
   const plotW = width - labelW - 60;
   const h = rows.length * rowH + 8;
   const { tip, show, hide } = useTip();
@@ -173,17 +224,23 @@ export function StackedBarChart({
   const folded = series.length > 8;
 
   return (
-    <div className="w-full">
+    <div ref={ref} className="w-full">
       <div className="relative">
         <svg viewBox={`0 0 ${width} ${h}`} role="img" aria-labelledby={id} className="w-full overflow-visible text-ink">
           <title id={id}>{ariaLabel}</title>
           {rows.map((r, i) => {
-            const y = i * rowH + 6;
+            const y = i * rowH + (compact ? 28 : 6);
             let x = labelW;
             const total = r.segments.reduce((s, seg) => s + seg.value, 0);
             return (
               <g key={i} className={cn(r.muted && "opacity-50")}>
-                <SvgLabel x={labelW - 10} y={y + 11} lines={wrapLabel(r.label, 26)} fontSize={11.5} />
+                {compact ? (
+                  <text x={0} y={i * rowH + 12} fontSize={12} fill="currentColor" dominantBaseline="middle">
+                    {wrapLabel(r.label, Math.floor(width / 7), 1)[0]}
+                  </text>
+                ) : (
+                  <SvgLabel x={labelW - 10} y={y + barH / 2} lines={wrapLabel(r.label, 26)} fontSize={11.5} />
+                )}
                 {r.segments.map((seg, j) => {
                   const w = (plotW * seg.value) / max;
                   const sx = x;
@@ -197,7 +254,7 @@ export function StackedBarChart({
                       x={sx + 1}
                       y={y}
                       width={Math.max(0, w - 2)}
-                      height={22}
+                      height={barH}
                       fill={color}
                       rx={j === r.segments.length - 1 ? 4 : 0}
                       onMouseMove={(e) => {
@@ -208,7 +265,7 @@ export function StackedBarChart({
                     />
                   );
                 })}
-                <text x={labelW + (plotW * total) / max + 8} y={y + 16} fontSize={12} fill="currentColor" className="tabular">
+                <text x={labelW + (plotW * total) / max + 8} y={y + barH / 2 + 4} fontSize={12} fill="currentColor" className="tabular">
                   {formatValue(total)}
                 </text>
               </g>
@@ -250,12 +307,14 @@ export function RadarChart({
   /** Breite des Diagramms (Standard max-w-md), z. B. max-w-lg im Druckbericht */
   className?: string;
 }) {
-  /* Breiter als hoch, damit seitliche Beschriftungen Platz haben */
+  /* Breiter als hoch, damit seitliche Beschriftungen Platz haben; auf schmalen Containern grössere Schrift und kleinerer Radius */
+  const [wrapRef, compact] = useCompact();
   const width = 520;
   const size = 420;
   const cx = width / 2;
   const cy = size / 2;
-  const r = size / 2 - 64;
+  const f = compact ? 1.5 : 1;
+  const r = size / 2 - (compact ? 92 : 64);
   const n = axes.length;
   const id = useId();
   const [active, setActive] = useState<number | null>(null);
@@ -267,7 +326,7 @@ export function RadarChart({
   };
   const shown = series.slice(0, 6);
   return (
-    <div className="w-full">
+    <div ref={wrapRef} className="w-full">
       <svg viewBox={`0 0 ${width} ${size}`} role="img" aria-labelledby={id} className={cn("mx-auto w-full overflow-visible text-ink", className ?? "max-w-md")}>
         <title id={id}>{ariaLabel}</title>
         {[0.25, 0.5, 0.75, 1].map((f) => (
@@ -286,14 +345,14 @@ export function RadarChart({
           const sin = Math.sin(ang);
           /* Seitliche Beschriftungen beginnen bzw. enden neben der Achse, obere und untere stehen zentriert darüber/darunter */
           const anchor = cos > 0.3 ? "start" : cos < -0.3 ? "end" : "middle";
-          const lines = wrapLabel(a, 20);
-          const gap = anchor === "middle" ? 12 + lines.length * 6 : 10;
+          const lines = wrapLabel(a, compact ? 15 : 20, compact ? 3 : 2);
+          const gap = anchor === "middle" ? (12 + lines.length * 6) * f : 10;
           const lx = cx + (r + gap) * cos;
           const ly = cy + (r + gap) * sin;
           return (
             <g key={i}>
               <line x1={cx} y1={cy} x2={x} y2={y} stroke="var(--chart-grid)" strokeWidth={1} />
-              <SvgLabel x={lx} y={ly} lines={lines} fontSize={11} anchor={anchor} />
+              <SvgLabel x={lx} y={ly} lines={lines} fontSize={11 * f} anchor={anchor} />
             </g>
           );
         })}
@@ -304,7 +363,7 @@ export function RadarChart({
             <g key={si} opacity={dim ? 0.25 : 1} onMouseEnter={() => setActive(si)} onMouseLeave={() => setActive(null)}>
               <polygon points={pts.map((p) => p.join(",")).join(" ")} fill={seriesColor(si)} fillOpacity={0.1} stroke={seriesColor(si)} strokeWidth={2} strokeLinejoin="round" />
               {pts.map((p, i) => (
-                <circle key={i} cx={p[0]} cy={p[1]} r={4} fill={seriesColor(si)} stroke="var(--surface)" strokeWidth={2}>
+                <circle key={i} cx={p[0]} cy={p[1]} r={4 * f} fill={seriesColor(si)} stroke="var(--surface)" strokeWidth={2}>
                   <title>
                     {s.label} · {axes[i]}: {s.values[i].toFixed(1)}
                   </title>
@@ -337,14 +396,15 @@ export function SensitivityBars({
   ariaLabel: string;
   robustLabel: string;
 }) {
-  const width = 600;
-  const rowH = 36;
-  const labelW = 170;
+  const [ref, compact, width] = useCompact();
+  const rowH = compact ? 50 : 36;
+  const labelW = compact ? 0 : 170;
   const plotW = width - labelW - 20;
   const h = rows.length * rowH + 16;
   const id = useId();
   const colorFor = (impact: string) => (impact === "high" ? "var(--bad)" : impact === "medium" ? "var(--warn)" : "var(--good)");
   return (
+    <div ref={ref} className="w-full">
     <svg viewBox={`0 0 ${width} ${h}`} role="img" aria-labelledby={id} className="w-full overflow-visible text-ink">
       <title id={id}>{ariaLabel}</title>
       {[0, 0.25, 0.5, 0.75, 1].map((g) => (
@@ -356,12 +416,18 @@ export function SensitivityBars({
         </g>
       ))}
       {rows.map((r, i) => {
-        const y = i * rowH + 8;
+        const y = i * rowH + (compact ? 26 : 8);
         const xc = labelW + plotW * r.current;
         const xf = r.flip === null ? null : labelW + plotW * r.flip;
         return (
           <g key={i}>
-            <SvgLabel x={labelW - 10} y={y + 10} lines={wrapLabel(r.label, 26)} fontSize={11.5} />
+            {compact ? (
+              <text x={0} y={i * rowH + 12} fontSize={12} fill="currentColor" dominantBaseline="middle">
+                {wrapLabel(r.label, Math.floor(width / 7), 1)[0]}
+              </text>
+            ) : (
+              <SvgLabel x={labelW - 10} y={y + 10} lines={wrapLabel(r.label, 26)} fontSize={11.5} />
+            )}
             <line x1={labelW} x2={labelW + plotW} y1={y + 10} y2={y + 10} stroke="var(--chart-axis)" strokeWidth={2} strokeLinecap="round" />
             {xf !== null && (
               <line x1={Math.min(xc, xf)} x2={Math.max(xc, xf)} y1={y + 10} y2={y + 10} stroke={colorFor(r.impact)} strokeWidth={6} strokeLinecap="round" opacity={0.8} />
@@ -388,5 +454,6 @@ export function SensitivityBars({
         );
       })}
     </svg>
+    </div>
   );
 }

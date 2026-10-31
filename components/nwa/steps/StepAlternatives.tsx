@@ -15,7 +15,7 @@ export function StepAlternatives() {
   const named = alts.filter((a) => a.name.trim()).length;
 
   return (
-    <div className="grid gap-6 lg:grid-cols-[1fr_320px]">
+    <div className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_320px]">
       <div className="card p-5 sm:p-6">
         <StepHeader title={t.alternatives.title} lead={t.alternatives.lead}>
           <button type="button" className="btn btn-primary" onClick={() => dispatch({ type: "addAlternative" })} disabled={alts.length >= 50}>
@@ -31,7 +31,7 @@ export function StepAlternatives() {
               <li key={alt.id} className={cn("rounded-xl border border-line bg-surface-2/40 p-3 sm:p-4", alt.excluded && "opacity-60")}>
                 <div className="flex items-start gap-3">
                   <span className="mt-2 h-3 w-3 shrink-0 rounded-full" style={{ background: seriesColor(i) }} aria-hidden />
-                  <div className="grid flex-1 gap-2 sm:grid-cols-[1fr_1.4fr]">
+                  <div className="grid grid-cols-1 flex-1 gap-2 sm:grid-cols-[minmax(0,1fr)_1.4fr]">
                     <div>
                       <label className="sr-only" htmlFor={`alt-name-${alt.id}`}>
                         {t.common.name}

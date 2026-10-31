@@ -80,7 +80,7 @@ export function ExportPanel() {
         {t.results.export}
       </h2>
       <p className="mt-1 text-xs text-ink-3">{t.results.exportLead}</p>
-      <ul className="mt-4 grid gap-2 sm:grid-cols-2">
+      <ul className="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-2">
         {items.map((it) => (
           <li key={it.label}>
             <button type="button" onClick={it.onClick} className="btn btn-secondary w-full justify-start">

@@ -21,7 +21,7 @@ export function UseCasesView() {
       </section>
       <section className="py-12 sm:py-16">
         <Container>
-          <ul className="grid gap-6 md:grid-cols-2">
+          <ul className="grid grid-cols-1 gap-6 md:grid-cols-2">
             {PRESET_IDS.map((id, i) => {
               const p = t.presets[id];
               const Ill = PRESET_ILLUSTRATIONS[id];

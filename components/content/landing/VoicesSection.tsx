@@ -185,7 +185,7 @@ export function VoicesSection() {
         </Reveal>
 
         {/* Vier Argumente */}
-        <ul className="voices-copy mt-12 grid gap-x-10 gap-y-8 sm:grid-cols-2">
+        <ul className="voices-copy mt-12 grid grid-cols-1 gap-x-10 gap-y-8 sm:grid-cols-2">
           {v.usps.map((u, i) => (
             <Reveal key={u.title} as="li" delay={i * 80} className="flex items-start gap-4">
               <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-white/10 ring-1 ring-white/20 backdrop-blur">
