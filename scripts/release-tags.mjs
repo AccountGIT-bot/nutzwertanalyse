@@ -30,8 +30,16 @@ const tags = [];
 for (const e of entries) {
   const tag = `v${e.version}`;
   if (!e.sha) {
-    console.log(`${tag}: kein Merge-Commit im Changelog, übersprungen (noch nicht gemergt?)`);
-    continue;
+    /* Changelog auf main nennt den Merge-Commit erst im Folgerelease: Release-Merge über den Betreff finden */
+    const found = sh(`git log origin/main --first-parent --format=%H%x09%s`)
+      .split("\n")
+      .map((l) => l.split("\t"))
+      .find(([, subject]) => subject?.startsWith(`Release ${e.version}:`) || subject === `Release ${e.version}` || subject?.startsWith(`Release ${e.version} (`));
+    if (!found) {
+      console.log(`${tag}: kein Release-Merge auf main gefunden, übersprungen (noch nicht gemergt?)`);
+      continue;
+    }
+    e.sha = found[0];
   }
   tags.push(tag);
   if (existing.has(tag)) {

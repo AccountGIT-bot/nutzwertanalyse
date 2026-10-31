@@ -11,12 +11,13 @@ import {
 } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import { useAnalysis } from "@/lib/nwa/store";
+import { measuredValue, measureScore, violatesLimit } from "@/lib/nwa/calc";
 import type { Alternative, Criterion, Analysis } from "@/lib/nwa/types";
 import { StepHeader } from "../Wizard";
 import { SegmentedControl, Tip, ProgressBar } from "@/components/ui/Controls";
 import { ConfirmDialog } from "@/components/ui/Dialog";
 import { seriesColor } from "@/components/charts/Charts";
-import { cn, fmt } from "@/lib/utils";
+import { cn, fmt, formatNumber } from "@/lib/utils";
 
 type View = "guided" | "matrix";
 type Ratings = Analysis["ratings"][string];
@@ -47,9 +48,10 @@ export function StepEvaluation() {
     let d = 0;
     for (const a of alts)
       for (const c of crits)
-        if (typeof ratings[a.id]?.[c.id]?.score === "number") d++;
+        if (cellDone(analysis, ratings, a.id, c)) d++;
     return { done: d, total: alts.length * crits.length };
-  }, [alts, crits, ratings]);
+  }, [alts, crits, ratings, analysis]);
+  const preset = analysis.presetId ? t.presets[analysis.presetId] : undefined;
 
   const setScore = (altId: string, critId: string, score: number | undefined) =>
     dispatch({
@@ -228,10 +230,12 @@ export function StepEvaluation() {
                             className="badge badge-bad"
                             title={t.criteria.knockoutHint}
                           >
-                            {t.evaluation.knockoutBadge}{" "}
-                            {fmt(t.evaluation.minBadge, {
-                              min: c.minScore ?? "",
-                            })}
+                            <KnockoutLabel c={c} />
+                          </span>
+                        )}
+                        {c.measure && (
+                          <span className="badge badge-primary">
+                            {c.measure.unit || t.evaluation.measureValue}
                           </span>
                         )}
                       </div>
@@ -250,14 +254,18 @@ export function StepEvaluation() {
                         r.score < c.minScore;
                       return (
                         <td key={a.id} className="px-2 py-2 align-top">
-                          <ScorePicker
-                            scale={scale}
-                            value={r?.score}
-                            onChange={(v) => setScore(a.id, c.id, v)}
-                            label={`${a.name} – ${c.name}`}
-                            failed={failed}
-                            size={scale === 10 ? "sm" : "md"}
-                          />
+                          {c.measure ? (
+                            <MeasureInput analysis={analysis} altId={a.id} crit={c} label={`${a.name} – ${c.name}`} compact />
+                          ) : (
+                            <ScorePicker
+                              scale={scale}
+                              value={r?.score}
+                              onChange={(v) => setScore(a.id, c.id, v)}
+                              label={`${a.name} – ${c.name}`}
+                              failed={failed}
+                              size={scale === 10 ? "sm" : "md"}
+                            />
+                          )}
                           <button
                             type="button"
                             className={cn(
@@ -289,6 +297,7 @@ export function StepEvaluation() {
       </div>
 
       <aside className="flex flex-col gap-4">
+        {preset?.tips && preset.tips.length > 0 && <UseCaseTips title={fmt(t.evaluation.useCaseTips, { label: preset.label })} tips={preset.tips} />}
         <div className="card p-5">
           <h2 className="text-sm font-semibold">{t.decision.scale}</h2>
           <ol className="mt-2 grid grid-cols-5 gap-1 text-center text-[11px] text-ink-2">
@@ -370,7 +379,7 @@ function GuidedView({
   const { t } = useI18n();
   const { dispatch } = useAnalysis();
   const ratedCount = (c: Criterion) =>
-    alts.filter((a) => typeof ratings[a.id]?.[c.id]?.score === "number").length;
+    alts.filter((a) => cellDone(analysis, ratings, a.id, c)).length;
   const firstOpen = crits.findIndex((c) => ratedCount(c) < alts.length);
   const [idx, setIdx] = useState(Math.max(0, firstOpen));
   const safeIdx = Math.min(idx, Math.max(0, crits.length - 1));
@@ -429,21 +438,27 @@ function GuidedView({
         {c.name || t.common.unnamed}
         {c.isKnockout && (
           <span className="badge badge-bad" title={t.criteria.knockoutHint}>
-            {t.evaluation.knockoutBadge}{" "}
-            {fmt(t.evaluation.minBadge, { min: c.minScore ?? "" })}
+            <KnockoutLabel c={c} />
           </span>
         )}
+        {c.measure && <span className="badge badge-primary">{c.measure.unit || t.evaluation.measureValue}</span>}
       </h2>
       {c.description && (
         <p className="mt-1 text-sm text-ink-2">{c.description}</p>
       )}
-      <p className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-xs text-ink-3">
-        {legendPairs.map((x) => (
-          <span key={x.v}>
-            <span className="font-semibold text-ink-2">{x.v}</span> {x.l}
-          </span>
-        ))}
-      </p>
+      {c.measure ? (
+        <p className="mt-3 text-xs text-ink-3">
+          {fmt(c.measure.direction === "lower" ? t.evaluation.ruleLower : t.evaluation.ruleHigher, { max: scale })} {t.evaluation.measureShared}
+        </p>
+      ) : (
+        <p className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-xs text-ink-3">
+          {legendPairs.map((x) => (
+            <span key={x.v}>
+              <span className="font-semibold text-ink-2">{x.v}</span> {x.l}
+            </span>
+          ))}
+        </p>
+      )}
 
       <ul className="mt-4 space-y-3">
         {alts.map((a) => {
@@ -458,13 +473,13 @@ function GuidedView({
               key={a.id}
               className={cn(
                 "rounded-xl border bg-surface p-3 sm:p-4",
-                typeof r?.score === "number"
+                cellDone(analysis, ratings, a.id, c)
                   ? "border-line"
                   : "border-dashed border-line-strong",
               )}
             >
               <div className="flex flex-col gap-2 md:flex-row md:items-center md:gap-4">
-                <span className="flex min-w-0 items-center gap-2 font-semibold md:w-44 md:shrink-0">
+                <span className="flex min-w-0 items-center gap-2 font-semibold md:w-52 md:shrink-0">
                   <span
                     className="h-3 w-3 shrink-0 rounded-full"
                     style={{
@@ -472,16 +487,20 @@ function GuidedView({
                     }}
                     aria-hidden
                   />
-                  <span className="truncate">{a.name || t.common.unnamed}</span>
+                  <span className="min-w-0 break-words leading-snug">{a.name || t.common.unnamed}</span>
                 </span>
-                <ScorePicker
-                  scale={scale}
-                  value={r?.score}
-                  onChange={(v) => setScore(a.id, c.id, v)}
-                  label={`${a.name} – ${c.name}`}
-                  failed={failed}
-                  size="lg"
-                />
+                {c.measure ? (
+                  <MeasureInput analysis={analysis} altId={a.id} crit={c} label={`${a.name} – ${c.name}`} />
+                ) : (
+                  <ScorePicker
+                    scale={scale}
+                    value={r?.score}
+                    onChange={(v) => setScore(a.id, c.id, v)}
+                    label={`${a.name} – ${c.name}`}
+                    failed={failed}
+                    size="lg"
+                  />
+                )}
               </div>
               <input
                 className="input mt-2 text-sm"
@@ -634,5 +653,105 @@ function NoteDialog({
         </button>
       </div>
     </dialog>
+  );
+}
+
+/** Erfasst? Messwert-Kriterien über den Messwert, sonst über die Punktzahl der aktuellen Bewertenden */
+function cellDone(analysis: Analysis, ratings: Ratings, altId: string, c: Criterion): boolean {
+  return c.measure ? measuredValue(analysis, altId, c.id) !== null : typeof ratings[altId]?.[c.id]?.score === "number";
+}
+
+/** «K.-o. ≥ 6» bzw. bei Messwerten «K.-o. max. 400 000 CHF» */
+function KnockoutLabel({ c }: { c: Criterion }) {
+  const { t, tag } = useI18n();
+  if (c.measure) {
+    if (typeof c.measure.limit !== "number") return <>{t.evaluation.knockoutBadge}</>;
+    return (
+      <>
+        {t.evaluation.knockoutBadge}{" "}
+        {fmt(c.measure.direction === "lower" ? t.evaluation.limitMax : t.evaluation.limitMin, {
+          limit: formatNumber(c.measure.limit, tag, 2),
+          unit: c.measure.unit,
+        })}
+      </>
+    );
+  }
+  return (
+    <>
+      {t.evaluation.knockoutBadge} {fmt(t.evaluation.minBadge, { min: c.minScore ?? "" })}
+    </>
+  );
+}
+
+/** Zahl in Schweizer oder internationaler Schreibweise lesen: 100'000, 100 000, 12,5, 12.5 */
+export function parseNumber(raw: string): number | null {
+  const cleaned = raw.replace(/['’\s  ]/g, "").replace(",", ".");
+  if (cleaned === "" || cleaned === "-" || cleaned === ".") return null;
+  const n = Number(cleaned);
+  return Number.isFinite(n) ? n : null;
+}
+
+/** Messwert-Eingabe mit Einheit und errechneten Punkten */
+function MeasureInput({ analysis, altId, crit, label, compact }: { analysis: Analysis; altId: string; crit: Criterion; label: string; compact?: boolean }) {
+  const { t, tag } = useI18n();
+  const { dispatch } = useAnalysis();
+  const value = measuredValue(analysis, altId, crit.id);
+  const formatted = value === null ? "" : formatNumber(value, tag, 2);
+  const [draft, setDraft] = useState(formatted);
+  const [focused, setFocused] = useState(false);
+  /* Beim Fokus bleibt der angezeigte Text gleich, sonst ginge die Markierung verloren und neue Eingaben würden angehängt */
+  const shown = focused ? draft : formatted;
+  const score = value === null ? null : measureScore(analysis, crit, value);
+  const out = violatesLimit(crit, value);
+  return (
+    <div className={cn("flex min-w-0 flex-1 flex-wrap items-center gap-2", compact && "min-w-[9rem]")}>
+      <div className="relative min-w-0 flex-1">
+        <input
+          className={cn("input tabular", crit.measure?.unit ? "pr-20" : "", compact && "py-1.5 text-sm", out && "border-bad ring-1 ring-bad/40")}
+          type="text"
+          inputMode="decimal"
+          aria-label={`${label} (${crit.measure?.unit || t.evaluation.measureValue})`}
+          placeholder={t.evaluation.measurePlaceholder}
+          value={shown}
+          onFocus={() => {
+            setDraft(formatted);
+            setFocused(true);
+          }}
+          onBlur={() => setFocused(false)}
+          onChange={(e) => {
+            setDraft(e.target.value);
+            dispatch({ type: "setMeasure", altId, critId: crit.id, value: parseNumber(e.target.value) });
+          }}
+        />
+        {crit.measure?.unit && (
+          <span className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-xs text-ink-3">{crit.measure.unit}</span>
+        )}
+      </div>
+      <span
+        className={cn(
+          "inline-flex min-w-[4.5rem] justify-center rounded-lg px-2 py-1 text-xs font-semibold tabular",
+          score === null ? "bg-surface-2 text-ink-3" : out ? "bg-bad-soft text-bad" : "bg-primary-soft text-primary",
+        )}
+        aria-live="polite"
+      >
+        {score === null ? "–" : fmt(t.evaluation.measurePoints, { score: formatNumber(score, tag, 1) })}
+      </span>
+    </div>
+  );
+}
+
+/** Fallspezifische Tipps der gewählten Vorlage */
+export function UseCaseTips({ title, tips }: { title: string; tips: string[] }) {
+  return (
+    <div className="card border-primary/25 p-5 text-sm">
+      <h2 className="flex items-center gap-2 text-sm font-semibold">
+        <Lightbulb className="h-4 w-4 text-primary" aria-hidden /> {title}
+      </h2>
+      <ul className="mt-2 list-disc space-y-1.5 pl-4 text-ink-2">
+        {tips.map((tip) => (
+          <li key={tip}>{tip}</li>
+        ))}
+      </ul>
+    </div>
   );
 }

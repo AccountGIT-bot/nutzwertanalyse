@@ -1,4 +1,4 @@
-import type { CategoryId } from "@/lib/nwa/types";
+import type { CategoryId, MeasureDirection } from "@/lib/nwa/types";
 
 export interface PresetText {
   label: string;
@@ -6,7 +6,9 @@ export interface PresetText {
   titleExample: string;
   descriptionExample: string;
   alternatives: string[];
-  criteria: { name: string; description: string; categoryId: CategoryId }[];
+  criteria: { name: string; description: string; categoryId: CategoryId; measure?: { unit: string; direction: MeasureDirection } }[];
+  /** Fallspezifische Tipps, angezeigt in Entscheidung und Bewertung */
+  tips?: string[];
 }
 
 export const de = {
@@ -191,15 +193,16 @@ export const de = {
       descriptionExample: "Wir suchen einen neuen Hauptlieferanten für Verpackungsmaterial mit stabiler Qualität und kurzen Lieferzeiten.",
       alternatives: ["Lieferant A", "Lieferant B", "Lieferant C"],
       criteria: [
-        { name: "Preis / Gesamtkosten", description: "Angebotspreis inkl. Nebenkosten und Konditionen", categoryId: "economic" },
+        { name: "Preis / Gesamtkosten", description: "Angebotspreis inkl. Nebenkosten und Konditionen", categoryId: "economic", measure: { unit: "CHF", direction: "lower" } },
         { name: "Qualität", description: "Produkt- bzw. Dienstleistungsqualität, Reklamationsquote", categoryId: "quality" },
-        { name: "Lieferzeit", description: "Durchschnittliche Lieferzeit und Verfügbarkeit", categoryId: "quality" },
+        { name: "Lieferzeit", description: "Durchschnittliche Lieferzeit und Verfügbarkeit", categoryId: "quality", measure: { unit: "Tage", direction: "lower" } },
         { name: "Zuverlässigkeit", description: "Termintreue, Liefertreue", categoryId: "risk" },
         { name: "Flexibilität", description: "Reaktion auf Änderungen, Mindestmengen", categoryId: "strategic" },
         { name: "Service & Support", description: "Erreichbarkeit, After-Sales", categoryId: "quality" },
         { name: "Finanzielle Stabilität", description: "Bonität, Unternehmensgrösse, Abhängigkeiten", categoryId: "risk" },
         { name: "Nachhaltigkeit", description: "Umwelt- und Sozialstandards, Zertifizierungen", categoryId: "social" },
       ],
+      tips: ["Holt Offerten mit gleichem Leistungsumfang ein, sonst sind Preise nicht vergleichbar.", "Preis und Lieferzeit als Messwerte erfassen; ein Budget oder eine maximale Lieferzeit als K.-o.-Grenze setzen.", "Referenzen und Probelieferungen liefern belastbare Werte für Qualität und Zuverlässigkeit."],
     },
     software: {
       label: "Softwarevergleich",
@@ -210,13 +213,14 @@ export const de = {
       criteria: [
         { name: "Funktionsumfang", description: "Abdeckung der fachlichen Anforderungen", categoryId: "quality" },
         { name: "Benutzerfreundlichkeit", description: "Bedienung, Erlernbarkeit, Akzeptanz", categoryId: "quality" },
-        { name: "Lizenz- und Betriebskosten", description: "Einmalige und laufende Kosten (TCO)", categoryId: "economic" },
+        { name: "Lizenz- und Betriebskosten", description: "Einmalige und laufende Kosten (TCO)", categoryId: "economic", measure: { unit: "CHF/Jahr", direction: "lower" } },
         { name: "Einführungsaufwand", description: "Zeit, Schulung, Migration", categoryId: "economic" },
         { name: "Integration", description: "Schnittstellen zu bestehenden Systemen", categoryId: "strategic" },
         { name: "Datenschutz & Sicherheit", description: "Datenstandort, Verschlüsselung, Compliance", categoryId: "risk" },
         { name: "Skalierbarkeit", description: "Wachstum, Mandanten, Performance", categoryId: "strategic" },
         { name: "Support & Weiterentwicklung", description: "Hersteller-Support, Roadmap, Community", categoryId: "quality" },
       ],
+      tips: ["Testet die Software mit echten Abläufen aus eurem Alltag, idealerweise in einer Probephase.", "Kosten über die geplante Nutzungsdauer rechnen (z. B. drei Jahre), nicht nur die Lizenz.", "Datenschutz eignet sich als K.-o.-Kriterium: Ein Anbieter ohne passenden Datenstandort scheidet aus."],
     },
     investment: {
       label: "Investitionsentscheid",
@@ -225,14 +229,15 @@ export const de = {
       descriptionExample: "Drei Projektvorschläge konkurrieren um ein Investitionsbudget von CHF 500'000.",
       alternatives: ["Projekt A", "Projekt B", "Status quo"],
       criteria: [
-        { name: "Rendite (ROI)", description: "Erwartete Kapitalrendite", categoryId: "economic" },
-        { name: "Amortisationsdauer", description: "Zeit bis zur Kostendeckung", categoryId: "economic" },
+        { name: "Rendite (ROI)", description: "Erwartete Kapitalrendite", categoryId: "economic", measure: { unit: "%", direction: "higher" } },
+        { name: "Amortisationsdauer", description: "Zeit bis zur Kostendeckung", categoryId: "economic", measure: { unit: "Jahre", direction: "lower" } },
         { name: "Strategische Relevanz", description: "Beitrag zur Unternehmensstrategie", categoryId: "strategic" },
         { name: "Marktpotenzial", description: "Wachstum, Umsatz, Kundennutzen", categoryId: "strategic" },
         { name: "Umsetzungsrisiko", description: "Komplexität, Abhängigkeiten, Know-how", categoryId: "risk" },
         { name: "Ressourcenbedarf", description: "Personal, Infrastruktur, Managementaufmerksamkeit", categoryId: "economic" },
         { name: "Nachhaltigkeit", description: "Ökologische und soziale Wirkung", categoryId: "social" },
       ],
+      tips: ["Den Status quo als Alternative aufnehmen – so zeigt sich, ob sich die Investition überhaupt lohnt.", "Rendite in % und Amortisation in Jahren als Messwerte erfassen; die App rechnet sie in Punkte um.", "In der Robustheits-Simulation prüfen, ob die Empfehlung auch bei unsicheren Annahmen hält."],
     },
     machines: {
       label: "Maschinenkauf",
@@ -241,15 +246,16 @@ export const de = {
       descriptionExample: "Ersatz der 15 Jahre alten Fräse; Budget max. CHF 400'000.",
       alternatives: ["Maschine A", "Maschine B", "Gebrauchtmaschine"],
       criteria: [
-        { name: "Anschaffungskosten", description: "Kaufpreis inkl. Installation und Schulung", categoryId: "economic" },
-        { name: "Betriebskosten", description: "Energie, Wartung, Verschleissteile", categoryId: "economic" },
+        { name: "Anschaffungskosten", description: "Kaufpreis inkl. Installation und Schulung", categoryId: "economic", measure: { unit: "CHF", direction: "lower" } },
+        { name: "Betriebskosten", description: "Energie, Wartung, Verschleissteile", categoryId: "economic", measure: { unit: "CHF/Jahr", direction: "lower" } },
         { name: "Leistung / Kapazität", description: "Output, Geschwindigkeit, Präzision", categoryId: "quality" },
         { name: "Zuverlässigkeit", description: "Verfügbarkeit, Ausfallsicherheit", categoryId: "risk" },
         { name: "Wartungsfreundlichkeit", description: "Serviceintervalle, Ersatzteilversorgung", categoryId: "quality" },
         { name: "Zukunftssicherheit", description: "Erweiterbarkeit, Software-Updates", categoryId: "strategic" },
         { name: "Arbeitssicherheit", description: "Schutzeinrichtungen, Zertifizierungen", categoryId: "risk" },
-        { name: "Lieferzeit", description: "Zeit bis zur Produktionsbereitschaft", categoryId: "quality" },
+        { name: "Lieferzeit", description: "Zeit bis zur Produktionsbereitschaft", categoryId: "quality", measure: { unit: "Wochen", direction: "lower" } },
       ],
+      tips: ["Gesamtkosten vergleichen: Anschaffung und Betriebskosten pro Jahr als Messwerte.", "Arbeitssicherheit eignet sich als K.-o.-Kriterium.", "Die Produktion mitbewerten lassen (weitere Bewertende), sie kennt die Praxis am besten."],
     },
     vehicle: {
       label: "Fahrzeugauswahl",
@@ -258,8 +264,8 @@ export const de = {
       descriptionExample: "Fahrzeug für den Aussendienst, ca. 30'000 km pro Jahr, Budget CHF 55'000.",
       alternatives: ["Fahrzeug A", "Fahrzeug B", "Leasing-Option"],
       criteria: [
-        { name: "Anschaffungspreis", description: "Kaufpreis oder Leasingrate", categoryId: "economic" },
-        { name: "Betriebskosten", description: "Energie/Treibstoff, Versicherung, Steuern, Service", categoryId: "economic" },
+        { name: "Anschaffungspreis", description: "Kaufpreis bzw. Summe der Leasingraten über die Haltedauer", categoryId: "economic", measure: { unit: "CHF", direction: "lower" } },
+        { name: "Betriebskosten", description: "Energie/Treibstoff, Versicherung, Steuern, Service", categoryId: "economic", measure: { unit: "CHF/Jahr", direction: "lower" } },
         { name: "Reichweite & Praxistauglichkeit", description: "Passt zum Einsatzzweck", categoryId: "quality" },
         { name: "Zuverlässigkeit", description: "Pannenstatistik, Garantie", categoryId: "risk" },
         { name: "Wiederverkaufswert", description: "Wertstabilität", categoryId: "economic" },
@@ -267,6 +273,7 @@ export const de = {
         { name: "Komfort & Ausstattung", description: "Fahrkomfort, Assistenzsysteme", categoryId: "quality" },
         { name: "Service-Netz", description: "Werkstattdichte, Garantieleistungen", categoryId: "quality" },
       ],
+      tips: ["Kauf und Leasing auf dieselbe Haltedauer rechnen, sonst vergleichst du Äpfel mit Birnen.", "Betriebskosten pro Jahr hängen stark von der Fahrleistung ab – mit deinen eigenen Kilometern rechnen.", "Ein Budget-Maximum direkt als K.-o.-Grenze im Messwert setzen."],
     },
     employee: {
       label: "Personalauswahl",
@@ -281,9 +288,10 @@ export const de = {
         { name: "Motivation & Haltung", description: "Engagement, Eigeninitiative", categoryId: "social" },
         { name: "Kulturelle Passung", description: "Werte, Zusammenarbeit", categoryId: "strategic" },
         { name: "Entwicklungspotenzial", description: "Lernbereitschaft, Perspektive", categoryId: "strategic" },
-        { name: "Lohnvorstellung", description: "Budget-Kompatibilität", categoryId: "economic" },
-        { name: "Verfügbarkeit", description: "Möglicher Eintrittstermin", categoryId: "other" },
+        { name: "Lohnvorstellung", description: "Budget-Kompatibilität", categoryId: "economic", measure: { unit: "CHF/Jahr", direction: "lower" } },
+        { name: "Verfügbarkeit", description: "Möglicher Eintrittstermin", categoryId: "other", measure: { unit: "Wochen bis Eintritt", direction: "lower" } },
       ],
+      tips: ["Unabhängig bewerten, bevor ihr diskutiert: jede Person als eigene Bewertende erfassen.", "Kriterien vor den Interviews festlegen und allen Kandidierenden dieselben Fragen stellen.", "Personendaten bleiben in deinem Browser. Exporte nur mit Beteiligten teilen und nach dem Entscheid löschen."],
     },
     realEstate: {
       label: "Immobilienentscheid",
@@ -292,7 +300,7 @@ export const de = {
       descriptionExample: "Zwei Wohnungen in Zürich und eine in Winterthur sind in der engeren Auswahl.",
       alternatives: ["Objekt A", "Objekt B", "Objekt C"],
       criteria: [
-        { name: "Preis / Miete", description: "Kaufpreis oder Monatsmiete inkl. Nebenkosten", categoryId: "economic" },
+        { name: "Preis / Miete", description: "Kaufpreis oder Monatsmiete inkl. Nebenkosten", categoryId: "economic", measure: { unit: "CHF/Monat", direction: "lower" } },
         { name: "Lage", description: "Quartier, Lärm, Aussicht", categoryId: "quality" },
         { name: "Erreichbarkeit", description: "ÖV-Anbindung, Arbeitsweg, Einkaufsmöglichkeiten", categoryId: "quality" },
         { name: "Grösse & Grundriss", description: "Fläche, Zimmerzahl, Nutzbarkeit", categoryId: "quality" },
@@ -300,6 +308,7 @@ export const de = {
         { name: "Wertentwicklung", description: "Lagepotenzial, Marktentwicklung", categoryId: "economic" },
         { name: "Umgebung & Infrastruktur", description: "Schulen, Freizeit, Natur", categoryId: "social" },
       ],
+      tips: ["Miete inkl. Nebenkosten als Messwert erfassen, das eigene Maximum als K.-o.-Grenze.", "Eindrücke direkt nach jeder Besichtigung als Begründung notieren, solange sie frisch sind.", "Lage und Erreichbarkeit mit konkreten Pendelzeiten objektivieren."],
     },
     product: {
       label: "Produktvergleich",
@@ -308,7 +317,7 @@ export const de = {
       descriptionExample: "Notebook für mobiles Arbeiten, Budget CHF 2'000.",
       alternatives: ["Produkt A", "Produkt B", "Produkt C"],
       criteria: [
-        { name: "Preis", description: "Kaufpreis inkl. Zubehör", categoryId: "economic" },
+        { name: "Preis", description: "Kaufpreis inkl. Zubehör", categoryId: "economic", measure: { unit: "CHF", direction: "lower" } },
         { name: "Leistung", description: "Erfüllung der Kernanforderungen", categoryId: "quality" },
         { name: "Qualität & Verarbeitung", description: "Material, Haltbarkeit", categoryId: "quality" },
         { name: "Bedienung", description: "Benutzerfreundlichkeit, Ergonomie", categoryId: "quality" },
@@ -316,6 +325,7 @@ export const de = {
         { name: "Nachhaltigkeit", description: "Energieverbrauch, Reparierbarkeit, Herkunft", categoryId: "social" },
         { name: "Zukunftssicherheit", description: "Updates, Erweiterbarkeit", categoryId: "strategic" },
       ],
+      tips: ["Tests zu genau den Kriterien lesen, die dir wichtig sind – nicht nur die Gesamtnote.", "Preis als Messwert erfassen: Das günstigste Angebot erhält die volle Punktzahl, die anderen im Verhältnis.", "Ein Muss-Merkmal (z. B. Akkulaufzeit) als K.-o.-Kriterium setzen."],
     },
     location: {
       label: "Standortwahl",
@@ -324,7 +334,7 @@ export const de = {
       descriptionExample: "Drei Städte sind in der engeren Auswahl für unser zweites Büro.",
       alternatives: ["Standort A", "Standort B", "Standort C"],
       criteria: [
-        { name: "Miet- und Betriebskosten", description: "Fläche, Nebenkosten, Steuern", categoryId: "economic" },
+        { name: "Miet- und Betriebskosten", description: "Fläche, Nebenkosten, Steuern", categoryId: "economic", measure: { unit: "CHF/Jahr", direction: "lower" } },
         { name: "Erreichbarkeit", description: "ÖV, Strasse, Parkplätze", categoryId: "quality" },
         { name: "Fachkräfteverfügbarkeit", description: "Arbeitsmarkt, Hochschulen", categoryId: "strategic" },
         { name: "Kundennähe", description: "Distanz zu Kunden und Partnern", categoryId: "strategic" },
@@ -332,6 +342,7 @@ export const de = {
         { name: "Infrastruktur", description: "Internet, Logistik, Versorgung", categoryId: "quality" },
         { name: "Standortrisiken", description: "Naturgefahren, Regulierung, Abhängigkeiten", categoryId: "risk" },
       ],
+      tips: ["Das Team mitbewerten lassen – Einschätzungen zur Erreichbarkeit gehen oft weit auseinander.", "Miet- und Betriebskosten pro Jahr als Messwert erfassen.", "Standorte zu Stosszeiten besuchen, um die Erreichbarkeit realistisch zu bewerten."],
     },
     personal: {
       label: "Persönliche Entscheidung",
@@ -347,6 +358,7 @@ export const de = {
         { name: "Umfeld & Beziehungen", description: "Familie, Freunde, Team", categoryId: "social" },
         { name: "Risiko", description: "Unsicherheit, Reversibilität", categoryId: "risk" },
       ],
+      tips: ["Zuerst aus dem Bauch entscheiden und mit dem Ergebnis vergleichen: Weicht es stark ab, fehlt vielleicht ein Kriterium.", "Eine vertraute Person als zweite Bewertende dazunehmen.", "Bedenken zu jeder Option im Feld «Begründung» festhalten."],
     },
     custom: {
       label: "Eigene Analyse",
@@ -465,6 +477,18 @@ export const de = {
     category: "Kategorie",
     knockout: "K.-o.-Kriterium",
     knockoutHint: "Alternativen, die die Mindestpunktzahl verfehlen, scheiden aus.",
+    measure: "Messwert",
+    measureHint: "Echte Zahl je Alternative erfassen (z. B. CHF, Tage). Die App rechnet sie in Punkte um.",
+    unit: "Einheit",
+    unitPlaceholder: "z. B. CHF",
+    direction: "Richtung",
+    lower: "Weniger ist besser",
+    higher: "Mehr ist besser",
+    worstAt: "1 Punkt bei",
+    bestAt: "Volle Punktzahl bei",
+    rangeHint: "Leer lassen: Punkte im Verhältnis zum besten Wert (bester Wert = volle Punktzahl).",
+    limitMax: "Höchstens",
+    limitMin: "Mindestens",
     minScore: "Mindestpunktzahl",
     minHint: "Mindestens zwei Kriterien werden benötigt.",
     maxHint: "Maximal 60 Kriterien.",
@@ -528,6 +552,15 @@ export const de = {
     allRated: "Alle Bewertungen erfasst – weiter zum Ergebnis.",
     ratedOf: "{{done}} von {{total}} bewertet",
     knockoutBadge: "K.-o.",
+    measureValue: "Messwert",
+    measureShared: "Messwerte gelten für alle Bewertenden.",
+    measurePoints: "{{score}} P.",
+    measurePlaceholder: "Wert",
+    limitMax: "max. {{limit}} {{unit}}",
+    limitMin: "min. {{limit}} {{unit}}",
+    ruleLower: "Weniger ist besser – der beste Wert erhält {{max}} Punkte.",
+    ruleHigher: "Mehr ist besser – der beste Wert erhält {{max}} Punkte.",
+    useCaseTips: "Tipps: {{label}}",
     minBadge: "min. {{min}}",
     fillAll: "Alle offenen Felder mit {{value}} vorbelegen",
     clearAll: "Alle Bewertungen dieser Person löschen",
@@ -545,17 +578,22 @@ export const de = {
     winnerText: "«{{name}}» erreicht mit {{percent}} % den höchsten Nutzwert.",
     lead_: "Vorsprung: {{points}} Prozentpunkte ({{relative}} % relativ) auf «{{runnerUp}}».",
     single: "Nur eine gültige Alternative – ein Vergleich ist nicht möglich.",
+    tieText: "Gleichstand: {{names}} erreichen je {{percent}} %.",
+    koLeader: "Ohne K.-o.-Kriterien läge «{{name}}» mit {{percent}} % vorne – verfehlt aber: {{criteria}}.",
     confidence: {
       high: "Deutlicher Vorsprung – die Empfehlung ist robust.",
       medium: "Moderater Vorsprung – Sensitivitätsanalyse prüfen.",
       low: "Knappes Ergebnis – die Alternativen liegen nah beieinander. Gewichtung und Bewertung kritisch hinterfragen.",
       none: "Kein Ergebnis verfügbar.",
+      single: "Erfasse eine weitere gültige Alternative oder prüfe die K.-o.-Kriterien.",
+      tie: "Gleichstand an der Spitze – die Entscheidung hängt an Gewichtung oder einzelnen Bewertungen. Sensitivität prüfen.",
     },
     incomplete: "Die Bewertung ist zu {{percent}} % vollständig. Fehlende Bewertungen zählen als 0.",
     knockedOut: "Ausgeschieden",
     knockedOutText: "verfehlt K.-o.-Kriterium: {{criteria}}",
     excluded: "Ausgeschlossen",
     noAlternatives: "Keine gültigen Alternativen.",
+    allKnockedOut: "Alle Alternativen verfehlen ein K.-o.-Kriterium. Prüfe, ob die Grenzen realistisch gesetzt sind.",
     tabs: { overview: "Überblick", details: "Stärken & Details", robustness: "Robustheit & Sensitivität", report: "Fazit & Bericht" },
     incompleteTitle: "Noch nicht alle Bewertungen erfasst",
     continueRating: "Bewertung fortsetzen",

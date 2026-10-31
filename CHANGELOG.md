@@ -2,9 +2,20 @@
 
 Alle freigegebenen Veröffentlichungen von Nutzwertanalyse, neueste zuoberst. Entwicklung auf `dev`, Freigabe nach `main` nur mit ausdrücklicher Zustimmung von Liam. Versionsnummern folgen Semantic Versioning (`MAJOR.MINOR.PATCH`), jede Fassung nennt Datum, Release-PR, Freigabe, Merge-Commit und Tag `vX.Y.Z`; Regeln und Checkliste in `docs/DEVELOPMENT_WORKFLOW.md`, Abschnitt «Versionierung und Releases». `tests/version.test.ts` prüft, dass `package.json` und der oberste Eintrag dieselbe Nummer tragen.
 
+## 2.8.0 – 31.10.2026
+
+Release-PR: [#40](https://github.com/AccountGIT-bot/nutzwertanalyse/pull/40). Freigabe durch Liam ausstehend.
+
+- Messwerte: Kriterien wie Preis, Lieferzeit, Rendite oder Miete lassen sich als echte Zahl je Alternative erfassen (Einheit, «weniger ist besser» / «mehr ist besser», Eingabe auch als 100'000 oder 12,5). Die App rechnet sie in Punkte um – standardmässig im Verhältnis zum besten Wert, optional zwischen eigenen Grenzen. Ein Budget oder eine Mindestrendite wird direkt als K.-o.-Grenze gesetzt. Werte erscheinen in Bewertung, Matrix, Bericht und CSV.
+- Vorlagen: 16 Kriterien sind als Messwert vorbereitet, dazu je drei fallspezifische Tipps für alle zehn Anwendungsfälle (z. B. unabhängige Bewertung bei Personalauswahl, gleiche Haltedauer bei Kauf und Leasing).
+- Empfehlung: Gleichstand wird erkannt (gleicher Rang, eigene Aussage) statt einen Sieger mit 0 Punkten Vorsprung zu küren; bleibt nur eine gültige Alternative, steht «Ergebnis ohne Vergleich» statt «robust»; liegt eine per K.-o. ausgeschiedene Alternative sonst vorne, wird das mit Wert und Grenze gezeigt; scheiden alle aus, folgt ein Hinweis auf die Grenzen.
+- Druckbericht auf dem Handy mit voller Diagrammdarstellung; Alternativnamen in der Bewertung werden nicht mehr abgeschnitten.
+- Texte in Deutsch, Englisch, Französisch, Italienisch. `package.json` von 2.7.0 auf 2.8.0.
+- Prüfbericht `docs/QA_2026-10-31.md` (Nachtrag Anwendungsfälle): zehn Fälle über die Oberfläche bei 1366 und 390 px, 400 Rechenvarianten, 8 neue Unit-Tests.
+
 ## 2.7.0 – 31.10.2026
 
-Release-PR: [#39](https://github.com/AccountGIT-bot/nutzwertanalyse/pull/39). Freigabe durch Liam ausstehend.
+Release-PR: [#39](https://github.com/AccountGIT-bot/nutzwertanalyse/pull/39). Freigegeben von Liam am 31.10.2026 über die Release-Karte (Doppelklick, 16:42 UTC) und im Chat («Freigabe erteilt, merge nach main»), Merge-Commit `ace15f2`, Tag `v2.7.0`.
 
 - Neues Logo «Gewicht × Bewertung»: drei Balken auf petrolfarbener Kachel, Breite = Gewicht, Höhe = Bewertung, Fläche = Nutzwert; die grösste Fläche ist golden und steht für die Empfehlung. Ersetzt das detailreiche Rasterlogo (Sechseck, Kompass, Pfeil), das unter 48 px verschwamm. Als Vektor (`public/logo.svg`, `components/brand/LogoMark.tsx`) scharf in jeder Grösse, in hell und dunkel identisch.
 - Eingesetzt im Kopf und neu in der Fusszeile, als Favicon (`favicon.ico` 16/32/48 px und SVG), als App-Icons 192/512 px, maskierbares Icon und Apple-Touch-Icon sowie im Teilen-Bild (Open Graph). Farbe des Browser-Rahmens im Manifest auf das Markenpetrol `#0b5d5a` vereinheitlicht. Icons reproduzierbar mit `scripts/brand-icons.mjs`.

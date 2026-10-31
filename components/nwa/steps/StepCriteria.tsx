@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Plus, Trash2, ArrowUp, ArrowDown, Lightbulb, LayoutTemplate } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import { useAnalysis } from "@/lib/nwa/store";
-import { CATEGORY_IDS, type CategoryId } from "@/lib/nwa/types";
+import { CATEGORY_IDS, type CategoryId, type Measure } from "@/lib/nwa/types";
 import { PRESET_IDS } from "@/lib/nwa/parser";
 import { presetCriteria } from "@/lib/nwa/presets";
 import { StepHeader } from "../Wizard";
@@ -90,7 +90,28 @@ export function StepCriteria() {
                       />
                       <span className={cn(c.isKnockout && "font-semibold text-bad")}>{t.criteria.knockout}</span>
                     </label>
-                    {c.isKnockout && (
+                    <label className="flex items-center gap-2 text-xs text-ink-2">
+                      <Switch
+                        checked={!!c.measure}
+                        onChange={(v) => dispatch({ type: "updateCriterion", id: c.id, patch: { measure: v ? { unit: "", direction: "lower" } : undefined } })}
+                        label={t.criteria.measure}
+                      />
+                      <span className={cn(c.measure && "font-semibold text-primary")}>{t.criteria.measure}</span>
+                    </label>
+                    {c.isKnockout && c.measure && (
+                      <label className="flex items-center gap-2 text-xs text-ink-2">
+                        {c.measure.direction === "lower" ? t.criteria.limitMax : t.criteria.limitMin}
+                        <input
+                          type="number"
+                          inputMode="decimal"
+                          className="input w-28"
+                          value={c.measure.limit ?? ""}
+                          onChange={(e) => dispatch({ type: "updateCriterion", id: c.id, patch: { measure: { ...c.measure!, limit: e.target.value === "" ? undefined : Number(e.target.value) } } })}
+                        />
+                        <span className="text-ink-3">{c.measure.unit}</span>
+                      </label>
+                    )}
+                    {c.isKnockout && !c.measure && (
                       <label className="flex items-center gap-2 text-xs text-ink-2">
                         {t.criteria.minScore}
                         <input
@@ -117,6 +138,7 @@ export function StepCriteria() {
                     </button>
                   </div>
                 </div>
+                {c.measure && <MeasureConfig criterionId={c.id} measure={c.measure} />}
               </li>
             ))}
           </ol>
@@ -188,6 +210,43 @@ export function StepCriteria() {
           ))}
         </ul>
       </Dialog>
+    </div>
+  );
+}
+
+/** Einstellungen eines Messwert-Kriteriums: Einheit, Richtung, optionale Grenzen der Umrechnung */
+function MeasureConfig({ criterionId, measure }: { criterionId: string; measure: Measure }) {
+  const { t } = useI18n();
+  const { analysis, dispatch } = useAnalysis();
+  const set = (patch: Partial<Measure>) => dispatch({ type: "updateCriterion", id: criterionId, patch: { measure: { ...measure, ...patch } } });
+  const num = (v: string) => (v.trim() === "" ? undefined : Number(v));
+  return (
+    <div className="mt-3 rounded-lg border border-primary/25 bg-primary-soft/40 p-3">
+      <p className="text-xs text-ink-2">{t.criteria.measureHint}</p>
+      <div className="mt-2 grid grid-cols-1 gap-2 sm:grid-cols-[8rem_minmax(0,1fr)_8rem_8rem]">
+        <label className="text-xs text-ink-2">
+          {t.criteria.unit}
+          <input className="input mt-1" value={measure.unit} maxLength={20} placeholder={t.criteria.unitPlaceholder} onChange={(e) => set({ unit: e.target.value })} />
+        </label>
+        <label className="text-xs text-ink-2">
+          {t.criteria.direction}
+          <select className="input mt-1" value={measure.direction} onChange={(e) => set({ direction: e.target.value === "higher" ? "higher" : "lower" })}>
+            <option value="lower">{t.criteria.lower}</option>
+            <option value="higher">{t.criteria.higher}</option>
+          </select>
+        </label>
+        <label className="text-xs text-ink-2">
+          {t.criteria.worstAt}
+          <input className="input mt-1" type="number" inputMode="decimal" value={measure.worst ?? ""} onChange={(e) => set({ worst: num(e.target.value) })} />
+        </label>
+        <label className="text-xs text-ink-2">
+          {fmt(t.criteria.bestAt, {})}
+          <input className="input mt-1" type="number" inputMode="decimal" value={measure.best ?? ""} onChange={(e) => set({ best: num(e.target.value) })} />
+        </label>
+      </div>
+      <p className="mt-2 text-[11px] text-ink-3">
+        {t.criteria.rangeHint} {measure.direction === "lower" ? fmt(t.evaluation.ruleLower, { max: analysis.settings.scale }) : fmt(t.evaluation.ruleHigher, { max: analysis.settings.scale })}
+      </p>
     </div>
   );
 }

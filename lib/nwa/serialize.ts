@@ -63,6 +63,12 @@ export function toCsv(a: Analysis, labels: { criterion: string; weight: string; 
       }),
     ]);
   }
+  for (const c of a.criteria.filter((x) => x.measure)) {
+    rows.push([`${c.name} [${c.measure!.unit}]`, c.categoryId, "", ...alts.map((alt) => {
+      const v = a.measures?.[alt.id]?.[c.id];
+      return typeof v === "number" ? String(v) : "";
+    })]);
+  }
   rows.push([labels.total, "", "100", ...alts.map((alt) => (res.alternatives.find((x) => x.alternativeId === alt.id)?.total ?? 0).toFixed(2))]);
   rows.push([labels.rank, "", "", ...alts.map((alt) => String(res.alternatives.find((x) => x.alternativeId === alt.id)?.rank || "-"))]);
   // BOM für Excel
