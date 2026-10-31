@@ -35,7 +35,7 @@ Nutzwertanalyse folgt **Semantic Versioning** (`MAJOR.MINOR.PATCH`). Die Nummer 
 Konventionen:
 
 - **Änderungsprotokoll** `CHANGELOG.md`, neueste Fassung zuoberst. Während der Arbeit auf `dev` sammeln Änderungen unter `## Unveröffentlicht`; beim Versionsschritt wird daraus `## X.Y.Z – TT.MM.JJJJ` mit der Zeile `Release-PR: [#n](…)` und nach dem Merge `Freigegeben von Liam am … (Karte/Chat), Merge-Commit \`abc1234\`, Tag \`vX.Y.Z\``. Jeder Eintrag listet die Änderungen aus Sicht der Nutzenden, den Versionsschritt und den Prüfbericht `docs/QA_<datum>.md`.
-- **Tags**: Nach dem Merge trägt der Merge-Commit auf `main` den annotierten Tag `vX.Y.Z` (`git tag -a vX.Y.Z <merge-commit> -m "Release X.Y.Z: <Titel>"`, `git push origin vX.Y.Z`). Tags werden nie verschoben oder gelöscht; eine Korrektur ist ein neues Release. Die Releases 2.0.0 bis 2.5.0 wurden am 31.10.2026 nachträglich auf ihre Merge-Commits getaggt.
+- **Tags**: Nach dem Merge trägt der Merge-Commit auf `main` den annotierten Tag `vX.Y.Z`. `npm run release:tags` (`scripts/release-tags.mjs`) liest Version und Merge-Commit aus dem Changelog, legt fehlende Tags an und pusht sie; vorhandene Tags bleiben unberührt. Tags werden nie verschoben oder gelöscht; eine Korrektur ist ein neues Release. Aus der Cloud-Sitzung von Claude lehnt der Git-Proxy das Pushen von Tags ab (HTTP 403), Branch-Pushes gehen; die Tags setzt Liam deshalb lokal mit `npm run release:tags`. Stand 31.10.2026: Tags `v2.0.0` bis `v2.6.0` sind damit nachzutragen.
 - **Prüfung**: `tests/version.test.ts` läuft mit `npm test` und bricht ab, wenn `package.json`, `package-lock.json` und der oberste Changelog-Eintrag nicht dieselbe Nummer tragen, Einträge nicht streng absteigend sind oder Datum bzw. Release-PR fehlen.
 - **Sichtbarkeit**: Die laufende Version steht auf `/einstellungen` («Version X.Y.Z») und in der Fusszeile jeder Seite (`vX.Y.Z`).
 - **Keine Vorab-Fassungen** (`-beta`, `-rc`) und keine Build-Nummern: `dev` ist die Vorschau, die Vercel-Preview zeigt den jeweils gepushten Stand.
@@ -47,7 +47,7 @@ Release-Checkliste (in dieser Reihenfolge):
 3. Push nach `dev`, Release-PR `dev` → `main` «Release X.Y.Z: <Titel>» mit Zusammenfassung und Prüfungen; Vercel-Preview READY abwarten.
 4. Release-Karte aktualisieren (Version, PR, Head, Preview, Prüfungen) und Freigabe einholen.
 5. Merge als Merge-Commit mit dem PR-Titel, `expectedHeadSha` = freigegebener Head.
-6. Tag `vX.Y.Z` auf den Merge-Commit setzen und pushen.
+6. Changelog-Zeile mit Merge-Commit ergänzen, dann `npm run release:tags` lokal ausführen (setzt und pusht `vX.Y.Z`).
 7. Changelog nachführen (Freigabe, Merge-Commit, Tag) mit Commit «Record release X.Y.Z in changelog» auf `dev`, Karte auf «gemergt» stellen, Produktions-Deployment prüfen.
 
 ## Verständliche Historie

@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
-    "test": "node --test --import tsx tests/*.test.ts"
+    "test": "node --test --import tsx tests/*.test.ts",
+    "release:tags": "node scripts/release-tags.mjs --push"
   },
   "dependencies": {
     "clsx": "^2.1.1",
