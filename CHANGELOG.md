@@ -2,14 +2,20 @@
 
 Alle freigegebenen Veröffentlichungen von Nutzwertanalyse, neueste zuoberst. Entwicklung auf `dev`, Freigabe nach `main` nur mit ausdrücklicher Zustimmung von Liam. Versionsnummern folgen Semantic Versioning (`MAJOR.MINOR.PATCH`), jede Fassung nennt Datum, Release-PR, Freigabe, Merge-Commit und Tag `vX.Y.Z`; Regeln und Checkliste in `docs/DEVELOPMENT_WORKFLOW.md`, Abschnitt «Versionierung und Releases». `tests/version.test.ts` prüft, dass `package.json` und der oberste Eintrag dieselbe Nummer tragen.
 
+## 2.6.1 – 31.10.2026
+
+Release-PR: [#38](https://github.com/AccountGIT-bot/nutzwertanalyse/pull/38). Freigabe durch Liam ausstehend.
+
+- Release-Tags automatisch: Die GitHub Action «Release-Tags» (`.github/workflows/release-tags.yml`) setzt nach jedem Merge nach `main` die Tags `vX.Y.Z` auf die im Changelog genannten Merge-Commits und trägt beim ersten Lauf `v2.0.0` bis `v2.6.0` nach. Kein Secret, kein lokaler Rechner nötig. Keine sichtbare Änderung an der Website.
+- `package.json` von 2.6.0 auf 2.6.1.
 ## 2.6.0 – 31.10.2026
 
-Release-PR: [#37](https://github.com/AccountGIT-bot/nutzwertanalyse/pull/37). Freigabe durch Liam ausstehend.
+Release-PR: [#37](https://github.com/AccountGIT-bot/nutzwertanalyse/pull/37). Freigegeben von Liam am 31.10.2026 im Chat («danach mergen») nach Vorlage von PR, Prüfungen und Grenzen sowie über die Release-Karte (Doppelklick, 14:45 UTC), Merge-Commit `5e13bc4`, Tag `v2.6.0`.
 
 - Startseite, Hero: Der helle bzw. graue Balken links vom Hintergrund während der Einblendung ist behoben; die skalierende Einblendung wird auf die Bühne beschnitten, der Verlauf deckt den Rand jederzeit.
 - Kein horizontales Scrollen mehr auf dem Handy (390 px): «Meine Analysen», Einstellungen, Datenschutz, Cookies & Speicher, Impressum, Schritt «Bewertung» sowie die Ergebnis-Reiter «Stärken & Details» und «Robustheit & Sensitivität». Ursache waren Raster ohne explizite Spalte, deren Auto-Spur auf die Inhaltsbreite wuchs; alle responsiven Raster tragen nun eine begrenzte Basisspalte. Dazu: 1–10-Knöpfe der geführten Bewertung schrumpfen auf schmalen Bildschirmen, Tabellen der Rechtstexte scrollen im Rahmen (Impressum bricht lange Werte um), lange Knopftexte und die Was-wäre-wenn-Knopfzeile brechen um, die Sensitivitätstabelle scrollt in der Karte.
 - Diagramme auf dem Handy lesbar: Unter 440 px Containerbreite wechseln Rangliste, Beiträge, Sensitivität und Robustheit in einen kompakten Modus mit Beschriftung über dem Balken und 12-px-Schrift statt herunterskalierter 6-px-Schrift; das Radar nutzt grössere Schrift, kleineren Radius und bis drei Beschriftungszeilen. Überlange Einzelwörter werden in allen Diagrammen mit Trennstrich geteilt statt abgeschnitten. Druckbericht unverändert.
-- Versionssystem: Semantic Versioning mit dokumentierten Stufen und Release-Checkliste (`docs/DEVELOPMENT_WORKFLOW.md`), Tags `vX.Y.Z` auf den Merge-Commits (2.0.0 bis 2.5.0 nachträglich gesetzt), Prüfung `tests/version.test.ts` (Paketversion, Lock-Datei und oberster Changelog-Eintrag müssen übereinstimmen, Einträge absteigend mit Datum und Release-PR), Version in der Fusszeile jeder Seite.
+- Versionssystem: Semantic Versioning mit dokumentierten Stufen und Release-Checkliste (`docs/DEVELOPMENT_WORKFLOW.md`), Tags `vX.Y.Z` auf den Merge-Commits über `npm run release:tags` (liest die Merge-Commits aus diesem Protokoll; 2.0.0 bis 2.6.0 werden damit nachgetragen), Prüfung `tests/version.test.ts` (Paketversion, Lock-Datei und oberster Changelog-Eintrag müssen übereinstimmen, Einträge absteigend mit Datum und Release-PR), Version in der Fusszeile jeder Seite.
 - `package.json` von 2.5.0 auf 2.6.0.
 - Prüfbericht `docs/QA_2026-10-31.md`: automatischer Durchgang über 80 Seitenvarianten (14 Routen und sechs Schritte, 1366/390 px, hell/dunkel) vor und nach der Korrektur, Bildfolgen der Hero-Einblendung, Ergebnis-Reiter bei 390 px, Druckbericht erneut erzeugt.
 
