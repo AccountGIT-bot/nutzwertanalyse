@@ -4,7 +4,7 @@ Alle freigegebenen Veröffentlichungen von Nutzwertanalyse, neueste zuoberst. En
 
 ## 2.7.0 – 31.10.2026
 
-Release-PR: [#39](https://github.com/AccountGIT-bot/nutzwertanalyse/pull/39). Freigegeben von Liam am 31.10.2026 im Chat («Freigabe erteilt, merge nach main»), Merge-Commit `ace15f2`, Tag `v2.7.0`.
+Release-PR: [#39](https://github.com/AccountGIT-bot/nutzwertanalyse/pull/39). Freigegeben von Liam am 31.10.2026 über die Release-Karte (Doppelklick, 16:42 UTC) und im Chat («Freigabe erteilt, merge nach main»), Merge-Commit `ace15f2`, Tag `v2.7.0`.
 
 - Neues Logo «Gewicht × Bewertung»: drei Balken auf petrolfarbener Kachel, Breite = Gewicht, Höhe = Bewertung, Fläche = Nutzwert; die grösste Fläche ist golden und steht für die Empfehlung. Ersetzt das detailreiche Rasterlogo (Sechseck, Kompass, Pfeil), das unter 48 px verschwamm. Als Vektor (`public/logo.svg`, `components/brand/LogoMark.tsx`) scharf in jeder Grösse, in hell und dunkel identisch.
 - Eingesetzt im Kopf und neu in der Fusszeile, als Favicon (`favicon.ico` 16/32/48 px und SVG), als App-Icons 192/512 px, maskierbares Icon und Apple-Touch-Icon sowie im Teilen-Bild (Open Graph). Farbe des Browser-Rahmens im Manifest auf das Markenpetrol `#0b5d5a` vereinheitlicht. Icons reproduzierbar mit `scripts/brand-icons.mjs`.
