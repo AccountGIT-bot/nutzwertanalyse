@@ -4,7 +4,7 @@ Alle freigegebenen Veröffentlichungen von Nutzwertanalyse, neueste zuoberst. En
 
 ## 2.8.0 – 31.10.2026
 
-Release-PR: [#40](https://github.com/AccountGIT-bot/nutzwertanalyse/pull/40). Freigabe durch Liam ausstehend.
+Release-PR: [#40](https://github.com/AccountGIT-bot/nutzwertanalyse/pull/40). Freigegeben von Liam am 31.10.2026 über die Release-Karte (Doppelklick, 17:41 UTC) und im Chat («Freigabe erteilt, merge nach main»), Merge-Commit `03953a7`, Tag `v2.8.0`.
 
 - Messwerte: Kriterien wie Preis, Lieferzeit, Rendite oder Miete lassen sich als echte Zahl je Alternative erfassen (Einheit, «weniger ist besser» / «mehr ist besser», Eingabe auch als 100'000 oder 12,5). Die App rechnet sie in Punkte um – standardmässig im Verhältnis zum besten Wert, optional zwischen eigenen Grenzen. Ein Budget oder eine Mindestrendite wird direkt als K.-o.-Grenze gesetzt. Werte erscheinen in Bewertung, Matrix, Bericht und CSV.
 - Vorlagen: 16 Kriterien sind als Messwert vorbereitet, dazu je drei fallspezifische Tipps für alle zehn Anwendungsfälle (z. B. unabhängige Bewertung bei Personalauswahl, gleiche Haltedauer bei Kauf und Leasing).
