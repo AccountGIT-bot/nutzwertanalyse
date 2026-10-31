@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
+import { LogoMark } from "@/components/brand/LogoMark";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { Menu, X, Sun, Moon, Monitor, Languages } from "lucide-react";
@@ -26,7 +26,7 @@ export function SiteHeader({ minimal = false }: { minimal?: boolean }) {
     <header className="no-print sticky top-0 z-40 border-b border-line/70 bg-bg/80 backdrop-blur-xl">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6">
         <Link href="/" className="flex items-center gap-2.5 rounded-lg" aria-label={t.nav.home}>
-          <Image src="/images/logo-256.webp" alt="" width={36} height={36} className="h-9 w-9" priority />
+          <LogoMark size={34} className="h-[34px] w-[34px] shrink-0" />
           <span className="text-base font-bold tracking-tight">
             Nutzwert<span className="text-primary">analyse</span>
           </span>

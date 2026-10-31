@@ -21,7 +21,12 @@ export default function OpenGraphImage() {
         }}
       >
         <div style={{ display: "flex", alignItems: "center", gap: 20, fontSize: 36, fontWeight: 700 }}>
-          <div style={{ width: 56, height: 56, borderRadius: 16, background: "#2cc4b4", display: "flex" }} />
+          <svg width="64" height="64" viewBox="0 0 64 64">
+            <rect width="64" height="64" rx="15" fill="#0b5d5a" stroke="#2f6f69" strokeWidth="1.5" />
+            <rect x="12" y="34" width="8" height="18" rx="2.5" fill="#ffffff" opacity="0.72" />
+            <rect x="23" y="24" width="11" height="28" rx="2.5" fill="#ffffff" />
+            <rect x="37" y="12" width="15" height="40" rx="2.5" fill="#d9a441" />
+          </svg>
           Nutzwertanalyse
         </div>
         <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
