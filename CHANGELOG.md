@@ -2,6 +2,16 @@
 
 Alle freigegebenen Veröffentlichungen von Nutzwertanalyse. Entwicklung auf `dev`, Freigabe nach `main` nur mit ausdrücklicher Zustimmung von Liam (siehe `docs/DEVELOPMENT_WORKFLOW.md`).
 
+## 2.6.0 – 31.10.2026
+
+Release-PR: [#37](https://github.com/AccountGIT-bot/nutzwertanalyse/pull/37). Freigabe durch Liam ausstehend.
+
+- Startseite, Hero: Der helle bzw. graue Balken links vom Hintergrund während der Einblendung ist behoben; die skalierende Einblendung wird auf die Bühne beschnitten, der Verlauf deckt den Rand jederzeit.
+- Kein horizontales Scrollen mehr auf dem Handy (390 px): «Meine Analysen», Einstellungen, Datenschutz, Cookies & Speicher, Impressum, Schritt «Bewertung» sowie die Ergebnis-Reiter «Stärken & Details» und «Robustheit & Sensitivität». Ursache waren Raster ohne explizite Spalte, deren Auto-Spur auf die Inhaltsbreite wuchs; alle responsiven Raster tragen nun eine begrenzte Basisspalte. Dazu: 1–10-Knöpfe der geführten Bewertung schrumpfen auf schmalen Bildschirmen, Tabellen der Rechtstexte scrollen im Rahmen (Impressum bricht lange Werte um), lange Knopftexte und die Was-wäre-wenn-Knopfzeile brechen um, die Sensitivitätstabelle scrollt in der Karte.
+- Diagramme auf dem Handy lesbar: Unter 440 px Containerbreite wechseln Rangliste, Beiträge, Sensitivität und Robustheit in einen kompakten Modus mit Beschriftung über dem Balken und 12-px-Schrift statt herunterskalierter 6-px-Schrift; das Radar nutzt grössere Schrift, kleineren Radius und bis drei Beschriftungszeilen. Überlange Einzelwörter werden in allen Diagrammen mit Trennstrich geteilt statt abgeschnitten. Druckbericht unverändert.
+- `package.json` von 2.5.0 auf 2.6.0.
+- Prüfbericht `docs/QA_2026-10-31.md`: automatischer Durchgang über 80 Seitenvarianten (14 Routen und sechs Schritte, 1366/390 px, hell/dunkel) vor und nach der Korrektur, Bildfolgen der Hero-Einblendung, Ergebnis-Reiter bei 390 px, Druckbericht erneut erzeugt.
+
 ## 2.5.0 – 25.10.2026
 
 Release-PR: [#36](https://github.com/AccountGIT-bot/nutzwertanalyse/pull/36). Freigegeben von Liam am 25.10.2026 über die Release-Karte (Doppelklick, 14:07 UTC) und im Chat bestätigt, Merge-Commit `2437aa8`.
