@@ -9,6 +9,8 @@ import { PRESET_IDS } from "@/lib/nwa/parser";
 import { presetCriteria } from "@/lib/nwa/presets";
 import type { ScaleMax } from "@/lib/nwa/types";
 import { StepHeader } from "../Wizard";
+import { fmt } from "@/lib/utils";
+import { UseCaseTips } from "./StepEvaluation";
 import { Field, TextInput, TextArea, Select, SegmentedControl, Tip } from "@/components/ui/Controls";
 import { ConfirmDialog } from "@/components/ui/Dialog";
 
@@ -134,6 +136,9 @@ export function StepDecision() {
           </div>
           <p className="mt-2 text-xs text-ink-2">{analysis.settings.scale === 5 ? t.decision.scale5 : t.decision.scale10}</p>
         </div>
+        {analysis.presetId && t.presets[analysis.presetId]?.tips?.length ? (
+          <UseCaseTips title={fmt(t.evaluation.useCaseTips, { label: t.presets[analysis.presetId].label })} tips={t.presets[analysis.presetId].tips ?? []} />
+        ) : null}
         <Tip>
           <div className="flex gap-2">
             <Lightbulb className="mt-0.5 h-4 w-4 shrink-0 text-accent" aria-hidden />

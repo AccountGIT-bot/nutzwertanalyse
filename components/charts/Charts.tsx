@@ -7,7 +7,7 @@
  * Hover-Tooltip je Marke, Tabellenansicht in der Ergebnisseite.
  */
 
-import { useEffect, useId, useRef, useState } from "react";
+import { createContext, useContext, useEffect, useId, useRef, useState, type ReactNode } from "react";
 import { cn } from "@/lib/utils";
 
 export const SERIES = ["var(--series-1)", "var(--series-2)", "var(--series-3)", "var(--series-4)", "var(--series-5)", "var(--series-6)", "var(--series-7)", "var(--series-8)"];
@@ -91,9 +91,40 @@ function useWidth<T extends HTMLElement>(): [React.RefObject<T | null>, number] 
 }
 
 /** Kompakt: Beschriftung über dem Balken, Zeichenfläche in CSS-Pixeln statt skaliert. */
+const FullChartsContext = createContext(false);
+
+/** Erzwingt die volle (nicht kompakte) Darstellung, z. B. im Druckbericht auf schmalen Bildschirmen */
+export function FullCharts({ children }: { children: ReactNode }) {
+  return <FullChartsContext.Provider value={true}>{children}</FullChartsContext.Provider>;
+}
+
+/** Druckt der Browser gerade? (Druckbericht auf dem Handy soll die volle Darstellung zeigen) */
+function usePrinting(): boolean {
+  const [printing, setPrinting] = useState(false);
+  useEffect(() => {
+    if (typeof window === "undefined" || !window.matchMedia) return;
+    const mq = window.matchMedia("print");
+    const update = () => setPrinting(mq.matches);
+    update();
+    mq.addEventListener("change", update);
+    window.addEventListener("beforeprint", update);
+    const after = () => setPrinting(false);
+    window.addEventListener("afterprint", after);
+    return () => {
+      mq.removeEventListener("change", update);
+      window.removeEventListener("beforeprint", update);
+      window.removeEventListener("afterprint", after);
+    };
+  }, []);
+  return printing;
+}
+
 function useCompact(): [React.RefObject<HTMLDivElement | null>, boolean, number] {
   const [ref, w] = useWidth<HTMLDivElement>();
-  const compact = w > 0 && w < COMPACT_BELOW;
+  const printing = usePrinting();
+  /* Im Druckbericht (FullCharts) und beim Drucken immer die volle Darstellung */
+  const full = useContext(FullChartsContext);
+  const compact = !printing && !full && w > 0 && w < COMPACT_BELOW;
   return [ref, compact, compact ? Math.max(240, Math.round(w)) : 600];
 }
 

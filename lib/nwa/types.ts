@@ -35,6 +35,22 @@ export interface Alternative {
   excluded?: boolean;
 }
 
+/** Messwert-Kriterium: echte Zahl je Alternative, die App rechnet sie in Punkte um */
+export type MeasureDirection = "lower" | "higher";
+
+export interface Measure {
+  /** Einheit zur Anzeige, z. B. «CHF», «Tage», «%» */
+  unit: string;
+  /** lower = weniger ist besser (Preis, Lieferzeit), higher = mehr ist besser (Rendite, Reichweite) */
+  direction: MeasureDirection;
+  /** Optionaler Wert, der 1 Punkt ergibt (zusammen mit best); ohne Grenzen: im Verhältnis zum besten Wert */
+  worst?: number;
+  /** Optionaler Wert, der die volle Punktzahl ergibt */
+  best?: number;
+  /** K.-o.-Grenze als Messwert: bei lower ein Höchstwert (Budget), bei higher ein Mindestwert */
+  limit?: number;
+}
+
 export interface Criterion {
   id: Id;
   name: string;
@@ -48,6 +64,8 @@ export interface Criterion {
   isKnockout: boolean;
   /** Mindestpunktzahl (auf der Bewertungsskala) für K.-o.-Kriterien */
   minScore?: number;
+  /** Gesetzt = Messwert-Kriterium (Werte in Analysis.measures, Punkte werden berechnet) */
+  measure?: Measure;
 }
 
 export interface Evaluator {
@@ -96,6 +114,8 @@ export interface Analysis {
   step: Step;
   /** Freitext: Fazit / Entscheidungsnotiz */
   conclusion: string;
+  /** Messwerte measures[alternativeId][criterionId]; gelten für alle Bewertenden */
+  measures?: Record<Id, Record<Id, number>>;
 }
 
 /* ---------- Ergebnisse ---------- */
@@ -109,6 +129,8 @@ export interface Contribution {
   /** weight × rawScore */
   weightedScore: number;
   rated: boolean;
+  /** Erfasster Messwert (nur bei Messwert-Kriterien) */
+  value?: number;
 }
 
 export interface AlternativeResult {
@@ -127,7 +149,8 @@ export interface AlternativeResult {
   excluded: boolean;
 }
 
-export type Confidence = "high" | "medium" | "low" | "none";
+/** single = nur eine gültige Alternative, tie = Gleichstand an der Spitze */
+export type Confidence = "high" | "medium" | "low" | "none" | "single" | "tie";
 
 export interface Recommendation {
   winnerId: Id | null;
@@ -137,6 +160,10 @@ export interface Recommendation {
   leadPoints: number;
   /** Vorsprung relativ zum Sieger in Prozent */
   leadRelative: number;
+  /** Alle Alternativen mit gleichem Höchstwert (bei Gleichstand ≥ 2, sonst nur der Sieger) */
+  tiedIds: Id[];
+  /** Per K.-o. ausgeschiedene Alternative mit höherem Nutzwert als der Sieger (null, wenn keine) */
+  koLeaderId: Id | null;
 }
 
 export interface AhpConsistency {

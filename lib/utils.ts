@@ -95,3 +95,12 @@ export async function copyToClipboard(text: string): Promise<boolean> {
 export function fmt(template: string, vars: Record<string, string | number> = {}): string {
   return template.replace(/\{\{(\w+)\}\}/g, (_, k: string) => (k in vars ? String(vars[k]) : `{{${k}}}`));
 }
+
+/** «A, B und C» in der jeweiligen Sprache */
+export function listFormat(items: string[], tag: string): string {
+  try {
+    return new Intl.ListFormat(tag, { style: "long", type: "conjunction" }).format(items);
+  } catch {
+    return items.join(", ");
+  }
+}

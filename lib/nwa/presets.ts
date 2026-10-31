@@ -6,7 +6,7 @@ import type { Analysis, Criterion } from "./types";
 export function presetCriteria(t: Translations, presetId: string): Partial<Criterion>[] {
   const p = t.presets[presetId];
   if (!p) return [];
-  return p.criteria.map((c) => ({ name: c.name, description: c.description, categoryId: c.categoryId, points: 3 }));
+  return p.criteria.map((c) => ({ name: c.name, description: c.description, categoryId: c.categoryId, points: 3, ...(c.measure ? { measure: { unit: c.measure.unit, direction: c.measure.direction } } : {}) }));
 }
 
 export interface NewAnalysisOptions {

@@ -140,6 +140,7 @@ export function sanitizeAnalysis(input: unknown, selfName = "Ich"): Analysis | n
       percent: clamp(num(c.percent, 0), 0, 100),
       isKnockout: bool(c.isKnockout),
       minScore: typeof c.minScore === "number" ? clamp(c.minScore, 1, scale) : undefined,
+      measure: sanitizeMeasure(c.measure),
     }));
 
   const evaluatorsRaw = (Array.isArray(o.evaluators) ? o.evaluators : [])
@@ -178,6 +179,17 @@ export function sanitizeAnalysis(input: unknown, selfName = "Ich"): Analysis | n
     }
   }
 
+  const measures: NonNullable<Analysis["measures"]> = {};
+  if (typeof o.measures === "object" && o.measures !== null) {
+    for (const [altId, byCrit] of Object.entries(o.measures as Record<string, unknown>)) {
+      if (!altIds.has(altId) || typeof byCrit !== "object" || byCrit === null) continue;
+      for (const [critId, v] of Object.entries(byCrit as Record<string, unknown>)) {
+        if (!critIds.has(critId) || typeof v !== "number" || !Number.isFinite(v)) continue;
+        (measures[altId] ??= {})[critId] = v;
+      }
+    }
+  }
+
   const stepRaw = o.step;
   return {
     ...base,
@@ -197,6 +209,20 @@ export function sanitizeAnalysis(input: unknown, selfName = "Ich"): Analysis | n
     ratings,
     step: STEPS.includes(stepRaw as Analysis["step"]) ? (stepRaw as Analysis["step"]) : "decision",
     conclusion: str(o.conclusion).slice(0, 5000),
+    measures,
+  };
+}
+
+function sanitizeMeasure(v: unknown): Criterion["measure"] {
+  if (typeof v !== "object" || v === null) return undefined;
+  const m = v as Record<string, unknown>;
+  const finite = (x: unknown) => (typeof x === "number" && Number.isFinite(x) ? x : undefined);
+  return {
+    unit: str(m.unit).slice(0, 20),
+    direction: m.direction === "higher" ? "higher" : "lower",
+    worst: finite(m.worst),
+    best: finite(m.best),
+    limit: finite(m.limit),
   };
 }
 

@@ -131,6 +131,11 @@ export function computeWeights(analysis: Analysis): { weights: Record<Id, number
  * (stimmgewichtet). Gibt null zurück, wenn niemand bewertet hat.
  */
 export function averageScore(analysis: Analysis, altId: Id, critId: Id): number | null {
+  const crit = analysis.criteria.find((c) => c.id === critId);
+  if (crit?.measure) {
+    const v = measuredValue(analysis, altId, critId);
+    return v === null ? null : measureScore(analysis, crit, v);
+  }
   let sum = 0;
   let wsum = 0;
   for (const ev of analysis.evaluators) {
@@ -143,6 +148,51 @@ export function averageScore(analysis: Analysis, altId: Id, critId: Id): number 
   }
   if (wsum === 0) return null;
   return sum / wsum;
+}
+
+/* ---------------- Messwerte ---------------- */
+
+/** Erfasster Messwert einer Alternative bei einem Kriterium (null = nicht erfasst) */
+export function measuredValue(analysis: Analysis, altId: Id, critId: Id): number | null {
+  const v = analysis.measures?.[altId]?.[critId];
+  return typeof v === "number" && Number.isFinite(v) ? v : null;
+}
+
+/**
+ * Rechnet einen Messwert in Punkte (1..Skala) um.
+ * - Mit Grenzen (worst/best): linear zwischen «1 Punkt bei» und «volle Punktzahl bei».
+ * - Ohne Grenzen und nur positive Werte: im Verhältnis zum besten Wert (bester = volle Punktzahl).
+ *   So werden kleine Unterschiede nicht aufgebläht (100 000 vs. 101 000 CHF ergibt 10 vs. 9.9).
+ * - Sonst (Nullen, negative Werte): linear zwischen schlechtestem und bestem erfassten Wert.
+ * Ergebnis auf eine Nachkommastelle gerundet.
+ */
+export function measureScore(analysis: Analysis, crit: Criterion, value: number): number {
+  const scale = analysis.settings.scale;
+  const m = crit.measure!;
+  const lower = m.direction === "lower";
+  const clampScore = (x: number) => Math.round(Math.min(scale, Math.max(1, x)) * 10) / 10;
+  if (typeof m.worst === "number" && typeof m.best === "number" && m.worst !== m.best) {
+    const t = (value - m.worst) / (m.best - m.worst);
+    return clampScore(1 + Math.min(1, Math.max(0, t)) * (scale - 1));
+  }
+  const values = analysis.alternatives
+    .filter((a) => !a.excluded)
+    .map((a) => measuredValue(analysis, a.id, crit.id))
+    .filter((v): v is number => v !== null);
+  if (values.length === 0) return scale;
+  const min = Math.min(...values);
+  const max = Math.max(...values);
+  if (min === max) return scale;
+  if (min > 0) return clampScore(lower ? (scale * min) / value : (scale * value) / max);
+  const t = lower ? (max - value) / (max - min) : (value - min) / (max - min);
+  return clampScore(1 + t * (scale - 1));
+}
+
+/** Verletzt der Messwert die K.-o.-Grenze? (lower: über dem Höchstwert, higher: unter dem Mindestwert) */
+export function violatesLimit(crit: Criterion, value: number | null): boolean {
+  const m = crit.measure;
+  if (!m || typeof m.limit !== "number" || value === null) return false;
+  return m.direction === "lower" ? value > m.limit : value < m.limit;
 }
 
 function scoreAlternative(
@@ -167,9 +217,12 @@ function scoreAlternative(
     const weighted = w * raw;
     total += weighted;
     byCategory[c.categoryId] = (byCategory[c.categoryId] ?? 0) + weighted;
-    contributions.push({ criterionId: c.id, weight: w, rawScore: raw, weightedScore: weighted, rated });
-    if (c.isKnockout && rated && typeof c.minScore === "number" && raw < c.minScore) {
-      failed.push(c.id);
+    const value = c.measure ? measuredValue(analysis, alt.id, c.id) : null;
+    contributions.push({ criterionId: c.id, weight: w, rawScore: raw, weightedScore: weighted, rated, ...(value !== null ? { value } : {}) });
+    if (c.isKnockout) {
+      /* Messwert-Kriterien: K.-o. über die Grenze im Messwert (z. B. Budget), sonst über die Mindestpunktzahl */
+      const out = c.measure ? violatesLimit(c, value) : rated && typeof c.minScore === "number" && raw < c.minScore;
+      if (out) failed.push(c.id);
     }
   }
 
@@ -187,10 +240,14 @@ function scoreAlternative(
   };
 }
 
+/** Gleichstand: Nutzwerte, die sich nur durch Rundungsrauschen unterscheiden */
+const TIE_EPS = 1e-9;
+
 function rankResults(results: AlternativeResult[]): AlternativeResult[] {
   const valid = results.filter((r) => !r.excluded && !r.knockedOut).sort((a, b) => b.total - a.total);
+  /* Wettkampf-Rangfolge: gleiche Nutzwerte teilen den Rang (1, 1, 3) */
   valid.forEach((r, i) => {
-    r.rank = i + 1;
+    r.rank = i > 0 && Math.abs(valid[i - 1].total - r.total) <= TIE_EPS ? valid[i - 1].rank : i + 1;
   });
   results.filter((r) => r.excluded || r.knockedOut).forEach((r) => {
     r.rank = 0;
@@ -198,21 +255,28 @@ function rankResults(results: AlternativeResult[]): AlternativeResult[] {
   return valid;
 }
 
-export function recommendation(ranking: AlternativeResult[]): Recommendation {
+export function recommendation(ranking: AlternativeResult[], all: AlternativeResult[] = ranking): Recommendation {
   if (ranking.length === 0) {
-    return { winnerId: null, runnerUpId: null, confidence: "none", leadPoints: 0, leadRelative: 0 };
+    return { winnerId: null, runnerUpId: null, confidence: "none", leadPoints: 0, leadRelative: 0, tiedIds: [], koLeaderId: null };
   }
   const w = ranking[0];
+  /* Beste per K.-o. ausgeschiedene Alternative, die ohne K.-o. vorne läge */
+  const koLeader = all.filter((x) => x.knockedOut && !x.excluded && x.total > w.total + TIE_EPS).sort((a, b) => b.total - a.total)[0];
+  const koLeaderId = koLeader ? koLeader.alternativeId : null;
   const r = ranking[1];
   if (!r) {
-    return { winnerId: w.alternativeId, runnerUpId: null, confidence: "high", leadPoints: w.percent, leadRelative: 100 };
+    return { winnerId: w.alternativeId, runnerUpId: null, confidence: "single", leadPoints: 0, leadRelative: 0, tiedIds: [w.alternativeId], koLeaderId };
+  }
+  const tiedIds = ranking.filter((x) => Math.abs(x.total - w.total) <= TIE_EPS).map((x) => x.alternativeId);
+  if (tiedIds.length > 1) {
+    return { winnerId: w.alternativeId, runnerUpId: r.alternativeId, confidence: "tie", leadPoints: 0, leadRelative: 0, tiedIds, koLeaderId };
   }
   const leadPoints = w.percent - r.percent;
   const leadRelative = w.percent > 0 ? (leadPoints / w.percent) * 100 : 0;
   let confidence: Confidence = "low";
   if (leadRelative >= 15) confidence = "high";
   else if (leadRelative >= 6) confidence = "medium";
-  return { winnerId: w.alternativeId, runnerUpId: r.alternativeId, confidence, leadPoints, leadRelative };
+  return { winnerId: w.alternativeId, runnerUpId: r.alternativeId, confidence, leadPoints, leadRelative, tiedIds, koLeaderId };
 }
 
 export function computeResults(analysis: Analysis): Results {
@@ -229,7 +293,7 @@ export function computeResults(analysis: Analysis): Results {
     weights,
     alternatives: results,
     ranking,
-    recommendation: recommendation(ranking),
+    recommendation: recommendation(ranking, results),
     consistency,
     completeness: cells > 0 ? rated / cells : 0,
     scale: analysis.settings.scale,
@@ -318,7 +382,7 @@ export function resultsWithWeights(analysis: Analysis, override: Record<Id, numb
   const results = analysis.alternatives.map((a) => scoreAlternative(analysis, a, weights));
   const ranking = rankResults(results);
   const base = computeResults(analysis);
-  return { ...base, weights, alternatives: results, ranking, recommendation: recommendation(ranking) };
+  return { ...base, weights, alternatives: results, ranking, recommendation: recommendation(ranking, results) };
 }
 
 /* =====================================================================
@@ -443,4 +507,25 @@ export function progress(analysis: Analysis): number {
   const steps: Analysis["step"][] = ["decision", "alternatives", "criteria", "weighting", "evaluation"];
   const done = steps.filter((s) => isStepComplete(analysis, s)).length;
   return done / steps.length;
+}
+
+/** Grund des Ausscheidens je Kriterium; bei Messwerten mit Wert und Grenze («Preis: 72 000 CHF, max. 60 000 CHF») */
+export function knockoutReasons(
+  analysis: Analysis,
+  result: AlternativeResult,
+  fmtNumber: (n: number) => string,
+  labels: { unnamed: string; limitMax: string; limitMin: string },
+): string[] {
+  return result.failedCriteria.map((id) => {
+    const c = analysis.criteria.find((x) => x.id === id);
+    if (!c) return labels.unnamed;
+    const name = c.name || labels.unnamed;
+    const v = measuredValue(analysis, result.alternativeId, id);
+    if (!c.measure || v === null || typeof c.measure.limit !== "number") return name;
+    const limit = (c.measure.direction === "lower" ? labels.limitMax : labels.limitMin)
+      .replace("{{limit}}", fmtNumber(c.measure.limit))
+      .replace("{{unit}}", c.measure.unit)
+      .trim();
+    return `${name} (${fmtNumber(v)} ${c.measure.unit}, ${limit})`.replace(/\s+\)/, ")");
+  });
 }

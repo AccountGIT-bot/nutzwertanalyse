@@ -34,6 +34,7 @@ type Action =
   | { type: "removeEvaluator"; id: Id }
   | { type: "setRating"; evaluatorId: Id; altId: Id; critId: Id; score?: number | null; note?: string }
   | { type: "fillRatings"; evaluatorId: Id; score: number }
+  | { type: "setMeasure"; altId: Id; critId: Id; value: number | null }
   | { type: "clearRatings"; evaluatorId: Id }
   | { type: "applyWeights"; weights: Record<Id, number> }
   | { type: "undo" }
@@ -111,7 +112,9 @@ function reduceAnalysis(a: Analysis, action: Action): Analysis {
         delete copy[action.id];
         ratings[ev] = copy;
       }
-      return { ...a, alternatives: a.alternatives.filter((x) => x.id !== action.id), ratings };
+      const measures = { ...(a.measures ?? {}) };
+      delete measures[action.id];
+      return { ...a, alternatives: a.alternatives.filter((x) => x.id !== action.id), ratings, measures };
     }
     case "moveAlternative":
       return { ...a, alternatives: move(a.alternatives, action.id, action.dir) };
@@ -143,7 +146,13 @@ function reduceAnalysis(a: Analysis, action: Action): Analysis {
       for (const [k, v] of Object.entries(a.pairwise)) {
         if (!k.split("|").includes(action.id)) pairwise[k] = v;
       }
-      return { ...a, criteria: a.criteria.filter((x) => x.id !== action.id), ratings, pairwise };
+      const measures: NonNullable<Analysis["measures"]> = {};
+      for (const [alt, byCrit] of Object.entries(a.measures ?? {})) {
+        const copy = { ...byCrit };
+        delete copy[action.id];
+        measures[alt] = copy;
+      }
+      return { ...a, criteria: a.criteria.filter((x) => x.id !== action.id), ratings, pairwise, measures };
     }
     case "moveCriterion":
       return { ...a, criteria: move(a.criteria, action.id, action.dir) };
@@ -207,12 +216,19 @@ function reduceAnalysis(a: Analysis, action: Action): Analysis {
       for (const alt of a.alternatives) {
         const byCrit = { ...(byAlt[alt.id] ?? {}) };
         for (const c of a.criteria) {
+          if (c.measure) continue; // Messwerte werden erfasst, nicht vorbelegt
           const prev = byCrit[c.id];
           if (!prev || typeof prev.score !== "number") byCrit[c.id] = { ...prev, score: action.score };
         }
         byAlt[alt.id] = byCrit;
       }
       return { ...a, ratings: { ...a.ratings, [action.evaluatorId]: byAlt } };
+    }
+    case "setMeasure": {
+      const byCrit = { ...(a.measures?.[action.altId] ?? {}) };
+      if (action.value === null || !Number.isFinite(action.value)) delete byCrit[action.critId];
+      else byCrit[action.critId] = action.value;
+      return { ...a, measures: { ...(a.measures ?? {}), [action.altId]: byCrit } };
     }
     case "clearRatings": {
       const ratings = { ...a.ratings };

@@ -13,6 +13,7 @@ import {
 import { useI18n } from "@/lib/i18n";
 import { useAnalysis } from "@/lib/nwa/store";
 import {
+  knockoutReasons,
   computeResults,
   resultsWithWeights,
   robustness,
@@ -32,7 +33,7 @@ import {
   SensitivityBars,
   seriesColor,
 } from "@/components/charts/Charts";
-import { cn, fmt, formatNumber } from "@/lib/utils";
+import { cn, fmt, formatNumber, listFormat } from "@/lib/utils";
 
 export function StepResults() {
   const { t, tag } = useI18n();
@@ -59,8 +60,23 @@ export function StepResults() {
     analysis.alternatives.find((a) => a.id === id)?.name || t.common.unnamed;
   const critName = (id: string) =>
     analysis.criteria.find((c) => c.id === id)?.name || t.common.unnamed;
+  const koReasons = (r: { alternativeId: string; failedCriteria: string[] }) =>
+    knockoutReasons(
+      analysis,
+      r as Parameters<typeof knockoutReasons>[1],
+      (n) => formatNumber(n, tag, 2),
+      {
+        unnamed: t.common.unnamed,
+        limitMax: t.evaluation.limitMax,
+        limitMin: t.evaluation.limitMin,
+      },
+    ).join(", ");
   const rec = shown.recommendation;
   const winner = rec.winnerId ? altName(rec.winnerId) : null;
+  const isTie = rec.confidence === "tie";
+  const koLeader = rec.koLeaderId
+    ? shown.alternatives.find((x) => x.alternativeId === rec.koLeaderId)
+    : undefined;
   const scale = analysis.settings.scale;
   const validAlts = analysis.alternatives.filter((a) => !a.excluded);
 
@@ -128,12 +144,20 @@ export function StepResults() {
             {winner && rec.winnerId ? (
               <>
                 <p className="mt-1 text-xl font-bold sm:text-2xl">
-                  {fmt(t.results.winnerText, {
-                    name: winner,
-                    percent: formatNumber(shown.ranking[0].percent, tag, 1),
-                  })}
+                  {isTie
+                    ? fmt(t.results.tieText, {
+                        names: listFormat(
+                          rec.tiedIds.map((id) => `«${altName(id)}»`),
+                          tag,
+                        ),
+                        percent: formatNumber(shown.ranking[0].percent, tag, 1),
+                      })
+                    : fmt(t.results.winnerText, {
+                        name: winner,
+                        percent: formatNumber(shown.ranking[0].percent, tag, 1),
+                      })}
                 </p>
-                {rec.runnerUpId ? (
+                {isTie ? null : rec.runnerUpId ? (
                   <p className="mt-1 text-sm text-ink-2">
                     {fmt(t.results.lead_, {
                       points: formatNumber(rec.leadPoints, tag, 1),
@@ -161,11 +185,33 @@ export function StepResults() {
                   )}
                   {t.results.confidence[rec.confidence]}
                 </p>
+                {koLeader && (
+                  <p className="mt-2 flex items-start gap-1.5 text-sm text-ink-2">
+                    <Info
+                      className="mt-0.5 h-4 w-4 shrink-0 text-warn"
+                      aria-hidden
+                    />
+                    <span>
+                      {fmt(t.results.koLeader, {
+                        name: altName(koLeader.alternativeId),
+                        percent: formatNumber(koLeader.percent, tag, 1),
+                        criteria: koReasons(koLeader),
+                      })}
+                    </span>
+                  </p>
+                )}
               </>
             ) : (
-              <p className="mt-1 text-lg font-semibold">
-                {t.results.noAlternatives}
-              </p>
+              <>
+                <p className="mt-1 text-lg font-semibold">
+                  {t.results.noAlternatives}
+                </p>
+                {shown.alternatives.some((r) => r.knockedOut) && (
+                  <p className="mt-1 text-sm text-ink-2">
+                    {t.results.allKnockedOut}
+                  </p>
+                )}
+              </>
             )}
           </div>
         </div>
@@ -213,7 +259,7 @@ export function StepResults() {
                     <strong>{altName(r.alternativeId)}</strong> –{" "}
                     {t.results.knockedOut}:{" "}
                     {fmt(t.results.knockedOutText, {
-                      criteria: r.failedCriteria.map(critName).join(", "),
+                      criteria: koReasons(r),
                     })}
                   </span>
                 </li>
@@ -507,6 +553,12 @@ export function StepResults() {
                             formatNumber(contrib.rawScore, tag, 1)
                           ) : (
                             <span className="text-ink-3">–</span>
+                          )}
+                          {typeof contrib?.value === "number" && (
+                            <span className="block text-[11px] font-normal text-ink-3">
+                              {formatNumber(contrib.value, tag, 2)}{" "}
+                              {c.measure?.unit}
+                            </span>
                           )}
                           <span className="ml-1 text-[11px] text-ink-3">
                             (
