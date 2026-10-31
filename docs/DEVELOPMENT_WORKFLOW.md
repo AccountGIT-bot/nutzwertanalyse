@@ -17,10 +17,38 @@ Ein Push auf `dev` ist keine Freigabe für `main`. Vor **jedem Merge nach `main`
 2. Zusammengehörige Korrekturen lokal fertigstellen. Kleine Folgeanpassungen am selben Ergebnis zusammen erledigen.
 3. Passend zum Risiko prüfen: `npm test`, `npm run lint`, `npm run typecheck`, `npm run build`; für UI-Änderungen zusätzlich eine Darstellungsprüfung im Browser (Desktop und 390 px) sowie die Druckansicht.
 4. Einen verständlich benannten Commit je abgeschlossenem Arbeitspaket erstellen. Einmal pushen, wenn das Paket prüfbar ist, ein expliziter Push gewünscht wird oder eine dauerhafte Übergabe nötig ist. Keine Pushes nach jedem Textsatz, keine leeren Deployment-Commits.
-5. Für eine fertig geprüfte Veröffentlichung eine gemeinsame PR `dev` → `main` erstellen oder aktualisieren. Dazu gehört immer der Versionsschritt: `npm version <neue Nummer> --no-git-tag-version` (aktualisiert `package.json` und `package-lock.json`; die Einstellungsseite und das JSON-LD lesen die Nummer von dort) sowie der gleich nummerierte Eintrag im `CHANGELOG.md`. Versionsnummer und Changelog-Eintrag müssen vor der Freigabe-Anfrage im PR enthalten sein.
-6. Konkrete Freigabe einholen, erst dann mergen. Die Freigabe läuft über die Release-Karte mit drei Knöpfen: «Pull Request» (GitHub-Logo, Link zur PR), «Vercel Preview» (Vercel-Logo, Link zur Vorschau des `dev`-Standes) und «Merge nach main freigeben» mit Doppelklick innerhalb von 10 Sekunden. Die Karte speichert die Freigabe mit Zeitstempel; erst dann wird gemergt. Sie erscheint erst, wenn das Paket vollständig gepusht und geprüft ist und die Release-PR offen ist. Ohne Karte ersatzweise eine Auswahlfrage mit zweiter Bestätigung. Anschliessend Deployment-Status und Produktionsstand prüfen. `dev` wieder mit `main` synchronisieren.
+5. Für eine fertig geprüfte Veröffentlichung eine gemeinsame PR `dev` → `main` erstellen oder aktualisieren. Dazu gehört immer der Versionsschritt nach den Regeln in «Versionierung und Releases»: `npm version <neue Nummer> --no-git-tag-version` (aktualisiert `package.json` und `package-lock.json`; Einstellungsseite, Fusszeile und JSON-LD lesen die Nummer von dort) sowie der gleich nummerierte Eintrag im `CHANGELOG.md`. Versionsnummer und Changelog-Eintrag müssen vor der Freigabe-Anfrage im PR enthalten sein; `npm test` prüft die Übereinstimmung.
+6. Konkrete Freigabe einholen, erst dann mergen. Die Freigabe läuft über die Release-Karte mit drei Knöpfen: «Pull Request» (GitHub-Logo, Link zur PR), «Vercel Preview» (Vercel-Logo, Link zur Vorschau des `dev`-Standes) und «Merge nach main freigeben» mit Doppelklick innerhalb von 10 Sekunden. Die Karte speichert die Freigabe mit Zeitstempel; erst dann wird gemergt. Sie erscheint erst, wenn das Paket vollständig gepusht und geprüft ist und die Release-PR offen ist. Ohne Karte ersatzweise eine Auswahlfrage mit zweiter Bestätigung. Anschliessend den Merge-Commit als `vX.Y.Z` taggen, Deployment-Status und Produktionsstand prüfen, Changelog nachführen. `dev` wieder mit `main` synchronisieren.
 
 Kurze Themenbranches sind für echte parallele Arbeit oder riskante Experimente erlaubt und gehen zuerst nach `dev`. Sie sind keine dauerhafte dritte Ebene.
+
+## Versionierung und Releases
+
+Nutzwertanalyse folgt **Semantic Versioning** (`MAJOR.MINOR.PATCH`). Die Nummer steht an genau einer Stelle, in `package.json`; Einstellungsseite, Fusszeile und JSON-LD lesen sie von dort. Jede Release-PR `dev` → `main` erhöht sie um genau eine Stufe:
+
+| Stufe | Wann | Beispiele |
+| --- | --- | --- |
+| `MAJOR` | Gespeicherte Analysen oder Exporte älterer Fassungen werden nicht mehr gelesen (`schemaVersion`), Produkt grundlegend neu | 1.x → 2.0.0 (Neubau 17.10.2026) |
+| `MINOR` | Neue oder sichtbar veränderte Funktion, neue Seite, neuer Bericht, geänderte Rechtstexte | 2.5.0 Druckbericht, 2.6.0 Mobil-Korrekturen und Diagramme |
+| `PATCH` | Fehlerbehebung, Textkorrektur, Austausch von Medien ohne neue Funktion | 2.2.1 scharfes Video |
+
+Konventionen:
+
+- **Änderungsprotokoll** `CHANGELOG.md`, neueste Fassung zuoberst. Während der Arbeit auf `dev` sammeln Änderungen unter `## Unveröffentlicht`; beim Versionsschritt wird daraus `## X.Y.Z – TT.MM.JJJJ` mit der Zeile `Release-PR: [#n](…)` und nach dem Merge `Freigegeben von Liam am … (Karte/Chat), Merge-Commit \`abc1234\`, Tag \`vX.Y.Z\``. Jeder Eintrag listet die Änderungen aus Sicht der Nutzenden, den Versionsschritt und den Prüfbericht `docs/QA_<datum>.md`.
+- **Tags**: Nach dem Merge trägt der Merge-Commit auf `main` den annotierten Tag `vX.Y.Z` (`git tag -a vX.Y.Z <merge-commit> -m "Release X.Y.Z: <Titel>"`, `git push origin vX.Y.Z`). Tags werden nie verschoben oder gelöscht; eine Korrektur ist ein neues Release. Die Releases 2.0.0 bis 2.5.0 wurden am 31.10.2026 nachträglich auf ihre Merge-Commits getaggt.
+- **Prüfung**: `tests/version.test.ts` läuft mit `npm test` und bricht ab, wenn `package.json`, `package-lock.json` und der oberste Changelog-Eintrag nicht dieselbe Nummer tragen, Einträge nicht streng absteigend sind oder Datum bzw. Release-PR fehlen.
+- **Sichtbarkeit**: Die laufende Version steht auf `/einstellungen` («Version X.Y.Z») und in der Fusszeile jeder Seite (`vX.Y.Z`).
+- **Keine Vorab-Fassungen** (`-beta`, `-rc`) und keine Build-Nummern: `dev` ist die Vorschau, die Vercel-Preview zeigt den jeweils gepushten Stand.
+
+Release-Checkliste (in dieser Reihenfolge):
+
+1. `dev` aktuell, Paket geprüft (`npm test`, `npm run lint`, `npm run typecheck`, `npm run build`, Browserprüfung, Prüfbericht).
+2. Versionsschritt: `npm version X.Y.Z --no-git-tag-version`; Changelog-Eintrag mit Datum und Release-PR-Nummer; Commit «Release X.Y.Z: version step and changelog entry».
+3. Push nach `dev`, Release-PR `dev` → `main` «Release X.Y.Z: <Titel>» mit Zusammenfassung und Prüfungen; Vercel-Preview READY abwarten.
+4. Release-Karte aktualisieren (Version, PR, Head, Preview, Prüfungen) und Freigabe einholen.
+5. Merge als Merge-Commit mit dem PR-Titel, `expectedHeadSha` = freigegebener Head.
+6. Tag `vX.Y.Z` auf den Merge-Commit setzen und pushen.
+7. Changelog nachführen (Freigabe, Merge-Commit, Tag) mit Commit «Record release X.Y.Z in changelog» auf `dev`, Karte auf «gemergt» stellen, Produktions-Deployment prüfen.
 
 ## Verständliche Historie
 

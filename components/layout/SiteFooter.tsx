@@ -4,7 +4,7 @@ import Link from "next/link";
 import { ShieldCheck } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import { useConsent } from "@/lib/consent/ConsentProvider";
-import { site } from "@/lib/site";
+import { appVersion, site } from "@/lib/site";
 
 export function SiteFooter() {
   const { t } = useI18n();
@@ -120,7 +120,7 @@ export function SiteFooter() {
       <div className="border-t border-line">
         <div className="mx-auto flex max-w-7xl flex-col gap-2 px-4 py-4 text-xs text-ink-3 sm:flex-row sm:items-center sm:justify-between sm:px-6">
           <span>
-            © {year} {site.domain}
+            © {year} {site.domain} · <span title="Version">v{appVersion}</span>
           </span>
           <span>{t.settings.privacyShort}</span>
         </div>
