@@ -372,7 +372,7 @@ export const it: Translations = {
     confirmDeleteAll: "Eliminare davvero tutte le analisi? L’operazione è irreversibile.",
     storageOff: "Il salvataggio è disattivato",
     storageOffText:
-      "Non hai acconsentito alla memorizzazione locale. Le analisi restano solo fino alla chiusura della scheda. Esportale come file o attiva la memorizzazione nelle impostazioni dei cookie.",
+      "Non hai acconsentito alla memorizzazione locale. Le analisi restano solo fino alla chiusura della scheda. Esportale come file o attiva la memorizzazione nelle impostazioni privacy.",
     enableStorage: "Attiva memorizzazione",
     imported: "{{count}} analisi importate",
     importFailed: "Impossibile leggere il file. Scegli un file di esportazione valido.",
@@ -663,6 +663,7 @@ export const it: Translations = {
     acceptAll: "Consenti memorizzazione",
     essentialOnly: "Solo necessari",
     settings: "Impostazioni",
+    footerLink: "Impostazioni privacy",
     save: "Salva selezione",
     moreInfo: "Maggiori informazioni",
     categories: {

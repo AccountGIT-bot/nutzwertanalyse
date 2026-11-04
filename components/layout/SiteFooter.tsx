@@ -115,7 +115,7 @@ export function SiteFooter() {
             </li>
             <li>
               <button type="button" onClick={openDialog} className="text-ink-2 underline-offset-2 hover:text-ink hover:underline">
-                {t.consent.settings}
+                {t.consent.footerLink}
               </button>
             </li>
           </ul>

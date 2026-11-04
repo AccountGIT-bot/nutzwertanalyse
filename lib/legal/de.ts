@@ -122,7 +122,7 @@ export const legalDe: LegalSet = {
         },
         {
           type: "p",
-          text: "Ohne Einwilligung in die Kategorie «Funktional» arbeitet die Anwendung ausschliesslich im Arbeitsspeicher; Analysen gehen dann beim Schliessen des Tabs verloren (ein Export als Datei ist weiterhin möglich). Sie können Ihre Einwilligung jederzeit über den Link «Cookie-Einstellungen» im Seitenfuss oder auf der Seite [Einstellungen](/einstellungen) ändern oder widerrufen; dabei werden alle lokal gespeicherten Daten gelöscht. Unabhängig davon können Sie die Daten auch über die Einstellungen Ihres Browsers (Website-Daten löschen) entfernen.",
+          text: "Ohne Einwilligung in die Kategorie «Funktional» arbeitet die Anwendung ausschliesslich im Arbeitsspeicher; Analysen gehen dann beim Schliessen des Tabs verloren (ein Export als Datei ist weiterhin möglich). Sie können Ihre Einwilligung jederzeit über den Knopf «Datenschutz-Einstellungen» im Seitenfuss oder auf der Seite [Einstellungen](/einstellungen) ändern oder widerrufen; dabei werden alle lokal gespeicherten Daten gelöscht. Unabhängig davon können Sie die Daten auch über die Einstellungen Ihres Browsers (Website-Daten löschen) entfernen.",
         },
         { type: "h2", text: "6. Inhalte Ihrer Analysen" },
         {
@@ -214,7 +214,7 @@ export const legalDe: LegalSet = {
         { type: "h2", text: "Einwilligung ändern oder widerrufen" },
         {
           type: "p",
-          text: "Über den Link «Cookie-Einstellungen» im Seitenfuss oder auf der Seite [Einstellungen](/einstellungen) können Sie Ihre Auswahl jederzeit ändern. Beim Widerruf werden sämtliche lokal gespeicherten Daten dieser Website gelöscht. Zusätzlich können Sie die Daten in den Einstellungen Ihres Browsers unter «Website-Daten» entfernen.",
+          text: "Über den Knopf «Datenschutz-Einstellungen» im Seitenfuss oder auf der Seite [Einstellungen](/einstellungen) können Sie Ihre Auswahl jederzeit ändern. Beim Widerruf werden sämtliche lokal gespeicherten Daten dieser Website gelöscht. Zusätzlich können Sie die Daten in den Einstellungen Ihres Browsers unter «Website-Daten» entfernen.",
         },
         { type: "h2", text: "Freigabe-Links" },
         {

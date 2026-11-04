@@ -122,7 +122,7 @@ export const legalEn: LegalSet = {
         },
         {
           type: "p",
-          text: "Without consent to the “Functional” category, the application works exclusively in memory; analyses are then lost when the tab is closed (export as a file remains possible). You can change or withdraw your consent at any time via the “Cookie settings” link in the footer or on the [Settings](/einstellungen) page; all locally stored data is then deleted. Independently of this, you can also remove the data via your browser settings (clear site data).",
+          text: "Without consent to the “Functional” category, the application works exclusively in memory; analyses are then lost when the tab is closed (export as a file remains possible). You can change or withdraw your consent at any time via the “Privacy settings” button in the footer or on the [Settings](/einstellungen) page; all locally stored data is then deleted. Independently of this, you can also remove the data via your browser settings (clear site data).",
         },
         { type: "h2", text: "6. Content of your analyses" },
         {
@@ -214,7 +214,7 @@ export const legalEn: LegalSet = {
         { type: "h2", text: "Change or withdraw consent" },
         {
           type: "p",
-          text: "Via the “Cookie settings” link in the footer or on the [Settings](/einstellungen) page you can change your selection at any time. On withdrawal, all locally stored data of this website is deleted. You can additionally remove the data in your browser settings under “site data”.",
+          text: "Via the “Privacy settings” button in the footer or on the [Settings](/einstellungen) page you can change your selection at any time. On withdrawal, all locally stored data of this website is deleted. You can additionally remove the data in your browser settings under “site data”.",
         },
         { type: "h2", text: "Share links" },
         {

@@ -372,7 +372,7 @@ export const en: Translations = {
     confirmDeleteAll: "Really delete all analyses? This cannot be undone.",
     storageOff: "Saving is disabled",
     storageOffText:
-      "You have not consented to local storage. Analyses are kept only until the tab is closed. Export them as a file or enable storage in the cookie settings.",
+      "You have not consented to local storage. Analyses are kept only until the tab is closed. Export them as a file or enable storage in the privacy settings.",
     enableStorage: "Enable storage",
     imported: "{{count}} analysis/analyses imported",
     importFailed: "The file could not be read. Please choose a valid export file.",
@@ -663,6 +663,7 @@ export const en: Translations = {
     acceptAll: "Allow storage",
     essentialOnly: "Essential only",
     settings: "Settings",
+    footerLink: "Privacy settings",
     save: "Save selection",
     moreInfo: "Learn more",
     categories: {

@@ -38,14 +38,15 @@ export function ConsentBanner() {
                   </Link>
                 </p>
                 {gpc && <p className="mt-2 text-xs text-ink-3">{t.consent.gpc}</p>}
-                <div className="mt-4 flex flex-wrap gap-2">
-                  <button type="button" className="btn btn-primary" onClick={acceptAll}>
+                <div className="mt-4 grid grid-cols-2 gap-2 sm:flex sm:flex-wrap">
+                  {/* Zustimmen und Ablehnen gleichwertig gestaltet, nebeneinander auf derselben Ebene */}
+                  <button type="button" className="btn btn-secondary whitespace-normal" onClick={acceptAll}>
                     {t.consent.acceptAll}
                   </button>
-                  <button type="button" className="btn btn-secondary" onClick={essentialOnly}>
+                  <button type="button" className="btn btn-secondary whitespace-normal" onClick={essentialOnly}>
                     {t.consent.essentialOnly}
                   </button>
-                  <button type="button" className="btn btn-ghost" onClick={openDialog}>
+                  <button type="button" className="btn btn-ghost col-span-2 sm:col-span-1" onClick={openDialog}>
                     {t.consent.settings}
                   </button>
                 </div>

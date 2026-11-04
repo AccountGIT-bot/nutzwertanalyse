@@ -21,6 +21,7 @@ let armedAt: number | null = null;
 let shownThisSession = false;
 
 function alreadyDismissed(): boolean {
+  if (!readConsent()?.functional) return false;
   try {
     return window.localStorage.getItem(THEME_HINT_KEY) === "1";
   } catch {

@@ -386,7 +386,7 @@ export const de = {
     confirmDeleteAll: "Wirklich alle Analysen löschen? Das kann nicht rückgängig gemacht werden.",
     storageOff: "Speichern ist deaktiviert",
     storageOffText:
-      "Du hast der lokalen Speicherung nicht zugestimmt. Analysen bleiben nur bis zum Schliessen des Tabs erhalten. Exportiere sie als Datei oder aktiviere die Speicherung in den Cookie-Einstellungen.",
+      "Du hast der lokalen Speicherung nicht zugestimmt. Analysen bleiben nur bis zum Schliessen des Tabs erhalten. Exportiere sie als Datei oder aktiviere die Speicherung in den Datenschutz-Einstellungen.",
     enableStorage: "Speicherung aktivieren",
     imported: "{{count}} Analyse(n) importiert",
     importFailed: "Datei konnte nicht gelesen werden. Bitte eine gültige Export-Datei wählen.",
@@ -677,6 +677,7 @@ export const de = {
     acceptAll: "Speicherung erlauben",
     essentialOnly: "Nur notwendige",
     settings: "Einstellungen",
+    footerLink: "Datenschutz-Einstellungen",
     save: "Auswahl speichern",
     moreInfo: "Mehr erfahren",
     categories: {

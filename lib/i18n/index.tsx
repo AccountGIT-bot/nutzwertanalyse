@@ -13,7 +13,8 @@ export const translations: Record<Locale, Translations> = { de, en, fr, it };
 
 const localeStore = createClientStore<Locale>(() => {
   try {
-    const saved = window.localStorage.getItem(LOCALE_KEY);
+    /* Gespeicherte Sprache nur mit gültiger Einwilligung «Funktional» verwenden */
+    const saved = readConsent()?.functional ? window.localStorage.getItem(LOCALE_KEY) : null;
     if (isLocale(saved)) return saved;
   } catch {
     /* ignore */
