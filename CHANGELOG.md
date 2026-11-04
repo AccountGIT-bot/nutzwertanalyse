@@ -4,7 +4,7 @@ Alle freigegebenen Veröffentlichungen von Nutzwertanalyse, neueste zuoberst. En
 
 ## 2.9.0 – 04.11.2026
 
-Release-PR: [#41](https://github.com/AccountGIT-bot/nutzwertanalyse/pull/41). Freigabe durch Liam ausstehend.
+Release-PR: [#41](https://github.com/AccountGIT-bot/nutzwertanalyse/pull/41). Freigegeben von Liam am 04.11.2026 im Chat («mergen auf main mit dazugehörigem Release und Changelog»), Merge-Commit `7c11255`, Tag `v2.9.0`, GitHub-Release «Nutzwertanalyse 2.9.0».
 
 - Datenschutz-Prüfung (Schweiz und EU) mit Bestandsaufnahme aller Speichertechnologien und 35 automatisierten Browser-Szenarien: keine Cookies, keine Drittanbieter, Speicherung im Browser nur mit Einwilligung «Funktional» – bestätigt und dokumentiert in `docs/QA_2026-11-04.md`.
 - Gespeicherte Design-, Sprach- und Hinweis-Einstellungen werden nur noch mit gültiger Einwilligung gelesen, auch im Skript vor dem ersten Seitenaufbau. Bisher wirkten sie nach einer neuen Einwilligungsversion weiter.

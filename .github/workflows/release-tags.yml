@@ -1,5 +1,6 @@
-# Setzt nach jedem Merge nach main die Tags vX.Y.Z auf die im CHANGELOG genannten Merge-Commits
-# (scripts/release-tags.mjs). Läuft auch von Hand über «Run workflow». Kein Secret nötig: GITHUB_TOKEN genügt.
+# Setzt nach jedem Merge nach main die Tags vX.Y.Z auf die im CHANGELOG genannten Merge-Commits und legt
+# zu jedem Tag ein GitHub-Release mit dem Changelog-Eintrag an (scripts/release-tags.mjs). Läuft auch von
+# Hand über «Run workflow». Kein Secret nötig: GITHUB_TOKEN genügt.
 name: Release-Tags
 
 on:
@@ -21,5 +22,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-      - name: Tags anlegen und pushen
-        run: node scripts/release-tags.mjs --push
+      - name: Tags und GitHub-Releases anlegen
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node scripts/release-tags.mjs --push --releases
