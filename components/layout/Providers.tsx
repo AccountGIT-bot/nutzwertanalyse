@@ -14,8 +14,9 @@ export function Providers({ children }: { children: ReactNode }) {
       <ConsentProvider>
         <I18nProvider>
           <ToastProvider>
-            {children}
+            {/* Im DOM vor dem Seiteninhalt, damit der Banner per Tastatur früh erreichbar ist (optisch bleibt er unten) */}
             <ConsentBanner />
+            {children}
             <ThemeHint />
           </ToastProvider>
         </I18nProvider>

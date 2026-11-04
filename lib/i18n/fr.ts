@@ -372,7 +372,7 @@ export const fr: Translations = {
     confirmDeleteAll: "Vraiment supprimer toutes les analyses ? Cette action est irréversible.",
     storageOff: "L’enregistrement est désactivé",
     storageOffText:
-      "Vous n’avez pas consenti au stockage local. Les analyses ne sont conservées que jusqu’à la fermeture de l’onglet. Exportez-les en fichier ou activez le stockage dans les paramètres des cookies.",
+      "Vous n’avez pas consenti au stockage local. Les analyses ne sont conservées que jusqu’à la fermeture de l’onglet. Exportez-les en fichier ou activez le stockage dans les paramètres de confidentialité.",
     enableStorage: "Activer le stockage",
     imported: "{{count}} analyse(s) importée(s)",
     importFailed: "Le fichier n’a pas pu être lu. Veuillez choisir un fichier d’export valide.",
@@ -663,6 +663,7 @@ export const fr: Translations = {
     acceptAll: "Autoriser le stockage",
     essentialOnly: "Nécessaire uniquement",
     settings: "Paramètres",
+    footerLink: "Paramètres de confidentialité",
     save: "Enregistrer la sélection",
     moreInfo: "En savoir plus",
     categories: {

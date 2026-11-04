@@ -2,9 +2,19 @@
 
 Alle freigegebenen Veröffentlichungen von Nutzwertanalyse, neueste zuoberst. Entwicklung auf `dev`, Freigabe nach `main` nur mit ausdrücklicher Zustimmung von Liam. Versionsnummern folgen Semantic Versioning (`MAJOR.MINOR.PATCH`), jede Fassung nennt Datum, Release-PR, Freigabe, Merge-Commit und Tag `vX.Y.Z`; Regeln und Checkliste in `docs/DEVELOPMENT_WORKFLOW.md`, Abschnitt «Versionierung und Releases». `tests/version.test.ts` prüft, dass `package.json` und der oberste Eintrag dieselbe Nummer tragen.
 
+## 2.9.0 – 04.11.2026
+
+Release-PR: [#41](https://github.com/AccountGIT-bot/nutzwertanalyse/pull/41). Freigabe durch Liam ausstehend.
+
+- Datenschutz-Prüfung (Schweiz und EU) mit Bestandsaufnahme aller Speichertechnologien und 35 automatisierten Browser-Szenarien: keine Cookies, keine Drittanbieter, Speicherung im Browser nur mit Einwilligung «Funktional» – bestätigt und dokumentiert in `docs/QA_2026-11-04.md`.
+- Gespeicherte Design-, Sprach- und Hinweis-Einstellungen werden nur noch mit gültiger Einwilligung gelesen, auch im Skript vor dem ersten Seitenaufbau. Bisher wirkten sie nach einer neuen Einwilligungsversion weiter.
+- Banner: «Speicherung erlauben» und «Nur notwendige» gleichwertig gestaltet und auf dem Handy nebeneinander; Banner per Tastatur nach drei Tab-Schritten statt am Seitenende erreichbar.
+- Fusszeile: eindeutiger Knopf «Datenschutz-Einstellungen» statt «Einstellungen»; Seite «Cookies & Speicher», Datenschutzerklärung und Hinweistexte entsprechend angepasst (vier Sprachen bzw. DE/EN), `legalVersion` 2026-11-04.
+- 3 neue Unit-Tests (`tests/consent.test.ts`). `package.json` von 2.8.0 auf 2.9.0.
+
 ## 2.8.0 – 31.10.2026
 
-Release-PR: [#40](https://github.com/AccountGIT-bot/nutzwertanalyse/pull/40). Freigabe durch Liam ausstehend.
+Release-PR: [#40](https://github.com/AccountGIT-bot/nutzwertanalyse/pull/40). Freigegeben von Liam am 31.10.2026 über die Release-Karte (Doppelklick, 17:41 UTC) und im Chat («Freigabe erteilt, merge nach main»), Merge-Commit `03953a7`, Tag `v2.8.0`.
 
 - Messwerte: Kriterien wie Preis, Lieferzeit, Rendite oder Miete lassen sich als echte Zahl je Alternative erfassen (Einheit, «weniger ist besser» / «mehr ist besser», Eingabe auch als 100'000 oder 12,5). Die App rechnet sie in Punkte um – standardmässig im Verhältnis zum besten Wert, optional zwischen eigenen Grenzen. Ein Budget oder eine Mindestrendite wird direkt als K.-o.-Grenze gesetzt. Werte erscheinen in Bewertung, Matrix, Bericht und CSV.
 - Vorlagen: 16 Kriterien sind als Messwert vorbereitet, dazu je drei fallspezifische Tipps für alle zehn Anwendungsfälle (z. B. unabhängige Bewertung bei Personalauswahl, gleiche Haltedauer bei Kauf und Leasing).

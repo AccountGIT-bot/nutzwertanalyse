@@ -1,7 +1,8 @@
 "use client";
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, useSyncExternalStore, type ReactNode } from "react";
-import { readConsent } from "@/lib/consent/consent";
+import { CONSENT_KEY, readConsent } from "@/lib/consent/consent";
+import { site } from "@/lib/site";
 import { createClientStore } from "@/lib/clientStore";
 
 export type ThemePref = "light" | "dark" | "system";
@@ -33,6 +34,8 @@ interface ThemeValue {
 const ThemeContext = createContext<ThemeValue | null>(null);
 
 function readStoredPref(): ThemePref | null {
+  /* Gespeicherte Wahl nur mit gültiger Einwilligung «Funktional» verwenden (z. B. nicht nach einer neuen Einwilligungsversion) */
+  if (!readConsent()?.functional) return null;
   try {
     const saved = window.localStorage.getItem(THEME_KEY);
     if (saved === "light" || saved === "dark" || saved === "system") return saved;
@@ -66,7 +69,7 @@ function applyTheme(pref: ThemePref) {
  * Inline-Skript, das vor dem ersten Paint läuft, um ein Aufblitzen des
  * falschen Designs zu vermeiden. Ohne gespeicherte Wahl bleibt die Seite hell.
  */
-export const themeInitScript = `(function(){var t=null;try{t=localStorage.getItem(${JSON.stringify(THEME_KEY)})}catch(e){}var r=document.documentElement;if(t==="dark"){r.setAttribute("data-theme","dark")}else if(t==="system"){r.removeAttribute("data-theme")}else{r.setAttribute("data-theme","light")}})();`;
+export const themeInitScript = `(function(){var t=null;try{var c=JSON.parse(localStorage.getItem(${JSON.stringify(CONSENT_KEY)})||"null");if(c&&c.version===${site.consentVersion}&&c.functional===true){t=localStorage.getItem(${JSON.stringify(THEME_KEY)})}}catch(e){}var r=document.documentElement;if(t==="dark"){r.setAttribute("data-theme","dark")}else if(t==="system"){r.removeAttribute("data-theme")}else{r.setAttribute("data-theme","light")}})();`;
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
   const pref = useSyncExternalStore(prefStore.subscribe, prefStore.get, prefStore.getServer);
